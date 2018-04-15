@@ -98,7 +98,7 @@ class PyHttpServer(Thread):
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     </head>
     <body>
-        <h3><img alt="Logo OAuth2" src="./OAuth2OOo/OAuth2.png" /> OAuth2OOo</h3>
+        <h3><img alt="Logo OAuth2" src="https://github.com/prrvchr/OAuth2OOo/blob/master/OAuth2OOo/OAuth2OOo/OAuth2.png" /> OAuth2OOo</h3>
         <h4>%s</h4>
     </body>
 </html>''' % message)

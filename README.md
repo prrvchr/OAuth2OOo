@@ -1,11 +1,11 @@
 # OAuth2OOo v.0.0.1
 
-## OAuth2.0 implementation for LibreOffice.
+## OAuth2.0 implementation for LibreOffice / OpenOffice.
 
 ![OAuth2OOo screenshot](OAuth2OOo.png)
 
 
-The OAuth2.0 protocol allows the connection to servers, after acceptance of the connection authorization, by exchange of tokens.
+The OAuth2.0 protocol allows the connection to resource servers, after acceptance of the connection authorization, by exchange of tokens.
 
 The revocation takes place in the management of: [Application associated with your Google account](https://myaccount.google.com/security?utm_source=OGB#connectedapps)
 
