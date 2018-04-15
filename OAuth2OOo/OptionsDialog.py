@@ -92,7 +92,6 @@ class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandle
         dialog.getControl("NumericField1").setValue(self.service.Setting.RequestTimeout)
         dialog.getControl("NumericField2").setValue(self.service.Setting.HandlerTimeout)
         dialog.getControl("ComboBox1").Model.StringItemList = self.service.Setting.UrlList
-        dialog.getControl("TextField1").setText("prrvchr@gmail.com")
         
     def _saveSetting(self, dialog):
         self.service.Setting.RequestTimeout = int(dialog.getControl("NumericField1").getValue())
