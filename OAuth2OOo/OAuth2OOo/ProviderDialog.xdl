@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="ProviderDialog" dlg:left="0" dlg:top="0" dlg:width="250" dlg:height="140" dlg:help-text="&amp;ProviderDialog.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;ProviderDialog.Title">
+ <dlg:bulletinboard>
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="0" dlg:left="5" dlg:top="5" dlg:width="240" dlg:height="110" dlg:help-text="&amp;ProviderDialog.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;ProviderDialog.FrameControl1.Label"/>
+  </dlg:titledbox>
+  <dlg:text dlg:id="Label1" dlg:tab-index="1" dlg:left="10" dlg:top="15" dlg:width="55" dlg:height="14" dlg:help-text="&amp;ProviderDialog.Label1.HelpText" dlg:value="&amp;ProviderDialog.Label1.Label" dlg:valign="center" dlg:tabstop="false"/>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="2" dlg:left="70" dlg:top="15" dlg:width="170" dlg:height="14" dlg:help-text="&amp;ProviderDialog.TextField1.HelpText" dlg:value="&amp;ProviderDialog.TextField1.Text"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="3" dlg:left="10" dlg:top="35" dlg:width="55" dlg:height="14" dlg:help-text="&amp;ProviderDialog.Label2.HelpText" dlg:value="&amp;ProviderDialog.Label2.Label" dlg:valign="center" dlg:tabstop="false"/>
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="4" dlg:left="70" dlg:top="35" dlg:width="170" dlg:height="14" dlg:help-text="&amp;ProviderDialog.TextField2.HelpText" dlg:value="&amp;ProviderDialog.TextField2.Text"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="5" dlg:left="10" dlg:top="55" dlg:width="55" dlg:height="14" dlg:help-text="&amp;ProviderDialog.Label3.HelpText" dlg:value="&amp;ProviderDialog.Label3.Label" dlg:valign="center" dlg:tabstop="false"/>
+  <dlg:textfield dlg:id="TextField3" dlg:tab-index="6" dlg:left="70" dlg:top="55" dlg:width="170" dlg:height="14" dlg:help-text="&amp;ProviderDialog.TextField3.HelpText" dlg:value="&amp;ProviderDialog.TextField3.Text"/>
+  <dlg:radiogroup>
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="7" dlg:left="10" dlg:top="75" dlg:width="110" dlg:height="14" dlg:tag="EnablePkce" dlg:help-text="&amp;ProviderDialog.OptionButton1.HelpText" dlg:value="&amp;ProviderDialog.OptionButton1.Label" dlg:valign="center">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:Changed" script:language="UNO"/>
+   </dlg:radio>
+   <dlg:radio dlg:id="OptionButton0" dlg:tab-index="8" dlg:left="130" dlg:top="75" dlg:width="110" dlg:height="14" dlg:tag="DisablePkce" dlg:help-text="&amp;ProviderDialog.OptionButton0.HelpText" dlg:value="&amp;ProviderDialog.OptionButton0.Label" dlg:valign="center">
+    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:Changed" script:language="UNO"/>
+   </dlg:radio>
+   </dlg:radiogroup>
+  <dlg:text dlg:id="Label4" dlg:tab-index="9" dlg:left="10" dlg:top="95" dlg:width="55" dlg:height="14" dlg:help-text="&amp;ProviderDialog.Label4.HelpText" dlg:value="&amp;ProviderDialog.Label4.Label" dlg:valign="center" dlg:tabstop="false"/>
+  <dlg:textfield dlg:id="TextField4" dlg:tab-index="10" dlg:disabled="true" dlg:left="70" dlg:top="95" dlg:width="170" dlg:height="14" dlg:help-text="&amp;ProviderDialog.TextField4.HelpText" dlg:value="&amp;ProviderDialog.TextField4.Text" dlg:echochar="*"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="11" dlg:left="130" dlg:top="120" dlg:width="55" dlg:height="15" dlg:help-text="&amp;ProviderDialog.Cancel.HelpText" dlg:value="&amp;ProviderDialog.Cancel.Label" dlg:button-type="cancel"/>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="12" dlg:left="190" dlg:top="120" dlg:width="55" dlg:height="15" dlg:help-text="&amp;ProviderDialog.Ok.HelpText" dlg:default="true" dlg:value="&amp;ProviderDialog.Ok.Label" dlg:button-type="ok"/>
+ </dlg:bulletinboard>
+</dlg:window>
