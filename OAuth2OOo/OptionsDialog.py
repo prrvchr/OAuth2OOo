@@ -18,8 +18,7 @@ g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.OptionsDialog"
 class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandler):
     def __init__(self, ctx):
         self.ctx = ctx
-        identifier = "com.gmail.prrvchr.extensions.OAuth2OOo"
-        self.stringResource = unotools.getStringResource(self.ctx, identifier, "OAuth2OOo", file="OptionsDialog")
+        self.stringResource = unotools.getStringResource(self.ctx, None, "OptionsDialog")
         self.service = unotools.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service")
 
     # XContainerWindowEventHandler

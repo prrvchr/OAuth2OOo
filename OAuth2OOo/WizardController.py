@@ -105,7 +105,7 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         self.advanceTo = True
         self.locale = unotools.getCurrentLocale(self.ctx)
         identifier = "com.gmail.prrvchr.extensions.OAuth2OOo"
-        self.stringResource = unotools.getStringResource(self.ctx, identifier, "OAuth2OOo", self.locale)
+        self.stringResource = unotools.getStringResource(self.ctx, self.locale)
         self._Wizard = unotools.createService(self.ctx, "com.sun.star.ui.dialogs.Wizard")
         arguments = ((uno.Any("[][]short", (self.Paths)), self), )
         uno.invoke(self._Wizard, "initialize", arguments)
@@ -248,9 +248,9 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
 #                next = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.NEXT")
 #                self.Wizard.enableButton(next, self.CheckUrl)
             self.Wizard.updateTravelUI()
-#            if self.advanceTo:
-#                self.advanceTo = False
-#                self.Wizard.advanceTo(2)
+            if self.advanceTo:
+                self.advanceTo = False
+                self.Wizard.advanceTo(2)
         except Exception as e:
             print("PyWizardController.onActivatePage error: %s" % e)
             traceback.print_exc()

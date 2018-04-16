@@ -76,8 +76,7 @@ class PyHttpServer(Thread):
         Thread.__init__(self)
         self.ctx = ctx
         self.controller = controller
-        identifier = "com.gmail.prrvchr.extensions.OAuth2OOo"
-        resource = unotools.getStringResource(self.ctx, identifier, "OAuth2OOo")
+        resource = unotools.getStringResource(self.ctx)
         self.success = resource.resolveString("HttpCodeHandler.Message.Success")
         self.error = resource.resolveString("HttpCodeHandler.Message.Error")
         self.lock = RLock()
@@ -89,20 +88,18 @@ class PyHttpServer(Thread):
         connection = self.acceptor.accept("socket,host=%s,port=%s,tcpNoDelay=1" % (address, port))
         with self.lock:
             if connection:
-                result = self._getResult(self._getResults(self._getParameters(connection)))
-                message = self.success.encode("utf-8") if result else self.error.encode("utf-8")
-                body = uno.ByteSequence(b'''\
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    </head>
-    <body>
-        <h3><img alt="Logo OAuth2" src="https://github.com/prrvchr/OAuth2OOo/releases/download/v0.0.1/OAuth2.png" /> OAuth2OOo</h3>
-        <h4>%s</h4>
-    </body>
-</html>''' % message)
-                length = str(len(body)).encode()
+                result = self._getResult(connection)
+                basename = unotools.getResourceLocation(self.ctx)
+                basename += "/OAuth2Success_%s.html" if result else "/OAuth2Error_%s.html"
+                locale = unotools.getCurrentLocale(self.ctx)
+                fileservice = self.ctx.ServiceManager.createInstance("com.sun.star.ucb.SimpleFileAccess")
+                if fileservice.exists(basename % locale.Language):
+                    filename = basename % locale.Language
+                else:
+                    filename = basename % "en"
+                inputstream = fileservice.openFileRead(filename)
+                length, body = inputstream.readBytes(None, fileservice.getSize(filename))
+                inputstream.closeInput()
                 header = uno.ByteSequence(b'''\
 HTTP/1.1 200 OK
 Content-Length: %s
@@ -180,7 +177,9 @@ Connection: Closed
                 results[name] = value
         return results
 
-    def _getResult(self, results):
+    def _getResult(self, connection):
+        parameters = self._getParameters(connection)
+        results = self._getResults(parameters)
         result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
         if "code" in results and "state" in results:
             if results["state"] == self.controller.State:

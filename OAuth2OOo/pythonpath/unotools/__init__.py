@@ -11,10 +11,10 @@ from com.sun.star.task import XInteractionHandler
 import binascii
 
 
-def getResourceLocation(ctx, identifier, path):
+def getResourceLocation(ctx, path="OAuth2OOo"):
+    identifier = "com.gmail.prrvchr.extensions.OAuth2OOo"
     service = "/singletons/com.sun.star.deployment.PackageInformationProvider"
     provider = ctx.getValueByName(service)
-    identifier = "com.gmail.prrvchr.extensions.OAuth2OOo"
     return "%s/%s" % (provider.getPackageLocation(identifier), path)
 
 def getConfiguration(ctx, nodepath, update=False):
@@ -36,11 +36,12 @@ def getCurrentLocale(ctx):
         locale.Country = service.getLanguageCountryInfo(locale).Country
     return locale
 
-def getStringResource(ctx, identifier, path, locale=None, file="DialogStrings"):
+def getStringResource(ctx, locale=None, filename="DialogStrings"):
     service = "com.sun.star.resource.StringResourceWithLocation"
-    location = getResourceLocation(ctx, identifier, path)
-    locale = getCurrentLocale(ctx) if locale is None else locale
-    arguments = (location, True, locale, file, "", PyInteractionHandler())
+    location = getResourceLocation(ctx)
+    if locale is None:
+        locale = getCurrentLocale(ctx)
+    arguments = (location, True, locale, filename, "", PyInteractionHandler())
     return ctx.ServiceManager.createInstanceWithArgumentsAndContext(service, arguments, ctx)
 
 def generateUuid():
