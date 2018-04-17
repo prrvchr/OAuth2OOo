@@ -30,71 +30,19 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         struct = "com.sun.star.beans.Property"
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["ResourceUrl"] =        uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "ResourceUrl",
-                                                                    0,
-                                                                    uno.getTypeByName("string"),
-                                                                    transient)
-        self.properties["UserName"] =           uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "UserName",
-                                                                    1,
-                                                                    uno.getTypeByName("string"),
-                                                                    transient)
-        self.properties["ActivePath"] =         uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "ActivePath",
-                                                                    2,
-                                                                    uno.getTypeByName("short"),
-                                                                    readonly)
-        self.properties["AuthorizationCode"] =  uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "AuthorizationCode",
-                                                                    3,
-                                                                    uno.getTypeByName("string"),
-                                                                    transient)
-        self.properties["AuthorizationUrl"] =   uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "AuthorizationUrl",
-                                                                    4,
-                                                                    uno.getTypeByName("string"),
-                                                                    readonly)
-        self.properties["AuthorizationStr"] =   uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "AuthorizationStr",
-                                                                    5,
-                                                                    uno.getTypeByName("string"),
-                                                                    readonly)
-        self.properties["CheckUrl"] =           uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "CheckUrl",
-                                                                    6,
-                                                                    uno.getTypeByName("boolean"),
-                                                                    readonly)
-        self.properties["CodeVerifier"] =       uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "CodeVerifier",
-                                                                    7,
-                                                                    uno.getTypeByName("string"),
-                                                                    readonly)
-        self.properties["Configuration"] =      uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "Configuration",
-                                                                    8,
-                                                                    uno.getTypeByName("com.sun.star.uno.XInterface"),
-                                                                    readonly)
-        self.properties["Handler"] =            uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "Handler",
-                                                                    9,
-                                                                    uno.getTypeByName("any"),
-                                                                    transient)
-        self.properties["Paths"] =              uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "Paths",
-                                                                    10,
-                                                                    uno.getTypeByName("[][]short"),
-                                                                    readonly)
-        self.properties["State"] =              uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "State",
-                                                                    11,
-                                                                    uno.getTypeByName("string"),
-                                                                    readonly)
-        self.properties["Wizard"] =             uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "Wizard",
-                                                                    12,
-                                                                    uno.getTypeByName("com.sun.star.ui.dialogs.XWizard"),
-                                                                    readonly)
+        self.properties["ResourceUrl"] = unotools.getProperty("ResourceUrl", "string", transient)
+        self.properties["UserName"] = unotools.getProperty("UserName", "string", transient)
+        self.properties["ActivePath"] = unotools.getProperty("ActivePath", "short", readonly)
+        self.properties["AuthorizationCode"] = unotools.getProperty("AuthorizationCode", "string", transient)
+        self.properties["AuthorizationUrl"] = unotools.getProperty("AuthorizationUrl", "string", readonly)
+        self.properties["AuthorizationStr"] = unotools.getProperty("AuthorizationStr", "string", readonly)
+        self.properties["CheckUrl"] = unotools.getProperty("CheckUrl", "boolean", readonly)
+        self.properties["CodeVerifier"] = unotools.getProperty("CodeVerifier", "string", readonly)
+        self.properties["Configuration"] = unotools.getProperty("Configuration", "com.sun.star.uno.XInterface", readonly)
+        self.properties["Handler"] = unotools.getProperty("Handler", "any", transient)
+        self.properties["Paths"] = unotools.getProperty("Paths", "[][]short", readonly)
+        self.properties["State"] = unotools.getProperty("State", "string", readonly)
+        self.properties["Wizard"] = unotools.getProperty("Wizard", "com.sun.star.ui.dialogs.XWizard", readonly)
         self._UserName = ""
         self._AuthorizationCode = ""
         self._Configuration = unotools.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.ConfigurationWriter")

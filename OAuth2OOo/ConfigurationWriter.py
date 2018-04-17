@@ -19,22 +19,9 @@ class PyConfigurationWriter(unohelper.Base, PyServiceInfo, PyPropertySet, XTrans
         self.ctx = ctx
         self.properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["Url"] =            uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "Url",
-                                                                0,
-                                                                uno.getTypeByName("com.sun.star.uno.XInterface"),
-                                                                readonly)
-        self.properties["UrlList"] =        uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "UrlList",
-                                                                1,
-                                                                uno.getTypeByName("[]string"),
-                                                                readonly)
-        self.properties["HandlerTimeout"] = uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "HandlerTimeout",
-                                                                2,
-                                                                uno.getTypeByName("short"),
-                                                                readonly)
+        self.properties["Url"] = unotools.getProperty("Url", "com.sun.star.uno.XInterface", readonly)
+        self.properties["UrlList"] = unotools.getProperty("UrlList", "[]string", readonly)
+        self.properties["HandlerTimeout"] = unotools.getProperty("HandlerTimeout", "short", readonly)
         self.configuration = unotools.getConfiguration(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo", True)
         self._Url = PyUrlWriter(self.configuration)
         self._HandlerTimeout = None
@@ -70,46 +57,14 @@ class PyUrlWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         self.properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["Id"] =             uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "Id",
-                                                                0,
-                                                                uno.getTypeByName("string"),
-                                                                transient)
-        self.properties["Provider"] =       uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "Provider",
-                                                                1,
-                                                                uno.getTypeByName("com.sun.star.uno.XInterface"),
-                                                                readonly)
-        self.properties["ProviderName"] =   uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "ProviderName",
-                                                                2,
-                                                                uno.getTypeByName("string"),
-                                                                transient)
-        self.properties["ProviderList"] =   uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "ProviderList",
-                                                                3,
-                                                                uno.getTypeByName("[]string"),
-                                                                readonly)
-        self.properties["ScopeName"] =      uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "ScopeName",
-                                                                4,
-                                                                uno.getTypeByName("string"),
-                                                                transient)
-        self.properties["ScopeList"] =      uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "ScopeList",
-                                                                5,
-                                                                uno.getTypeByName("[]string"),
-                                                                readonly)
-        self.properties["ScopesList"] =     uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "ScopesList",
-                                                                6,
-                                                                uno.getTypeByName("[]string"),
-                                                                readonly)
-        self.properties["State"] =          uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "State",
-                                                                7,
-                                                                uno.getTypeByName("short"),
-                                                                transient)
+        self.properties["Id"] = unotools.getProperty("Id", "string", transient)
+        self.properties["Provider"] = unotools.getProperty("Provider", "com.sun.star.uno.XInterface", readonly)
+        self.properties["ProviderName"] = unotools.getProperty("ProviderName", "string", transient)
+        self.properties["ProviderList"] = unotools.getProperty("ProviderList", "[]string", readonly)
+        self.properties["ScopeName"] = unotools.getProperty("ScopeName", "string", transient)
+        self.properties["ScopeList"] = unotools.getProperty("ScopeList", "[]string", readonly)
+        self.properties["ScopesList"] = unotools.getProperty("ScopesList", "[]string", readonly)
+        self.properties["State"] = unotools.getProperty("State", "short", transient)
         self._Provider = PyProviderWriter(self.configuration)
         self._Id = ""
         self.Urls = {}
@@ -233,61 +188,17 @@ class PyProviderWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         self.properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["Scope"] =              uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "Scope",
-                                                                    0,
-                                                                    uno.getTypeByName("com.sun.star.uno.XInterface"),
-                                                                    readonly)
-        self.properties["ClientId"] =           uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "ClientId",
-                                                                    1,
-                                                                    uno.getTypeByName("string"),
-                                                                    transient)
-        self.properties["ClientSecret"] =       uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "ClientSecret",
-                                                                    2,
-                                                                    uno.getTypeByName("string"),
-                                                                    transient)
-        self.properties["AuthorizationUrl"] =   uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "AuthorizationUrl",
-                                                                    3,
-                                                                    uno.getTypeByName("string"),
-                                                                    transient)
-        self.properties["TokenUrl"] =           uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "TokenUrl",
-                                                                    4,
-                                                                    uno.getTypeByName("string"),
-                                                                    transient)
-        self.properties["CodeChallenge"] =      uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "CodeChallenge",
-                                                                    5,
-                                                                    uno.getTypeByName("boolean"),
-                                                                    transient)
-        self.properties["HttpHandler"] =        uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "HttpHandler",
-                                                                    6,
-                                                                    uno.getTypeByName("boolean"),
-                                                                    transient)
-        self.properties["RedirectAddress"] =    uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "RedirectAddress",
-                                                                    7,
-                                                                    uno.getTypeByName("string"),
-                                                                    transient)
-        self.properties["RedirectPort"] =       uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "RedirectPort",
-                                                                    8,
-                                                                    uno.getTypeByName("short"),
-                                                                    transient)
-        self.properties["RedirectUri"] =        uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "RedirectUri",
-                                                                    9,
-                                                                    uno.getTypeByName("string"),
-                                                                    readonly)
-        self.properties["State"] =              uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                    "State",
-                                                                    10,
-                                                                    uno.getTypeByName("short"),
-                                                                    transient)
+        self.properties["Scope"] = unotools.getProperty("Scope", "com.sun.star.uno.XInterface", readonly)
+        self.properties["ClientId"] = unotools.getProperty("ClientId", "string", transient)
+        self.properties["ClientSecret"] = unotools.getProperty("ClientSecret", "string", transient)
+        self.properties["AuthorizationUrl"] = unotools.getProperty("AuthorizationUrl", "string", transient)
+        self.properties["TokenUrl"] = unotools.getProperty("TokenUrl", "string", transient)
+        self.properties["CodeChallenge"] = unotools.getProperty("CodeChallenge", "boolean", transient)
+        self.properties["HttpHandler"] = unotools.getProperty("HttpHandler", "boolean", transient)
+        self.properties["RedirectAddress"] = unotools.getProperty("RedirectAddress", "string", transient)
+        self.properties["RedirectPort"] = unotools.getProperty("RedirectPort", "short", transient)
+        self.properties["RedirectUri"] = unotools.getProperty("RedirectUri", "string", readonly)
+        self.properties["State"] = unotools.getProperty("State", "short", transient)
         self.Id = ""
         self.redirect = "urn:ietf:wg:oauth:2.0:oob"
         self.Providers = {}
@@ -446,26 +357,10 @@ class PyScopeWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         self.properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["Id"] =             uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "Id",
-                                                                0,
-                                                                uno.getTypeByName("string"),
-                                                                transient)
-        self.properties["Value"] =          uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "Value",
-                                                                1,
-                                                                uno.getTypeByName("string"),
-                                                                readonly)
-        self.properties["Values"] =         uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "Values",
-                                                                2,
-                                                                uno.getTypeByName("[]string"),
-                                                                transient)
-        self.properties["State"] =          uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "State",
-                                                                3,
-                                                                uno.getTypeByName("short"),
-                                                                transient)
+        self.properties["Id"] = unotools.getProperty("Id", "string", transient)
+        self.properties["Value"] = unotools.getProperty("Value", "string", readonly)
+        self.properties["Values"] = unotools.getProperty("Values", "[]string", transient)
+        self.properties["State"] = unotools.getProperty("State", "short", transient)
         self.Id = ""
         self.Scopes = {}
         self.revert()

@@ -24,21 +24,9 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
         self.properties = {}
-        self.properties["ResourceUrl"] =    uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "ResourceUrl",
-                                                                0,
-                                                                uno.getTypeByName("string"),
-                                                                transient)
-        self.properties["UserName"] =       uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "UserName",
-                                                                1,
-                                                                uno.getTypeByName("string"),
-                                                                transient)
-        self.properties["Setting"] =        uno.createUnoStruct("com.sun.star.beans.Property",
-                                                                "Setting",
-                                                                2,
-                                                                uno.getTypeByName("com.sun.star.uno.XInterface"),
-                                                                readonly)
+        self.properties["ResourceUrl"] = unotools.getProperty("ResourceUrl", "string", transient)
+        self.properties["UserName"] = unotools.getProperty("UserName", "string", transient)
+        self.properties["Setting"] = unotools.getProperty("Setting", "com.sun.star.uno.XInterface", readonly)
         self._Setting = unotools.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.SettingReader")
         self.initialize(namedvalues)
 

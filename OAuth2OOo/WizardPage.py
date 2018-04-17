@@ -21,22 +21,9 @@ class PyWizardPage(unohelper.Base, PyPropertySet, PyInitialization, XWizardPage,
         self.ctx = ctx
         self.properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["Controller"] = uno.createUnoStruct("com.sun.star.beans.Property",
-                                                            "Controller",
-                                                            1,
-                                                            uno.getTypeByName("com.sun.star.ui.dialogs.XWizardController"),
-                                                            readonly)
-        self.properties["PageId"] =     uno.createUnoStruct("com.sun.star.beans.Property",
-                                                            "PageId",
-                                                            2,
-                                                            uno.getTypeByName("short"),
-                                                            readonly)
-        self.properties["Window"] =     uno.createUnoStruct("com.sun.star.beans.Property",
-                                                            "Window",
-                                                            3,
-                                                            uno.getTypeByName("com.sun.star.awt.XWindow"),
-                                                            readonly)
+        self.properties["Controller"] = unotools.getProperty("Controller", "com.sun.star.ui.dialogs.XWizardController", readonly)
+        self.properties["PageId"] = unotools.getProperty("PageId", "short", readonly)
+        self.properties["Window"] = unotools.getProperty("Window", "com.sun.star.awt.XWindow", readonly)
         self._Controller = None
         self._PageId = None
         self._Window = None

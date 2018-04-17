@@ -11,6 +11,13 @@ from com.sun.star.task import XInteractionHandler
 import binascii
 
 
+def getProperty(name, typename, attributes, handle=-1):
+    return uno.createUnoStruct("com.sun.star.beans.Property",
+                               name,
+                               handle,
+                               uno.getTypeByName(typename),
+                               attributes)
+
 def getResourceLocation(ctx, path="OAuth2OOo"):
     identifier = "com.gmail.prrvchr.extensions.OAuth2OOo"
     service = "/singletons/com.sun.star.deployment.PackageInformationProvider"
