@@ -58,7 +58,7 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
             print("PyOAuth2Service.execute:2")
             token = self.Setting.Url.Provider.Scope.User.AccessToken
             print("PyOAuth2Service.execute:3")
-            if not token:
+            if not token or self.Setting.Url.Provider.Scope.NeedAuthorization:
                 print("PyOAuth2Service.execute:4")
                 code, codeverifier = self._getAuthorizationCode()
                 if code is not None:
@@ -85,9 +85,7 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
                 self.UserName = controller.UserName
                 self.ResourceUrl = controller.ResourceUrl
                 print("_getAuthorizationCode: %s" % code)
-            else:
-                controller.cancel()
-            controller.Wizard.DialogWindow.dispose()
+            controller.dispose()
             return code, codeverifier
         except Exception as e:
             print("PyOAuth2Service._getAuthorizationCode error: %s" % e)
@@ -110,7 +108,7 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         verify = self._getCertificat()
         print("_getTokens.data: %s" % data)
         response = requests.post(url, headers=headers, data=data, timeout=timeout, verify=verify)
-        print("_getTokens: %s" % (response.json(), ))
+        print("_getTokens: %s" % response.json())
         return self._getTokenFromResponse(response.json())
 
     def _refreshToken(self):
@@ -139,7 +137,7 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         return verify
 
     def _getTokenFromResponse(self, response):
-        token = None
+        token = ""
         if "refresh_token" in response:
             self.Setting.Url.Provider.Scope.User.RefreshToken = response["refresh_token"]
         if "access_token" in response:
@@ -148,6 +146,9 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         if "expires_in" in response:
             self.Setting.Url.Provider.Scope.User.ExpiresIn = response["expires_in"]
         if token:
+            scope = self.Setting.Url.Provider.Scope.Values
+            self.Setting.Url.Provider.Scope.User.Scope = scope
+            print("PyOAuth2Service._getTokenFromResponse: scope ")
             self.Setting.Url.Provider.Scope.User.commit()
         return token
 

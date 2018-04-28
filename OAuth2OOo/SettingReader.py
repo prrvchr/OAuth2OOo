@@ -96,7 +96,7 @@ class PyUrlReader(unohelper.Base, PyPropertySet, XUpdatable):
         urls = self.configuration.getByName("Urls")
         if urls.hasByName(self.Id):
             url = urls.getByName(self.Id)
-            self.Provider.Scope.User.ScopeId = url.getByName("Scope")
+            self.Provider.Scope.ScopeId = url.getByName("Scope")
         self.Provider.Scope.update()
         self.Provider.update()
 
@@ -165,8 +165,8 @@ class PyProviderReader(unohelper.Base, PyPropertySet, XUpdatable):
     # XUpdatable
     def update(self):
         providers = self.configuration.getByName("Providers")
-        if providers.hasByName(self.Scope.ProviderId):
-            provider = providers.getByName(self.Scope.ProviderId)
+        if providers.hasByName(self.Scope.User.ProviderId):
+            provider = providers.getByName(self.Scope.User.ProviderId)
             self._ClientId = provider.getByName("ClientId")
             self._ClientSecret = provider.getByName("ClientSecret")
             self._AuthorizationUrl = provider.getByName("AuthorizationUrl")
@@ -192,14 +192,28 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
         self.properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         self.properties["Values"] = unotools.getProperty("Values", "string", readonly)
+        self.properties["NeedAuthorization"] = unotools.getProperty("NeedAuthorization", "boolean", readonly)
         self.properties["User"] = unotools.getProperty("User", "com.sun.star.uno.XInterface", readonly)
-        self.ProviderId = ""
+        self.ScopeId = ""
         self._Values = []
         self._User = PyUserReader(self.configuration)
 
     @property
     def Values(self):
-        return " ".join(self._Values)
+        values = self.User._Scope
+        for value in self._Values:
+            if value not in values:
+                values.append(value)
+        return " ".join(values)
+    @property
+    def NeedAuthorization(self):
+        needed = False
+        for value in self._Values:
+            if value not in self.User._Scope:
+                needed = True
+                print("PyScopeReader.NeedAuthorization: %s - %s" % (value, self.User._Scope))
+                break
+        return needed
     @property
     def User(self):
         return self._User
@@ -207,13 +221,13 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
     # XUpdatable
     def update(self):
         scopes = self.configuration.getByName("Scopes")
-        if scopes.hasByName(self.User.ScopeId):
-            scope = scopes.getByName(self.User.ScopeId)
-            self._Values = scope.getByName("Values")
-            self.ProviderId = scope.getByName("Provider")
+        if scopes.hasByName(self.ScopeId):
+            scope = scopes.getByName(self.ScopeId)
+            self._Values = list(scope.getByName("Values"))
+            self.User.ProviderId = scope.getByName("Provider")
         else:
             self._Values = []
-            self.ProviderId = ""
+            self.User.ProviderId = ""
 
 
 class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable):
@@ -225,11 +239,13 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
         self.properties["AccessToken"] = unotools.getProperty("AccessToken", "string", transient)
         self.properties["RefreshToken"] = unotools.getProperty("RefreshToken", "string", transient)
         self.properties["ExpiresIn"] = unotools.getProperty("ExpiresIn", "short", transient)
+        self.properties["Scope"] = unotools.getProperty("Scope", "string", transient)
         self._Id = ""
-        self.ScopeId = ""
+        self.ProviderId = ""
         self._AccessToken = ""
         self._RefreshToken = ""
         self._TimeStamp = 0
+        self._Scope = []
 
     @property
     def Id(self):
@@ -256,39 +272,50 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
     @ExpiresIn.setter
     def ExpiresIn(self, second):
         self._TimeStamp = int(time.time()) + second
+    @property
+    def Scope(self):
+        return " ".join(self._Scope)
+    @Scope.setter
+    def Scope(self, scope):
+        self._Scope = scope.split(" ")
 
     # XTransactedObject
     def commit(self):
-        scopes = self.configuration.getByName("Scopes")
-        if scopes.hasByName(self.ScopeId):
-            scope = scopes.getByName(self.ScopeId)
-            users = scope.getByName("Users")
+        providers = self.configuration.getByName("Providers")
+        if providers.hasByName(self.ProviderId):
+            provider = providers.getByName(self.ProviderId)
+            users = provider.getByName("Users")
             if not users.hasByName(self.Id):
                 users.insertByName(self.Id, users.createInstance())
             user = users.getByName(self.Id)
             user.replaceByName("AccessToken", self._AccessToken)
             user.replaceByName("RefreshToken", self._RefreshToken)
             user.replaceByName("TimeStamp", self._TimeStamp)
+#            user.replaceByName("Scopes", self._Scope)
+            arguments = ("Scopes", uno.Any("[]string", tuple(self._Scope)))
+            uno.invoke(user, "replaceByName", arguments)
             if self.configuration.hasPendingChanges():
                 self.configuration.commitChanges()
     def revert(self):
         self._AccessToken = ""
         self._RefreshToken = ""
         self._TimeStamp = 0
+        self._Scope = []
 
     # XUpdatable
     def update(self):
         user = None
-        scopes = self.configuration.getByName("Scopes")
-        if scopes.hasByName(self.ScopeId):
-            scope = scopes.getByName(self.ScopeId)
-            users = scope.getByName("Users")
+        providers = self.configuration.getByName("Providers")
+        if providers.hasByName(self.ProviderId):
+            provider = providers.getByName(self.ProviderId)
+            users = provider.getByName("Users")
             if users.hasByName(self.Id):
                 user = users.getByName(self.Id)
         if user is not None:
             self._AccessToken = user.getByName("AccessToken")
             self._RefreshToken = user.getByName("RefreshToken")
             self._TimeStamp = user.getByName("TimeStamp")
+            self._Scope = list(user.getByName("Scopes"))
         else:
             self.revert()
 

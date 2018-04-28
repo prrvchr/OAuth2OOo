@@ -5,6 +5,7 @@ import uno
 import unohelper
 
 from com.sun.star.embed import XTransactedObject
+from com.sun.star.util import XUpdatable
 
 import unotools
 from unotools import PyServiceInfo, PyPropertySet
@@ -199,12 +200,17 @@ class PyProviderWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         self.properties["RedirectPort"] = unotools.getProperty("RedirectPort", "short", transient)
         self.properties["RedirectUri"] = unotools.getProperty("RedirectUri", "string", readonly)
         self.properties["State"] = unotools.getProperty("State", "short", transient)
-        self.Id = ""
         self.redirect = "urn:ietf:wg:oauth:2.0:oob"
         self.Providers = {}
         self._Scope = PyScopeWriter(self.configuration)
         self.revert()
 
+    @property
+    def Id(self):
+        return self.Scope.User.ProviderId
+    @Id.setter
+    def Id(self, id):
+        self.Scope.User.ProviderId = id
     @property
     def Scope(self):
         return self._Scope
@@ -358,16 +364,26 @@ class PyScopeWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
         self.properties["Id"] = unotools.getProperty("Id", "string", transient)
+        self.properties["User"] = unotools.getProperty("User", "com.sun.star.uno.XInterface", readonly)
         self.properties["Value"] = unotools.getProperty("Value", "string", readonly)
         self.properties["Values"] = unotools.getProperty("Values", "[]string", transient)
         self.properties["State"] = unotools.getProperty("State", "short", transient)
         self.Id = ""
         self.Scopes = {}
+        self._User = PyUserWriter(self.configuration)
         self.revert()
 
     @property
+    def User(self):
+        return self._User
+    @property
     def Value(self):
-        return " ".join(self.Values)
+        values = self.User._Scope
+        if self.Id in self.Scopes:
+            for value in self.Scopes[self.Id]["Values"]:
+                if value not in values:
+                    values.append(value)
+        return " ".join(values)
     @property
     def Values(self):
         values = []
@@ -415,6 +431,41 @@ class PyScopeWriter(unohelper.Base, PyPropertySet, XTransactedObject):
             self.Scopes[id] = {"Provider": scope.getByName("Provider"),
                                "Values": scope.getByName("Values"),
                                "State": 1}
+
+
+class PyUserWriter(unohelper.Base, PyPropertySet, XUpdatable):
+    def __init__(self, configuration):
+        self.configuration = configuration
+        self.properties = {}
+        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
+        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
+        self.properties["Id"] = unotools.getProperty("Id", "string", transient)
+        self.properties["Scope"] = unotools.getProperty("Scope", "string", readonly)
+        self._Id = ""
+        self.ProviderId = ""
+        self._Scope = []
+
+    @property
+    def Id(self):
+        return self._Id
+    @Id.setter
+    def Id(self, id):
+        self._Id = id
+        self.update()
+    @property
+    def Scope(self):
+        return " ".join(self._Scope)
+
+    # XUpdatable
+    def update(self):
+        self._Scope = []
+        providers = self.configuration.getByName("Providers")
+        if providers.hasByName(self.ProviderId):
+            provider = providers.getByName(self.ProviderId)
+            users = provider.getByName("Users")
+            if users.hasByName(self._Id):
+                user = users.getByName(self._Id)
+                self._Scope = list(user.getByName("Scopes"))
 
 
 g_ImplementationHelper.addImplementation(PyConfigurationWriter,                     # UNO object class

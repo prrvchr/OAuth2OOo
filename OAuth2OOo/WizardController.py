@@ -6,7 +6,7 @@ import unohelper
 
 from com.sun.star.ui.dialogs import XWizardController
 from com.sun.star.awt import XContainerWindowEventHandler, XDialogEventHandler
-from com.sun.star.util import XCancellable
+from com.sun.star.uno import XReference
 
 import unotools
 from unotools import PyServiceInfo, PyPropertySet, PyInitialization
@@ -23,7 +23,7 @@ g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.WizardController"
 
 
 class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitialization,
-                         XWizardController, XContainerWindowEventHandler, XDialogEventHandler, XCancellable):
+                         XWizardController, XContainerWindowEventHandler, XDialogEventHandler, XReference):
     def __init__(self, ctx, *namedvalues):
         self.ctx = ctx
         self.properties = {}
@@ -67,10 +67,10 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         self.Configuration.Url.Id = url
     @property
     def UserName(self):
-        return self._UserName
+        return self.Configuration.Url.Provider.Scope.User.Id
     @UserName.setter
     def UserName(self, name):
-        self._UserName = name
+        self.Configuration.Url.Provider.Scope.User.Id = name
     @property
     def ActivePath(self):
         return 0 if self.Configuration.Url.Provider.HttpHandler else 1
@@ -196,9 +196,9 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
 #                next = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.NEXT")
 #                self.Wizard.enableButton(next, self.CheckUrl)
             self.Wizard.updateTravelUI()
-            if self.advanceTo:
-                self.advanceTo = False
-                self.Wizard.advanceTo(2)
+#            if self.advanceTo:
+#                self.advanceTo = False
+#                self.Wizard.advanceTo(2)
         except Exception as e:
             print("PyWizardController.onActivatePage error: %s" % e)
             traceback.print_exc()
@@ -208,8 +208,9 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         print("PyWizardController.confirmFinish")
         return True
 
-    # XCancellable
-    def cancel(self):
+    # XReference
+    def dispose(self):
+        self.Wizard.DialogWindow.dispose()
         if self.Handler is not None:
             self.Handler.cancel()
 

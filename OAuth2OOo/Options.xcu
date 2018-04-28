@@ -13,19 +13,24 @@
         <value>90</value>
     </prop>
     <node oor:name="Urls">
-        <node oor:name="smtp.gmail.com" oor:op="fuse">
+        <node oor:name="smtp.gmail.com/send" oor:op="fuse">
             <prop oor:name="Scope">
-                <value>Google Mail</value>
+                <value>Google Mail Send</value>
+            </prop>
+        </node>
+        <node oor:name="smtp.gmail.com/compose" oor:op="fuse">
+            <prop oor:name="Scope">
+                <value>Google Mail Compose</value>
             </prop>
         </node>
         <node oor:name="smtp-mail.outlook.com" oor:op="fuse">
             <prop oor:name="Scope">
-                <value>Microsoft Mail</value>
+                <value>Microsoft Mail Send</value>
             </prop>
         </node>
     </node>
     <node oor:name="Scopes">
-        <node oor:name="Google Mail" oor:op="fuse">
+        <node oor:name="Google Mail Send" oor:op="fuse">
             <prop oor:name="Provider">
                 <value>Google</value>
             </prop>
@@ -33,7 +38,15 @@
                 <value>https://www.googleapis.com/auth/gmail.send</value>
             </prop>
         </node>
-        <node oor:name="Microsoft Mail" oor:op="fuse">
+        <node oor:name="Google Mail Compose" oor:op="fuse">
+            <prop oor:name="Provider">
+                <value>Google</value>
+            </prop>
+            <prop oor:name="Values">
+                <value>https://www.googleapis.com/auth/gmail.compose</value>
+            </prop>
+        </node>
+        <node oor:name="Microsoft Mail Send" oor:op="fuse">
             <prop oor:name="Provider">
                 <value>Microsoft</value>
             </prop>

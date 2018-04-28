@@ -111,7 +111,7 @@ Connection: Closed
                 connection.close()
                 self.acceptor.stopAccepting()
                 self.controller.Wizard.DialogWindow.endDialog(result)
-                self.controller.cancel()
+#                self.controller.Handler.cancel()
         print("PyHttpServer.stop")
 
     def cancel(self):
