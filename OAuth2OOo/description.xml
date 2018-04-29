@@ -10,8 +10,11 @@
 		<OpenOffice.org-minimal-version value="4.1" d:name="OpenOffice.org 4.1"/>
 	</dependencies>
 	<update-information>
-		<src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/download/v0.0.1/OAuth2OOo.update.xml" />
+		<src xlink:href="https://raw.githubusercontent.com/prrvchr/OAuth2OOo/master/OAuth2OOo.update.xml" />
 	</update-information>
+	<publisher>
+		<name xlink:href="https://github.com/prrvchr/OAuth2OOo" lang="en">OAuth2.0 implementation for LibreOffice / OpenOffice</name>
+	</publisher>
 	<registration>
 		<simple-license accept-by="admin" suppress-on-update="true" >
 			<license-text xlink:href="registration/license_fr-FR.txt" lang="fr-FR" />
