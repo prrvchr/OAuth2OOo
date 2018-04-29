@@ -1,6 +1,6 @@
 # OAuth2OOo v.0.0.1
 
-## OAuth2.0 implementation for LibreOffice / OpenOffice.
+## Uno OAuth2.0 API for LibreOffice / OpenOffice.
 
 ![OAuth2OOo Wizard Page1 screenshot](OAuth2Wizard1.png)
 
@@ -13,6 +13,21 @@ The OAuth2.0 protocol allows the connection to resource servers, after acceptanc
 The revocation takes place in the management of the applications associated with your account.
 
 No more password is stored in LibreOffice.
+
+## Use:
+
+### Create OAuth2 service:
+
+service = context.ServiceManager.createInstanceWithContext(context, "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service")
+
+### Optional (give a username and a remote resource url):
+
+service.UserName = your_user_account
+service.ResourceUrl = your_registered_url
+
+### Get the access token:
+
+token = service.execute(())
 
 ## Has been tested with:
 	

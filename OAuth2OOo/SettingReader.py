@@ -211,7 +211,6 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
         for value in self._Values:
             if value not in self.User._Scope:
                 needed = True
-                print("PyScopeReader.NeedAuthorization: %s - %s" % (value, self.User._Scope))
                 break
         return needed
     @property

@@ -14,9 +14,6 @@ import base64
 import hashlib
 from requests.compat import urlencode, quote, unquote
 
-import traceback
-
-
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.WizardController"
@@ -114,98 +111,76 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
 
     # XContainerWindowEventHandler, XDialogEventHandler
     def callHandlerMethod(self, window, event, method):
-        try:
-            handled = False
-            if method == "Add":
-                item = event.Source.Model.Tag
-                id = self._addItem(window, item)
-                if item == "Url" or item == "Value":
-                    handled = self._updateWindow(window, method, item, id)
-                else:
-                    handled = self._showDialog(window, method, item, id)
-            elif method == "Edit":
-                item = event.Source.Model.Tag
-                handled = self._showDialog(window, method, item)
-            elif method == "Remove":
-                item = event.Source.Model.Tag
-                handled = self._showDialog(window, method, item)
-            elif method == "Changed":
-                print("PyWizardController.callHandlerMethod: %s %s" % (method, event.Source.Model.Tag))
-                handled = self._updateUI(window, event.Source)
-            elif method == "Clicked":
-                handled = self.callHandlerMethod(window, event, "Edit")
-            return handled
-        except Exception as e:
-            print("PyWizardController.callHandlerMethod error: %s" % e)
-            traceback.print_exc()
+        handled = False
+        if method == "Add":
+            item = event.Source.Model.Tag
+            id = self._addItem(window, item)
+            if item == "Url" or item == "Value":
+                handled = self._updateWindow(window, method, item, id)
+            else:
+                handled = self._showDialog(window, method, item, id)
+        elif method == "Edit":
+            item = event.Source.Model.Tag
+            handled = self._showDialog(window, method, item)
+        elif method == "Remove":
+            item = event.Source.Model.Tag
+            handled = self._showDialog(window, method, item)
+        elif method == "Changed":
+            handled = self._updateUI(window, event.Source)
+        elif method == "Clicked":
+            handled = self.callHandlerMethod(window, event, "Edit")
+        return handled
     def getSupportedMethodNames(self):
         return ("Add", "Edit", "Remove", "Changed", "Clicked")
 
     # XWizardController
     def createPage(self, parent, id):
-        try:
-            window = self._createWindow(parent, id)
-            service = "com.gmail.prrvchr.extensions.OAuth2OOo.WizardPage"
-            page = unotools.createService(self.ctx, service, Controller=self, PageId=id, Window=window)
-            if id == 1:
-                window.getControl("TextField1").setText(self.UserName)
-                urls = self.Configuration.UrlList
-                control = window.getControl("ComboBox1")
-                control.Model.StringItemList = urls
-                providers = self.Configuration.Url.ProviderList
-                window.getControl("ComboBox2").Model.StringItemList = providers
-                url = self.ResourceUrl
-                if url:
-                    control.setText(url)
-            elif id == 2:
-#                url = self.AuthorizationStr
-#                window.getControl("TextField1").setText(url)
-                address = self.Configuration.Url.Provider.RedirectAddress
-                window.getControl("TextField2").setText(address)
-                port = self.Configuration.Url.Provider.RedirectPort
-                window.getControl("NumericField1").setValue(port)
-                window.getControl("OptionButton%s" % self.ActivePath).setState(True)
-            elif id == 3:
-                service = "com.gmail.prrvchr.extensions.OAuth2OOo.HttpCodeHandler"
-                self.Handler = unotools.createService(self.ctx, service)
-                self.Handler.addCallback(page, self)
-                self._openUrl(self.AuthorizationUrl)
-            elif id == 4:
-                self._openUrl(self.AuthorizationUrl)
-            return page
-        except Exception as e:
-            print("PyWizardController.createPage error: %s" % e)
-            traceback.print_exc()
+        window = self._createWindow(parent, id)
+        service = "com.gmail.prrvchr.extensions.OAuth2OOo.WizardPage"
+        page = unotools.createService(self.ctx, service, Controller=self, PageId=id, Window=window)
+        if id == 1:
+            window.getControl("TextField1").setText(self.UserName)
+            urls = self.Configuration.UrlList
+            control = window.getControl("ComboBox1")
+            control.Model.StringItemList = urls
+            providers = self.Configuration.Url.ProviderList
+            window.getControl("ComboBox2").Model.StringItemList = providers
+            url = self.ResourceUrl
+            if url:
+                control.setText(url)
+        elif id == 2:
+            address = self.Configuration.Url.Provider.RedirectAddress
+            window.getControl("TextField2").setText(address)
+            port = self.Configuration.Url.Provider.RedirectPort
+            window.getControl("NumericField1").setValue(port)
+            window.getControl("OptionButton%s" % self.ActivePath).setState(True)
+        elif id == 3:
+            service = "com.gmail.prrvchr.extensions.OAuth2OOo.HttpCodeHandler"
+            self.Handler = unotools.createService(self.ctx, service)
+            self.Handler.addCallback(page, self)
+            self._openUrl(self.AuthorizationUrl)
+        elif id == 4:
+            self._openUrl(self.AuthorizationUrl)
+        return page
     def getPageTitle(self, id):
         title = self.stringResource.resolveString("PageWizard%s.Step" % (id, ))
         return title
     def canAdvance(self):
         return True
     def onActivatePage(self, id):
-        try:
-            title = self.stringResource.resolveString("PageWizard%s.Title" % (id, ))
-            self.Wizard.setTitle(title)
-    #        previous = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.PREVIOUS")
-    #        self.Wizard.enableButton(previous, self._isInsidePage(id))
-            finish = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.FINISH")
-            self.Wizard.enableButton(finish, False)
-            if id == 1:
-                self.Wizard.activatePath(self.ActivePath, True)
-                print("PyWizardController.onActivatePage: %s" % self.ActivePath)
-#            elif id == 2:
-#                next = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.NEXT")
-#                self.Wizard.enableButton(next, self.CheckUrl)
-            self.Wizard.updateTravelUI()
-#            if self.advanceTo:
-#                self.advanceTo = False
-#                self.Wizard.advanceTo(2)
-        except Exception as e:
-            print("PyWizardController.onActivatePage error: %s" % e)
-            traceback.print_exc()
+        title = self.stringResource.resolveString("PageWizard%s.Title" % (id, ))
+        self.Wizard.setTitle(title)
+        finish = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.FINISH")
+        self.Wizard.enableButton(finish, False)
+        if id == 1:
+            self.Wizard.activatePath(self.ActivePath, True)
+        self.Wizard.updateTravelUI()
+#       if self.advanceTo:
+#           self.advanceTo = False
+#           self.Wizard.advanceTo(2)
     def onDeactivatePage(self, id):
-        print("PyWizardController.onDeactivatePage")
+        pass
     def confirmFinish(self):
-        print("PyWizardController.confirmFinish")
         return True
 
     # XReference
@@ -325,100 +300,83 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         return True
 
     def _updateUI(self, window, control):
-        try:
-            item = control.Model.Tag
-            print("PyWizardController._updateUI: %s" % item)
-            if item == "User":
-                self.Wizard.updateTravelUI()
-            elif item == "Url":
-                url = control.getText()
-                urls = control.Model.StringItemList
-                enabled = url in urls
-                if enabled:
-                    self.ResourceUrl = url
-                    title = self.stringResource.resolveString("PageWizard1.FrameControl2.Label")
-                    window.getControl("FrameControl2").Model.Label = title % url
-                    window.getControl("ComboBox2").setText(self.Configuration.Url.ProviderName)
-                    window.getControl("ComboBox3").setText(self.Configuration.Url.ScopeName)
-                window.getControl("CommandButton1").Model.Enabled = url != "" and not enabled
-                window.getControl("CommandButton2").Model.Enabled = enabled and len(urls) > 1
-                self.Wizard.updateTravelUI()
-            elif item == "Provider":
-                print("PyWizardController._updateUI.Provider:1")
-                provider = control.getText()
-                providers = control.Model.StringItemList
-                scopes = ()
-                enabled = provider in providers
-                if enabled:
-                    self.Configuration.Url.ProviderName = provider
-                    scopes = self.Configuration.Url.ScopeList
-                    print("PyWizardController._updateUI.Provider:2")
-                combobox = window.getControl("ComboBox3")
-                combobox.Model.StringItemList = scopes
-                print("PyWizardController._updateUI.Provider:3")
-                if combobox.getText() != "":
-                    combobox.setText("")
-                window.getControl("CommandButton3").Model.Enabled = provider != "" and not enabled
-                window.getControl("CommandButton4").Model.Enabled = enabled
-                window.getControl("CommandButton5").Model.Enabled = enabled and len(providers) > 1
-                print("PyWizardController._updateUI.Provider:4")
-                self.Wizard.activatePath(self.ActivePath, True)
-                print("PyWizardController._updateUI.Provider: %s" % self.ActivePath)
-                self.Wizard.updateTravelUI()
-            elif item == "Scope":
-                scope = control.getText()
-                scopes = control.Model.StringItemList
-                enabled = scope in scopes
-                if enabled:
-                    self.Configuration.Url.ScopeName = scope
-                window.getControl("CommandButton7").Model.Enabled = enabled
-                window.getControl("CommandButton8").Model.Enabled = enabled and len(scopes) > 1
-                scopes = self.Configuration.Url.ScopesList
-                window.getControl("CommandButton6").Model.Enabled = scope != "" and scope not in scopes
-                self.Wizard.updateTravelUI()
-            elif item == "Values":
-                count = control.Model.ItemCount
-                button = window.getControl("CommandButton2")
-                button.Model.Enabled = control.SelectedItemPos != -1 and count > 1
-            elif item == "Value":
-                value = control.getText()
-                values = window.getControl("ListBox1").Model.StringItemList
-                button = window.getControl("CommandButton1")
-                button.Model.Enabled = value != "" and value not in values
-            elif item == "HttpHandler":
-                address = window.getControl("TextField2").getText()
-                self.Configuration.Url.Provider.RedirectAddress = address
-                port = int(window.getControl("NumericField1").getValue())
-                self.Configuration.Url.Provider.RedirectPort = port
-                self.Configuration.Url.Provider.HttpHandler = True
-                self.Wizard.activatePath(self.ActivePath, True)
-                print("PyWizardController._updateUI.HttpHandler: %s" % self.ActivePath)
-                window.getControl("TextField1").setText(self.AuthorizationStr)
-                self.Wizard.updateTravelUI()
-            elif item == "GuiHandler":
-                self.Configuration.Url.Provider.HttpHandler = False
-                self.Wizard.activatePath(self.ActivePath, True)
-                print("PyWizardController._updateUI.GuiHandler: %s" % self.ActivePath)
-                window.getControl("TextField1").setText(self.AuthorizationStr)
-                self.Wizard.updateTravelUI()
-            elif item == "EnablePkce":
-                window.getControl("TextField4").Model.Enabled = False
-            elif item == "DisablePkce":
-                window.getControl("TextField4").Model.Enabled = True
-            elif item == "AuthorizationCode":
-                enabled = window.getControl("TextField1").getText() != ""
-                finish = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.FINISH")
-                self.Wizard.enableButton(finish, enabled)
-                self.Wizard.updateTravelUI()
-            return True
-        except Exception as e:
-            print("PyWizardController._updateUI error: %s" % e)
-            traceback.print_exc()
-
-    def _isInsidePage(self, id):
-        fist = self.Paths[self.ActivePath][0]
-        last = self.Paths[self.ActivePath][-1]
-        return id not in (fist, last)
+        item = control.Model.Tag
+        if item == "User":
+            self.Wizard.updateTravelUI()
+        elif item == "Url":
+            url = control.getText()
+            urls = control.Model.StringItemList
+            enabled = url in urls
+            if enabled:
+                self.ResourceUrl = url
+                title = self.stringResource.resolveString("PageWizard1.FrameControl2.Label")
+                window.getControl("FrameControl2").Model.Label = title % url
+                window.getControl("ComboBox2").setText(self.Configuration.Url.ProviderName)
+                window.getControl("ComboBox3").setText(self.Configuration.Url.ScopeName)
+            window.getControl("CommandButton1").Model.Enabled = url != "" and not enabled
+            window.getControl("CommandButton2").Model.Enabled = enabled and len(urls) > 1
+            self.Wizard.updateTravelUI()
+        elif item == "Provider":
+            provider = control.getText()
+            providers = control.Model.StringItemList
+            scopes = ()
+            enabled = provider in providers
+            if enabled:
+                self.Configuration.Url.ProviderName = provider
+                scopes = self.Configuration.Url.ScopeList
+            combobox = window.getControl("ComboBox3")
+            combobox.Model.StringItemList = scopes
+            if combobox.getText() != "":
+                combobox.setText("")
+            window.getControl("CommandButton3").Model.Enabled = provider != "" and not enabled
+            window.getControl("CommandButton4").Model.Enabled = enabled
+            window.getControl("CommandButton5").Model.Enabled = enabled and len(providers) > 1
+            self.Wizard.activatePath(self.ActivePath, True)
+            self.Wizard.updateTravelUI()
+        elif item == "Scope":
+            scope = control.getText()
+            scopes = control.Model.StringItemList
+            enabled = scope in scopes
+            if enabled:
+                self.Configuration.Url.ScopeName = scope
+            window.getControl("CommandButton7").Model.Enabled = enabled
+            window.getControl("CommandButton8").Model.Enabled = enabled and len(scopes) > 1
+            scopes = self.Configuration.Url.ScopesList
+            window.getControl("CommandButton6").Model.Enabled = scope != "" and scope not in scopes
+            self.Wizard.updateTravelUI()
+        elif item == "Values":
+            count = control.Model.ItemCount
+            button = window.getControl("CommandButton2")
+            button.Model.Enabled = control.SelectedItemPos != -1 and count > 1
+        elif item == "Value":
+            value = control.getText()
+            values = window.getControl("ListBox1").Model.StringItemList
+            button = window.getControl("CommandButton1")
+            button.Model.Enabled = value != "" and value not in values
+        elif item == "HttpHandler":
+            address = window.getControl("TextField2").getText()
+            self.Configuration.Url.Provider.RedirectAddress = address
+            port = int(window.getControl("NumericField1").getValue())
+            self.Configuration.Url.Provider.RedirectPort = port
+            self.Configuration.Url.Provider.HttpHandler = True
+            self.Wizard.activatePath(self.ActivePath, True)
+            window.getControl("TextField1").setText(self.AuthorizationStr)
+            self.Wizard.updateTravelUI()
+        elif item == "GuiHandler":
+            self.Configuration.Url.Provider.HttpHandler = False
+            self.Wizard.activatePath(self.ActivePath, True)
+            window.getControl("TextField1").setText(self.AuthorizationStr)
+            self.Wizard.updateTravelUI()
+        elif item == "EnablePkce":
+            window.getControl("TextField4").Model.Enabled = False
+        elif item == "DisablePkce":
+            window.getControl("TextField4").Model.Enabled = True
+        elif item == "AuthorizationCode":
+            enabled = window.getControl("TextField1").getText() != ""
+            finish = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.FINISH")
+            self.Wizard.enableButton(finish, enabled)
+            self.Wizard.updateTravelUI()
+        return True
 
     def _getAuthorizationUrl(self):
         success, main, parameters = self._getUrlMainAndParameters()
@@ -439,13 +397,11 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
 
     def _checkUrl(self):
         success, main, parameters = self._getUrlMainAndParameters()
-        print("_checkUrl:1 %s" % success)
         if success:
             transformer = unotools.createService(self.ctx, "com.sun.star.util.URLTransformer")
             url = uno.createUnoStruct("com.sun.star.util.URL")
             url.Complete = "%s?%s" % (main, self._getUrlArguments(parameters))
             success, url = transformer.parseStrict(url)
-            print("_checkUrl:2 %s" % success)
         return success
 
     def _getUrlMainAndParameters(self):
@@ -504,7 +460,6 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
     def _openUrl(self, url, option=""):
         service = "com.sun.star.system.SystemShellExecute"
         self.ctx.ServiceManager.createInstance(service).execute(url, option, 0)
-        print("_openUrl.url: %s" % self._getAuthorizationStr())
 
 
 g_ImplementationHelper.addImplementation(PyWizardController,                        # UNO object class

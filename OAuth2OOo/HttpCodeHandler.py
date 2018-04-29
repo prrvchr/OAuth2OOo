@@ -65,7 +65,6 @@ class PyWatchDog(Thread):
         if self.end != 0:
             result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
             self.server.controller.Wizard.DialogWindow.endDialog(result)
-        print("PyWatchDog.stop")
 
     def cancel(self):
         self.end = 0
@@ -111,8 +110,6 @@ Connection: Closed
                 connection.close()
                 self.acceptor.stopAccepting()
                 self.controller.Wizard.DialogWindow.endDialog(result)
-#                self.controller.Handler.cancel()
-        print("PyHttpServer.stop")
 
     def cancel(self):
         with self.lock:

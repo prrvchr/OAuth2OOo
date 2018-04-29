@@ -8,7 +8,6 @@ from com.sun.star.awt import XContainerWindowEventHandler
 
 import unotools
 from unotools import PyServiceInfo
-import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -52,28 +51,18 @@ class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandle
 
     def _doChanged(self, dialog, control):
         item = control.Model.Tag
+        text = control.getText()
         if item == "UserName":
-            pass
+            self.service.UserName = text
         elif item == "Url":
-            url = control.getText()
-            self.service.ResourceUrl = url
-            dialog.getControl("CommandButton1").Model.Enabled = url != ""
-            token = self.service.Setting.Url.Provider.Scope.User.AccessToken
-            self._updateUI(dialog, token != "")
+            self.service.ResourceUrl = text
+            dialog.getControl("CommandButton1").Model.Enabled = text != ""
+        token = self.service.Setting.Url.Provider.Scope.User.AccessToken
+        self._updateUI(dialog, token != "")
 
     def _doConnect(self, dialog):
-        try:
-            print("PyOptionsDialog._doConnect:1")
-#           mri = self.ctx.ServiceManager.createInstance("mytools.Mri")
-#           mri.inspect(wizard)
-            self.service.UserName = dialog.getControl("TextField1").getText()
-            print("PyOptionsDialog._doConnect:2")
-            token = self.service.execute(())
-            enabled = True if token != "" else False
-            self._updateUI(dialog, enabled)
-        except Exception as e:
-            print("PyOptionsDialog._doConnect error: %s" % e)
-            traceback.print_exc()
+        token = self.service.execute(())
+        self._updateUI(dialog, token != "")
 
     def _doRemove(self, dialog):
         user = self.service.Setting.Url.Provider.Scope.User
@@ -102,14 +91,12 @@ class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandle
             dialog.getControl("Label7").setText(self.service.Setting.Url.Provider.Scope.User.RefreshToken)
             dialog.getControl("Label9").setText(self.service.Setting.Url.Provider.Scope.User.AccessToken)
             dialog.getControl("Label11").setText(self.service.Setting.Url.Provider.Scope.User.ExpiresIn)
-            dialog.getControl("CommandButton2").Model.Enabled = True
-            dialog.getControl("CommandButton3").Model.Enabled = True
         else:
             dialog.getControl("Label7").setText(self.stringResource.resolveString("OptionsDialog.Label7.Label"))
             dialog.getControl("Label9").setText(self.stringResource.resolveString("OptionsDialog.Label9.Label"))
             dialog.getControl("Label11").setText(self.stringResource.resolveString("OptionsDialog.Label11.Label"))
-            dialog.getControl("CommandButton2").Model.Enabled = False
-            dialog.getControl("CommandButton3").Model.Enabled = False
+        dialog.getControl("CommandButton2").Model.Enabled = state
+        dialog.getControl("CommandButton3").Model.Enabled = state
 
 
 g_ImplementationHelper.addImplementation(PyOptionsDialog,                           # UNO object class
