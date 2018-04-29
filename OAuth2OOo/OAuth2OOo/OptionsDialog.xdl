@@ -14,26 +14,26 @@
    <dlg:title dlg:value="&amp;OptionsDialog.FrameControl1.Label"/>
   </dlg:titledbox>
   <dlg:text dlg:id="Label4" dlg:tab-index="6" dlg:left="20" dlg:top="90" dlg:width="70" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label4.HelpText" dlg:value="&amp;OptionsDialog.Label4.Label" dlg:valign="center" dlg:tabstop="false"/>
-  <dlg:textfield dlg:id="TextField1" dlg:tab-index="7" dlg:left="95" dlg:top="90" dlg:width="125" dlg:height="15" dlg:help-text="&amp;OptionsDialog.TextField1.HelpText">
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="7" dlg:left="95" dlg:top="90" dlg:width="125" dlg:height="15" dlg:tag="UserName" dlg:help-text="&amp;OptionsDialog.TextField1.HelpText">
    <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.UNO:Changed" script:language="UNO"/>
   </dlg:textfield>
   <dlg:text dlg:id="Label5" dlg:tab-index="8" dlg:left="20" dlg:top="110" dlg:width="70" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label5.HelpText" dlg:value="&amp;OptionsDialog.Label5.Label" dlg:valign="center" dlg:tabstop="false"/>
   <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="9" dlg:left="95" dlg:top="110" dlg:width="125" dlg:height="15" dlg:tag="Url" dlg:help-text="&amp;OptionsDialog.ComboBox1.HelpText" dlg:value="&amp;OptionsDialog.ComboBox1.Text" dlg:spin="true">
    <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.UNO:Changed" script:language="UNO"/>
   </dlg:combobox>
-  <dlg:button dlg:id="CommandButton1" dlg:tab-index="10" dlg:disabled="true" dlg:left="225" dlg:top="110" dlg:width="35" dlg:height="15" dlg:tag="Url" dlg:help-text="&amp;OptionsDialog.CommandButton1.HelpText" dlg:value="&amp;OptionsDialog.CommandButton1.Label">
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="10" dlg:disabled="true" dlg:left="225" dlg:top="110" dlg:width="35" dlg:height="15" dlg:help-text="&amp;OptionsDialog.CommandButton1.HelpText" dlg:value="&amp;OptionsDialog.CommandButton1.Label">
    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:Connect" script:language="UNO"/>
   </dlg:button>
   <dlg:text dlg:id="Label6" dlg:tab-index="11" dlg:left="20" dlg:top="130" dlg:width="70" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label6.HelpText" dlg:value="&amp;OptionsDialog.Label6.Label" dlg:valign="center" dlg:tabstop="false"/>
   <dlg:text dlg:id="Label7" dlg:tab-index="12" dlg:left="95" dlg:top="130" dlg:width="125" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label7.HelpText" dlg:value="&amp;OptionsDialog.Label7.Label" dlg:valign="center" dlg:tabstop="false"/>
   <dlg:text dlg:id="Label8" dlg:tab-index="13" dlg:left="20" dlg:top="150" dlg:width="70" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label8.HelpText" dlg:value="&amp;OptionsDialog.Label8.Label" dlg:valign="center" dlg:tabstop="false"/>
   <dlg:text dlg:id="Label9" dlg:tab-index="14" dlg:left="95" dlg:top="150" dlg:width="125" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label9.HelpText" dlg:value="&amp;OptionsDialog.Label9.Label" dlg:valign="center" dlg:tabstop="false"/>
-  <dlg:button dlg:id="CommandButton2" dlg:tab-index="15" dlg:disabled="true" dlg:left="225" dlg:top="150" dlg:width="35" dlg:height="15" dlg:tag="Url" dlg:help-text="&amp;OptionsDialog.CommandButton2.HelpText" dlg:value="&amp;OptionsDialog.CommandButton2.Label">
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="15" dlg:disabled="true" dlg:left="225" dlg:top="150" dlg:width="35" dlg:height="15" dlg:help-text="&amp;OptionsDialog.CommandButton2.HelpText" dlg:value="&amp;OptionsDialog.CommandButton2.Label">
    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:Remove" script:language="UNO"/>
   </dlg:button>
   <dlg:text dlg:id="Label10" dlg:tab-index="16" dlg:left="20" dlg:top="170" dlg:width="70" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label10.HelpText" dlg:value="&amp;OptionsDialog.Label10.Label" dlg:valign="center" dlg:tabstop="false"/>
   <dlg:text dlg:id="Label11" dlg:tab-index="17" dlg:left="95" dlg:top="170" dlg:width="125" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label11.HelpText" dlg:value="&amp;OptionsDialog.Label11.Label" dlg:valign="center" dlg:tabstop="false"/>
-  <dlg:button dlg:id="CommandButton3" dlg:tab-index="18" dlg:disabled="true" dlg:left="225" dlg:top="170" dlg:width="35" dlg:height="15" dlg:tag="Url" dlg:help-text="&amp;OptionsDialog.CommandButton3.HelpText" dlg:value="&amp;OptionsDialog.CommandButton3.Label">
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="18" dlg:disabled="true" dlg:left="225" dlg:top="170" dlg:width="35" dlg:height="15" dlg:help-text="&amp;OptionsDialog.CommandButton3.HelpText" dlg:value="&amp;OptionsDialog.CommandButton3.Label">
    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:Reset" script:language="UNO"/>
   </dlg:button>
  </dlg:bulletinboard>
