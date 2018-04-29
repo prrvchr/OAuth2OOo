@@ -102,7 +102,7 @@ class PyHttpServer(Thread):
                 inputstream.closeInput()
                 header = uno.ByteSequence(b'''\
 HTTP/1.1 200 OK
-Content-Length: %s
+Content-Length: %d
 Content-Type: text/html; charset=utf-8
 Connection: Closed
 

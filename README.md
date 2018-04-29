@@ -2,20 +2,23 @@
 
 ## OAuth2.0 implementation for LibreOffice / OpenOffice.
 
-![OAuth2OOo screenshot](OAuth2OOo.png)
+![OAuth2OOo Wizard Page1 screenshot](OAuth2Wizard1.png)
 
+![OAuth2OOo Wizard Page2 screenshot](OAuth2Wizard2.png)
+
+![OAuth2OOo Wizard Page3 screenshot](OAuth2Wizard3.png)
 
 The OAuth2.0 protocol allows the connection to resource servers, after acceptance of the connection authorization, by exchange of tokens.
 
-The revocation takes place in the management of: [Application associated with your Google account](https://myaccount.google.com/security?utm_source=OGB#connectedapps)
+The revocation takes place in the management of the applications associated with your account.
 
 No more password is stored in LibreOffice.
 
 ## Has been tested with:
 	
-* LibreOffice 5.3.3.2 - Lubuntu 16.10 -  LxQt 0.11.0.3
+* LibreOffice 6.0.2.1 x86_64 - Ubuntu 17.10 - LxQt 0.11.1
 
-* LibreOffice 5.3.1.2 x86 - Windows 7 SP1
+* OpenOffice 4.1.5 x86_64 - Ubuntu 17.10 - LxQt 0.11.1
 
 I encourage you in case of problem to create an [issue](https://github.com/prrvchr/OAuth2OOo/issues/new)
 I will try to solve it :-)

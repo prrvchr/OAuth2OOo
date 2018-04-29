@@ -42,10 +42,10 @@
   <dlg:button dlg:id="CommandButton6" dlg:tab-index="15" dlg:disabled="true" dlg:left="154" dlg:top="125" dlg:width="35" dlg:height="15" dlg:tag="Scope" dlg:help-text="&amp;PageWizard1.CommandButton6.HelpText" dlg:value="&amp;PageWizard1.CommandButton6.Label">
    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:Add" script:language="UNO"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton7" dlg:tab-index="16" dlg:disabled="true" dlg:left="192" dlg:top="125" dlg:width="35" dlg:height="15" dlg:tag="Scope" dlg:help-text="&amp;PageWizard1.CommandButton7.HelpText" dlg:value="Editer">
+  <dlg:button dlg:id="CommandButton7" dlg:tab-index="16" dlg:disabled="true" dlg:left="192" dlg:top="125" dlg:width="35" dlg:height="15" dlg:tag="Scope" dlg:help-text="&amp;PageWizard1.CommandButton7.HelpText" dlg:value="&amp;PageWizard1.CommandButton7.Label">
    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:Edit" script:language="UNO"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton8" dlg:tab-index="17" dlg:disabled="true" dlg:left="230" dlg:top="125" dlg:width="35" dlg:height="15" dlg:tag="Scope" dlg:help-text="&amp;PageWizard1.CommandButton8.HelpText" dlg:value="Supprimer">
+  <dlg:button dlg:id="CommandButton8" dlg:tab-index="17" dlg:disabled="true" dlg:left="230" dlg:top="125" dlg:width="35" dlg:height="15" dlg:tag="Scope" dlg:help-text="&amp;PageWizard1.CommandButton8.HelpText" dlg:value="&amp;PageWizard1.CommandButton8.Label">
    <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:Remove" script:language="UNO"/>
   </dlg:button>
  </dlg:bulletinboard>
