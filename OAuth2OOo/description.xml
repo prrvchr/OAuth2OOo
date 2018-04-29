@@ -10,7 +10,7 @@
 		<OpenOffice.org-minimal-version value="4.1" d:name="OpenOffice.org 4.1"/>
 	</dependencies>
 	<update-information>
-		<src xlink:href="https://github.com/prrvchr/OAuth2OOo/raw/master/extension.update.xml" />
+		<src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/download/v0.0.1/OAuth2OOo.update.xml" />
 	</update-information>
 	<registration>
 		<simple-license accept-by="admin" suppress-on-update="true" >
