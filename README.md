@@ -23,6 +23,7 @@ service = context.ServiceManager.createInstanceWithContext(context, "com.gmail.p
 ### Optional (give a username and a remote resource url):
 
 service.UserName = your_user_account
+
 service.ResourceUrl = your_registered_url
 
 ### Get the access token:
