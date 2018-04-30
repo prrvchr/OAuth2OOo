@@ -18,7 +18,7 @@ No more password is stored in LibreOffice.
 
 ### Create OAuth2 service:
 
-service = context.ServiceManager.createInstanceWithContext(context, "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service")
+service = context.ServiceManager.createInstanceWithContext("com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service", context)
 
 ### Optional (give a username and a remote resource url):
 
