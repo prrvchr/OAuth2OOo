@@ -20,15 +20,19 @@ class PySettingReader(unohelper.Base, PyServiceInfo, PyPropertySet, XTransactedO
     def __init__(self, ctx):
         self.ctx = ctx
         self.properties = {}
+        maybevoid = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.MAYBEVOID")
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
         self.properties["Url"] = unotools.getProperty("Url", "com.sun.star.uno.XInterface", readonly)
         self.properties["UrlList"] = unotools.getProperty("UrlList", "[]string", readonly)
         self.properties["RequestTimeout"] = unotools.getProperty("RequestTimeout", "short", transient)
         self.properties["HandlerTimeout"] = unotools.getProperty("HandlerTimeout", "short", transient)
+        self.properties["Logger"] = unotools.getProperty("Logger", "com.sun.star.logging.XLogger", readonly)
         self.configuration = unotools.getConfiguration(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo", True)
         self._RequestTimeout = None
         self._HandlerTimeout = None
+        self._Logger = unotools.getLogger(self.ctx)
+        self._initLogger()
         self._Url = PyUrlReader(self.configuration)
 
     @property
@@ -53,6 +57,9 @@ class PySettingReader(unohelper.Base, PyServiceInfo, PyPropertySet, XTransactedO
     @HandlerTimeout.setter
     def HandlerTimeout(self, timeout):
         self._HandlerTimeout = timeout
+    @property
+    def Logger(self):
+        return self._Logger
 
     # XTransactedObject
     def commit(self):
@@ -68,6 +75,15 @@ class PySettingReader(unohelper.Base, PyServiceInfo, PyPropertySet, XTransactedO
     def update(self):
         self.Url.update()
         self.Url.Provider.Scope.User.update()
+
+    def _initLogger(self):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.ALL")
+        handler = unotools.getConsoleHandler(self.ctx)
+        handler.Level = level
+        self.Logger.Level = level
+        self.Logger.addLogHandler(handler)
+#        mri = self.ctx.ServiceManager.createInstance("mytools.Mri")
+#        mri.inspect(self.Logger)
 
 
 class PyUrlReader(unohelper.Base, PyPropertySet, XUpdatable):

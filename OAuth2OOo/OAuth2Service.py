@@ -87,10 +87,8 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
             data["code_verifier"] = codeverifier
         if self.Setting.Url.Provider.ClientSecret:
             data["client_secret"] = self.Setting.Url.Provider.ClientSecret
-        timeout = self.Setting.RequestTimeout
-        verify = self._getCertificat()
-        response = requests.post(url, headers=headers, data=data, timeout=timeout, verify=verify)
-        return self._getTokenFromResponse(response.json())
+        response = self._getResponseFromRequest(url, headers, data)
+        return self._getTokenFromResponse(response)
 
     def _refreshToken(self):
         url = self.Setting.Url.Provider.TokenUrl
@@ -103,10 +101,8 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         data["redirect_uri"] = self.Setting.Url.Provider.RedirectUri
         if self.Setting.Url.Provider.ClientSecret:
             data["client_secret"] = self.Setting.Url.Provider.ClientSecret
-        timeout = self.Setting.RequestTimeout
-        verify = self._getCertificat()
-        response = requests.post(url, headers=headers, data=data, timeout=timeout, verify=verify)
-        return self._getTokenFromResponse(response.json())
+        response = self._getResponseFromRequest(url, headers, data)
+        return self._getTokenFromResponse(response)
 
     def _getCertificat(self):
         verify = True
@@ -114,6 +110,17 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
             requests.packages.urllib3.disable_warnings()
             verify = certifi.old_where()
         return verify
+
+    def _getResponseFromRequest(self, url, headers, data):
+        response = {}
+        timeout = self.Setting.RequestTimeout
+        verify = self._getCertificat()
+        try:
+            response = requests.post(url, headers=headers, data=data, timeout=timeout, verify=verify).json()
+        except Exception as e:
+            level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
+            self.Setting.Logger.logp(level, "PyOAuth2Service", "_getResponseFromRequest", "%s" % e)
+        return response
 
     def _getTokenFromResponse(self, response):
         token = ""
@@ -128,6 +135,10 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
             scope = self.Setting.Url.Provider.Scope.Values
             self.Setting.Url.Provider.Scope.User.Scope = scope
             self.Setting.Url.Provider.Scope.User.commit()
+            level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        else:
+            level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
+        self.Setting.Logger.logp(level, "PyOAuth2Service", "_getTokenFromResponse", "%s" % response)
         return token
 
 

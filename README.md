@@ -1,4 +1,4 @@
-# OAuth2OOo v.0.0.1
+# OAuth2OOo v.0.0.2
 
 ## Uno OAuth2.0 API for LibreOffice / OpenOffice.
 

@@ -8,6 +8,7 @@ from com.sun.star.awt import XContainerWindowEventHandler
 
 import unotools
 from unotools import PyServiceInfo
+import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -61,8 +62,12 @@ class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandle
         self._updateUI(dialog, token != "")
 
     def _doConnect(self, dialog):
-        token = self.service.execute(())
-        self._updateUI(dialog, token != "")
+        try:
+            token = self.service.execute(())
+            self._updateUI(dialog, token != "")
+        except Exception as e:
+            print("PyOptionsDialog._doConnect error: %s" % e)
+            traceback.print_exc()
 
     def _doRemove(self, dialog):
         user = self.service.Setting.Url.Provider.Scope.User

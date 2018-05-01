@@ -6,5 +6,6 @@
    <dlg:title dlg:value="&amp;PageWizard3.FrameControl1.Label"/>
   </dlg:titledbox>
   <dlg:progressmeter dlg:id="ProgressBar1" dlg:tab-index="1" dlg:left="20" dlg:top="25" dlg:width="247" dlg:height="15" dlg:help-text="&amp;PageWizard3.ProgressBar1.HelpText" dlg:value="0"/>
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="2" dlg:left="20" dlg:top="50" dlg:width="247" dlg:height="65" dlg:help-text="&amp;PageWizard3.TextField1.HelpText" dlg:hscroll="true" dlg:vscroll="true" dlg:multiline="true" dlg:readonly="true" dlg:value=""/>
  </dlg:bulletinboard>
 </dlg:window>

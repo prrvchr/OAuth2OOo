@@ -81,9 +81,13 @@ class PyWizardPage(unohelper.Base, PyPropertySet, PyInitialization, XWizardPage,
         return advance
 
     # XCallback
-    def notify(self, percent):
+    def notify(self, namedvalue):
         if self.PageId == 3:
-            self.Window.getControl("ProgressBar1").setValue(percent)
+            if namedvalue.Name == "ProgressBar":
+                self.Window.getControl("ProgressBar1").setValue(namedvalue.Value)
+            elif namedvalue.Name == "TextField":
+                control = self.Window.getControl("TextField1")
+                control.setText(control.getText() + namedvalue.Value)
 
 
 g_ImplementationHelper.addImplementation(PyWizardPage,                              # UNO object class

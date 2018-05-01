@@ -49,16 +49,17 @@ class PyWatchDog(Thread):
         self.lock = RLock()
 
     def run(self):
+        namedvalue = uno.createUnoStruct("com.sun.star.beans.NamedValue", "ProgressBar", 0)
         wait = self.timeout/self.step
         start = now = timer()
         self.end = start + self.timeout
-        self.page.notify(0)
+        self.page.notify(namedvalue)
         while now < self.end and self.server.is_alive():
             time.sleep(wait)
             now = timer()
             elapsed = now - start
-            pourcent = int(elapsed / self.timeout * 100)
-            self.page.notify(pourcent)
+            namedvalue.Value = int(elapsed / self.timeout * 100)
+            self.page.notify(namedvalue)
         with self.lock:
             if self.server.is_alive():
                 self.server.cancel()
@@ -109,6 +110,8 @@ Connection: Closed
                 connection.write(header + body)
                 connection.close()
                 self.acceptor.stopAccepting()
+                wait = self.controller.Configuration.RequestTimeout
+                time.sleep(wait)
                 self.controller.Wizard.DialogWindow.endDialog(result)
 
     def cancel(self):
@@ -164,24 +167,27 @@ Connection: Closed
             parameters = self._readString(connection, length).strip()
         return unquote_plus(parameters)
 
-    def _getResults(self, parameters):
-        results = {}
+    def _getResponse(self, parameters):
+        response = {}
         for parameter in parameters.split("&"):
             parts = parameter.split("=")
             if len(parts) > 1:
                 name = parts[0].strip()
                 value = "=".join(parts[1:]).strip()
-                results[name] = value
-        return results
+                response[name] = value
+        return response
 
     def _getResult(self, connection):
         parameters = self._getParameters(connection)
-        results = self._getResults(parameters)
+        response = self._getResponse(parameters)
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
         result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
-        if "code" in results and "state" in results:
-            if results["state"] == self.controller.State:
-                self.controller.AuthorizationCode = results["code"]
+        if "code" in response and "state" in response:
+            if response["state"] == self.controller.State:
+                self.controller.AuthorizationCode = response["code"]
+                level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
                 result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.OK")
+        self.controller.Configuration.Logger.logp(level, "PyHttpServer", "_getResult", "%s" % response)
         return result
 
 

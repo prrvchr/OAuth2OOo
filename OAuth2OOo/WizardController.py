@@ -155,6 +155,9 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
             window.getControl("NumericField1").setValue(port)
             window.getControl("OptionButton%s" % self.ActivePath).setState(True)
         elif id == 3:
+            handler = unotools.getCallBackHandler()
+            handler.addCallback(page, None)
+            self.Configuration.Logger.addLogHandler(handler)
             service = "com.gmail.prrvchr.extensions.OAuth2OOo.HttpCodeHandler"
             self.Handler = unotools.createService(self.ctx, service)
             self.Handler.addCallback(page, self)

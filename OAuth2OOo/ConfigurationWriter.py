@@ -23,9 +23,13 @@ class PyConfigurationWriter(unohelper.Base, PyServiceInfo, PyPropertySet, XTrans
         self.properties["Url"] = unotools.getProperty("Url", "com.sun.star.uno.XInterface", readonly)
         self.properties["UrlList"] = unotools.getProperty("UrlList", "[]string", readonly)
         self.properties["HandlerTimeout"] = unotools.getProperty("HandlerTimeout", "short", readonly)
+        self.properties["RequestTimeout"] = unotools.getProperty("RequestTimeout", "short", readonly)
+        self.properties["Logger"] = unotools.getProperty("Logger", "com.sun.star.logging.XLogger", readonly)
         self.configuration = unotools.getConfiguration(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo", True)
         self._Url = PyUrlWriter(self.configuration)
         self._HandlerTimeout = None
+        self._RequestTimeout = None
+        self._Logger = unotools.getLogger(self.ctx)
 
     @property
     def Url(self):
@@ -42,6 +46,14 @@ class PyConfigurationWriter(unohelper.Base, PyServiceInfo, PyPropertySet, XTrans
         if self._HandlerTimeout is None:
             self._HandlerTimeout = self.configuration.getByName("HandlerTimeout")
         return self._HandlerTimeout
+    @property
+    def RequestTimeout(self):
+        if self._RequestTimeout is None:
+            self._RequestTimeout = self.configuration.getByName("RequestTimeout")
+        return self._RequestTimeout
+    @property
+    def Logger(self):
+        return self._Logger
 
     # XTransactedObject
     def commit(self):

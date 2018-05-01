@@ -23,7 +23,7 @@
                         <value>com.gmail.prrvchr.extensions.OAuth2OOo</value>
                     </prop>
                     <prop oor:name="Label">
-                        <value xml:lang="en-US">Protocole OAuth2</value>
+                        <value xml:lang="en-US">OAuth2 protocol</value>
                         <value xml:lang="fr-FR">Protocole OAuth2</value>
                     </prop>
                     <prop oor:name="OptionsPage">
