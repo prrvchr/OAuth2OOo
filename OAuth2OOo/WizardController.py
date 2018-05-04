@@ -155,9 +155,6 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
             window.getControl("NumericField1").setValue(port)
             window.getControl("OptionButton%s" % self.ActivePath).setState(True)
         elif id == 3:
-            handler = unotools.getCallBackHandler()
-            handler.addCallback(page, None)
-            self.Configuration.Logger.addLogHandler(handler)
             service = "com.gmail.prrvchr.extensions.OAuth2OOo.HttpCodeHandler"
             self.Handler = unotools.createService(self.ctx, service)
             self.Handler.addCallback(page, self)
@@ -232,7 +229,7 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         else:
             title = self.stringResource.resolveString("MessageBox.Title")
             message = self.stringResource.resolveString("MessageBox.Message")
-            dialog = unotools.createMessageBox(self.ctx, window.Peer, message, title)
+            dialog = unotools.createMessageBox(window.Peer, message, title)
         return dialog
 
     def _initDialog(self, dialog, method, item):

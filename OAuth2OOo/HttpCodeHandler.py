@@ -49,17 +49,16 @@ class PyWatchDog(Thread):
         self.lock = RLock()
 
     def run(self):
-        namedvalue = uno.createUnoStruct("com.sun.star.beans.NamedValue", "ProgressBar", 0)
         wait = self.timeout/self.step
         start = now = timer()
         self.end = start + self.timeout
-        self.page.notify(namedvalue)
+        self.page.notify(0)
         while now < self.end and self.server.is_alive():
             time.sleep(wait)
             now = timer()
             elapsed = now - start
-            namedvalue.Value = int(elapsed / self.timeout * 100)
-            self.page.notify(namedvalue)
+            percent = int(elapsed / self.timeout * 100)
+            self.page.notify(percent)
         with self.lock:
             if self.server.is_alive():
                 self.server.cancel()

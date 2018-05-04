@@ -17,18 +17,7 @@ def getLogger(ctx, logger="org.openoffice.logging.DefaultLogger"):
     pool = ctx.getValueByName("/singletons/com.sun.star.logging.LoggerPool")
     return pool.getNamedLogger(logger)
 
-def getConsoleHandler(ctx):
-    return ctx.ServiceManager.createInstance("com.sun.star.logging.ConsoleHandler")
-
-def getCallBackHandler():
-    return PyLogHandler()
-
-def setLogLevel(ctx, logger, level):
-    settings = getLoggerSettings(ctx, logger)
-    settings.LogLevel = level
-    settings.commitChanges()
-
-def getLoggerSettings(ctx, logger):
+def getLoggerSettings(ctx, logger="org.openoffice.logging.DefaultLogger"):
     nodepath = "/org.openoffice.Office.Logging/Settings"
     configuration = getConfiguration(ctx, nodepath, True)
     if not configuration.hasByName(logger):
@@ -37,14 +26,61 @@ def getLoggerSettings(ctx, logger):
     nodepath += "/%s" % logger
     return getConfiguration(ctx, nodepath, True)
 
-def logToHandler(ctx, logger, handler, threshold):
+def getLogLevel(ctx, logger="org.openoffice.logging.DefaultLogger"):
+    settings = getLoggerSettings(ctx, logger)
+    level = settings.LogLevel
+    return level
+
+def getLogLevels():
+    levels = (uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE"),
+              uno.getConstantByName("com.sun.star.logging.LogLevel.WARNING"),
+              uno.getConstantByName("com.sun.star.logging.LogLevel.INFO"),
+              uno.getConstantByName("com.sun.star.logging.LogLevel.CONFIG"),
+              uno.getConstantByName("com.sun.star.logging.LogLevel.FINE"),
+              uno.getConstantByName("com.sun.star.logging.LogLevel.FINER"),
+              uno.getConstantByName("com.sun.star.logging.LogLevel.FINEST"),
+              uno.getConstantByName("com.sun.star.logging.LogLevel.ALL"))
+    return levels
+
+def getLogHandler(ctx, logger="org.openoffice.logging.DefaultLogger"):
+    settings = getLoggerSettings(ctx, logger)
+    handler = settings.DefaultHandler
+    return 1 if handler != "com.sun.star.logging.FileHandler" else 2
+
+def getLogUrl(ctx, logger="org.openoffice.logging.DefaultLogger"):
+    url = "$(userurl)/$(loggername).log"
     configuration = getLoggerSettings(ctx, logger)
-    configuration.DefaultHandler = handler
     settings = configuration.getByName("HandlerSettings")
-    if settings.hasByName("Threshold"):
-        settings.replaceByName("Threshold", threshold)
-    else:
-        settings.insertByName("Threshold", threshold)
+    if settings.hasByName("FileURL"):
+        url = settings.getByName("FileURL")
+    service = ctx.ServiceManager.createInstance("com.sun.star.util.PathSubstitution")
+    return service.substituteVariables(url.replace("$(loggername)", logger), True)
+
+def setLogLevel(ctx, level, logger="org.openoffice.logging.DefaultLogger"):
+    settings = getLoggerSettings(ctx, logger)
+    settings.LogLevel = level
+    settings.commitChanges()
+
+def logToConsole(ctx, threshold=None, logger="org.openoffice.logging.DefaultLogger"):
+    configuration = getLoggerSettings(ctx, logger)
+    configuration.DefaultHandler = "com.sun.star.logging.ConsoleHandler"
+    if threshold is not None:
+        settings = configuration.getByName("HandlerSettings")
+        if settings.hasByName("Threshold"):
+            settings.replaceByName("Threshold", threshold)
+        else:
+            settings.insertByName("Threshold", threshold)
+    configuration.commitChanges()
+
+def logToFile(ctx, url=None, logger="org.openoffice.logging.DefaultLogger"):
+    configuration = getLoggerSettings(ctx, logger)
+    configuration.DefaultHandler = "com.sun.star.logging.FileHandler"
+    if url is not None:
+        settings = configuration.getByName("HandlerSettings")
+        if settings.hasByName("FileURL"):
+            settings.replaceByName("FileURL", url)
+        else:
+            settings.insertByName("FileURL", url)
     configuration.commitChanges()
 
 def getProperty(name, typename, attributes, handle=-1):
@@ -90,11 +126,11 @@ def getStringResource(ctx, locale=None, filename="DialogStrings"):
 def generateUuid():
     return binascii.hexlify(uno.generateUuid().value).decode("utf-8")
 
-def createMessageBox(ctx, peer, message, title, mtype="messbox", buttons=2):
-    mtypes = {"messbox": "MESSAGEBOX", "infobox": "INFOBOX", "warningbox": "WARNINGBOX",
-              "errorbox": "ERRORBOX", "querybox": "QUERYBOX"}
-    mtype = uno.Enum("com.sun.star.awt.MessageBoxType", mtypes[mtype] if mtype in mtypes else "MESSAGEBOX")
-    return peer.getToolkit().createMessageBox(peer, mtype, buttons, title, message)
+def createMessageBox(peer, message, title, box="message", buttons=2):
+    boxtypes = {"message": "MESSAGEBOX", "info": "INFOBOX", "warning": "WARNINGBOX",
+                "error": "ERRORBOX", "query": "QUERYBOX"}
+    box = uno.Enum("com.sun.star.awt.MessageBoxType", boxtypes[box] if box in boxtypes else "MESSAGEBOX")
+    return peer.getToolkit().createMessageBox(peer, box, buttons, title, message)
 
 def createService(ctx, name, **args):
     if args:
@@ -106,47 +142,6 @@ def createService(ctx, name, **args):
     else:
         service = ctx.ServiceManager.createInstanceWithContext(name, ctx)
     return service
-
-
-class PyLogHandler(unohelper.Base, XLogHandler, XRequestCallback):
-    def __init__(self):
-        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties = {}
-        self.properties["Encoding"] = getProperty("Encoding", "string", transient)
-        self.properties["Formatter"] = getProperty("Formatter", "com.sun.star.logging.XLogFormatter", readonly)
-        self.properties["Level"] = getProperty("Level", "long", transient)
-        self.Encoding = "UTF-8"
-        self.Formatter = PyLogFormatter()
-        self.Level = uno.getConstantByName("com.sun.star.logging.LogLevel.ALL")
-        self.callbacks = []
-
-    # XLogHandler
-    def flush(self):
-        pass
-    def publish(self, record):
-        publish = record.Level >= self.Level
-        if publish:
-            namedvalue = uno.createUnoStruct("com.sun.star.beans.NamedValue", "TextField", "")
-            for callback in self.callbacks:
-                namedvalue.Value = self.Formatter.format(record)
-                callback.notify(namedvalue)
-        return publish
-
-    # XRequestCallback
-    def addCallback(self, callback, data):
-        if callback not in self.callbacks:
-            self.callbacks.append(callback)
-
-
-class PyLogFormatter(XLogFormatter):
-    # XLogFormatter
-    def getHead(self):
-        return ""
-    def format(self, record):
-        return "%s%s%s" % (self.getHead(), record.Message, self.getTail())
-    def getTail(self):
-        return "\r\n"
 
 
 class PyInteractionHandler(unohelper.Base, XInteractionHandler):

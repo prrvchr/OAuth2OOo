@@ -5,6 +5,7 @@ import uno
 import unohelper
 
 from com.sun.star.task import XJob
+from com.sun.star.uno import XReference
 
 import unotools
 from unotools import PyServiceInfo, PyPropertySet, PyInitialization
@@ -36,7 +37,7 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
     def ResourceUrl(self, url):
         if self.Setting.Url.Id != url:
             self.Setting.Url.Id = url
-            self.Setting.update()
+            self.Setting.Url.update()
     @property
     def UserName(self):
         return self.Setting.Url.Provider.Scope.User.Id
@@ -67,8 +68,8 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         controller = unotools.createService(self.ctx, service, ResourceUrl=self.ResourceUrl, UserName=self.UserName)
         codeverifier = controller.CodeVerifier
         if controller.Wizard.execute():
-            code = controller.AuthorizationCode
             controller.Configuration.commit()
+            code = controller.AuthorizationCode
             self.UserName = controller.UserName
             self.ResourceUrl = controller.ResourceUrl
         controller.dispose()

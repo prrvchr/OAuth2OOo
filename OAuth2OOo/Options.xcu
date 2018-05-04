@@ -12,6 +12,12 @@
     <prop oor:name="HandlerTimeout">
         <value>90</value>
     </prop>
+    <prop oor:name="LogToConsole">
+        <value>false</value>
+    </prop>
+    <prop oor:name="LogToFile">
+        <value>false</value>
+    </prop>
     <node oor:name="Urls">
         <node oor:name="smtp.gmail.com/send" oor:op="fuse">
             <prop oor:name="Scope">

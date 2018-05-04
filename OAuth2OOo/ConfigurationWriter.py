@@ -26,14 +26,11 @@ class PyConfigurationWriter(unohelper.Base, PyServiceInfo, PyPropertySet, XTrans
         self.properties["RequestTimeout"] = unotools.getProperty("RequestTimeout", "short", readonly)
         self.properties["Logger"] = unotools.getProperty("Logger", "com.sun.star.logging.XLogger", readonly)
         self.configuration = unotools.getConfiguration(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo", True)
-        self._Url = PyUrlWriter(self.configuration)
-        self._HandlerTimeout = None
-        self._RequestTimeout = None
-        self._Logger = unotools.getLogger(self.ctx)
+        self.Url = PyUrlWriter(self.configuration)
+        self.HandlerTimeout = self.configuration.getByName("HandlerTimeout")
+        self.RequestTimeout = self.configuration.getByName("RequestTimeout")
+        self.Logger = unotools.getLogger(self.ctx)
 
-    @property
-    def Url(self):
-        return self._Url
     @property
     def UrlList(self):
         names = []
@@ -41,19 +38,6 @@ class PyConfigurationWriter(unohelper.Base, PyServiceInfo, PyPropertySet, XTrans
             if value["State"] < 8:
                 names.append(key)
         return tuple(names)
-    @property
-    def HandlerTimeout(self):
-        if self._HandlerTimeout is None:
-            self._HandlerTimeout = self.configuration.getByName("HandlerTimeout")
-        return self._HandlerTimeout
-    @property
-    def RequestTimeout(self):
-        if self._RequestTimeout is None:
-            self._RequestTimeout = self.configuration.getByName("RequestTimeout")
-        return self._RequestTimeout
-    @property
-    def Logger(self):
-        return self._Logger
 
     # XTransactedObject
     def commit(self):
@@ -78,7 +62,7 @@ class PyUrlWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         self.properties["ScopeList"] = unotools.getProperty("ScopeList", "[]string", readonly)
         self.properties["ScopesList"] = unotools.getProperty("ScopesList", "[]string", readonly)
         self.properties["State"] = unotools.getProperty("State", "short", transient)
-        self._Provider = PyProviderWriter(self.configuration)
+        self.Provider = PyProviderWriter(self.configuration)
         self._Id = ""
         self.Urls = {}
         self.revert()
@@ -101,9 +85,6 @@ class PyUrlWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         if scope in self.Provider.Scope.Scopes:
             provider = self.Provider.Scope.Scopes[scope]["Provider"]
         self.Provider.Id = provider
-    @property
-    def Provider(self):
-        return self._Provider
     @property
     def ProviderName(self):
         return self.Provider.Id
@@ -214,7 +195,7 @@ class PyProviderWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         self.properties["State"] = unotools.getProperty("State", "short", transient)
         self.redirect = "urn:ietf:wg:oauth:2.0:oob"
         self.Providers = {}
-        self._Scope = PyScopeWriter(self.configuration)
+        self.Scope = PyScopeWriter(self.configuration)
         self.revert()
 
     @property
@@ -223,9 +204,6 @@ class PyProviderWriter(unohelper.Base, PyPropertySet, XTransactedObject):
     @Id.setter
     def Id(self, id):
         self.Scope.User.ProviderId = id
-    @property
-    def Scope(self):
-        return self._Scope
     @property
     def ClientId(self):
         id = ""
@@ -382,12 +360,9 @@ class PyScopeWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         self.properties["State"] = unotools.getProperty("State", "short", transient)
         self.Id = ""
         self.Scopes = {}
-        self._User = PyUserWriter(self.configuration)
+        self.User = PyUserWriter(self.configuration)
         self.revert()
 
-    @property
-    def User(self):
-        return self._User
     @property
     def Value(self):
         values = self.User._Scope
@@ -453,17 +428,10 @@ class PyUserWriter(unohelper.Base, PyPropertySet, XUpdatable):
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
         self.properties["Id"] = unotools.getProperty("Id", "string", transient)
         self.properties["Scope"] = unotools.getProperty("Scope", "string", readonly)
-        self._Id = ""
+        self.Id = ""
         self.ProviderId = ""
         self._Scope = []
 
-    @property
-    def Id(self):
-        return self._Id
-    @Id.setter
-    def Id(self, id):
-        self._Id = id
-        self.update()
     @property
     def Scope(self):
         return " ".join(self._Scope)

@@ -6,10 +6,12 @@ import unohelper
 
 from com.sun.star.embed import XTransactedObject
 from com.sun.star.util import XUpdatable
+from com.sun.star.uno import XReference
 
 import unotools
 from unotools import PyServiceInfo, PyPropertySet
 import time
+import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -27,63 +29,73 @@ class PySettingReader(unohelper.Base, PyServiceInfo, PyPropertySet, XTransactedO
         self.properties["UrlList"] = unotools.getProperty("UrlList", "[]string", readonly)
         self.properties["RequestTimeout"] = unotools.getProperty("RequestTimeout", "short", transient)
         self.properties["HandlerTimeout"] = unotools.getProperty("HandlerTimeout", "short", transient)
+        self.properties["LogToConsole"] = unotools.getProperty("LogToConsole", "boolean", transient)
+        self.properties["LogToFile"] = unotools.getProperty("LogToFile", "boolean", transient)
         self.properties["Logger"] = unotools.getProperty("Logger", "com.sun.star.logging.XLogger", readonly)
+        self.properties["LogUrl"] = unotools.getProperty("LogUrl", "string", readonly)
         self.configuration = unotools.getConfiguration(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo", True)
-        self._RequestTimeout = None
-        self._HandlerTimeout = None
-        self._Logger = unotools.getLogger(self.ctx)
-        self._initLogger()
-        self._Url = PyUrlReader(self.configuration)
+        self.RequestTimeout = self.configuration.getByName("RequestTimeout")
+        self.HandlerTimeout = self.configuration.getByName("HandlerTimeout")
+        self.Logger = unotools.getLogger(self.ctx)
+        self.Logger.Level = uno.getConstantByName("com.sun.star.logging.LogLevel.ALL")
+        self._ConsoleHandler = None
+        self._FileHandler = None
+        self.LogUrl = "$(temp)/OAuth2OOo.txt"
+        self.LogToConsole = self.configuration.getByName("LogToConsole")
+        self.LogToFile = self.configuration.getByName("LogToFile")
+        self.Url = PyUrlReader(self.configuration)
 
-    @property
-    def Url(self):
-        return self._Url
     @property
     def UrlList(self):
         return self.configuration.getByName("Urls").ElementNames
     @property
-    def RequestTimeout(self):
-        if self._RequestTimeout is None:
-            self._RequestTimeout = self.configuration.getByName("RequestTimeout")
-        return self._RequestTimeout
-    @RequestTimeout.setter
-    def RequestTimeout(self, timeout):
-        self._RequestTimeout = timeout
+    def LogToConsole(self):
+        return False if self._ConsoleHandler is None else True
+    @LogToConsole.setter
+    def LogToConsole(self, enabled):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        if enabled:
+            self._ConsoleHandler = unotools.getConsoleHandler(self.ctx, level)
+            self.Logger.addLogHandler(self._ConsoleHandler)
+            self.Logger.logp(level, "PySettingReader", "LogToConsole", "LogToConsole enabled")
+        else:
+            if self._ConsoleHandler is not None:
+                self.Logger.logp(level, "PySettingReader", "LogToConsole", "LogToConsole disabled")
+            self.Logger.removeLogHandler(self._ConsoleHandler)
+            self._ConsoleHandler = None
     @property
-    def HandlerTimeout(self):
-        if self._HandlerTimeout is None:
-            self._HandlerTimeout = self.configuration.getByName("HandlerTimeout")
-        return self._HandlerTimeout
-    @HandlerTimeout.setter
-    def HandlerTimeout(self, timeout):
-        self._HandlerTimeout = timeout
-    @property
-    def Logger(self):
-        return self._Logger
+    def LogToFile(self):
+        return False if self._FileHandler is None else True
+    @LogToFile.setter
+    def LogToFile(self, enabled):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        if enabled:
+            self._FileHandler = unotools.getFileHandler(self.ctx, self.LogUrl, level)
+            self.Logger.addLogHandler(self._FileHandler)
+            self.Logger.logp(level, "PySettingReader", "LogToFile", "LogToFile enabled")
+        else:
+            if self._FileHandler is not None:
+                self.Logger.logp(level, "PySettingReader", "LogToFile", "LogToFile disabled")
+            self.Logger.removeLogHandler(self._FileHandler)
+            self._FileHandler = None
 
     # XTransactedObject
     def commit(self):
-        self.configuration.replaceByName("RequestTimeout", self._RequestTimeout)
-        self.configuration.replaceByName("HandlerTimeout", self._HandlerTimeout)
+        self.configuration.replaceByName("RequestTimeout", self.RequestTimeout)
+        self.configuration.replaceByName("HandlerTimeout", self.HandlerTimeout)
+        self.configuration.replaceByName("LogToConsole", self.LogToConsole)
+        self.configuration.replaceByName("LogToFile", self.LogToFile)
         if self.configuration.hasPendingChanges():
             self.configuration.commitChanges()
     def revert(self):
-        self._RequestTimeout = self.configuration.getByName("RequestTimeout")
-        self._HandlerTimeout = self.configuration.getByName("HandlerTimeout")
+        self.RequestTimeout = self.configuration.getByName("RequestTimeout")
+        self.HandlerTimeout = self.configuration.getByName("HandlerTimeout")
+        self.LogToConsole = self.configuration.getByName("LogToConsole")
+        self.LogToFile = self.configuration.getByName("LogToFile")
 
     # XUpdatable
     def update(self):
-        self.Url.update()
-        self.Url.Provider.Scope.User.update()
-
-    def _initLogger(self):
-        level = uno.getConstantByName("com.sun.star.logging.LogLevel.ALL")
-        handler = unotools.getConsoleHandler(self.ctx)
-        handler.Level = level
-        self.Logger.Level = level
-        self.Logger.addLogHandler(handler)
-#        mri = self.ctx.ServiceManager.createInstance("mytools.Mri")
-#        mri.inspect(self.Logger)
+        pass
 
 
 class PyUrlReader(unohelper.Base, PyPropertySet, XUpdatable):
@@ -109,10 +121,11 @@ class PyUrlReader(unohelper.Base, PyPropertySet, XUpdatable):
 
     # XUpdatable
     def update(self):
+        id = ""
         urls = self.configuration.getByName("Urls")
         if urls.hasByName(self.Id):
-            url = urls.getByName(self.Id)
-            self.Provider.Scope.ScopeId = url.getByName("Scope")
+            id = urls.getByName(self.Id).getByName("Scope")
+        self.Provider.Scope.ScopeId = id
         self.Provider.Scope.update()
         self.Provider.update()
 
@@ -132,41 +145,17 @@ class PyProviderReader(unohelper.Base, PyPropertySet, XUpdatable):
         self.properties["RedirectPort"] = unotools.getProperty("RedirectPort", "short", readonly)
         self.properties["RedirectUri"] = unotools.getProperty("RedirectUri", "string", readonly)
         self.properties["Scope"] = unotools.getProperty("Scope", "com.sun.star.uno.XInterface", readonly)
-        self._ClientId = ""
-        self._ClientSecret = ""
-        self._AuthorizationUrl = ""
-        self._TokenUrl = ""
-        self._CodeChallenge = True
-        self._HttpHandler = True
-        self._RedirectAddress = "localhost"
-        self._RedirectPort = 8080
+        self.ClientId = ""
+        self.ClientSecret = ""
+        self.AuthorizationUrl = ""
+        self.TokenUrl = ""
+        self.CodeChallenge = True
+        self.HttpHandler = True
+        self.RedirectAddress = "localhost"
+        self.RedirectPort = 8080
         self.redirect = "urn:ietf:wg:oauth:2.0:oob"
-        self._Scope = PyScopeReader(self.configuration)
+        self.Scope = PyScopeReader(self.configuration)
 
-    @property
-    def ClientId(self):
-        return self._ClientId
-    @property
-    def ClientSecret(self):
-        return self._ClientSecret
-    @property
-    def AuthorizationUrl(self):
-        return self._AuthorizationUrl
-    @property
-    def TokenUrl(self):
-        return self._TokenUrl
-    @property
-    def CodeChallenge(self):
-        return self._CodeChallenge
-    @property
-    def HttpHandler(self):
-        return self._HttpHandler
-    @property
-    def RedirectAddress(self):
-        return self._RedirectAddress
-    @property
-    def RedirectPort(self):
-        return self._RedirectPort
     @property
     def RedirectUri(self):
         if self.HttpHandler:
@@ -174,32 +163,37 @@ class PyProviderReader(unohelper.Base, PyPropertySet, XUpdatable):
         else:
             uri = self.redirect
         return uri
-    @property
-    def Scope(self):
-        return self._Scope
 
     # XUpdatable
     def update(self):
+        clientid = ""
+        clientsecret = ""
+        authorizationurl = ""
+        tokenurl = ""
+        codechallenge = True
+        httphandler = True
+        redirectaddress = "localhost"
+        redirectport = 8080
         providers = self.configuration.getByName("Providers")
         if providers.hasByName(self.Scope.User.ProviderId):
             provider = providers.getByName(self.Scope.User.ProviderId)
-            self._ClientId = provider.getByName("ClientId")
-            self._ClientSecret = provider.getByName("ClientSecret")
-            self._AuthorizationUrl = provider.getByName("AuthorizationUrl")
-            self._TokenUrl = provider.getByName("TokenUrl")
-            self._CodeChallenge = provider.getByName("CodeChallenge")
-            self._HttpHandler = provider.getByName("HttpHandler")
-            self._RedirectAddress = provider.getByName("RedirectAddress")
-            self._RedirectPort = provider.getByName("RedirectPort")
-        else:
-            self._ClientId = ""
-            self._ClientSecret = ""
-            self._AuthorizationUrl = ""
-            self._TokenUrl = ""
-            self._CodeChallenge = True
-            self._HttpHandler = True
-            self._RedirectAddress = "localhost"
-            self._RedirectPort = 8080
+            clientid = provider.getByName("ClientId")
+            clientsecret = provider.getByName("ClientSecret")
+            authorizationurl = provider.getByName("AuthorizationUrl")
+            tokenurl = provider.getByName("TokenUrl")
+            codechallenge = provider.getByName("CodeChallenge")
+            httphandler = provider.getByName("HttpHandler")
+            redirectaddress = provider.getByName("RedirectAddress")
+            redirectport = provider.getByName("RedirectPort")
+        self.ClientId = clientid
+        self.ClientSecret = clientsecret
+        self.AuthorizationUrl = authorizationurl
+        self.TokenUrl = tokenurl
+        self.CodeChallenge = codechallenge
+        self.HttpHandler = httphandler
+        self.RedirectAddress = redirectaddress
+        self.RedirectPort = redirectport
+        self.Scope.User.update()
 
 
 class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
@@ -212,7 +206,7 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
         self.properties["User"] = unotools.getProperty("User", "com.sun.star.uno.XInterface", readonly)
         self.ScopeId = ""
         self._Values = []
-        self._User = PyUserReader(self.configuration)
+        self.User = PyUserReader(self.configuration)
 
     @property
     def Values(self):
@@ -229,20 +223,18 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
                 needed = True
                 break
         return needed
-    @property
-    def User(self):
-        return self._User
 
     # XUpdatable
     def update(self):
+        id = ""
+        values = []
         scopes = self.configuration.getByName("Scopes")
         if scopes.hasByName(self.ScopeId):
             scope = scopes.getByName(self.ScopeId)
-            self._Values = list(scope.getByName("Values"))
-            self.User.ProviderId = scope.getByName("Provider")
-        else:
-            self._Values = []
-            self.User.ProviderId = ""
+            id = scope.getByName("Provider")
+            values = list(scope.getByName("Values"))
+        self.User.ProviderId = id
+        self._Values = values
 
 
 class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable):
@@ -255,31 +247,13 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
         self.properties["RefreshToken"] = unotools.getProperty("RefreshToken", "string", transient)
         self.properties["ExpiresIn"] = unotools.getProperty("ExpiresIn", "short", transient)
         self.properties["Scope"] = unotools.getProperty("Scope", "string", transient)
-        self._Id = ""
+        self.Id = ""
         self.ProviderId = ""
-        self._AccessToken = ""
-        self._RefreshToken = ""
+        self.AccessToken = ""
+        self.RefreshToken = ""
         self._TimeStamp = 0
         self._Scope = []
 
-    @property
-    def Id(self):
-        return self._Id
-    @Id.setter
-    def Id(self, id):
-        self._Id = id
-    @property
-    def AccessToken(self):
-        return self._AccessToken
-    @AccessToken.setter
-    def AccessToken(self, token):
-        self._AccessToken = token
-    @property
-    def RefreshToken(self):
-        return self._RefreshToken
-    @RefreshToken.setter
-    def RefreshToken(self, token):
-        self._RefreshToken = token
     @property
     def ExpiresIn(self):
         second = self._TimeStamp - int(time.time())
@@ -319,20 +293,24 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
 
     # XUpdatable
     def update(self):
-        user = None
+        accesstoken = ""
+        refreshtoken = ""
+        timestamp = 0
+        scope = []
         providers = self.configuration.getByName("Providers")
         if providers.hasByName(self.ProviderId):
             provider = providers.getByName(self.ProviderId)
             users = provider.getByName("Users")
             if users.hasByName(self.Id):
                 user = users.getByName(self.Id)
-        if user is not None:
-            self._AccessToken = user.getByName("AccessToken")
-            self._RefreshToken = user.getByName("RefreshToken")
-            self._TimeStamp = user.getByName("TimeStamp")
-            self._Scope = list(user.getByName("Scopes"))
-        else:
-            self.revert()
+                accesstoken = user.getByName("AccessToken")
+                refreshtoken = user.getByName("RefreshToken")
+                timestamp = user.getByName("TimeStamp")
+                scope = list(user.getByName("Scopes"))
+        self._AccessToken = accesstoken
+        self._RefreshToken = refreshtoken
+        self._TimeStamp = timestamp
+        self._Scope = scope
 
 
 g_ImplementationHelper.addImplementation(PySettingReader,                           # UNO object class
