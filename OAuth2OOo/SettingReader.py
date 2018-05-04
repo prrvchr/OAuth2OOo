@@ -29,69 +29,26 @@ class PySettingReader(unohelper.Base, PyServiceInfo, PyPropertySet, XTransactedO
         self.properties["UrlList"] = unotools.getProperty("UrlList", "[]string", readonly)
         self.properties["RequestTimeout"] = unotools.getProperty("RequestTimeout", "short", transient)
         self.properties["HandlerTimeout"] = unotools.getProperty("HandlerTimeout", "short", transient)
-        self.properties["LogToConsole"] = unotools.getProperty("LogToConsole", "boolean", transient)
-        self.properties["LogToFile"] = unotools.getProperty("LogToFile", "boolean", transient)
         self.properties["Logger"] = unotools.getProperty("Logger", "com.sun.star.logging.XLogger", readonly)
-        self.properties["LogUrl"] = unotools.getProperty("LogUrl", "string", readonly)
         self.configuration = unotools.getConfiguration(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo", True)
         self.RequestTimeout = self.configuration.getByName("RequestTimeout")
         self.HandlerTimeout = self.configuration.getByName("HandlerTimeout")
         self.Logger = unotools.getLogger(self.ctx)
-        self.Logger.Level = uno.getConstantByName("com.sun.star.logging.LogLevel.ALL")
-        self._ConsoleHandler = None
-        self._FileHandler = None
-        self.LogUrl = "$(temp)/OAuth2OOo.txt"
-        self.LogToConsole = self.configuration.getByName("LogToConsole")
-        self.LogToFile = self.configuration.getByName("LogToFile")
         self.Url = PyUrlReader(self.configuration)
 
     @property
     def UrlList(self):
         return self.configuration.getByName("Urls").ElementNames
-    @property
-    def LogToConsole(self):
-        return False if self._ConsoleHandler is None else True
-    @LogToConsole.setter
-    def LogToConsole(self, enabled):
-        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
-        if enabled:
-            self._ConsoleHandler = unotools.getConsoleHandler(self.ctx, level)
-            self.Logger.addLogHandler(self._ConsoleHandler)
-            self.Logger.logp(level, "PySettingReader", "LogToConsole", "LogToConsole enabled")
-        else:
-            if self._ConsoleHandler is not None:
-                self.Logger.logp(level, "PySettingReader", "LogToConsole", "LogToConsole disabled")
-            self.Logger.removeLogHandler(self._ConsoleHandler)
-            self._ConsoleHandler = None
-    @property
-    def LogToFile(self):
-        return False if self._FileHandler is None else True
-    @LogToFile.setter
-    def LogToFile(self, enabled):
-        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
-        if enabled:
-            self._FileHandler = unotools.getFileHandler(self.ctx, self.LogUrl, level)
-            self.Logger.addLogHandler(self._FileHandler)
-            self.Logger.logp(level, "PySettingReader", "LogToFile", "LogToFile enabled")
-        else:
-            if self._FileHandler is not None:
-                self.Logger.logp(level, "PySettingReader", "LogToFile", "LogToFile disabled")
-            self.Logger.removeLogHandler(self._FileHandler)
-            self._FileHandler = None
 
     # XTransactedObject
     def commit(self):
         self.configuration.replaceByName("RequestTimeout", self.RequestTimeout)
         self.configuration.replaceByName("HandlerTimeout", self.HandlerTimeout)
-        self.configuration.replaceByName("LogToConsole", self.LogToConsole)
-        self.configuration.replaceByName("LogToFile", self.LogToFile)
         if self.configuration.hasPendingChanges():
             self.configuration.commitChanges()
     def revert(self):
         self.RequestTimeout = self.configuration.getByName("RequestTimeout")
         self.HandlerTimeout = self.configuration.getByName("HandlerTimeout")
-        self.LogToConsole = self.configuration.getByName("LogToConsole")
-        self.LogToFile = self.configuration.getByName("LogToFile")
 
     # XUpdatable
     def update(self):
@@ -106,18 +63,8 @@ class PyUrlReader(unohelper.Base, PyPropertySet, XUpdatable):
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
         self.properties["Id"] = unotools.getProperty("Id", "string", transient)
         self.properties["Provider"] = unotools.getProperty("Provider", "com.sun.star.uno.XInterface", readonly)
-        self._Id = ""
-        self._Provider = PyProviderReader(self.configuration)
-
-    @property
-    def Id(self):
-        return self._Id
-    @Id.setter
-    def Id(self, id):
-        self._Id = id
-    @property
-    def Provider(self):
-        return self._Provider
+        self.Id = ""
+        self.Provider = PyProviderReader(self.configuration)
 
     # XUpdatable
     def update(self):
@@ -202,7 +149,7 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
         self.properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         self.properties["Values"] = unotools.getProperty("Values", "string", readonly)
-        self.properties["NeedAuthorization"] = unotools.getProperty("NeedAuthorization", "boolean", readonly)
+        self.properties["Authorized"] = unotools.getProperty("Authorized", "boolean", readonly)
         self.properties["User"] = unotools.getProperty("User", "com.sun.star.uno.XInterface", readonly)
         self.ScopeId = ""
         self._Values = []
@@ -216,13 +163,13 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
                 values.append(value)
         return " ".join(values)
     @property
-    def NeedAuthorization(self):
-        needed = False
+    def Authorized(self):
+        authorized = True
         for value in self._Values:
             if value not in self.User._Scope:
-                needed = True
+                authorized = False
                 break
-        return needed
+        return authorized
 
     # XUpdatable
     def update(self):
@@ -277,8 +224,8 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
             if not users.hasByName(self.Id):
                 users.insertByName(self.Id, users.createInstance())
             user = users.getByName(self.Id)
-            user.replaceByName("AccessToken", self._AccessToken)
-            user.replaceByName("RefreshToken", self._RefreshToken)
+            user.replaceByName("AccessToken", self.AccessToken)
+            user.replaceByName("RefreshToken", self.RefreshToken)
             user.replaceByName("TimeStamp", self._TimeStamp)
 #            user.replaceByName("Scopes", self._Scope)
             arguments = ("Scopes", uno.Any("[]string", tuple(self._Scope)))
@@ -286,8 +233,8 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
             if self.configuration.hasPendingChanges():
                 self.configuration.commitChanges()
     def revert(self):
-        self._AccessToken = ""
-        self._RefreshToken = ""
+        self.AccessToken = ""
+        self.RefreshToken = ""
         self._TimeStamp = 0
         self._Scope = []
 
@@ -307,8 +254,8 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
                 refreshtoken = user.getByName("RefreshToken")
                 timestamp = user.getByName("TimeStamp")
                 scope = list(user.getByName("Scopes"))
-        self._AccessToken = accesstoken
-        self._RefreshToken = refreshtoken
+        self.AccessToken = accesstoken
+        self.RefreshToken = refreshtoken
         self._TimeStamp = timestamp
         self._Scope = scope
 

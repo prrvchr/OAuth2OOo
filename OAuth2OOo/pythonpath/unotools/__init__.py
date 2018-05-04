@@ -13,6 +13,20 @@ from com.sun.star.awt import XRequestCallback
 import binascii
 
 
+def getFileSequence(ctx, url, default=None):
+    length = 0
+    sequence = uno.ByteSequence(b"")
+    fileservice = ctx.ServiceManager.createInstance("com.sun.star.ucb.SimpleFileAccess")
+    if fileservice.exists(url):
+        inputstream = fileservice.openFileRead(url)
+        length, sequence = inputstream.readBytes(None, fileservice.getSize(url))
+        inputstream.closeInput()
+    elif default is not None and fileservice.exists(default):
+        inputstream = fileservice.openFileRead(default)
+        length, sequence = inputstream.readBytes(None, fileservice.getSize(default))
+        inputstream.closeInput()
+    return length, sequence
+
 def getLogger(ctx, logger="org.openoffice.logging.DefaultLogger"):
     pool = ctx.getValueByName("/singletons/com.sun.star.logging.LoggerPool")
     return pool.getNamedLogger(logger)

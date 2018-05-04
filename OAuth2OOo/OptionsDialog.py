@@ -19,22 +19,18 @@ class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandle
         self.ctx = ctx
         self.stringResource = unotools.getStringResource(self.ctx, None, "OptionsDialog")
         self.service = unotools.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service")
-        self.LogLevels = unotools.getLogLevels()
 
     # XContainerWindowEventHandler
     def callHandlerMethod(self, dialog, event, method):
         handled = False
         if method == "external_event":
             if event == "ok":
-                print("PyOptionsDialog.callHandlerMethod.ok")
                 self._saveSetting(dialog)
                 handled = True
             elif event == "back":
-                print("PyOptionsDialog.callHandlerMethod.back")
                 self._loadSetting(dialog)
                 handled = True
             elif event == "initialize":
-                print("PyOptionsDialog.callHandlerMethod.initialize")
                 self._loadSetting(dialog)
                 handled = True
         elif method == "Changed":
@@ -67,42 +63,35 @@ class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandle
         elif item == "Url":
             self.service.ResourceUrl = text
             dialog.getControl("CommandButton2").Model.Enabled = text != ""
-        token = self.service.Setting.Url.Provider.Scope.User.AccessToken
-        self._updateUI(dialog, token != "")
+        self._updateUI(dialog)
 
     def _doConnect(self, dialog):
-#        logger = unotools.getLoggerSettings(self.ctx, "org.openoffice.logging.DefaultLogger")
-#        mri = self.ctx.ServiceManager.createInstance("mytools.Mri")
-#        mri.inspect(logger)
         token = self.service.execute(())
-        self._updateUI(dialog, token != "")
+        self._updateUI(dialog)
 
     def _doLogger(self, dialog, enabled):
         self._updateLogUI(dialog, enabled)
 
     def _doRemove(self, dialog):
         user = self.service.Setting.Url.Provider.Scope.User
-        user.AccessToken = ""
+        user.Scope = ""
         user.commit()
-        self._updateUI(dialog, True)
+        self._updateUI(dialog)
 
     def _doReset(self, dialog):
         user = self.service.Setting.Url.Provider.Scope.User
         user.ExpiresIn = 0
         user.commit()
-        self._updateUI(dialog, True)
+        self._updateUI(dialog)
 
     def _doView(self, window):
-        text = ""
-        url = unotools.getLogUrl(self.ctx)
-        fileservice = self.ctx.ServiceManager.createInstance("com.sun.star.ucb.SimpleFileAccess")
-        if fileservice.exists(url):
-            inputstream = fileservice.openFileRead(url)
-            length, seq = inputstream.readBytes(None, fileservice.getSize(url))
-            inputstream.closeInput()
-            text = seq.value.decode("utf-8")
-        title = self.stringResource.resolveString("MessageBox.Title") % url
-        dialog = unotools.createMessageBox(window.Peer, text, title, "message", 1)
+        title = unotools.getLogUrl(self.ctx)
+        length, sequence = unotools.getFileSequence(self.ctx, title)
+        text = sequence.value.decode("utf-8")
+        url = "vnd.sun.star.script:OAuth2OOo.LogDialog?location=application"
+        dialog = unotools.createService(self.ctx, "com.sun.star.awt.DialogProvider").createDialog(url)
+        dialog.Title = title
+        dialog.getControl("TextField1").Text = text
         dialog.execute()
         dialog.dispose()
 
@@ -111,25 +100,31 @@ class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandle
         dialog.getControl("NumericField2").setValue(self.service.Setting.HandlerTimeout)
         dialog.getControl("ComboBox2").Model.StringItemList = self.service.Setting.UrlList
         level = unotools.getLogLevel(self.ctx)
-        enabled = level in self.LogLevels
+        levels = unotools.getLogLevels()
+        enabled = level in levels
         dialog.getControl("CheckBox1").State = int(enabled)
-        dialog.getControl("ComboBox1").Text = self._getComboBoxText("ComboBox1", level)
+        control = dialog.getControl("ComboBox1")
+        control.Text = self._getControlText(control, levels, level)
         dialog.getControl("OptionButton%s" % unotools.getLogHandler(self.ctx)).State = 1
         self._updateLogUI(dialog, enabled)
 
-    def _getComboBoxText(self, name, level):
-        text = self.stringResource.resolveString("OptionsDialog.%s.StringItemList.%s" % (name, 7))
-        if level in self.LogLevels:
-            index = self.LogLevels.index(level)
+    def _getControlText(self, control, levels, level):
+        name = control.Model.Name
+        index = control.ItemCount -1
+        text = self.stringResource.resolveString("OptionsDialog.%s.StringItemList.%s" % (name, index))
+        if level in levels:
+            index = levels.index(level)
             text = self.stringResource.resolveString("OptionsDialog.%s.StringItemList.%s" % (name, index))
         return text
 
-    def _getComboBoxLevel(self, control):
+    def _getControlLevel(self, control):
+        name = control.Model.Name
         level = uno.getConstantByName("com.sun.star.logging.LogLevel.OFF")
+        levels = unotools.getLogLevels()
         for index in range(control.ItemCount):
-            text = self.stringResource.resolveString("OptionsDialog.%s.StringItemList.%s" % (control.Model.Name, index))
+            text = self.stringResource.resolveString("OptionsDialog.%s.StringItemList.%s" % (name, index))
             if text == control.Text:
-                level = self.LogLevels[index]
+                level = levels[index]
                 break
         return level
 
@@ -139,14 +134,15 @@ class PyOptionsDialog(unohelper.Base, PyServiceInfo, XContainerWindowEventHandle
         self.service.Setting.commit()
         level = uno.getConstantByName("com.sun.star.logging.LogLevel.OFF")
         if dialog.getControl("CheckBox1").State:
-            level = self._getComboBoxLevel(dialog.getControl("ComboBox1"))
+            level = self._getControlLevel(dialog.getControl("ComboBox1"))
             if dialog.getControl("OptionButton1").State:
                 unotools.logToConsole(self.ctx)
             else:
                 unotools.logToFile(self.ctx)
         unotools.setLogLevel(self.ctx, level)
 
-    def _updateUI(self, dialog, enabled):
+    def _updateUI(self, dialog):
+        enabled = self.service.Setting.Url.Provider.Scope.Authorized
         if enabled:
             dialog.getControl("Label8").setText(self.service.Setting.Url.Provider.Scope.User.RefreshToken)
             dialog.getControl("Label10").setText(self.service.Setting.Url.Provider.Scope.User.AccessToken)

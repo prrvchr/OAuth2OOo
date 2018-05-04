@@ -27,7 +27,7 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         self.properties["ResourceUrl"] = unotools.getProperty("ResourceUrl", "string", transient)
         self.properties["UserName"] = unotools.getProperty("UserName", "string", transient)
         self.properties["Setting"] = unotools.getProperty("Setting", "com.sun.star.uno.XInterface", readonly)
-        self._Setting = unotools.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.SettingReader")
+        self.Setting = unotools.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.SettingReader")
         self.initialize(namedvalues)
 
     @property
@@ -46,20 +46,17 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         if self.Setting.Url.Provider.Scope.User.Id != name:
             self.Setting.Url.Provider.Scope.User.Id = name
             self.Setting.Url.Provider.Scope.User.update()
-    @property
-    def Setting(self):
-        return self._Setting
 
     # XJob
     def execute(self, namedvalues=()):
         self.initialize(namedvalues)
-        token = self.Setting.Url.Provider.Scope.User.AccessToken
-        if not token or self.Setting.Url.Provider.Scope.NeedAuthorization:
+        if not self.Setting.Url.Provider.Scope.Authorized:
             code, codeverifier = self._getAuthorizationCode()
-            if code is not None:
-                token = self._getTokens(code, codeverifier)
+            token = "" if code is None else self._getTokens(code, codeverifier)
         elif self.Setting.Url.Provider.Scope.User.ExpiresIn < self.Setting.HandlerTimeout:
             token = self._refreshToken()
+        else:
+            token = self.Setting.Url.Provider.Scope.User.AccessToken
         return token
 
     def _getAuthorizationCode(self):

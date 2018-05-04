@@ -75,9 +75,6 @@ class PyHttpServer(Thread):
         Thread.__init__(self)
         self.ctx = ctx
         self.controller = controller
-        resource = unotools.getStringResource(self.ctx)
-        self.success = resource.resolveString("HttpCodeHandler.Message.Success")
-        self.error = resource.resolveString("HttpCodeHandler.Message.Error")
         self.lock = RLock()
         self.acceptor = unotools.createService(self.ctx, "com.sun.star.connection.Acceptor")
 
@@ -91,14 +88,7 @@ class PyHttpServer(Thread):
                 basename = unotools.getResourceLocation(self.ctx)
                 basename += "/OAuth2Success_%s.html" if result else "/OAuth2Error_%s.html"
                 locale = unotools.getCurrentLocale(self.ctx)
-                fileservice = self.ctx.ServiceManager.createInstance("com.sun.star.ucb.SimpleFileAccess")
-                if fileservice.exists(basename % locale.Language):
-                    filename = basename % locale.Language
-                else:
-                    filename = basename % "en"
-                inputstream = fileservice.openFileRead(filename)
-                length, body = inputstream.readBytes(None, fileservice.getSize(filename))
-                inputstream.closeInput()
+                length, body = unotools.getFileSequence(self.ctx, basename % locale.Language, basename % "en")
                 header = uno.ByteSequence(b'''\
 HTTP/1.1 200 OK
 Content-Length: %d
