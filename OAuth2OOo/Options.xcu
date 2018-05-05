@@ -12,12 +12,6 @@
     <prop oor:name="HandlerTimeout">
         <value>90</value>
     </prop>
-    <prop oor:name="LogToConsole">
-        <value>false</value>
-    </prop>
-    <prop oor:name="LogToFile">
-        <value>false</value>
-    </prop>
     <node oor:name="Urls">
         <node oor:name="smtp.gmail.com/send" oor:op="fuse">
             <prop oor:name="Scope">
@@ -78,6 +72,9 @@
             <prop oor:name="CodeChallenge">
                 <value>true</value>
             </prop>
+            <prop oor:name="CodeChallengeMethod">
+                <value>S256</value>
+            </prop>
             <prop oor:name="HttpHandler">
                 <value>true</value>
             </prop>
@@ -103,6 +100,9 @@
             </prop>
             <prop oor:name="CodeChallenge">
                 <value>true</value>
+            </prop>
+            <prop oor:name="CodeChallengeMethod">
+                <value>S256</value>
             </prop>
             <prop oor:name="HttpHandler">
                 <value>true</value>

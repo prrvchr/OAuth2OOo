@@ -239,9 +239,12 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
                 dialog.getControl("TextField2").setText(self.Configuration.Url.Provider.AuthorizationUrl)
                 dialog.getControl("TextField3").setText(self.Configuration.Url.Provider.TokenUrl)
                 dialog.getControl("TextField4").setText(self.Configuration.Url.Provider.ClientSecret)
-                pkce = self.Configuration.Url.Provider.CodeChallenge
-                control = dialog.getControl("OptionButton1" if pkce else "OptionButton0")
-                control.setState(True)
+                method = self.Configuration.Url.Provider.CodeChallengeMethod
+                name = "OptionButton1" if method == "S256" else "OptionButton2"
+                dialog.getControl(name).State = 1
+                challenge = self.Configuration.Url.Provider.CodeChallenge
+                control = dialog.getControl("CheckBox1")
+                control.State = 1 if challenge else 0
                 self._updateUI(dialog, control)
             elif item == "Scope":
                 values = self.Configuration.Url.Provider.Scope.Values
@@ -260,15 +263,17 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
                 control.Model.removeItem(control.SelectedItemPos)
         else:
             if item == "Provider":
-                clientid = dialog.getControl("TextField1").getText()
+                clientid = dialog.getControl("TextField1").Text
                 self.Configuration.Url.Provider.ClientId = clientid
-                authorizationUrl = dialog.getControl("TextField2").getText()
+                authorizationUrl = dialog.getControl("TextField2").Text
                 self.Configuration.Url.Provider.AuthorizationUrl = authorizationUrl
-                tokenUrl = dialog.getControl("TextField3").getText()
+                tokenUrl = dialog.getControl("TextField3").Text
                 self.Configuration.Url.Provider.TokenUrl = tokenUrl
-                pkce = dialog.getControl("OptionButton1").getState()
-                self.Configuration.Url.Provider.CodeChallenge = pkce
-                clientsecret = dialog.getControl("TextField4").getText()
+                challenge = bool(dialog.getControl("CheckBox1").State)
+                self.Configuration.Url.Provider.CodeChallenge = challenge
+                method = "S256" if dialog.getControl("OptionButton1").State else "plain"
+                self.Configuration.Url.Provider.CodeChallengeMethod = method
+                clientsecret = dialog.getControl("TextField4").Text
                 self.Configuration.Url.Provider.ClientSecret = clientsecret
                 self.Configuration.Url.Provider.State = 4
             elif item == "Scope":
@@ -367,10 +372,10 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
             self.Wizard.activatePath(self.ActivePath, True)
             window.getControl("TextField1").setText(self.AuthorizationStr)
             self.Wizard.updateTravelUI()
-        elif item == "EnablePkce":
-            window.getControl("TextField4").Model.Enabled = False
-        elif item == "DisablePkce":
-            window.getControl("TextField4").Model.Enabled = True
+        elif item == "CodeChallenge":
+            enabled = bool(control.State)
+            window.getControl("OptionButton1").Model.Enabled = enabled
+            window.getControl("OptionButton2").Model.Enabled = enabled
         elif item == "AuthorizationCode":
             enabled = window.getControl("TextField1").getText() != ""
             finish = uno.getConstantByName("com.sun.star.ui.dialogs.WizardButton.FINISH")
@@ -434,8 +439,9 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         parameters["scope"] = self.Configuration.Url.Provider.Scope.Value
 #        parameters["access_type"] = "offline"
         if self.Configuration.Url.Provider.CodeChallenge:
-            parameters["code_challenge_method"] = "S256"
-            parameters["code_challenge"] = self._getCodeChallenge()
+            method = self.Configuration.Url.Provider.CodeChallengeMethod
+            parameters["code_challenge_method"] = method
+            parameters["code_challenge"] = self._getCodeChallenge(method)
         if self.Configuration.Url.Provider.ClientSecret:
             parameters["client_secret"] = self.Configuration.Url.Provider.ClientSecret
         parameters["login_hint"] = self.UserName
@@ -451,11 +457,14 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
             arguments.append("%s=%s" % (key, value))
         return "&".join(arguments)
             
-    def _getCodeChallenge(self):
-        code = hashlib.sha256(self.CodeVerifier.encode("utf-8")).digest()
-        padding = {0:0, 1:2, 2:1}[len(code) % 3]
-        challenge = base64.urlsafe_b64encode(code).decode("utf-8")
-        return challenge[:len(challenge)-padding]
+    def _getCodeChallenge(self, method):
+        code = self.CodeVerifier
+        if method == "S256":
+            code = hashlib.sha256(code.encode("utf-8")).digest()
+            padding = {0:0, 1:2, 2:1}[len(code) % 3]
+            challenge = base64.urlsafe_b64encode(code).decode("utf-8")
+            code = challenge[:len(challenge)-padding]
+        return code
 
     def _openUrl(self, url, option=""):
         service = "com.sun.star.system.SystemShellExecute"

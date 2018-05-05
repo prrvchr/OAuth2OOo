@@ -97,6 +97,7 @@ class PyUrlWriter(unohelper.Base, PyPropertySet, XTransactedObject):
                                            "AuthorizationUrl": "",
                                            "TokenUrl": "",
                                            "CodeChallenge": True,
+                                           "CodeChallengeMethod": "S256",
                                            "HttpHandler": True,
                                            "RedirectAddress": "localhost",
                                            "RedirectPort": 8080,
@@ -188,6 +189,7 @@ class PyProviderWriter(unohelper.Base, PyPropertySet, XTransactedObject):
         self.properties["AuthorizationUrl"] = unotools.getProperty("AuthorizationUrl", "string", transient)
         self.properties["TokenUrl"] = unotools.getProperty("TokenUrl", "string", transient)
         self.properties["CodeChallenge"] = unotools.getProperty("CodeChallenge", "boolean", transient)
+        self.properties["CodeChallengeMethod"] = unotools.getProperty("CodeChallengeMethod", "string", transient)
         self.properties["HttpHandler"] = unotools.getProperty("HttpHandler", "boolean", transient)
         self.properties["RedirectAddress"] = unotools.getProperty("RedirectAddress", "string", transient)
         self.properties["RedirectPort"] = unotools.getProperty("RedirectPort", "short", transient)
@@ -246,24 +248,34 @@ class PyProviderWriter(unohelper.Base, PyPropertySet, XTransactedObject):
             self.Providers[self.Id]["TokenUrl"] = url
     @property
     def CodeChallenge(self):
-        enable = True
+        enabled = True
         if self.Id in self.Providers:
-            enable = self.Providers[self.Id]["CodeChallenge"]
-        return enable
+            enabled = self.Providers[self.Id]["CodeChallenge"]
+        return enabled
     @CodeChallenge.setter
-    def CodeChallenge(self, enable):
+    def CodeChallenge(self, enabled):
         if self.Id in self.Providers:
-            self.Providers[self.Id]["CodeChallenge"] = enable
+            self.Providers[self.Id]["CodeChallenge"] = enabled
+    @property
+    def CodeChallengeMethod(self):
+        method = "S256"
+        if self.Id in self.Providers:
+            method = self.Providers[self.Id]["CodeChallengeMethod"]
+        return method
+    @CodeChallengeMethod.setter
+    def CodeChallengeMethod(self, method):
+        if self.Id in self.Providers:
+            self.Providers[self.Id]["CodeChallengeMethod"] = method
     @property
     def HttpHandler(self):
-        enable = True
+        enabled = True
         if self.Id in self.Providers:
-            enable = self.Providers[self.Id]["HttpHandler"]
-        return enable
+            enabled = self.Providers[self.Id]["HttpHandler"]
+        return enabled
     @HttpHandler.setter
-    def HttpHandler(self, enable):
-        if self.Id in self.Providers and self.Providers[self.Id]["HttpHandler"] != enable:
-            self.Providers[self.Id]["HttpHandler"] = enable
+    def HttpHandler(self, enabled):
+        if self.Id in self.Providers and self.Providers[self.Id]["HttpHandler"] != enabled:
+            self.Providers[self.Id]["HttpHandler"] = enabled
             self.State = 4
     @property
     def RedirectAddress(self):
@@ -324,6 +336,7 @@ class PyProviderWriter(unohelper.Base, PyPropertySet, XTransactedObject):
                 provider.replaceByName("AuthorizationUrl", value["AuthorizationUrl"])
                 provider.replaceByName("TokenUrl", value["TokenUrl"])
                 provider.replaceByName("CodeChallenge", value["CodeChallenge"])
+                provider.replaceByName("CodeChallengeMethod", value["CodeChallengeMethod"])
                 provider.replaceByName("HttpHandler", value["HttpHandler"])
                 provider.replaceByName("RedirectAddress", value["RedirectAddress"])
                 provider.replaceByName("RedirectPort", value["RedirectPort"])
@@ -341,6 +354,7 @@ class PyProviderWriter(unohelper.Base, PyPropertySet, XTransactedObject):
                                   "AuthorizationUrl": provider.getByName("AuthorizationUrl"),
                                   "TokenUrl": provider.getByName("TokenUrl"),
                                   "CodeChallenge": provider.getByName("CodeChallenge"),
+                                  "CodeChallengeMethod": provider.getByName("CodeChallengeMethod"),
                                   "HttpHandler": provider.getByName("HttpHandler"),
                                   "RedirectAddress": provider.getByName("RedirectAddress"),
                                   "RedirectPort": provider.getByName("RedirectPort"),
@@ -438,14 +452,15 @@ class PyUserWriter(unohelper.Base, PyPropertySet, XUpdatable):
 
     # XUpdatable
     def update(self):
-        self._Scope = []
+        scope = []
         providers = self.configuration.getByName("Providers")
         if providers.hasByName(self.ProviderId):
             provider = providers.getByName(self.ProviderId)
             users = provider.getByName("Users")
-            if users.hasByName(self._Id):
-                user = users.getByName(self._Id)
-                self._Scope = list(user.getByName("Scopes"))
+            if users.hasByName(self.Id):
+                user = users.getByName(self.Id)
+                scope = list(user.getByName("Scopes"))
+        self._Scope = scope
 
 
 g_ImplementationHelper.addImplementation(PyConfigurationWriter,                     # UNO object class
