@@ -4,12 +4,13 @@
 import uno
 import unohelper
 
+from com.sun.star.lang import XServiceInfo
 from com.sun.star.ui.dialogs import XWizardController
 from com.sun.star.awt import XContainerWindowEventHandler, XDialogEventHandler
 from com.sun.star.uno import XReference
 
-import unotools
-from unotools import PyServiceInfo, PyPropertySet, PyInitialization
+import oauth2
+from oauth2 import PyPropertySet, PyInitialization
 import base64
 import hashlib
 from requests.compat import urlencode, quote, unquote
@@ -19,7 +20,7 @@ g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.WizardController"
 
 
-class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitialization,
+class PyWizardController(unohelper.Base, XServiceInfo, PyPropertySet, PyInitialization,
                          XWizardController, XContainerWindowEventHandler, XDialogEventHandler, XReference):
     def __init__(self, ctx, *namedvalues):
         self.ctx = ctx
@@ -27,31 +28,31 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         struct = "com.sun.star.beans.Property"
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["ResourceUrl"] = unotools.getProperty("ResourceUrl", "string", transient)
-        self.properties["UserName"] = unotools.getProperty("UserName", "string", transient)
-        self.properties["ActivePath"] = unotools.getProperty("ActivePath", "short", readonly)
-        self.properties["AuthorizationCode"] = unotools.getProperty("AuthorizationCode", "string", transient)
-        self.properties["AuthorizationUrl"] = unotools.getProperty("AuthorizationUrl", "string", readonly)
-        self.properties["AuthorizationStr"] = unotools.getProperty("AuthorizationStr", "string", readonly)
-        self.properties["CheckUrl"] = unotools.getProperty("CheckUrl", "boolean", readonly)
-        self.properties["CodeVerifier"] = unotools.getProperty("CodeVerifier", "string", readonly)
-        self.properties["Configuration"] = unotools.getProperty("Configuration", "com.sun.star.uno.XInterface", readonly)
-        self.properties["Handler"] = unotools.getProperty("Handler", "any", transient)
-        self.properties["Paths"] = unotools.getProperty("Paths", "[][]short", readonly)
-        self.properties["State"] = unotools.getProperty("State", "string", readonly)
-        self.properties["Wizard"] = unotools.getProperty("Wizard", "com.sun.star.ui.dialogs.XWizard", readonly)
+        self.properties["ResourceUrl"] = oauth2.getProperty("ResourceUrl", "string", transient)
+        self.properties["UserName"] = oauth2.getProperty("UserName", "string", transient)
+        self.properties["ActivePath"] = oauth2.getProperty("ActivePath", "short", readonly)
+        self.properties["AuthorizationCode"] = oauth2.getProperty("AuthorizationCode", "string", transient)
+        self.properties["AuthorizationUrl"] = oauth2.getProperty("AuthorizationUrl", "string", readonly)
+        self.properties["AuthorizationStr"] = oauth2.getProperty("AuthorizationStr", "string", readonly)
+        self.properties["CheckUrl"] = oauth2.getProperty("CheckUrl", "boolean", readonly)
+        self.properties["CodeVerifier"] = oauth2.getProperty("CodeVerifier", "string", readonly)
+        self.properties["Configuration"] = oauth2.getProperty("Configuration", "com.sun.star.uno.XInterface", readonly)
+        self.properties["Handler"] = oauth2.getProperty("Handler", "any", transient)
+        self.properties["Paths"] = oauth2.getProperty("Paths", "[][]short", readonly)
+        self.properties["State"] = oauth2.getProperty("State", "string", readonly)
+        self.properties["Wizard"] = oauth2.getProperty("Wizard", "com.sun.star.ui.dialogs.XWizard", readonly)
         self._UserName = ""
         self._AuthorizationCode = ""
-        self._Configuration = unotools.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.ConfigurationWriter")
+        self._Configuration = oauth2.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.ConfigurationWriter")
         self._Handler = None
         self._Paths = ((1, 2, 3), (1, 2, 4))
-        self._CodeVerifier = unotools.generateUuid() + unotools.generateUuid()
-        self._State = unotools.generateUuid()
+        self._CodeVerifier = oauth2.generateUuid() + oauth2.generateUuid()
+        self._State = oauth2.generateUuid()
         self.advanceTo = True
-        self.locale = unotools.getCurrentLocale(self.ctx)
+        self.locale = oauth2.getCurrentLocale(self.ctx)
         identifier = "com.gmail.prrvchr.extensions.OAuth2OOo"
-        self.stringResource = unotools.getStringResource(self.ctx, self.locale)
-        self._Wizard = unotools.createService(self.ctx, "com.sun.star.ui.dialogs.Wizard")
+        self.stringResource = oauth2.getStringResource(self.ctx, self.locale)
+        self._Wizard = oauth2.createService(self.ctx, "com.sun.star.ui.dialogs.Wizard")
         arguments = ((uno.Any("[][]short", (self.Paths)), self), )
         uno.invoke(self._Wizard, "initialize", arguments)
         self.initialize(namedvalues)
@@ -137,7 +138,7 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
     def createPage(self, parent, id):
         window = self._createWindow(parent, id)
         service = "com.gmail.prrvchr.extensions.OAuth2OOo.WizardPage"
-        page = unotools.createService(self.ctx, service, Controller=self, PageId=id, Window=window)
+        page = oauth2.createService(self.ctx, service, Controller=self, PageId=id, Window=window)
         if id == 1:
             window.getControl("TextField1").setText(self.UserName)
             urls = self.Configuration.UrlList
@@ -156,7 +157,7 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
             window.getControl("OptionButton%s" % self.ActivePath).setState(True)
         elif id == 3:
             service = "com.gmail.prrvchr.extensions.OAuth2OOo.HttpCodeHandler"
-            self.Handler = unotools.createService(self.ctx, service)
+            self.Handler = oauth2.createService(self.ctx, service)
             self.Handler.addCallback(page, self)
             self._openUrl(self.AuthorizationUrl)
         elif id == 4:
@@ -192,7 +193,7 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
     def _createWindow(self, parent, id):
         provider = "com.sun.star.awt.ContainerWindowProvider"
         url = "vnd.sun.star.script:OAuth2OOo.PageWizard%s?location=application" % id
-        return unotools.createService(self.ctx, provider).createContainerWindow(url, "", parent, self)
+        return oauth2.createService(self.ctx, provider).createContainerWindow(url, "", parent, self)
 
     def _addItem(self, window, item):
         if item == "Url":
@@ -224,12 +225,12 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
     def _getDialog(self, window, method, item):
         if method != "Remove":
             url = "vnd.sun.star.script:OAuth2OOo.%sDialog?location=application" % item
-            provider = unotools.createService(self.ctx, "com.sun.star.awt.DialogProvider")
+            provider = oauth2.createService(self.ctx, "com.sun.star.awt.DialogProvider")
             dialog = provider.createDialogWithHandler(url, self)
         else:
             title = self.stringResource.resolveString("MessageBox.Title")
             message = self.stringResource.resolveString("MessageBox.Message")
-            dialog = unotools.createMessageBox(window.Peer, message, title)
+            dialog = oauth2.createMessageBox(window.Peer, message, title)
         return dialog
 
     def _initDialog(self, dialog, method, item):
@@ -392,7 +393,7 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         presentation = "Error: "
         success, main, parameters = self._getUrlMainAndParameters()
         if success:
-            transformer = unotools.createService(self.ctx, "com.sun.star.util.URLTransformer")
+            transformer = oauth2.createService(self.ctx, "com.sun.star.util.URLTransformer")
             url = uno.createUnoStruct("com.sun.star.util.URL")
             url.Complete = "%s?%s" % (main, self._getUrlArguments(parameters))
             success, url = transformer.parseStrict(url)
@@ -403,7 +404,7 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
     def _checkUrl(self):
         success, main, parameters = self._getUrlMainAndParameters()
         if success:
-            transformer = unotools.createService(self.ctx, "com.sun.star.util.URLTransformer")
+            transformer = oauth2.createService(self.ctx, "com.sun.star.util.URLTransformer")
             url = uno.createUnoStruct("com.sun.star.util.URL")
             url.Complete = "%s?%s" % (main, self._getUrlArguments(parameters))
             success, url = transformer.parseStrict(url)
@@ -412,7 +413,7 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
     def _getUrlMainAndParameters(self):
         main = self.Configuration.Url.Provider.AuthorizationUrl
         parameters = {}
-        transformer = unotools.createService(self.ctx, "com.sun.star.util.URLTransformer")
+        transformer = oauth2.createService(self.ctx, "com.sun.star.util.URLTransformer")
         url = uno.createUnoStruct("com.sun.star.util.URL")
         url.Complete = main
         success, url = transformer.parseStrict(url)
@@ -467,8 +468,19 @@ class PyWizardController(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitial
         return code
 
     def _openUrl(self, url, option=""):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        message = self._getAuthorizationStr()
+        self.Configuration.Logger.logp(level, "PyWizardController", "_openUrl", "Url: %s" % message)
         service = "com.sun.star.system.SystemShellExecute"
         self.ctx.ServiceManager.createInstance(service).execute(url, option, 0)
+
+    # XServiceInfo
+    def supportsService(self, service):
+        return g_ImplementationHelper.supportsService(g_ImplementationName, service)
+    def getImplementationName(self):
+        return g_ImplementationName
+    def getSupportedServiceNames(self):
+        return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
 g_ImplementationHelper.addImplementation(PyWizardController,                        # UNO object class

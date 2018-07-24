@@ -4,11 +4,11 @@
 import uno
 import unohelper
 
+from com.sun.star.lang import XServiceInfo
 from com.sun.star.awt import XRequestCallback
 from com.sun.star.util import XCancellable
 
-import unotools
-from unotools import PyServiceInfo
+import oauth2
 import time
 from threading import Thread, RLock
 from timeit import default_timer as timer
@@ -19,7 +19,7 @@ g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.HttpCodeHandler"
 
 
-class PyHttpCodeHandler(unohelper.Base, PyServiceInfo, XCancellable, XRequestCallback):
+class PyHttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCallback):
     def __init__(self, ctx):
         self.ctx = ctx
         self.watchdog = None
@@ -36,6 +36,14 @@ class PyHttpCodeHandler(unohelper.Base, PyServiceInfo, XCancellable, XRequestCal
         self.watchdog = PyWatchDog(server, page, timeout)
         server.start()
         self.watchdog.start()
+
+    # XServiceInfo
+    def supportsService(self, service):
+        return g_ImplementationHelper.supportsService(g_ImplementationName, service)
+    def getImplementationName(self):
+        return g_ImplementationName
+    def getSupportedServiceNames(self):
+        return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
 class PyWatchDog(Thread):
@@ -76,7 +84,7 @@ class PyHttpServer(Thread):
         self.ctx = ctx
         self.controller = controller
         self.lock = RLock()
-        self.acceptor = unotools.createService(self.ctx, "com.sun.star.connection.Acceptor")
+        self.acceptor = oauth2.createService(self.ctx, "com.sun.star.connection.Acceptor")
 
     def run(self):
         address = self.controller.Configuration.Url.Provider.RedirectAddress
@@ -85,10 +93,10 @@ class PyHttpServer(Thread):
         with self.lock:
             if connection:
                 result = self._getResult(connection)
-                basename = unotools.getResourceLocation(self.ctx)
+                basename = oauth2.getResourceLocation(self.ctx)
                 basename += "/OAuth2Success_%s.html" if result else "/OAuth2Error_%s.html"
-                locale = unotools.getCurrentLocale(self.ctx)
-                length, body = unotools.getFileSequence(self.ctx, basename % locale.Language, basename % "en")
+                locale = oauth2.getCurrentLocale(self.ctx)
+                length, body = oauth2.getFileSequence(self.ctx, basename % locale.Language, basename % "en")
                 header = uno.ByteSequence(b'''\
 HTTP/1.1 200 OK
 Content-Length: %d

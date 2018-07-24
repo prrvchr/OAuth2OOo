@@ -4,11 +4,10 @@
 import uno
 import unohelper
 
-from com.sun.star.task import XJob
-from com.sun.star.uno import XReference
+from com.sun.star.lang import XServiceInfo
 
-import unotools
-from unotools import PyServiceInfo, PyPropertySet, PyInitialization
+import oauth2
+from oauth2 import PyPropertySet, PyInitialization
 import sys
 import certifi
 import requests
@@ -18,17 +17,22 @@ g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service"
 
 
-class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitialization, XJob):
+class PyOAuth2Service(unohelper.Base, XServiceInfo, PyPropertySet, PyInitialization):
     def __init__(self, ctx, *namedvalues):
         self.ctx = ctx
+        self.properties = self._getPropertySetInfo()
+        self.Setting = oauth2.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.SettingReader")
+        self.initialize(namedvalues)
+
+    def _getPropertySetInfo(self):
+        properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties = {}
-        self.properties["ResourceUrl"] = unotools.getProperty("ResourceUrl", "string", transient)
-        self.properties["UserName"] = unotools.getProperty("UserName", "string", transient)
-        self.properties["Setting"] = unotools.getProperty("Setting", "com.sun.star.uno.XInterface", readonly)
-        self.Setting = unotools.createService(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo.SettingReader")
-        self.initialize(namedvalues)
+        properties["ResourceUrl"] = oauth2.getProperty("ResourceUrl", "string", transient)
+        properties["UserName"] = oauth2.getProperty("UserName", "string", transient)
+        properties["Token"] = oauth2.getProperty("Token", "string", readonly)
+        properties["Setting"] = oauth2.getProperty("Setting", "com.sun.star.uno.XInterface", readonly)
+        return properties
 
     @property
     def ResourceUrl(self):
@@ -46,20 +50,18 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         if self.Setting.Url.Provider.Scope.User.Id != name:
             self.Setting.Url.Provider.Scope.User.Id = name
             self.Setting.Url.Provider.Scope.User.update()
-
-    # XJob
-    def execute(self, namedvalues=()):
-        self.initialize(namedvalues)
+    @property
+    def Token(self):
         level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
         if not self.Setting.Url.Provider.Scope.Authorized:
-            self.Setting.Logger.logp(level, "PyOAuth2Service", "execute", "AuthorizationCode needed")
+            self.Setting.Logger.logp(level, "PyOAuth2Service", "getToken", "AuthorizationCode needed")
             code, codeverifier = self._getAuthorizationCode()
             token = "" if code is None else self._getTokens(code, codeverifier)
         elif self.Setting.Url.Provider.Scope.User.ExpiresIn < self.Setting.HandlerTimeout:
-            self.Setting.Logger.logp(level, "PyOAuth2Service", "execute", "Refresh token needed")
+            self.Setting.Logger.logp(level, "PyOAuth2Service", "getToken", "Refresh token needed")
             token = self._refreshToken()
         else:
-            self.Setting.Logger.logp(level, "PyOAuth2Service", "execute", "Get token from configuration")
+            self.Setting.Logger.logp(level, "PyOAuth2Service", "getToken", "Get token from configuration")
             token = self.Setting.Url.Provider.Scope.User.AccessToken
         return token
 
@@ -68,7 +70,7 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
         level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
         self.Setting.Logger.logp(level, "PyOAuth2Service", "_getAuthorizationCode", "WizardController Loading...")
         service = "com.gmail.prrvchr.extensions.OAuth2OOo.WizardController"
-        controller = unotools.createService(self.ctx, service, ResourceUrl=self.ResourceUrl, UserName=self.UserName)
+        controller = oauth2.createService(self.ctx, service, ResourceUrl=self.ResourceUrl, UserName=self.UserName)
         codeverifier = controller.CodeVerifier
         self.Setting.Logger.logp(level, "PyOAuth2Service", "_getAuthorizationCode", "WizardController Loading... Done")
         if controller.Wizard.execute():
@@ -152,6 +154,14 @@ class PyOAuth2Service(unohelper.Base, PyServiceInfo, PyPropertySet, PyInitializa
             level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
         self.Setting.Logger.logp(level, "PyOAuth2Service", "_getTokenFromResponse", "%s" % response)
         return token
+
+    # XServiceInfo
+    def supportsService(self, service):
+        return g_ImplementationHelper.supportsService(g_ImplementationName, service)
+    def getImplementationName(self):
+        return g_ImplementationName
+    def getSupportedServiceNames(self):
+        return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
 g_ImplementationHelper.addImplementation(PyOAuth2Service,                           # UNO object class

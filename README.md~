@@ -28,7 +28,7 @@ service.ResourceUrl = your_registered_url
 
 ### Get the access token:
 
-token = service.Token
+token = service.execute(())
 
 ## Has been tested with:
 	
