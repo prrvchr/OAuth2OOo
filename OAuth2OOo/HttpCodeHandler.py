@@ -19,7 +19,7 @@ g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.HttpCodeHandler"
 
 
-class PyHttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCallback):
+class HttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCallback):
     def __init__(self, ctx):
         self.ctx = ctx
         self.watchdog = None
@@ -31,9 +31,9 @@ class PyHttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCall
 
     # XRequestCallback
     def addCallback(self, page, controller):
-        server = PyHttpServer(self.ctx, controller)
+        server = HttpServer(self.ctx, controller)
         timeout = controller.Configuration.HandlerTimeout
-        self.watchdog = PyWatchDog(server, page, timeout)
+        self.watchdog = WatchDog(server, page, timeout)
         server.start()
         self.watchdog.start()
 
@@ -46,7 +46,7 @@ class PyHttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCall
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
-class PyWatchDog(Thread):
+class WatchDog(Thread):
     def __init__(self, server, page, timeout):
         Thread.__init__(self)
         self.server = server
@@ -78,7 +78,7 @@ class PyWatchDog(Thread):
         self.end = 0
 
 
-class PyHttpServer(Thread):
+class HttpServer(Thread):
     def __init__(self, ctx, controller):
         Thread.__init__(self)
         self.ctx = ctx
@@ -184,10 +184,10 @@ Connection: Closed
                 self.controller.AuthorizationCode = response["code"]
                 level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
                 result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.OK")
-        self.controller.Configuration.Logger.logp(level, "PyHttpServer", "_getResult", "%s" % response)
+        self.controller.Configuration.Logger.logp(level, "HttpServer", "_getResult", "%s" % response)
         return result
 
 
-g_ImplementationHelper.addImplementation(PyHttpCodeHandler,                         # UNO object class
+g_ImplementationHelper.addImplementation(HttpCodeHandler,                           # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                         (g_ImplementationName, ))                   # List of implemented services

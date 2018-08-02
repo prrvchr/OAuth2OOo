@@ -9,25 +9,23 @@ from com.sun.star.ui.dialogs import XWizardPage
 from com.sun.star.awt import XCallback
 
 import oauth2
-from oauth2 import PyPropertySet, PyInitialization
+from oauth2 import PropertySet, Initialization
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.WizardPage"
 
 
-class PyWizardPage(unohelper.Base, XServiceInfo, PyPropertySet, PyInitialization, XWizardPage, XCallback):
+class WizardPage(unohelper.Base, XServiceInfo, PropertySet, Initialization, XWizardPage, XCallback):
     def __init__(self, ctx, *namedvalues):
         self.ctx = ctx
-        self.properties = {}
-        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        self.properties["Controller"] = oauth2.getProperty("Controller", "com.sun.star.ui.dialogs.XWizardController", readonly)
-        self.properties["PageId"] = oauth2.getProperty("PageId", "short", readonly)
-        self.properties["Window"] = oauth2.getProperty("Window", "com.sun.star.awt.XWindow", readonly)
+        self.listeners = []
         self._Controller = None
         self._PageId = None
         self._Window = None
         self.initialize(namedvalues)
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "__init__()", "PageId: %s... Done" % self.PageId)
 
     @property
     def Controller(self):
@@ -48,13 +46,26 @@ class PyWizardPage(unohelper.Base, XServiceInfo, PyPropertySet, PyInitialization
     def Window(self, window):
         self._Window = window
 
+    def _getPropertySetInfo(self):
+        properties = {}
+        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
+        properties["Controller"] = oauth2.getProperty("Controller", "com.sun.star.ui.dialogs.XWizardController", readonly)
+        properties["PageId"] = oauth2.getProperty("PageId", "short", readonly)
+        properties["Window"] = oauth2.getProperty("Window", "com.sun.star.awt.XWindow", readonly)
+        return properties
+
     # XWizardPage Methods
     def activatePage(self):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "activatePage()", "PageId: %s..." % self.PageId)
         if self.PageId == 2:
             url = self.Controller.AuthorizationStr
             self.Window.getControl("TextField1").setText(url)
         self.Window.setVisible(True)
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "activatePage()", "PageId: %s... Done" % self.PageId)
     def commitPage(self, reason):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "commitPage()", "PageId: %s..." % self.PageId)
         forward = uno.getConstantByName("com.sun.star.ui.dialogs.WizardTravelType.FORWARD")
         backward = uno.getConstantByName("com.sun.star.ui.dialogs.WizardTravelType.BACKWARD")
         finish = uno.getConstantByName("com.sun.star.ui.dialogs.WizardTravelType.FINISH")
@@ -65,6 +76,7 @@ class PyWizardPage(unohelper.Base, XServiceInfo, PyPropertySet, PyInitialization
         elif self.PageId == 4 and reason == finish:
             code = self.Window.getControl("TextField1").getText()
             self.Controller.AuthorizationCode = code
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "commitPage()", "PageId: %s... Done" % self.PageId)
         return True
     def canAdvance(self):
         advance = False
@@ -80,6 +92,26 @@ class PyWizardPage(unohelper.Base, XServiceInfo, PyPropertySet, PyInitialization
         elif self.PageId == 2:
             advance = self.Controller.CheckUrl
         return advance
+    def dispose(self):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "dispose()", "PageId: %s..." % self.PageId)
+        event = uno.createUnoStruct('com.sun.star.lang.EventObject', self)
+        for listener in self.listeners:
+            listener.disposing(event)
+        self.Window.dispose()
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "dispose()", "PageId: %s... Done" % self.PageId)
+    def addEventListener(self, listener):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "addEventListener()", "PageId: %s..." % self.PageId)
+        if listener not in self.listeners:
+            self.listeners.append(listener)
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "addEventListener()", "PageId: %s... Done" % self.PageId)
+    def removeEventListener(self, listener):
+        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "removeEventListener()", "PageId: %s..." % self.PageId)
+        if listener in self.listeners:
+            self.listeners.remove(listener)
+        self.Controller.Configuration.Logger.logp(level, "WizardPage", "removeEventListener()", "PageId: %s... Done" % self.PageId)
 
     # XCallback
     def notify(self, percent):
@@ -95,6 +127,7 @@ class PyWizardPage(unohelper.Base, XServiceInfo, PyPropertySet, PyInitialization
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
-g_ImplementationHelper.addImplementation(PyWizardPage,                              # UNO object class
+
+g_ImplementationHelper.addImplementation(WizardPage,                                # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                         (g_ImplementationName, ))                   # List of implemented services

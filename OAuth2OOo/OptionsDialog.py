@@ -14,7 +14,7 @@ g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = 'com.gmail.prrvchr.extensions.OAuth2OOo.OptionsDialog'
 
 
-class PyOptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler):
+class OptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler):
     def __init__(self, ctx):
         self.ctx = ctx
         self.stringResource = oauth2.getStringResource(self.ctx, None, 'OptionsDialog')
@@ -117,12 +117,15 @@ class PyOptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler
         url = oauth2.getLoggerUrl(self.ctx)
         length, sequence = oauth2.getFileSequence(self.ctx, url)
         text = sequence.value.decode('utf-8')
-        url = 'vnd.sun.star.script:OAuth2OOo.LogDialog?location=application'
-        dialog = oauth2.createService(self.ctx, 'com.sun.star.awt.DialogProvider').createDialog(url)
+        dialog = self._getLogDialog()
         dialog.Title = url
         dialog.getControl('TextField1').Text = text
         dialog.execute()
         dialog.dispose()
+
+    def _getLogDialog(self):
+        url = 'vnd.sun.star.script:OAuth2OOo.LogDialog?location=application'
+        return oauth2.createService(self.ctx, 'com.sun.star.awt.DialogProvider').createDialog(url)
 
     def _loadLoggerSetting(self, dialog):
         enabled, index, handler = oauth2.getLoggerSetting(self.ctx)
@@ -159,6 +162,6 @@ class PyOptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
-g_ImplementationHelper.addImplementation(PyOptionsDialog,                           # UNO object class
+g_ImplementationHelper.addImplementation(OptionsDialog,                             # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                         (g_ImplementationName,))                    # List of implemented services

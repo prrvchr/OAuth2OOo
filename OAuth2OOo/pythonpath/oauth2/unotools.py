@@ -4,7 +4,7 @@
 import uno
 import binascii
 
-from .unolib import PyInteractionHandler
+from .unolib import InteractionHandler
 
 
 def getFileSequence(ctx, url, default=None):
@@ -58,7 +58,7 @@ def getStringResource(ctx, locale=None, filename='DialogStrings'):
     location = getResourceLocation(ctx)
     if locale is None:
         locale = getCurrentLocale(ctx)
-    arguments = (location, True, locale, filename, '', PyInteractionHandler())
+    arguments = (location, True, locale, filename, '', InteractionHandler())
     return ctx.ServiceManager.createInstanceWithArgumentsAndContext(service, arguments, ctx)
 
 def generateUuid():

@@ -9,7 +9,7 @@ from com.sun.star.embed import XTransactedObject
 from com.sun.star.util import XUpdatable
 
 import oauth2
-from oauth2 import PyPropertySet
+from oauth2 import PropertySet
 import time
 import traceback
 
@@ -18,27 +18,30 @@ g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.SettingReader"
 
 
-class PySettingReader(unohelper.Base, XServiceInfo, PyPropertySet, XTransactedObject, XUpdatable):
+class SettingReader(unohelper.Base, PropertySet, XServiceInfo, XTransactedObject, XUpdatable):
     def __init__(self, ctx):
         self.ctx = ctx
-        self.properties = {}
-        maybevoid = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.MAYBEVOID")
-        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["Url"] = oauth2.getProperty("Url", "com.sun.star.uno.XInterface", readonly)
-        self.properties["UrlList"] = oauth2.getProperty("UrlList", "[]string", readonly)
-        self.properties["RequestTimeout"] = oauth2.getProperty("RequestTimeout", "short", transient)
-        self.properties["HandlerTimeout"] = oauth2.getProperty("HandlerTimeout", "short", transient)
-        self.properties["Logger"] = oauth2.getProperty("Logger", "com.sun.star.logging.XLogger", readonly)
         self.configuration = oauth2.getConfiguration(self.ctx, "com.gmail.prrvchr.extensions.OAuth2OOo", True)
         self.RequestTimeout = self.configuration.getByName("RequestTimeout")
         self.HandlerTimeout = self.configuration.getByName("HandlerTimeout")
         self.Logger = oauth2.getLogger(self.ctx)
-        self.Url = PyUrlReader(self.configuration)
+        self.Url = UrlReader(self.configuration)
 
     @property
     def UrlList(self):
         return self.configuration.getByName("Urls").ElementNames
+
+    def _getPropertySetInfo(self):
+        properties = {}
+        maybevoid = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.MAYBEVOID")
+        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
+        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
+        properties["Url"] = oauth2.getProperty("Url", "com.sun.star.uno.XInterface", readonly)
+        properties["UrlList"] = oauth2.getProperty("UrlList", "[]string", readonly)
+        properties["RequestTimeout"] = oauth2.getProperty("RequestTimeout", "short", transient)
+        properties["HandlerTimeout"] = oauth2.getProperty("HandlerTimeout", "short", transient)
+        properties["Logger"] = oauth2.getProperty("Logger", "com.sun.star.logging.XLogger", readonly)
+        return properties
 
     # XTransactedObject
     def commit(self):
@@ -63,16 +66,19 @@ class PySettingReader(unohelper.Base, XServiceInfo, PyPropertySet, XTransactedOb
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
-class PyUrlReader(unohelper.Base, PyPropertySet, XUpdatable):
+class UrlReader(unohelper.Base, PropertySet, XUpdatable):
     def __init__(self, configuration):
         self.configuration = configuration
-        self.properties = {}
+        self.Id = ""
+        self.Provider = ProviderReader(self.configuration)
+
+    def _getPropertySetInfo(self):
+        properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["Id"] = oauth2.getProperty("Id", "string", transient)
-        self.properties["Provider"] = oauth2.getProperty("Provider", "com.sun.star.uno.XInterface", readonly)
-        self.Id = ""
-        self.Provider = PyProviderReader(self.configuration)
+        properties["Id"] = oauth2.getProperty("Id", "string", transient)
+        properties["Provider"] = oauth2.getProperty("Provider", "com.sun.star.uno.XInterface", readonly)
+        return properties
 
     # XUpdatable
     def update(self):
@@ -85,21 +91,9 @@ class PyUrlReader(unohelper.Base, PyPropertySet, XUpdatable):
         self.Provider.update()
 
 
-class PyProviderReader(unohelper.Base, PyPropertySet, XUpdatable):
+class ProviderReader(unohelper.Base, PropertySet, XUpdatable):
     def __init__(self, configuration):
         self.configuration = configuration
-        self.properties = {}
-        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        self.properties["ClientId"] = oauth2.getProperty("ClientId", "string", readonly)
-        self.properties["ClientSecret"] = oauth2.getProperty("ClientSecret", "string", readonly)
-        self.properties["AuthorizationUrl"] = oauth2.getProperty("AuthorizationUrl", "string", readonly)
-        self.properties["TokenUrl"] = oauth2.getProperty("TokenUrl", "string", readonly)
-        self.properties["CodeChallenge"] = oauth2.getProperty("CodeChallenge", "boolean", readonly)
-        self.properties["HttpHandler"] = oauth2.getProperty("HttpHandler", "boolean", readonly)
-        self.properties["RedirectAddress"] = oauth2.getProperty("RedirectAddress", "string", readonly)
-        self.properties["RedirectPort"] = oauth2.getProperty("RedirectPort", "short", readonly)
-        self.properties["RedirectUri"] = oauth2.getProperty("RedirectUri", "string", readonly)
-        self.properties["Scope"] = oauth2.getProperty("Scope", "com.sun.star.uno.XInterface", readonly)
         self.ClientId = ""
         self.ClientSecret = ""
         self.AuthorizationUrl = ""
@@ -109,7 +103,7 @@ class PyProviderReader(unohelper.Base, PyPropertySet, XUpdatable):
         self.RedirectAddress = "localhost"
         self.RedirectPort = 8080
         self.redirect = "urn:ietf:wg:oauth:2.0:oob"
-        self.Scope = PyScopeReader(self.configuration)
+        self.Scope = ScopeReader(self.configuration)
 
     @property
     def RedirectUri(self):
@@ -118,6 +112,21 @@ class PyProviderReader(unohelper.Base, PyPropertySet, XUpdatable):
         else:
             uri = self.redirect
         return uri
+
+    def _getPropertySetInfo(self):
+        properties = {}
+        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
+        properties["ClientId"] = oauth2.getProperty("ClientId", "string", readonly)
+        properties["ClientSecret"] = oauth2.getProperty("ClientSecret", "string", readonly)
+        properties["AuthorizationUrl"] = oauth2.getProperty("AuthorizationUrl", "string", readonly)
+        properties["TokenUrl"] = oauth2.getProperty("TokenUrl", "string", readonly)
+        properties["CodeChallenge"] = oauth2.getProperty("CodeChallenge", "boolean", readonly)
+        properties["HttpHandler"] = oauth2.getProperty("HttpHandler", "boolean", readonly)
+        properties["RedirectAddress"] = oauth2.getProperty("RedirectAddress", "string", readonly)
+        properties["RedirectPort"] = oauth2.getProperty("RedirectPort", "short", readonly)
+        properties["RedirectUri"] = oauth2.getProperty("RedirectUri", "string", readonly)
+        properties["Scope"] = oauth2.getProperty("Scope", "com.sun.star.uno.XInterface", readonly)
+        return properties
 
     # XUpdatable
     def update(self):
@@ -151,17 +160,12 @@ class PyProviderReader(unohelper.Base, PyPropertySet, XUpdatable):
         self.Scope.User.update()
 
 
-class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
+class ScopeReader(unohelper.Base, PropertySet, XUpdatable):
     def __init__(self, configuration):
         self.configuration = configuration
-        self.properties = {}
-        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        self.properties["Values"] = oauth2.getProperty("Values", "string", readonly)
-        self.properties["Authorized"] = oauth2.getProperty("Authorized", "boolean", readonly)
-        self.properties["User"] = oauth2.getProperty("User", "com.sun.star.uno.XInterface", readonly)
         self.Id = ""
         self._Values = []
-        self.User = PyUserReader(self.configuration)
+        self.User = UserReader(self.configuration)
 
     @property
     def Values(self):
@@ -179,6 +183,14 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
                 break
         return authorized
 
+    def _getPropertySetInfo(self):
+        properties = {}
+        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
+        properties["Values"] = oauth2.getProperty("Values", "string", readonly)
+        properties["Authorized"] = oauth2.getProperty("Authorized", "boolean", readonly)
+        properties["User"] = oauth2.getProperty("User", "com.sun.star.uno.XInterface", readonly)
+        return properties
+
     # XUpdatable
     def update(self):
         id = ""
@@ -192,16 +204,9 @@ class PyScopeReader(unohelper.Base, PyPropertySet, XUpdatable):
         self.User.ProviderId = id
 
 
-class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable):
+class UserReader(unohelper.Base, PropertySet, XTransactedObject, XUpdatable):
     def __init__(self, configuration):
         self.configuration = configuration
-        self.properties = {}
-        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        self.properties["Id"] = oauth2.getProperty("Id", "string", transient)
-        self.properties["AccessToken"] = oauth2.getProperty("AccessToken", "string", transient)
-        self.properties["RefreshToken"] = oauth2.getProperty("RefreshToken", "string", transient)
-        self.properties["ExpiresIn"] = oauth2.getProperty("ExpiresIn", "short", transient)
-        self.properties["Scope"] = oauth2.getProperty("Scope", "string", transient)
         self.Id = ""
         self.ProviderId = ""
         self.AccessToken = ""
@@ -222,6 +227,16 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
     @Scope.setter
     def Scope(self, scope):
         self._Scope = scope.split(" ")
+
+    def _getPropertySetInfo(self):
+        properties = {}
+        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
+        properties["Id"] = oauth2.getProperty("Id", "string", transient)
+        properties["AccessToken"] = oauth2.getProperty("AccessToken", "string", transient)
+        properties["RefreshToken"] = oauth2.getProperty("RefreshToken", "string", transient)
+        properties["ExpiresIn"] = oauth2.getProperty("ExpiresIn", "short", transient)
+        properties["Scope"] = oauth2.getProperty("Scope", "string", transient)
+        return properties
 
     # XTransactedObject
     def commit(self):
@@ -268,6 +283,6 @@ class PyUserReader(unohelper.Base, PyPropertySet, XTransactedObject, XUpdatable)
         self._Scope = scope
 
 
-g_ImplementationHelper.addImplementation(PySettingReader,                           # UNO object class
+g_ImplementationHelper.addImplementation(SettingReader,                             # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                         (g_ImplementationName, ))                   # List of implemented services
