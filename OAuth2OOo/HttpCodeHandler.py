@@ -107,8 +107,6 @@ Connection: Closed
                 connection.write(header + body)
                 connection.close()
                 self.acceptor.stopAccepting()
-                wait = self.controller.Configuration.RequestTimeout
-                time.sleep(wait)
                 self.controller.Wizard.DialogWindow.endDialog(result)
 
     def cancel(self):
