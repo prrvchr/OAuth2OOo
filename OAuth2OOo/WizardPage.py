@@ -115,7 +115,7 @@ class WizardPage(unohelper.Base, XServiceInfo, PropertySet, Initialization, XWiz
 
     # XCallback
     def notify(self, percent):
-        if self.PageId == 3:
+        if self.PageId == 3 and self.Window:
             self.Window.getControl("ProgressBar1").setValue(percent)
 
     # XServiceInfo
