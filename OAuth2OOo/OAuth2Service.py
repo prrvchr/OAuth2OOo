@@ -42,16 +42,24 @@ class OAuth2Service(unohelper.Base, PropertySet, XServiceInfo, Initialization):
     @property
     def Token(self):
         level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        msg = "Request Token ... "
         if not self.Setting.Url.Provider.Scope.Authorized:
-            self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", "AuthorizationCode needed")
+            msg += "AuthorizationCode needed ... "
             code, codeverifier = self._getAuthorizationCode()
-            token = "" if code is None else self._getTokens(code, codeverifier)
+            if code is not None:
+                token = self._getTokens(code, codeverifier)
+                msg += "Done"
+            else:
+                level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
+                msg += "ERROR: Aborted!!!"
+                token = ""
         elif self.Setting.Url.Provider.Scope.User.ExpiresIn < self.Setting.HandlerTimeout:
-            self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", "Refresh token needed")
             token = self._refreshToken()
+            msg += "Refresh needed ... Done"
         else:
-            self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", "Get token from configuration")
             token = self.Setting.Url.Provider.Scope.User.AccessToken
+            msg += "Get from configuration ... Done"
+        self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
         return token
 
     def _getPropertySetInfo(self):
