@@ -66,7 +66,9 @@ class WatchDog(Thread):
             now = timer()
             elapsed = now - start
             percent = int(elapsed / self.timeout * 100)
-            self.page.notify(percent)
+            with self.lock:
+                if self.server.is_alive():
+                    self.page.notify(percent)
         with self.lock:
             if self.server.is_alive():
                 self.server.cancel()
