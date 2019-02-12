@@ -10,7 +10,7 @@ from com.sun.star.util import XCancellable
 
 import oauth2
 import time
-from threading import Thread, RLock
+from threading import Thread, Condition
 from timeit import default_timer as timer
 from requests.compat import unquote_plus
 
@@ -31,7 +31,7 @@ class HttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCallba
 
     # XRequestCallback
     def addCallback(self, page, controller):
-        lock = RLock()
+        lock = Condition()
         server = HttpServer(self.ctx, controller, lock)
         timeout = controller.Configuration.HandlerTimeout
         self.watchdog = WatchDog(server, page, timeout, lock)
@@ -62,23 +62,22 @@ class WatchDog(Thread):
         start = now = timer()
         self.end = start + self.timeout
         self.page.notify(0)
-        while now < self.end and self.server.is_alive():
-            time.sleep(wait)
-            now = timer()
-            elapsed = now - start
-            percent = int(elapsed / self.timeout * 100)
-            with self.lock:
-                if self.server.is_alive():
-                    self.page.notify(percent)
         with self.lock:
+            while now < self.end and self.server.is_alive():
+                elapsed = now - start
+                percent = int(elapsed / self.timeout * 100)
+                self.page.notify(percent)
+                self.lock.wait(wait)
+                now = timer()
             if self.server.is_alive():
                 self.server.cancel()
-            if self.end != 0:
-                result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
-                self.server.controller.Wizard.DialogWindow.endDialog(result)
+                if self.end != 0:
+                    result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
+                    self.server.controller.Wizard.DialogWindow.endDialog(result)
 
     def cancel(self):
-        self.end = 0
+        with self.lock:
+            self.end = 0
 
 
 class HttpServer(Thread):
@@ -93,8 +92,8 @@ class HttpServer(Thread):
         address = self.controller.Configuration.Url.Provider.RedirectAddress
         port = self.controller.Configuration.Url.Provider.RedirectPort
         connection = self.acceptor.accept("socket,host=%s,port=%s,tcpNoDelay=1" % (address, port))
-        with self.lock:
-            if connection:
+        if connection:
+            with self.lock:
                 result = self._getResult(connection)
                 basename = oauth2.getResourceLocation(self.ctx)
                 basename += "/OAuth2Success_%s.html" if result else "/OAuth2Error_%s.html"
@@ -111,6 +110,7 @@ Connection: Closed
                 connection.close()
                 self.acceptor.stopAccepting()
                 self.controller.Wizard.DialogWindow.endDialog(result)
+                self.lock.notify()
 
     def cancel(self):
         with self.lock:
