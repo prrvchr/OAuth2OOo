@@ -31,9 +31,10 @@ class HttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCallba
 
     # XRequestCallback
     def addCallback(self, page, controller):
-        server = HttpServer(self.ctx, controller)
+        lock = RLock()
+        server = HttpServer(self.ctx, controller, lock)
         timeout = controller.Configuration.HandlerTimeout
-        self.watchdog = WatchDog(server, page, timeout)
+        self.watchdog = WatchDog(server, page, timeout, lock)
         server.start()
         self.watchdog.start()
 
@@ -47,14 +48,14 @@ class HttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCallba
 
 
 class WatchDog(Thread):
-    def __init__(self, server, page, timeout):
+    def __init__(self, server, page, timeout, lock):
         Thread.__init__(self)
         self.server = server
         self.page = page
         self.timeout = timeout
         self.end = 0
         self.step = 20
-        self.lock = RLock()
+        self.lock = lock
 
     def run(self):
         wait = self.timeout/self.step
@@ -72,20 +73,20 @@ class WatchDog(Thread):
         with self.lock:
             if self.server.is_alive():
                 self.server.cancel()
-        if self.end != 0:
-            result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
-            self.server.controller.Wizard.DialogWindow.endDialog(result)
+            if self.end != 0:
+                result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
+                self.server.controller.Wizard.DialogWindow.endDialog(result)
 
     def cancel(self):
         self.end = 0
 
 
 class HttpServer(Thread):
-    def __init__(self, ctx, controller):
+    def __init__(self, ctx, controller, lock):
         Thread.__init__(self)
         self.ctx = ctx
         self.controller = controller
-        self.lock = RLock()
+        self.lock = lock
         self.acceptor = oauth2.createService(self.ctx, "com.sun.star.connection.Acceptor")
 
     def run(self):
