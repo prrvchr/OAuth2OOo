@@ -338,7 +338,7 @@ class Session(SessionRedirectMixin):
     ]
 
     def __init__(self):
-
+        self.codes = codes
         #: A case-insensitive dictionary of headers to be sent on each
         #: :class:`Request <Request>` sent from this
         #: :class:`Session <Session>`.
