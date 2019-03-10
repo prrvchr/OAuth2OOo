@@ -2,6 +2,7 @@
 # -*- coding: utf_8 -*-
 
 import uno
+
 import binascii
 
 from .unolib import InteractionHandler
