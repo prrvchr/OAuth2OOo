@@ -10,7 +10,10 @@ import oauth2
 from oauth2 import PropertySet, Initialization
 import sys
 import certifi
-import requests
+#import requests
+#print("OAuth2Service.import 1: %s" % requests.__version__)
+from oauth2 import requests
+print("OAuth2Service.import 2: %s" % requests.__version__)
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()

@@ -13,7 +13,7 @@ import oauth2
 from oauth2 import PropertySet, Initialization
 import base64
 import hashlib
-from requests.compat import urlencode, quote, unquote
+from oauth2.requests.compat import urlencode, quote, unquote
 
 
 # pythonloader looks for a static g_ImplementationHelper variable

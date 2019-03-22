@@ -12,7 +12,7 @@ import oauth2
 import time
 from threading import Thread, Condition
 from timeit import default_timer as timer
-from requests.compat import unquote_plus
+from oauth2.requests.compat import unquote_plus
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
