@@ -1,11 +1,11 @@
 #!
 # -*- coding: utf-8 -*-
 
-from wizardcontroller import WizardController
-from wizardpage import WizardPage
-from httpcodehandler import HttpCodeHandler
-from configurationwriter import ConfigurationWriter
-from settingreader import SettingReader
+from .wizardcontroller import WizardController
+from .wizardpage import WizardPage
+from .httpcodehandler import HttpCodeHandler
+from .configurationwriter import ConfigurationWriter
+from .settingreader import SettingReader
 
 from .oauth2tools import g_wizard_paths
 from .oauth2tools import g_identifier

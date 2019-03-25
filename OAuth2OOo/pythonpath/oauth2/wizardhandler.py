@@ -27,7 +27,7 @@ class WizardHandler(unohelper.Base,
         self.Wizard = createService(self.ctx, 'com.sun.star.ui.dialogs.Wizard')
         arguments = ((uno.Any('[][]short', (g_wizard_paths)), controller), )
         uno.invoke(self.Wizard, 'initialize', arguments)
-        self.stringResource = getStringResource(self.ctx, g_identifier)
+        self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
 
     # XContainerWindowEventHandler, XDialogEventHandler
     def callHandlerMethod(self, window, event, method):

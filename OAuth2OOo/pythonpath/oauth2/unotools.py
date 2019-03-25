@@ -56,9 +56,9 @@ def getCurrentLocale(ctx):
         locale.Country = service.getLanguageCountryInfo(locale).Country
     return locale
 
-def getStringResource(ctx, identifier, locale=None, filename='DialogStrings'):
+def getStringResource(ctx, identifier, path=None, filename='DialogStrings', locale=None):
     service = 'com.sun.star.resource.StringResourceWithLocation'
-    location = getResourceLocation(ctx, identifier)
+    location = getResourceLocation(ctx, identifier, path)
     if locale is None:
         locale = getCurrentLocale(ctx)
     arguments = (location, True, locale, filename, '', InteractionHandler())

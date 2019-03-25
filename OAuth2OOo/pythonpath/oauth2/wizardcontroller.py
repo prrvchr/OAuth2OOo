@@ -17,6 +17,7 @@ from .unotools import createService
 from .unotools import generateUuid
 from .unotools import getCurrentLocale
 from .unotools import getProperty
+from .unotools import getStringResource
 
 from .logger import getLogger
 
@@ -42,6 +43,7 @@ class WizardController(unohelper.Base,
         self.Pages = {}
         self.WizardHandler = WizardHandler(self.ctx, self.Configuration, self)
         self.Logger = getLogger(self.ctx)
+        self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
         self.Provider = createService(self.ctx, 'com.sun.star.awt.ContainerWindowProvider')
 
     @property
