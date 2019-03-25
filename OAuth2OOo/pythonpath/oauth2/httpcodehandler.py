@@ -31,11 +31,12 @@ class HttpCodeHandler(unohelper.Base,
 
     # XCancellable
     def cancel(self):
+        print("HttpCodeHandler.cancel()")
         with self.lock:
             if self.watchdog and self.watchdog.is_alive():
                 self.watchdog.cancel()
+                print("HttpCodeHandler.wait()")
                 self.lock.wait()
-            self.lock.notifyAll()
 
     # XRequestCallback
     def addCallback(self, page, controller):
@@ -79,7 +80,7 @@ class WatchDog(Thread):
                 now = timer()
             if self.server.is_alive():
                 self.server.cancel()
-                self.lock.wait()
+                print("WatchDog.server.cancel()")
             self.lock.notifyAll()
 
     def cancel(self):
@@ -123,11 +124,9 @@ Connection: Closed
         print("HttpServer.run() end")
 
     def cancel(self):
-        with self.lock:
-            if self.is_alive():
-                self.acceptor.stopAccepting()
-                self.lock.wait()
-            self.lock.notifyAll()
+        print("HttpServer.cancel()")
+        self.acceptor.stopAccepting()
+        print("HttpServer.stop()")
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)

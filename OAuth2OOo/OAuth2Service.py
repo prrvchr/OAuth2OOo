@@ -58,7 +58,7 @@ class OAuth2Service(unohelper.Base,
     def getDefaultMethodName(self):
         try:
             print("OAuth2Service.getDefaultMethodName()")
-            level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
             msg = "Request Token ... "
             if not self.Setting.Url.Provider.Scope.Authorized:
                 msg += "AuthorizationCode needed ... "
@@ -67,9 +67,9 @@ class OAuth2Service(unohelper.Base,
                     token = self._getTokens(code, codeverifier)
                     msg += "Done"
                 else:
-                    level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
+                    level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
                     msg += "ERROR: Aborted!!!"
-                    token = ""
+                    token = ''
             elif self.Setting.Url.Provider.Scope.User.ExpiresIn < self.Setting.HandlerTimeout:
                 token = self._refreshToken()
                 msg += "Refresh needed ... Done"
@@ -89,57 +89,58 @@ class OAuth2Service(unohelper.Base,
         return session
 
     def _getAuthorizationCode(self):
-        code = None
-        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
-        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading...")
-        controller = WizardController(self.ctx, self.ResourceUrl, self.UserName)
-        codeverifier = controller.CodeVerifier
-        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading... Done")
-        print("OAuth2Service._getAuthorizationCode() 1")
-        if controller.WizardHandler.Wizard.execute():
-            print("OAuth2Service._getAuthorizationCode() 2")
-            if controller.AuthorizationCode.IsPresent:
-                print("OAuth2Service._getAuthorizationCode() 3")
-                controller.Configuration.commit()
-                code = controller.AuthorizationCode.Value
-                self.UserName = controller.UserName
-                self.ResourceUrl = controller.ResourceUrl
-        controller.Handler.cancel()
-        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController closed")
-        return code, codeverifier
+        try:
+            code = None
+            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+            self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading...")
+            controller = WizardController(self.ctx, self.ResourceUrl, self.UserName)
+            self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading... Done")
+            print("OAuth2Service._getAuthorizationCode() 1")
+            if controller.WizardHandler.Wizard.execute():
+                print("OAuth2Service._getAuthorizationCode() 2")
+                if controller.AuthorizationCode.IsPresent:
+                    print("OAuth2Service._getAuthorizationCode() 3")
+                    controller.Configuration.commit()
+                    code = controller.AuthorizationCode.Value
+                    self.UserName = controller.UserName
+                    self.ResourceUrl = controller.ResourceUrl
+            print("OAuth2Service._getAuthorizationCode() 4")
+            controller.Handler.cancel()
+            self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController closed")
+            return code, controller.CodeVerifier
+        except Exception as e:
+            print("PyOptionsDialog.__init__().Error: %s - %s" % (e, traceback.print_exc()))
 
     def _getTokens(self, code, codeverifier):
         url = self.Setting.Url.Provider.TokenUrl
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = {}
-        data["client_id"] = self.Setting.Url.Provider.ClientId
-        data["redirect_uri"] = self.Setting.Url.Provider.RedirectUri
-        data["grant_type"] = "authorization_code"
-        data["scope"] = self.Setting.Url.Provider.Scope.Values
-        data["code"] = code
+        data['client_id'] = self.Setting.Url.Provider.ClientId
+        data['redirect_uri'] = self.Setting.Url.Provider.RedirectUri
+        data['grant_type'] = 'authorization_code'
+        data['scope'] = self.Setting.Url.Provider.Scope.Values
+        data['code'] = code
         if self.Setting.Url.Provider.CodeChallenge:
-            data["code_verifier"] = codeverifier
+            data['code_verifier'] = codeverifier
         if self.Setting.Url.Provider.ClientSecret:
-            data["client_secret"] = self.Setting.Url.Provider.ClientSecret
+            data['client_secret'] = self.Setting.Url.Provider.ClientSecret
         message = "Make Http Request: %s?%s" % (url, data)
-        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         self.Setting.Logger.logp(level, "OAuth2Service", "_getTokens", message)
         response = self._getResponseFromRequest(url, data)
         return self._getTokenFromResponse(response)
 
     def _refreshToken(self):
         url = self.Setting.Url.Provider.TokenUrl
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = {}
-        data["client_id"] = self.Setting.Url.Provider.ClientId
-        data["refresh_token"] = self.Setting.Url.Provider.Scope.User.RefreshToken
-        data["grant_type"] = "refresh_token"
-        data["scope"] = self.Setting.Url.Provider.Scope.User.Scope
-        data["redirect_uri"] = self.Setting.Url.Provider.RedirectUri
+        data['client_id'] = self.Setting.Url.Provider.ClientId
+        data['refresh_token'] = self.Setting.Url.Provider.Scope.User.RefreshToken
+        data['grant_type'] = 'refresh_token'
+        data['scope'] = self.Setting.Url.Provider.Scope.User.Scope
+        data['redirect_uri'] = self.Setting.Url.Provider.RedirectUri
         if self.Setting.Url.Provider.ClientSecret:
-            data["client_secret"] = self.Setting.Url.Provider.ClientSecret
+            data['client_secret'] = self.Setting.Url.Provider.ClientSecret
         message = "Make Http Request: %s?%s" % (url, data)
-        level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         self.Setting.Logger.logp(level, "OAuth2Service", "_refreshToken", message)
         response = self._getResponseFromRequest(url, data)
         return self._getTokenFromResponse(response)
@@ -160,7 +161,7 @@ class OAuth2Service(unohelper.Base,
                     if r.status_code == s.codes.ok:
                         response = r.json()
         except Exception as e:
-            level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
+            level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
             self.Setting.Logger.logp(level, "OAuth2Service", "_getResponseFromRequest", "%s" % e)
         return response
 
@@ -177,19 +178,19 @@ class OAuth2Service(unohelper.Base,
             scope = self.Setting.Url.Provider.Scope.Values
             self.Setting.Url.Provider.Scope.User.Scope = scope
             self.Setting.Url.Provider.Scope.User.commit()
-            level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
+            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         else:
-            level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
+            level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
         self.Setting.Logger.logp(level, "OAuth2Service", "_getTokenFromResponse", "%s" % response)
         return token
 
     def _getPropertySetInfo(self):
         properties = {}
-        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        properties["ResourceUrl"] = getProperty("ResourceUrl", "string", transient)
-        properties["UserName"] = getProperty("UserName", "string", transient)
-        properties["Setting"] = getProperty("Setting", "com.sun.star.uno.XInterface", readonly)
+        readonly = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
+        transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
+        properties['ResourceUrl'] = getProperty('ResourceUrl', 'string', transient)
+        properties['UserName'] = getProperty('UserName', 'string', transient)
+        properties['Setting'] = getProperty('Setting', 'com.sun.star.uno.XInterface', readonly)
         return properties
 
     # XServiceInfo
