@@ -7,7 +7,15 @@ import unohelper
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.awt import XContainerWindowEventHandler
 
-import oauth2
+from oauth2 import createService
+from oauth2 import getFileSequence
+from oauth2 import getLoggerUrl
+from oauth2 import getLoggerSetting
+from oauth2 import setLoggerSetting
+from oauth2 import getStringResource
+from oauth2 import g_identifier
+
+import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -17,8 +25,8 @@ g_ImplementationName = 'com.gmail.prrvchr.extensions.OAuth2OOo.OptionsDialog'
 class OptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler):
     def __init__(self, ctx):
         self.ctx = ctx
-        self.stringResource = oauth2.getStringResource(self.ctx, None, 'OptionsDialog')
-        self.service = oauth2.createService(self.ctx, 'com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service')
+        self.stringResource = getStringResource(self.ctx, g_identifier, None, 'OptionsDialog')
+        self.service = createService(self.ctx, 'com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service')
 
     # XContainerWindowEventHandler
     def callHandlerMethod(self, dialog, event, method):
@@ -66,8 +74,12 @@ class OptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler):
         self._updateUI(dialog)
 
     def _doConnect(self, dialog):
-        token = self.service.Token
-        self._updateUI(dialog)
+        try:
+            print("OptionsDialog._doConnect()")
+            token = self.service.getDefaultMethodName()
+            self._updateUI(dialog)
+        except Exception as e:
+            print("OptionsDialog._doConnect().Error: %s - %s" % (e, traceback.print_exc()))
 
     def _doRemove(self, dialog):
         user = self.service.Setting.Url.Provider.Scope.User
@@ -114,8 +126,8 @@ class OptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler):
         dialog.getControl('CommandButton1').Model.Enabled = enabled
 
     def _doView(self, window):
-        url = oauth2.getLoggerUrl(self.ctx)
-        length, sequence = oauth2.getFileSequence(self.ctx, url)
+        url = getLoggerUrl(self.ctx)
+        length, sequence = getFileSequence(self.ctx, url)
         text = sequence.value.decode('utf-8')
         dialog = self._getLogDialog()
         dialog.Title = url
@@ -125,10 +137,10 @@ class OptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler):
 
     def _getLogDialog(self):
         url = 'vnd.sun.star.script:OAuth2OOo.LogDialog?location=application'
-        return oauth2.createService(self.ctx, 'com.sun.star.awt.DialogProvider').createDialog(url)
+        return createService(self.ctx, 'com.sun.star.awt.DialogProvider').createDialog(url)
 
     def _loadLoggerSetting(self, dialog):
-        enabled, index, handler = oauth2.getLoggerSetting(self.ctx)
+        enabled, index, handler = getLoggerSetting(self.ctx)
         dialog.getControl('CheckBox1').State = int(enabled)
         self._setLoggerLevel(dialog.getControl('ComboBox1'), index)
         dialog.getControl('OptionButton%s' % handler).State = 1
@@ -151,7 +163,7 @@ class OptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler):
         enabled = bool(dialog.getControl('CheckBox1').State)
         index = self._getLoggerLevel(dialog.getControl('ComboBox1'))
         handler = dialog.getControl('OptionButton1').State
-        oauth2.setLoggerSetting(self.ctx, enabled, index, handler)
+        setLoggerSetting(self.ctx, enabled, index, handler)
 
     # XServiceInfo
     def supportsService(self, service):

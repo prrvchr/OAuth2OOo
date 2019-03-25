@@ -4,37 +4,45 @@
 import uno
 import unohelper
 
-from com.sun.star.lang import XServiceInfo
 from com.sun.star.awt import XRequestCallback
 from com.sun.star.util import XCancellable
 
-import oauth2
+from .unotools import createService
+from .unotools import getResourceLocation
+from .unotools import getCurrentLocale
+from .unotools import getFileSequence
+from .oauth2tools import g_identifier
+
+from .requests.compat import unquote_plus
+
 import time
-from threading import Thread, Condition
+from threading import Thread
+from threading import Condition
 from timeit import default_timer as timer
-from oauth2.requests.compat import unquote_plus
-
-# pythonloader looks for a static g_ImplementationHelper variable
-g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = "com.gmail.prrvchr.extensions.OAuth2OOo.HttpCodeHandler"
 
 
-class HttpCodeHandler(unohelper.Base, XServiceInfo, XCancellable, XRequestCallback):
+class HttpCodeHandler(unohelper.Base,
+                      XCancellable,
+                      XRequestCallback):
     def __init__(self, ctx):
         self.ctx = ctx
+        self.lock = Condition()
         self.watchdog = None
 
     # XCancellable
     def cancel(self):
-        if self.watchdog is not None:
-            self.watchdog.cancel()
+        with self.lock:
+            if self.watchdog and self.watchdog.is_alive():
+                self.watchdog.cancel()
+                self.lock.wait()
+            self.lock.notifyAll()
 
     # XRequestCallback
     def addCallback(self, page, controller):
-        lock = Condition()
-        server = HttpServer(self.ctx, controller, lock)
+        self.cancel()
+        server = HttpServer(self.ctx, controller, self.lock)
         timeout = controller.Configuration.HandlerTimeout
-        self.watchdog = WatchDog(server, page, timeout, lock)
+        self.watchdog = WatchDog(server, page, timeout, self.lock)
         server.start()
         self.watchdog.start()
 
@@ -54,7 +62,7 @@ class WatchDog(Thread):
         self.page = page
         self.timeout = timeout
         self.end = 0
-        self.step = 20
+        self.step = 50
         self.lock = lock
 
     def run(self):
@@ -71,13 +79,12 @@ class WatchDog(Thread):
                 now = timer()
             if self.server.is_alive():
                 self.server.cancel()
-                if self.end != 0:
-                    result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
-                    self.server.controller.Wizard.DialogWindow.endDialog(result)
+                self.lock.wait()
+            self.lock.notifyAll()
 
     def cancel(self):
-        with self.lock:
-            self.end = 0
+        print("WatchDog.cancel()")
+        self.end = 0
 
 
 class HttpServer(Thread):
@@ -86,19 +93,20 @@ class HttpServer(Thread):
         self.ctx = ctx
         self.controller = controller
         self.lock = lock
-        self.acceptor = oauth2.createService(self.ctx, "com.sun.star.connection.Acceptor")
+        self.acceptor = createService(self.ctx, 'com.sun.star.connection.Acceptor')
 
     def run(self):
         address = self.controller.Configuration.Url.Provider.RedirectAddress
         port = self.controller.Configuration.Url.Provider.RedirectPort
-        connection = self.acceptor.accept("socket,host=%s,port=%s,tcpNoDelay=1" % (address, port))
-        if connection:
-            with self.lock:
+        result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
+        connection = self.acceptor.accept('socket,host=%s,port=%s,tcpNoDelay=1' % (address, port))
+        with self.lock:
+            if connection:
                 result = self._getResult(connection)
-                basename = oauth2.getResourceLocation(self.ctx)
-                basename += "/OAuth2Success_%s.html" if result else "/OAuth2Error_%s.html"
-                locale = oauth2.getCurrentLocale(self.ctx)
-                length, body = oauth2.getFileSequence(self.ctx, basename % locale.Language, basename % "en")
+                basename = getResourceLocation(self.ctx, g_identifier, 'OAuth2OOo')
+                basename += '/OAuth2Success_%s.html' if result else '/OAuth2Error_%s.html'
+                locale = getCurrentLocale(self.ctx)
+                length, body = getFileSequence(self.ctx, basename % locale.Language, basename % 'en')
                 header = uno.ByteSequence(b'''\
 HTTP/1.1 200 OK
 Content-Length: %d
@@ -109,28 +117,32 @@ Connection: Closed
                 connection.write(header + body)
                 connection.close()
                 self.acceptor.stopAccepting()
-                self.controller.Wizard.DialogWindow.endDialog(result)
-                self.lock.notify()
+                print("HttpServer.acceptor.stopAccepting()")
+                self.controller.WizardHandler.Wizard.DialogWindow.endDialog(result)
+            self.lock.notifyAll()
+        print("HttpServer.run() end")
 
     def cancel(self):
         with self.lock:
             if self.is_alive():
                 self.acceptor.stopAccepting()
+                self.lock.wait()
+            self.lock.notifyAll()
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)
         return sequence.value.decode()
 
-    def _readLine(self, connection, eol="\r\n"):
-        line = ""
+    def _readLine(self, connection, eol='\r\n'):
+        line = ''
         while not line.endswith(eol):
             line += self._readString(connection, 1)
         return line.strip()
 
     def _getRequest(self, connection):
-        method, url, version = None, "/", "HTTP/0.9"
+        method, url, version = None, '/', 'HTTP/0.9'
         line = self._readLine(connection)
-        parts = line.split(" ")
+        parts = line.split(' ')
         if len(parts) > 1:
             method = parts[0].strip()
             url = parts[1].strip()
@@ -139,56 +151,52 @@ Connection: Closed
         return method, url, version
 
     def _getHeaders(self, connection):
-        headers = {"Content-Length": 0}
+        headers = {'Content-Length': 0}
         while True:
             line = self._readLine(connection)
             if not line:
                 break
-            parts = line.split(":")
+            parts = line.split(':')
             if len(parts) > 1:
-                headers[parts[0].strip()] = ":".join(parts[1:]).strip()
+                headers[parts[0].strip()] = ':'.join(parts[1:]).strip()
         return headers
 
     def _getContentLength(self, headers):
-        return int(headers["Content-Length"])
+        return int(headers['Content-Length'])
 
     def _getParameters(self, connection):
-        parameters = ""
+        parameters = ''
         method, url, version = self._getRequest(connection)
         headers = self._getHeaders(connection)
-        if method == "GET":
-            parts = url.split("?")
+        if method == 'GET':
+            parts = url.split('?')
             if len(parts) > 1:
-                parameters = "?".join(parts[1:]).strip()
-        elif method == "POST":
+                parameters = '?'.join(parts[1:]).strip()
+        elif method == 'POST':
             length = self._getContentLength(headers)
             parameters = self._readString(connection, length).strip()
         return unquote_plus(parameters)
 
     def _getResponse(self, parameters):
         response = {}
-        for parameter in parameters.split("&"):
-            parts = parameter.split("=")
+        for parameter in parameters.split('&'):
+            parts = parameter.split('=')
             if len(parts) > 1:
                 name = parts[0].strip()
-                value = "=".join(parts[1:]).strip()
+                value = '='.join(parts[1:]).strip()
                 response[name] = value
         return response
 
     def _getResult(self, connection):
         parameters = self._getParameters(connection)
         response = self._getResponse(parameters)
-        level = uno.getConstantByName("com.sun.star.logging.LogLevel.SEVERE")
-        result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL")
-        if "code" in response and "state" in response:
-            if response["state"] == self.controller.State:
-                self.controller.AuthorizationCode = response["code"]
-                level = uno.getConstantByName("com.sun.star.logging.LogLevel.INFO")
-                result = uno.getConstantByName("com.sun.star.ui.dialogs.ExecutableDialogResults.OK")
-        self.controller.Configuration.Logger.logp(level, "HttpServer", "_getResult", "%s" % response)
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
+        result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
+        if 'code' in response and 'state' in response:
+            if response['state'] == self.controller.State:
+                self.controller.AuthorizationCode.Value = response['code']
+                self.controller.AuthorizationCode.IsPresent = True
+                level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+                result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.OK')
+        self.controller.Configuration.Logger.logp(level, 'HttpServer', '_getResult', '%s' % response)
         return result
-
-
-g_ImplementationHelper.addImplementation(HttpCodeHandler,                           # UNO object class
-                                         g_ImplementationName,                      # Implementation name
-                                        (g_ImplementationName, ))                   # List of implemented services

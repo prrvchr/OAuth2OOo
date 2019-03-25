@@ -29,11 +29,13 @@ def getProperty(name, typename, attributes, handle=-1):
                                uno.getTypeByName(typename),
                                attributes)
 
-def getResourceLocation(ctx, path='OAuth2OOo'):
-    identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
+def getResourceLocation(ctx, identifier, path=None):
     service = '/singletons/com.sun.star.deployment.PackageInformationProvider'
     provider = ctx.getValueByName(service)
-    return '%s/%s' % (provider.getPackageLocation(identifier), path)
+    location = provider.getPackageLocation(identifier)
+    if path is not None:
+        location += '/%s' % path
+    return location
 
 def getConfiguration(ctx, nodepath, update=False):
     service = 'com.sun.star.configuration.ConfigurationProvider'
@@ -54,9 +56,9 @@ def getCurrentLocale(ctx):
         locale.Country = service.getLanguageCountryInfo(locale).Country
     return locale
 
-def getStringResource(ctx, locale=None, filename='DialogStrings'):
+def getStringResource(ctx, identifier, locale=None, filename='DialogStrings'):
     service = 'com.sun.star.resource.StringResourceWithLocation'
-    location = getResourceLocation(ctx)
+    location = getResourceLocation(ctx, identifier)
     if locale is None:
         locale = getCurrentLocale(ctx)
     arguments = (location, True, locale, filename, '', InteractionHandler())

@@ -2,26 +2,10 @@
 <!DOCTYPE manifest:manifest PUBLIC "-//OpenOffice.org//DTD Manifest 1.0//EN" "Manifest.dtd">
 <manifest:manifest
   xmlns:manifest="http://openoffice.org/2001/manifest">
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.basic-library"
-        manifest:full-path="OAuth2OOo/"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
-        manifest:full-path="OptionsDialog.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
-        manifest:full-path="OAuth2Service.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
-        manifest:full-path="SettingReader.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
-        manifest:full-path="ConfigurationWriter.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
-        manifest:full-path="HttpCodeHandler.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
-        manifest:full-path="WizardController.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python"
-        manifest:full-path="WizardPage.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-schema"
-        manifest:full-path="Options.xcs"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data"
-        manifest:full-path="Options.xcu"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data"
-        manifest:full-path="OptionsDialog.xcu"/>
+    <manifest:file-entry manifest:media-type="application/vnd.sun.star.basic-library" manifest:full-path="OAuth2OOo/"/>
+    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="OptionsDialog.py"/>
+    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="OAuth2Service.py"/>
+    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-schema" manifest:full-path="Options.xcs"/>
+    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="Options.xcu"/>
+    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="OptionsDialog.xcu"/>
 </manifest:manifest>

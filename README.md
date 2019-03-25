@@ -1,4 +1,4 @@
-# OAuth2OOo v.0.0.2
+# OAuth2OOo v.0.0.3
 
 ## Uno OAuth2.0 API for LibreOffice / OpenOffice.
 
@@ -28,7 +28,7 @@ service.ResourceUrl = your_registered_url
 
 ### Get the access token:
 
-token = service.Token
+token = service.getDefaultMethodName()
 
 ## Has been tested with:
 	
