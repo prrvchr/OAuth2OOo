@@ -5,6 +5,6 @@
         <identifier value="com.gmail.prrvchr.extensions.OAuth2OOo" />
         <version value="0.0.3" /> 
         <update-download>
-                <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/download/v0.0.3/OAuth2OOo.oxt" />
+                <src xlink:href="https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt" />
         </update-download>
 </description>
