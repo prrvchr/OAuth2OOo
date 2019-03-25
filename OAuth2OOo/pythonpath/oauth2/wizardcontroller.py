@@ -9,7 +9,7 @@ from com.sun.star.ui.dialogs import XWizardController
 from .unolib import PropertySet
 
 from .configurationwriter import ConfigurationWriter
-from .httpcodehandler import HttpCodeHandler
+from .httpserver import HttpServer
 from .wizardpage import WizardPage
 from .wizardhandler import WizardHandler
 
@@ -22,6 +22,7 @@ from .unotools import getStringResource
 from .logger import getLogger
 
 from .oauth2tools import g_identifier
+from .oauth2tools import g_advance_to
 
 import traceback
 
@@ -36,12 +37,12 @@ class WizardController(unohelper.Base,
         self.ResourceUrl = url
         self.UserName = username
         self.AuthorizationCode = uno.createUnoStruct('com.sun.star.beans.Optional<string>')
-        self.Handler = HttpCodeHandler(self.ctx)
+        self.Server = HttpServer(self.ctx)
         self.CodeVerifier = generateUuid() + generateUuid()
         self.State = generateUuid()
-        self.advanceTo = True
+        self.advanceTo = g_advance_to # 0 to disable
         self.Pages = {}
-        self.WizardHandler = WizardHandler(self.ctx, self.Configuration, self)
+        self.Handler = WizardHandler(self.ctx, self.Configuration, self)
         self.Logger = getLogger(self.ctx)
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
         self.Provider = createService(self.ctx, 'com.sun.star.awt.ContainerWindowProvider')
@@ -71,7 +72,7 @@ class WizardController(unohelper.Base,
                               self.Configuration,
                               id,
                               parent,
-                              self.WizardHandler,
+                              self.Handler,
                               self.CodeVerifier,
                               self.State,
                               self.AuthorizationCode)
@@ -88,22 +89,22 @@ class WizardController(unohelper.Base,
             level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
             self.Logger.logp(level, "WizardController", "onActivatePage()", "PageId: %s..." % id)
             title = self.stringResource.resolveString('PageWizard%s.Title' % (id, ))
-            self.WizardHandler.Wizard.setTitle(title)
+            self.Handler.Wizard.setTitle(title)
             finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
-            self.WizardHandler.Wizard.enableButton(finish, False)
+            self.Handler.Wizard.enableButton(finish, False)
             if id == 1:
-                self.WizardHandler.Wizard.activatePath(self.ActivePath, True)
-                self.WizardHandler.Wizard.updateTravelUI()
+                self.Handler.Wizard.activatePath(self.ActivePath, True)
+                self.Handler.Wizard.updateTravelUI()
             elif id == 3:
                 print("WizardController.onActivatePage.addCallback() 1 %s" % id)
                 page = self.Pages[id]
                 print("WizardController.onActivatePage.addCallback() 2 %s" % page)
                 if page:
-                    self.Handler.addCallback(page, self)
+                    self.Server.addCallback(page, self)
                     print("WizardController.onActivatePage.addCallback() 3")
-    #       if self.advanceTo:
-    #           self.advanceTo = False
-    #           self.WizardHandler.Wizard.advanceTo(2)
+            if self.advanceTo:
+                self.advanceTo = 0
+                self.Handler.Wizard.advanceTo(g_advance_to)
             self.Logger.logp(level, "WizardController", "onActivatePage()", "PageId: %s... Done" % id)
         except Exception as e:
             print("WizardController.onActivatePage().Error: %s - %s" % (e, traceback.print_exc()))
@@ -127,8 +128,8 @@ class WizardController(unohelper.Base,
         properties['CheckUrl'] = getProperty('CheckUrl', 'boolean', readonly)
         properties['CodeVerifier'] = getProperty('CodeVerifier', 'string', readonly)
         properties['Configuration'] = getProperty('Configuration', 'com.sun.star.uno.XInterface', readonly)
-        properties['Handler'] = getProperty('Handler', 'com.sun.star.uno.XInterface', bound | readonly)
+        properties['Server'] = getProperty('Server', 'com.sun.star.uno.XInterface', bound | readonly)
         properties['Paths'] = getProperty('Paths', '[][]short', readonly)
         properties['State'] = getProperty('State', 'string', readonly)
-        properties['WizardHandler'] = getProperty('WizardHandler', 'com.sun.star.uno.XInterface', readonly)
+        properties['Handler'] = getProperty('Handler', 'com.sun.star.uno.XInterface', readonly)
         return properties

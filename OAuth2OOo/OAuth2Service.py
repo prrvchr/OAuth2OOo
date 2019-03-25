@@ -96,7 +96,7 @@ class OAuth2Service(unohelper.Base,
             controller = WizardController(self.ctx, self.ResourceUrl, self.UserName)
             self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading... Done")
             print("OAuth2Service._getAuthorizationCode() 1")
-            if controller.WizardHandler.Wizard.execute():
+            if controller.Handler.Wizard.execute():
                 print("OAuth2Service._getAuthorizationCode() 2")
                 if controller.AuthorizationCode.IsPresent:
                     print("OAuth2Service._getAuthorizationCode() 3")
@@ -105,7 +105,7 @@ class OAuth2Service(unohelper.Base,
                     self.UserName = controller.UserName
                     self.ResourceUrl = controller.ResourceUrl
             print("OAuth2Service._getAuthorizationCode() 4")
-            controller.Handler.cancel()
+            controller.Server.cancel()
             self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController closed")
             return code, controller.CodeVerifier
         except Exception as e:

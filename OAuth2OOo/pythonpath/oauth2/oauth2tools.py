@@ -10,8 +10,10 @@ from .requests.compat import urlencode
 import base64
 import hashlib
 
+g_advance_to = 2 # 0 to disable
 g_wizard_paths = ((1, 2, 3), (1, 2, 4))
 g_identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
+
 
 def getAuthorizationUrl(ctx, configuration, code, state):
     success, main, parameters = _getUrlMainAndParameters(ctx, configuration)

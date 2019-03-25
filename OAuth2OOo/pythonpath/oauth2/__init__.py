@@ -3,7 +3,7 @@
 
 from .wizardcontroller import WizardController
 from .wizardpage import WizardPage
-from .httpcodehandler import HttpCodeHandler
+from .httpserver import HttpServer
 from .configurationwriter import ConfigurationWriter
 from .settingreader import SettingReader
 

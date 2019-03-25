@@ -21,9 +21,9 @@ from threading import Condition
 from timeit import default_timer as timer
 
 
-class HttpCodeHandler(unohelper.Base,
-                      XCancellable,
-                      XRequestCallback):
+class HttpServer(unohelper.Base,
+                 XCancellable,
+                 XRequestCallback):
     def __init__(self, ctx):
         self.ctx = ctx
         self.lock = Condition()
@@ -36,12 +36,11 @@ class HttpCodeHandler(unohelper.Base,
             if self.watchdog and self.watchdog.is_alive():
                 self.watchdog.cancel()
                 print("HttpCodeHandler.wait()")
-                self.lock.wait()
+                #self.lock.wait()
 
     # XRequestCallback
     def addCallback(self, page, controller):
-        self.cancel()
-        server = HttpServer(self.ctx, controller, self.lock)
+        server = Server(self.ctx, controller, self.lock)
         timeout = controller.Configuration.HandlerTimeout
         self.watchdog = WatchDog(server, page, timeout, self.lock)
         server.start()
@@ -81,6 +80,10 @@ class WatchDog(Thread):
             if self.server.is_alive():
                 self.server.cancel()
                 print("WatchDog.server.cancel()")
+            if self.end:
+                self.page.notify(100)
+                result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
+                self.server.controller.Handler.Wizard.DialogWindow.endDialog(result)
             self.lock.notifyAll()
 
     def cancel(self):
@@ -88,7 +91,7 @@ class WatchDog(Thread):
         self.end = 0
 
 
-class HttpServer(Thread):
+class Server(Thread):
     def __init__(self, ctx, controller, lock):
         Thread.__init__(self)
         self.ctx = ctx
@@ -119,7 +122,7 @@ Connection: Closed
                 connection.close()
                 self.acceptor.stopAccepting()
                 print("HttpServer.acceptor.stopAccepting()")
-                self.controller.WizardHandler.Wizard.DialogWindow.endDialog(result)
+                self.controller.Handler.Wizard.DialogWindow.endDialog(result)
             self.lock.notifyAll()
         print("HttpServer.run() end")
 
