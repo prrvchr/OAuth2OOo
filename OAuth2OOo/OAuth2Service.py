@@ -7,11 +7,13 @@ import unohelper
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.script import XDefaultMethod
 
-from oauth2 import SettingReader
+from oauth2 import OAuth2Configuration
 from oauth2 import WizardController
 from oauth2 import PropertySet
 from oauth2 import Initialization
 from oauth2 import createService
+from oauth2 import getTokenParameters
+from oauth2 import getRefreshParameters
 from oauth2 import getProperty
 from oauth2 import g_identifier
 
@@ -33,7 +35,7 @@ class OAuth2Service(unohelper.Base,
                     PropertySet):
     def __init__(self, ctx, *namedvalues):
         self.ctx = ctx
-        self.Setting = SettingReader(self.ctx)
+        self.Setting = OAuth2Configuration(self.ctx)
         self.initialize(namedvalues)
         self.Session = self._getSession()
 
@@ -65,12 +67,13 @@ class OAuth2Service(unohelper.Base,
                 code, codeverifier = self._getAuthorizationCode()
                 if code is not None:
                     token = self._getTokens(code, codeverifier)
+                    print("OAuth2Service.getDefaultMethodName() %s" % (token, ))
                     msg += "Done"
                 else:
                     level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
                     msg += "ERROR: Aborted!!!"
                     token = ''
-            elif self.Setting.Url.Provider.Scope.User.ExpiresIn < self.Setting.HandlerTimeout:
+            elif self.Setting.Url.Provider.Scope.User.HasExpired:
                 token = self._refreshToken()
                 msg += "Refresh needed ... Done"
             else:
@@ -113,16 +116,7 @@ class OAuth2Service(unohelper.Base,
 
     def _getTokens(self, code, codeverifier):
         url = self.Setting.Url.Provider.TokenUrl
-        data = {}
-        data['client_id'] = self.Setting.Url.Provider.ClientId
-        data['redirect_uri'] = self.Setting.Url.Provider.RedirectUri
-        data['grant_type'] = 'authorization_code'
-        data['scope'] = self.Setting.Url.Provider.Scope.Values
-        data['code'] = code
-        if self.Setting.Url.Provider.CodeChallenge:
-            data['code_verifier'] = codeverifier
-        if self.Setting.Url.Provider.ClientSecret:
-            data['client_secret'] = self.Setting.Url.Provider.ClientSecret
+        data = getTokenParameters(self.Setting, code, codeverifier)
         message = "Make Http Request: %s?%s" % (url, data)
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         self.Setting.Logger.logp(level, "OAuth2Service", "_getTokens", message)
@@ -131,14 +125,7 @@ class OAuth2Service(unohelper.Base,
 
     def _refreshToken(self):
         url = self.Setting.Url.Provider.TokenUrl
-        data = {}
-        data['client_id'] = self.Setting.Url.Provider.ClientId
-        data['refresh_token'] = self.Setting.Url.Provider.Scope.User.RefreshToken
-        data['grant_type'] = 'refresh_token'
-        data['scope'] = self.Setting.Url.Provider.Scope.User.Scope
-        data['redirect_uri'] = self.Setting.Url.Provider.RedirectUri
-        if self.Setting.Url.Provider.ClientSecret:
-            data['client_secret'] = self.Setting.Url.Provider.ClientSecret
+        data = getRefreshParameters(self.Setting)
         message = "Make Http Request: %s?%s" % (url, data)
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         self.Setting.Logger.logp(level, "OAuth2Service", "_refreshToken", message)
@@ -177,6 +164,7 @@ class OAuth2Service(unohelper.Base,
             self.Setting.Url.Provider.Scope.User.AccessToken = token
             scope = self.Setting.Url.Provider.Scope.Values
             self.Setting.Url.Provider.Scope.User.Scope = scope
+            self.Setting.Url.Provider.Scope.User.NeverExpires = expires is None
             self.Setting.Url.Provider.Scope.User.commit()
             level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         else:

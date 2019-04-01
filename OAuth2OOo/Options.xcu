@@ -66,8 +66,14 @@
             <prop oor:name="AuthorizationUrl">
                 <value>https://accounts.google.com/o/oauth2/v2/auth</value>
             </prop>
+            <prop oor:name="AuthorizationParameters">
+                <value>{}</value>
+            </prop>
             <prop oor:name="TokenUrl">
                 <value>https://www.googleapis.com/oauth2/v4/token</value>
+            </prop>
+            <prop oor:name="TokenParameters">
+                <value>{}</value>
             </prop>
             <prop oor:name="CodeChallenge">
                 <value>true</value>
@@ -95,8 +101,14 @@
             <prop oor:name="AuthorizationUrl">
                 <value>https://login.microsoftonline.com/common/oauth2/v2.0/authorize</value>
             </prop>
+            <prop oor:name="AuthorizationParameters">
+                <value>{}</value>
+            </prop>
             <prop oor:name="TokenUrl">
                 <value>https://login.microsoftonline.com/common/oauth2/v2.0/token</value>
+            </prop>
+            <prop oor:name="TokenParameters">
+                <value>{}</value>
             </prop>
             <prop oor:name="CodeChallenge">
                 <value>true</value>

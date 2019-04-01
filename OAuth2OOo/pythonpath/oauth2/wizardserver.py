@@ -21,9 +21,9 @@ from threading import Condition
 from timeit import default_timer as timer
 
 
-class HttpServer(unohelper.Base,
-                 XCancellable,
-                 XRequestCallback):
+class WizardServer(unohelper.Base,
+                   XCancellable,
+                   XRequestCallback):
     def __init__(self, ctx):
         self.ctx = ctx
         self.lock = Condition()
@@ -45,14 +45,6 @@ class HttpServer(unohelper.Base,
         self.watchdog = WatchDog(server, page, timeout, self.lock)
         server.start()
         self.watchdog.start()
-
-    # XServiceInfo
-    def supportsService(self, service):
-        return g_ImplementationHelper.supportsService(g_ImplementationName, service)
-    def getImplementationName(self):
-        return g_ImplementationName
-    def getSupportedServiceNames(self):
-        return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
 class WatchDog(Thread):
@@ -195,7 +187,7 @@ Connection: Closed
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
         result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
         if 'code' in response and 'state' in response:
-            if response['state'] == self.controller.State:
+            if response['state'] == self.controller.Uuid:
                 self.controller.AuthorizationCode.Value = response['code']
                 self.controller.AuthorizationCode.IsPresent = True
                 level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')

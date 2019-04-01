@@ -1,19 +1,17 @@
 #!
 # -*- coding: utf-8 -*-
 
+from .oauth2configuration import OAuth2Configuration
 from .wizardcontroller import WizardController
-from .wizardpage import WizardPage
-from .httpserver import HttpServer
-from .configurationwriter import ConfigurationWriter
-from .settingreader import SettingReader
 
 from .oauth2tools import g_wizard_paths
 from .oauth2tools import g_identifier
 from .oauth2tools import getActivePath
 from .oauth2tools import getAuthorizationStr
-from .oauth2tools import getAuthorizationUrl
+from .oauth2tools import getTokenParameters
+from .oauth2tools import getRefreshParameters
 from .oauth2tools import checkUrl
-from .oauth2tools import openUrl 
+from .oauth2tools import openUrl
 
 from .unolib import InteractionHandler
 from .unolib import Initialization

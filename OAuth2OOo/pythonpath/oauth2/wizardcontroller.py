@@ -8,10 +8,10 @@ from com.sun.star.ui.dialogs import XWizardController
 
 from .unolib import PropertySet
 
-from .configurationwriter import ConfigurationWriter
-from .httpserver import HttpServer
-from .wizardpage import WizardPage
+from .wizardconfiguration import WizardConfiguration
 from .wizardhandler import WizardHandler
+from .wizardserver import WizardServer
+from .wizardpage import WizardPage
 
 from .unotools import createService
 from .unotools import generateUuid
@@ -33,13 +33,12 @@ class WizardController(unohelper.Base,
     def __init__(self, ctx, url, username):
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         self.ctx = ctx
-        self.Configuration = ConfigurationWriter(self.ctx)
+        self.Configuration = WizardConfiguration(self.ctx)
         self.ResourceUrl = url
         self.UserName = username
         self.AuthorizationCode = uno.createUnoStruct('com.sun.star.beans.Optional<string>')
-        self.Server = HttpServer(self.ctx)
-        self.CodeVerifier = generateUuid() + generateUuid()
-        self.State = generateUuid()
+        self.Server = WizardServer(self.ctx)
+        self.Uuid = generateUuid()
         self.advanceTo = g_advance_to # 0 to disable
         self.Pages = {}
         self.Handler = WizardHandler(self.ctx, self.Configuration, self)
@@ -62,6 +61,9 @@ class WizardController(unohelper.Base,
     @property
     def ActivePath(self):
         return 0 if self.Configuration.Url.Provider.HttpHandler else 1
+    @property
+    def CodeVerifier(self):
+        return self.Uuid + self.Uuid
 
     # XWizardController
     def createPage(self, parent, id):
@@ -73,8 +75,7 @@ class WizardController(unohelper.Base,
                               id,
                               parent,
                               self.Handler,
-                              self.CodeVerifier,
-                              self.State,
+                              self.Uuid,
                               self.AuthorizationCode)
             self.Pages[id] = page
         return self.Pages[id]
@@ -126,10 +127,10 @@ class WizardController(unohelper.Base,
         properties['AuthorizationCode'] = getProperty('AuthorizationCode', 'com.sun.star.beans.Optional<string>', bound)
         properties['AuthorizationStr'] = getProperty('AuthorizationStr', 'string', readonly)
         properties['CheckUrl'] = getProperty('CheckUrl', 'boolean', readonly)
+        properties['Uuid'] = getProperty('Uuid', 'string', readonly)
         properties['CodeVerifier'] = getProperty('CodeVerifier', 'string', readonly)
         properties['Configuration'] = getProperty('Configuration', 'com.sun.star.uno.XInterface', readonly)
         properties['Server'] = getProperty('Server', 'com.sun.star.uno.XInterface', bound | readonly)
         properties['Paths'] = getProperty('Paths', '[][]short', readonly)
-        properties['State'] = getProperty('State', 'string', readonly)
         properties['Handler'] = getProperty('Handler', 'com.sun.star.uno.XInterface', readonly)
         return properties

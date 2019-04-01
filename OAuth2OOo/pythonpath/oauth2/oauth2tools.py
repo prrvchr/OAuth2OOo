@@ -3,100 +3,81 @@
 
 import uno
 
+from .oauth2lib import JsonHook
 from .unotools import createService
 from .unotools import getCurrentLocale
 from .requests.compat import urlencode
 
+import json
 import base64
 import hashlib
 
 g_advance_to = 2 # 0 to disable
 g_wizard_paths = ((1, 2, 3), (1, 2, 4))
 g_identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
+g_refresh_overlap = 10 # must be positive, in second
 
-
-def getAuthorizationUrl(ctx, configuration, code, state):
-    success, main, parameters = _getUrlMainAndParameters(ctx, configuration)
-    parameters = urlencode(_getUrlParameters(ctx, configuration, code, state, parameters))
-    return '%s?%s' % (main, parameters)
-
-def getAuthorizationStr(ctx, configuration, code, state):
-    presentation = ''
-    success, main, parameters = _getUrlMainAndParameters(ctx, configuration)
-    if success:
-        transformer = ctx.ServiceManager.createInstance('com.sun.star.util.URLTransformer')
-        url = uno.createUnoStruct('com.sun.star.util.URL')
-        url.Complete = '%s?%s' % (main, _getUrlArguments(ctx, configuration, code, state, parameters))
-        success, url = transformer.parseStrict(url)
-        if success:
-            presentation = transformer.getPresentation(url, False)
-    return presentation
 
 def getActivePath(configuration):
     return 0 if configuration.Url.Provider.HttpHandler else 1
 
-def checkUrl(ctx, configuration, code, state):
-    success, main, parameters = _getUrlMainAndParameters(ctx, configuration)
-    if success:
-        transformer = ctx.ServiceManager.createInstance('com.sun.star.util.URLTransformer')
-        url = uno.createUnoStruct('com.sun.star.util.URL')
-        url.Complete = '%s?%s' % (main, _getUrlArguments(ctx, configuration, code, state, parameters))
-        success, url = transformer.parseStrict(url)
+def getAuthorizationStr(ctx, configuration, uuid):
+    main = configuration.Url.Provider.AuthorizationUrl
+    parameters = _getUrlArguments(ctx, configuration, uuid)
+    return '%s?%s' % (main, parameters)
+
+def checkUrl(ctx, configuration, uuid):
+    transformer = ctx.ServiceManager.createInstance('com.sun.star.util.URLTransformer')
+    url = uno.createUnoStruct('com.sun.star.util.URL')
+    url.Complete = getAuthorizationStr(ctx, configuration, uuid)
+    success, url = transformer.parseStrict(url)
     return success
 
-def openUrl(ctx, configuration, code, state, option=''):
-    url = getAuthorizationUrl(ctx, configuration, code, state)
-    message = getAuthorizationStr(ctx, configuration, code, state)
+def openUrl(ctx, configuration, uuid, option=''):
+    url = _getAuthorizationUrl(ctx, configuration, uuid)
     service = 'com.sun.star.system.SystemShellExecute'
     ctx.ServiceManager.createInstance(service).execute(url, option, 0)
 
-def _getUrlMainAndParameters(ctx, configuration):
+def _getAuthorizationUrl(ctx, configuration, uuid):
     main = configuration.Url.Provider.AuthorizationUrl
-    parameters = {}
-    transformer = ctx.ServiceManager.createInstance('com.sun.star.util.URLTransformer')
-    url = uno.createUnoStruct('com.sun.star.util.URL')
-    url.Complete = main
-    success, url = transformer.parseStrict(url)
-    if success:
-        main = url.Main
-        parameters = _getParametersFromArguments(url.Arguments)
-    return success, main, parameters
+    parameters = urlencode(_getUrlParameters(ctx, configuration, uuid))
+    return '%s?%s' % (main, parameters)
 
-def _getParametersFromArguments(arguments):
-    parameters = {}
-    for arg in arguments.split('&'):
-        parts = arg.split('=')
-        if len(parts) > 1:
-            name = unquote(parts[0]).strip()
-            value = unquote('='.join(parts[1:])).strip()
-            parameters[name] = value
-    return parameters
-
-def _getUrlParameters(ctx, configuration, code, state, parameters={}):
-    parameters['client_id'] = configuration.Url.Provider.ClientId
-    parameters['redirect_uri'] = configuration.Url.Provider.RedirectUri
-    parameters['response_type'] = 'code'
-    parameters['response_mode'] = 'query'
-    parameters['scope'] = configuration.Url.Provider.Scope.Value
-#        parameters['access_type'] = 'offline'
-    if configuration.Url.Provider.CodeChallenge:
-        method = configuration.Url.Provider.CodeChallengeMethod
-        parameters['code_challenge_method'] = method
-        parameters['code_challenge'] = _getCodeChallenge(code, method)
-    if configuration.Url.Provider.ClientSecret:
-        parameters['client_secret'] = configuration.Url.Provider.ClientSecret
-    parameters['login_hint'] = configuration.Url.Provider.Scope.User.Id
-    parameters['prompt'] = 'consent'
-    parameters['hl'] = getCurrentLocale(ctx).Language
-    parameters['state'] = state
-    return parameters
-
-def _getUrlArguments(ctx, configuration, code, state, parameters={}):
+def _getUrlArguments(ctx, configuration, uuid):
     arguments = []
-    parameters = _getUrlParameters(ctx, configuration, code, state, parameters)
+    parameters = _getUrlParameters(ctx, configuration, uuid)
     for key, value in parameters.items():
         arguments.append('%s=%s' % (key, value))
     return '&'.join(arguments)
+
+def _getUrlParameters(ctx, configuration, uuid):
+    parameters = getUrlBaseParameters(configuration, uuid)
+    optional = getUrlOptionalParameters(ctx, configuration)
+    options = configuration.Url.Provider.AuthorizationParameters
+    update = getUpdateOption(options, parameters, optional)
+    parameters.update(update)
+    return parameters
+
+def getUrlBaseParameters(configuration, uuid):
+    parameters = {}
+    parameters['response_type'] = 'code'
+    parameters['client_id'] = configuration.Url.Provider.ClientId
+    parameters['state'] = uuid
+    if configuration.Url.Provider.HttpHandler:
+        parameters['redirect_uri'] = configuration.Url.Provider.RedirectUri
+    if configuration.Url.Provider.CodeChallenge:
+        method = configuration.Url.Provider.CodeChallengeMethod
+        parameters['code_challenge_method'] = method
+        parameters['code_challenge'] = _getCodeChallenge(uuid + uuid, method)
+    return parameters
+
+def getUrlOptionalParameters(ctx, configuration):
+    parameters = {}
+    parameters['scope'] = configuration.Url.Provider.Scope.Value
+    parameters['client_secret'] = configuration.Url.Provider.ClientSecret
+    parameters['current_user'] = configuration.Url.Provider.Scope.User.Id
+    parameters['current_language'] = getCurrentLocale(ctx).Language
+    return parameters
 
 def _getCodeChallenge(code, method):
     if method == 'S256':
@@ -105,3 +86,56 @@ def _getCodeChallenge(code, method):
         challenge = base64.urlsafe_b64encode(code).decode('utf-8')
         code = challenge[:len(challenge)-padding]
     return code
+
+def getTokenParameters(setting, code, codeverifier):
+    data = getTokenBaseParameters(setting, code, codeverifier)
+    optional = getTokenOptionalParameters(setting)
+    options = setting.Url.Provider.TokenParameters
+    update = getUpdateOption(options, data, optional)
+    data.update(update)
+    return data
+
+def getTokenBaseParameters(setting, code, codeverifier):
+    parameters = {}
+    parameters['code'] = code
+    parameters['grant_type'] = 'authorization_code'
+    parameters['client_id'] = setting.Url.Provider.ClientId
+    if setting.Url.Provider.HttpHandler:
+        parameters['redirect_uri'] = setting.Url.Provider.RedirectUri
+    if setting.Url.Provider.CodeChallenge:
+        parameters['code_verifier'] = codeverifier
+    return parameters
+
+def getTokenOptionalParameters(setting):
+    parameters = {}
+    parameters['scope'] = setting.Url.Provider.Scope.Values
+    parameters['client_secret'] = setting.Url.Provider.ClientSecret
+    return parameters
+
+def getRefreshParameters(setting):
+    data = getRefreshBaseParameters(setting)
+    optional = getRefreshOptionalParameters(setting)
+    options = setting.Url.Provider.TokenParameters
+    update = getUpdateOption(options, data, optional)
+    data.update(update)
+    return data
+
+def getRefreshBaseParameters(setting):
+    parameters = {}
+    parameters['refresh_token'] = setting.Url.Provider.Scope.User.RefreshToken
+    parameters['grant_type'] = 'refresh_token'
+    parameters['client_id'] = setting.Url.Provider.ClientId
+    if setting.Url.Provider.CodeChallenge:
+        parameters['redirect_uri'] = setting.Url.Provider.RedirectUri
+    return parameters
+
+def getRefreshOptionalParameters(setting):
+    parameters = {}
+    parameters['scope'] = setting.Url.Provider.Scope.User.Scope
+    parameters['client_secret'] = setting.Url.Provider.ClientSecret
+    return parameters
+
+def getUpdateOption(option, data, optional):
+    options = JsonHook(data, optional)
+    update = json.loads(option, object_pairs_hook=options.hook)
+    return update

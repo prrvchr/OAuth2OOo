@@ -4,7 +4,6 @@
 import uno
 import unohelper
 
-from com.sun.star.lang import XServiceInfo
 from com.sun.star.embed import XTransactedObject
 from com.sun.star.util import XUpdatable
 
@@ -13,15 +12,16 @@ from .unotools import getProperty
 from .unotools import getConfiguration
 from .logger import getLogger
 from .oauth2tools import g_identifier
+from .oauth2tools import g_refresh_overlap
 
 import time
 import traceback
 
 
-class SettingReader(unohelper.Base,
-                    XTransactedObject,
-                    XUpdatable,
-                    PropertySet):
+class OAuth2Configuration(unohelper.Base,
+                          XTransactedObject,
+                          XUpdatable,
+                          PropertySet):
     def __init__(self, ctx):
         self.ctx = ctx
         self.configuration = getConfiguration(self.ctx, g_identifier, True)
@@ -129,7 +129,9 @@ class ProviderReader(unohelper.Base,
             clientid = provider.getByName("ClientId")
             clientsecret = provider.getByName("ClientSecret")
             authorizationurl = provider.getByName("AuthorizationUrl")
+            authorizationparameters = provider.getByName("AuthorizationParameters")
             tokenurl = provider.getByName("TokenUrl")
+            tokenparameters = provider.getByName("TokenParameters")
             codechallenge = provider.getByName("CodeChallenge")
             httphandler = provider.getByName("HttpHandler")
             redirectaddress = provider.getByName("RedirectAddress")
@@ -137,7 +139,9 @@ class ProviderReader(unohelper.Base,
         self.ClientId = clientid
         self.ClientSecret = clientsecret
         self.AuthorizationUrl = authorizationurl
+        self.AuthorizationParameters = authorizationparameters
         self.TokenUrl = tokenurl
+        self.TokenParameters = tokenparameters
         self.CodeChallenge = codechallenge
         self.HttpHandler = httphandler
         self.RedirectAddress = redirectaddress
@@ -150,7 +154,9 @@ class ProviderReader(unohelper.Base,
         properties["ClientId"] = getProperty("ClientId", "string", readonly)
         properties["ClientSecret"] = getProperty("ClientSecret", "string", readonly)
         properties["AuthorizationUrl"] = getProperty("AuthorizationUrl", "string", readonly)
+        properties["AuthorizationParameters"] = getProperty("AuthorizationParameters", "string", readonly)
         properties["TokenUrl"] = getProperty("TokenUrl", "string", readonly)
+        properties["TokenParameters"] = getProperty("TokenParameters", "string", readonly)
         properties["CodeChallenge"] = getProperty("CodeChallenge", "boolean", readonly)
         properties["HttpHandler"] = getProperty("HttpHandler", "boolean", readonly)
         properties["RedirectAddress"] = getProperty("RedirectAddress", "string", readonly)
@@ -216,16 +222,19 @@ class UserReader(unohelper.Base,
         self.ProviderId = ""
         self.AccessToken = ""
         self.RefreshToken = ""
+        self.NeverExpires = False
         self._TimeStamp = 0
         self._Scope = []
 
     @property
+    def HasExpired(self):
+        return False if self.NeverExpires else self.ExpiresIn > g_refresh_overlap
+    @property
     def ExpiresIn(self):
-        second = self._TimeStamp - int(time.time())
-        return second if second > 0 else 0
+        return g_refresh_overlap if self.NeverExpires else max(0, self._TimeStamp - int(time.time()))
     @ExpiresIn.setter
     def ExpiresIn(self, second):
-        self._TimeStamp = int(time.time()) + second
+        self._TimeStamp = second + int(time.time())
     @property
     def Scope(self):
         return " ".join(self._Scope)
@@ -244,8 +253,9 @@ class UserReader(unohelper.Base,
             user = users.getByName(self.Id)
             user.replaceByName("AccessToken", self.AccessToken)
             user.replaceByName("RefreshToken", self.RefreshToken)
+            user.replaceByName("NeverExpires", self.NeverExpires)
             user.replaceByName("TimeStamp", self._TimeStamp)
-#            user.replaceByName("Scopes", self._Scope)
+            # user.replaceByName("Scopes", self._Scope)
             arguments = ("Scopes", uno.Any("[]string", tuple(self._Scope)))
             uno.invoke(user, "replaceByName", arguments)
             if self.configuration.hasPendingChanges():
@@ -253,6 +263,7 @@ class UserReader(unohelper.Base,
     def revert(self):
         self.AccessToken = ""
         self.RefreshToken = ""
+        self.NeverExpires = False
         self._TimeStamp = 0
         self._Scope = []
 
@@ -260,6 +271,7 @@ class UserReader(unohelper.Base,
     def update(self):
         accesstoken = ""
         refreshtoken = ""
+        neverexpires = False
         timestamp = 0
         scope = []
         providers = self.configuration.getByName("Providers")
@@ -270,19 +282,24 @@ class UserReader(unohelper.Base,
                 user = users.getByName(self.Id)
                 accesstoken = user.getByName("AccessToken")
                 refreshtoken = user.getByName("RefreshToken")
+                neverexpires = user.getByName("NeverExpires")
                 timestamp = user.getByName("TimeStamp")
                 scope = list(user.getByName("Scopes"))
         self.AccessToken = accesstoken
         self.RefreshToken = refreshtoken
+        self.NeverExpires = neverexpires
         self._TimeStamp = timestamp
         self._Scope = scope
 
     def _getPropertySetInfo(self):
         properties = {}
+        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
         properties["Id"] = getProperty("Id", "string", transient)
         properties["AccessToken"] = getProperty("AccessToken", "string", transient)
         properties["RefreshToken"] = getProperty("RefreshToken", "string", transient)
+        properties["NeverExpires"] = getProperty("NeverExpires", "boolean", transient)
         properties["ExpiresIn"] = getProperty("ExpiresIn", "short", transient)
+        properties["HasExpired"] = getProperty("HasExpired", "boolean", readonly)
         properties["Scope"] = getProperty("Scope", "string", transient)
         return properties

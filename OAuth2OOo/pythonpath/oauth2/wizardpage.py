@@ -17,9 +17,8 @@ from .logger import getLogger
 from .oauth2tools import g_wizard_paths
 from .oauth2tools import getActivePath
 from .oauth2tools import getAuthorizationStr
-from .oauth2tools import getAuthorizationUrl
 from .oauth2tools import checkUrl
-from .oauth2tools import openUrl 
+from .oauth2tools import openUrl
 
 import traceback
 
@@ -28,15 +27,14 @@ class WizardPage(unohelper.Base,
                  PropertySet,
                  XWizardPage,
                  XCallback):
-    def __init__(self, ctx, configuration, id, parent, handler, code, state, result):
+    def __init__(self, ctx, configuration, id, parent, handler, uuid, result):
         self.ctx = ctx
         self.Configuration = configuration
         self.PageId = id
         provider = createService(self.ctx, 'com.sun.star.awt.ContainerWindowProvider')
         url = 'vnd.sun.star.script:OAuth2OOo.PageWizard%s?location=application' % id
         self.Window = provider.createContainerWindow(url, '', parent, handler)
-        self.CodeVerifier = code
-        self.State = state
+        self.Uuid = uuid
         self.AuthorizationCode = result
         self.listeners = []
         self.Logger = getLogger(self.ctx)
@@ -61,7 +59,7 @@ class WizardPage(unohelper.Base,
                 if url:
                     control.setText(url)
             elif self.PageId == 2:
-                url = getAuthorizationStr(self.ctx, self.Configuration, self.CodeVerifier, self.State)
+                url = getAuthorizationStr(self.ctx, self.Configuration, self.Uuid)
                 self.Window.getControl('TextField1').setText(url)
                 address = self.Configuration.Url.Provider.RedirectAddress
                 self.Window.getControl('TextField2').setText(address)
@@ -70,9 +68,9 @@ class WizardPage(unohelper.Base,
                 option = 'OptionButton%s' % getActivePath(self.Configuration)
                 self.Window.getControl(option).setState(True)
             elif self.PageId == 3:
-                openUrl(self.ctx, self.Configuration, self.CodeVerifier, self.State)
+                openUrl(self.ctx, self.Configuration, self.Uuid)
             elif self.PageId == 4:
-                openUrl(self.ctx, self.Configuration, self.CodeVerifier, self.State)
+                openUrl(self.ctx, self.Configuration, self.Uuid)
             self.Window.setVisible(True)
             self.Logger.logp(level, 'WizardPage', 'activatePage()', 'PageId: %s... Done' % self.PageId)
         except Exception as e:
@@ -148,7 +146,6 @@ class WizardPage(unohelper.Base,
         properties['Configuration'] = getProperty('Configuration', 'com.sun.star.uno.XInterface', readonly)
         properties['PageId'] = getProperty('PageId', 'short', readonly)
         properties['Window'] = getProperty('Window', 'com.sun.star.awt.XWindow', readonly)
-        properties['CodeVerifier'] = getProperty('CodeVerifier', 'string', readonly)
-        properties['State'] = getProperty('State', 'string', readonly)
+        properties['Uuid'] = getProperty('Uuid', 'string', readonly)
         properties['AuthorizationCode'] = getProperty('AuthorizationCode', 'com.sun.star.beans.Optional<string>', transient)
         return properties

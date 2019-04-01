@@ -10,6 +10,7 @@
         <group oor:name="UserSet">
             <prop oor:name="RefreshToken" oor:type="xs:string" />
             <prop oor:name="AccessToken" oor:type="xs:string" />
+            <prop oor:name="NeverExpires" oor:type="xs:boolean" />
             <prop oor:name="TimeStamp" oor:type="xs:int" />
             <prop oor:name="Scopes" oor:type="oor:string-list" />
         </group>
@@ -24,7 +25,9 @@
             <prop oor:name="ClientId" oor:type="xs:string" />
             <prop oor:name="ClientSecret" oor:type="xs:string" />
             <prop oor:name="AuthorizationUrl" oor:type="xs:string" />
+            <prop oor:name="AuthorizationParameters" oor:type="xs:string" />
             <prop oor:name="TokenUrl" oor:type="xs:string" />
+            <prop oor:name="TokenParameters" oor:type="xs:string" />
             <prop oor:name="CodeChallenge" oor:type="xs:boolean" />
             <prop oor:name="CodeChallengeMethod" oor:type="xs:string" />
             <prop oor:name="HttpHandler" oor:type="xs:boolean" />

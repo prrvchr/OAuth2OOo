@@ -31,7 +31,7 @@ service.ResourceUrl = your_registered_url
 token = service.getDefaultMethodName()
 
 ## Has been tested with:
-	
+
 * LibreOffice 6.0.2.1 x86_64 - Ubuntu 17.10 - LxQt 0.11.1
 
 * OpenOffice 4.1.5 x86_64 - Ubuntu 17.10 - LxQt 0.11.1

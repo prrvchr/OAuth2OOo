@@ -19,14 +19,16 @@ import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = 'com.gmail.prrvchr.extensions.OAuth2OOo.OptionsDialog'
+g_ImplementationName = '%s.OptionsDialog' % g_identifier
 
 
-class OptionsDialog(unohelper.Base, XServiceInfo, XContainerWindowEventHandler):
+class OptionsDialog(unohelper.Base,
+                    XServiceInfo,
+                    XContainerWindowEventHandler):
     def __init__(self, ctx):
         self.ctx = ctx
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo', 'OptionsDialog')
-        self.service = createService(self.ctx, 'com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service')
+        self.service = createService(self.ctx, '%s.OAuth2Service' % g_identifier)
 
     # XContainerWindowEventHandler
     def callHandlerMethod(self, dialog, event, method):

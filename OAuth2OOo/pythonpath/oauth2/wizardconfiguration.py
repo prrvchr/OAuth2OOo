@@ -14,7 +14,7 @@ from .logger import getLogger
 from .oauth2tools import g_identifier
 
 
-class ConfigurationWriter(unohelper.Base,
+class WizardConfiguration(unohelper.Base,
                           XTransactedObject,
                           PropertySet):
     def __init__(self, ctx):
@@ -233,6 +233,12 @@ class ProviderWriter(unohelper.Base,
         if self.Id in self.Providers:
             self.Providers[self.Id]["AuthorizationUrl"] = url
     @property
+    def AuthorizationParameters(self):
+        parameters = '{}'
+        if self.Id in self.Providers:
+            parameters = self.Providers[self.Id]["AuthorizationParameters"]
+        return parameters
+    @property
     def TokenUrl(self):
         url = ""
         if self.Id in self.Providers:
@@ -242,6 +248,12 @@ class ProviderWriter(unohelper.Base,
     def TokenUrl(self, url):
         if self.Id in self.Providers:
             self.Providers[self.Id]["TokenUrl"] = url
+    @property
+    def TokenParameters(self):
+        parameters = '{}'
+        if self.Id in self.Providers:
+            parameters = self.Providers[self.Id]["TokenParameters"]
+        return parameters
     @property
     def CodeChallenge(self):
         enabled = True
@@ -348,7 +360,9 @@ class ProviderWriter(unohelper.Base,
             self.Providers[id] = {"ClientId": provider.getByName("ClientId"),
                                   "ClientSecret": provider.getByName("ClientSecret"),
                                   "AuthorizationUrl": provider.getByName("AuthorizationUrl"),
+                                  "AuthorizationParameters": provider.getByName("AuthorizationParameters"),
                                   "TokenUrl": provider.getByName("TokenUrl"),
+                                  "TokenParameters": provider.getByName("TokenParameters"),
                                   "CodeChallenge": provider.getByName("CodeChallenge"),
                                   "CodeChallengeMethod": provider.getByName("CodeChallengeMethod"),
                                   "HttpHandler": provider.getByName("HttpHandler"),
@@ -364,7 +378,9 @@ class ProviderWriter(unohelper.Base,
         properties["ClientId"] = getProperty("ClientId", "string", transient)
         properties["ClientSecret"] = getProperty("ClientSecret", "string", transient)
         properties["AuthorizationUrl"] = getProperty("AuthorizationUrl", "string", transient)
+        properties["AuthorizationParameters"] = getProperty("AuthorizationParameters", "string", transient)
         properties["TokenUrl"] = getProperty("TokenUrl", "string", transient)
+        properties["TokenParameters"] = getProperty("TokenParameters", "string", transient)
         properties["CodeChallenge"] = getProperty("CodeChallenge", "boolean", transient)
         properties["CodeChallengeMethod"] = getProperty("CodeChallengeMethod", "string", transient)
         properties["HttpHandler"] = getProperty("HttpHandler", "boolean", transient)
