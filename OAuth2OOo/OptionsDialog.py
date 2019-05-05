@@ -73,8 +73,6 @@ class OptionsDialog(unohelper.Base,
             self.service.UserName = text
         elif item == 'Url':
             self.service.ResourceUrl = text
-        dialog.getControl('CommandButton2').Model.Enabled = text != ''
-        #dialog.getControl('CommandButton2').Model.Enabled = True
         self._updateUI(dialog)
         print("OptionsDialog._doChanged() 2 %s - %s" % (item, text))
 
@@ -111,6 +109,8 @@ class OptionsDialog(unohelper.Base,
         self._saveLoggerSetting(dialog)
 
     def _updateUI(self, dialog):
+        enabled = self.service.ResourceUrl != '' and self.service.UserName != ''
+        dialog.getControl('CommandButton2').Model.Enabled = enabled
         enabled = self.service.Setting.Url.Scope.Authorized
         if enabled:
             dialog.getControl('Label8').setText(self.service.Setting.Url.Scope.User.RefreshToken)
