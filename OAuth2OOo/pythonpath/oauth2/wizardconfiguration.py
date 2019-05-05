@@ -36,8 +36,8 @@ class WizardConfiguration(unohelper.Base,
     # XTransactedObject
     def commit(self):
         self.Url.commit()
-        self.Url.Provider.commit()
-        self.Url.Provider.Scope.commit()
+        self.Url.Scope.commit()
+        self.Url.Scope.User.Provider.commit()
     def revert(self):
         pass
 
@@ -57,7 +57,7 @@ class UrlWriter(unohelper.Base,
                 PropertySet):
     def __init__(self, configuration):
         self.configuration = configuration
-        self.Provider = ProviderWriter(self.configuration)
+        self.Scope = ScopeWriter(self.configuration)
         self._Id = ""
         self.Urls = {}
         self.revert()
@@ -75,65 +75,67 @@ class UrlWriter(unohelper.Base,
             scope = self.Urls[id]["Scope"]
             if self.Urls[id]["State"] > 7:
                 self.Urls[id]["State"] = 2
-        self.Provider.Scope.Id = scope
+        self.Scope.Id = scope
         provider = ""
-        if scope in self.Provider.Scope.Scopes:
-            provider = self.Provider.Scope.Scopes[scope]["Provider"]
-        self.Provider.Id = provider
+        if scope in self.Scope.Scopes:
+            provider = self.Scope.Scopes[scope]["Provider"]
+        self.Scope.User.Provider.Id = provider
     @property
     def ProviderName(self):
-        return self.Provider.Id
+        return self.Scope.User.Provider.Id
     @ProviderName.setter
     def ProviderName(self, id):
-        self.Provider.Id = id
-        if id and id not in self.Provider.Providers:
-            self.Provider.Providers[id] = {"ClientId": "",
-                                           "ClientSecret": "",
-                                           "AuthorizationUrl": "",
-                                           "TokenUrl": "",
-                                           "CodeChallenge": True,
-                                           "CodeChallengeMethod": "S256",
-                                           "HttpHandler": True,
-                                           "RedirectAddress": "localhost",
-                                           "RedirectPort": 8080,
-                                           "State": 2}
-        elif id in self.Provider.Providers:
-            if self.Provider.Providers[id]["State"] > 7:
-                self.Provider.Providers[id]["State"] = 2
+        self.Scope.User.Provider.Id = id
+        if id and id not in self.Scope.User.Provider.Providers:
+            self.Scope.User.Provider.Providers[id] = {"ClientId": "",
+                                                      "ClientSecret": "",
+                                                      "AuthorizationUrl": "",
+                                                      "AuthorizationParameters": "{}",
+                                                      "TokenUrl": "",
+                                                      "TokenParameters": "{}",
+                                                      "CodeChallenge": True,
+                                                      "CodeChallengeMethod": "S256",
+                                                      "HttpHandler": True,
+                                                      "RedirectAddress": "localhost",
+                                                      "RedirectPort": 8080,
+                                                      "State": 2}
+        elif id in self.Scope.User.Provider.Providers:
+            if self.Scope.User.Provider.Providers[id]["State"] > 7:
+                self.Scope.User.Provider.Providers[id]["State"] = 2
     @property
     def ProviderList(self):
         names = []
-        for key, value in self.Provider.Providers.items():
+        for key, value in self.Scope.User.Provider.Providers.items():
             if value["State"] < 8:
                 names.append(key)
         return tuple(names)
     @property
     def ScopeName(self):
-        return self.Provider.Scope.Id
+        return self.Scope.Id
     @ScopeName.setter
     def ScopeName(self, id):
-        self.Provider.Scope.Id = id
-        if id and id not in self.Provider.Scope.Scopes:
-            self.Provider.Scope.Scopes[id] = {"Provider": self.Provider.Id,
-                                              "Values": [],
-                                              "State": 2}
-        elif id in self.Provider.Scope.Scopes:
-            if self.Provider.Scope.Scopes[id]["State"] > 7:
-                self.Provider.Scope.Scopes[id]["State"] = 2
+        self.Scope.Id = id
+        if id and id not in self.Scope.Scopes:
+            self.Scope.Scopes[id] = {"Provider": self.Scope.User.Provider.Id,
+                                     "Values": [],
+                                     "State": 2}
+        elif id in self.Scope.Scopes:
+            if self.Scope.Scopes[id]["State"] > 7:
+                self.Scope.Scopes[id]["State"] = 2
         if id and self.Id in self.Urls:
             self.Urls[self.Id]["Scope"] = id
             self.State = 4
     @property
     def ScopeList(self):
         names = []
-        for key, value in self.Provider.Scope.Scopes.items():
-            if value["State"] < 8 and value["Provider"] == self.Provider.Id:
+        for key, value in self.Scope.Scopes.items():
+            if value["State"] < 8 and value["Provider"] == self.Scope.User.Provider.Id:
                 names.append(key)
         return tuple(names)
     @property
     def ScopesList(self):
         names = []
-        for key, value in self.Provider.Scope.Scopes.items():
+        for key, value in self.Scope.Scopes.items():
             if value["State"] < 8:
                 names.append(key)
         return tuple(names)
@@ -176,7 +178,7 @@ class UrlWriter(unohelper.Base,
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
         properties["Id"] = getProperty("Id", "string", transient)
-        properties["Provider"] = getProperty("Provider", "com.sun.star.uno.XInterface", readonly)
+        properties["Scope"] = getProperty("Scope", "com.sun.star.uno.XInterface", readonly)
         properties["ProviderName"] = getProperty("ProviderName", "string", transient)
         properties["ProviderList"] = getProperty("ProviderList", "[]string", readonly)
         properties["ScopeName"] = getProperty("ScopeName", "string", transient)
@@ -186,22 +188,129 @@ class UrlWriter(unohelper.Base,
         return properties
 
 
+class ScopeWriter(unohelper.Base,
+                  XTransactedObject,
+                  PropertySet):
+    def __init__(self, configuration):
+        self.configuration = configuration
+        self.User = UserWriter(self.configuration)
+        self.Id = ""
+        self.Scopes = {}
+        self.revert()
+
+    @property
+    def Value(self):
+        values = self.User._Scope
+        if self.Id in self.Scopes:
+            for value in self.Scopes[self.Id]["Values"]:
+                if value not in values:
+                    values.append(value)
+        return " ".join(values)
+    @property
+    def Values(self):
+        values = []
+        if self.Id in self.Scopes:
+            values = self.Scopes[self.Id]["Values"]
+        return tuple(values)
+    @Values.setter
+    def Values(self, values):
+        if self.Id in self.Scopes:
+            self.Scopes[self.Id]["Values"] = values
+    @property
+    def State(self):
+        state = 2
+        if self.Id in self.Scopes:
+            state = self.Scopes[self.Id]["State"]
+        return state
+    @State.setter
+    def State(self, state):
+        if self.Id in self.Scopes:
+            self.Scopes[self.Id]["State"] = state
+
+    # XTransactedObject
+    def commit(self):
+        scopes = self.configuration.getByName("Scopes")
+        for key, value in self.Scopes.items():
+            if value["State"] < 4:
+                continue
+            elif value["State"] < 8:
+                if not scopes.hasByName(key):
+                    scopes.insertByName(key, scopes.createInstance())
+                    scopes.getByName(key).replaceByName("Provider", value["Provider"])
+                scope = scopes.getByName(key)
+#               scope.replaceByName("Value", value["Values"])
+                arguments = ("Values", uno.Any("[]string", value["Values"]))
+                uno.invoke(scope, "replaceByName", arguments)
+            elif scopes.hasByName(key):
+                scopes.removeByName(key)
+        if self.configuration.hasPendingChanges():
+            self.configuration.commitChanges()
+    def revert(self):
+        self.Scopes = {}
+        scopes = self.configuration.getByName("Scopes")
+        for id in scopes.ElementNames:
+            scope = scopes.getByName(id)
+            self.Scopes[id] = {"Provider": scope.getByName("Provider"),
+                               "Values": scope.getByName("Values"),
+                               "State": 1}
+
+    def _getPropertySetInfo(self):
+        properties = {}
+        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
+        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
+        properties["User"] = getProperty("User", "com.sun.star.uno.XInterface", readonly)
+        properties["Id"] = getProperty("Id", "string", transient)
+        properties["Value"] = getProperty("Value", "string", readonly)
+        properties["Values"] = getProperty("Values", "[]string", transient)
+        properties["State"] = getProperty("State", "short", transient)
+        return properties
+
+
+class UserWriter(unohelper.Base,
+                 XUpdatable,
+                 PropertySet):
+    def __init__(self, configuration):
+        self.configuration = configuration
+        self.Provider = ProviderWriter(self.configuration)
+        self.Id = ""
+        self._Scope = []
+
+    @property
+    def Scope(self):
+        return " ".join(self._Scope)
+
+    # XUpdatable
+    def update(self):
+        scope = []
+        providers = self.configuration.getByName("Providers")
+        if providers.hasByName(self.Provider.Id):
+            provider = providers.getByName(self.Provider.Id)
+            users = provider.getByName("Users")
+            if users.hasByName(self.Id):
+                user = users.getByName(self.Id)
+                scope = list(user.getByName("Scopes"))
+        self._Scope = scope
+
+    def _getPropertySetInfo(self):
+        properties = {}
+        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
+        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
+        properties["Provider"] = getProperty("Provider", "com.sun.star.uno.XInterface", readonly)
+        properties["Id"] = getProperty("Id", "string", transient)
+        properties["Scope"] = getProperty("Scope", "string", readonly)
+        return properties
+
+
 class ProviderWriter(unohelper.Base,
                      XTransactedObject,
                      PropertySet):
     def __init__(self, configuration):
         self.configuration = configuration
+        self.Id = ''
         self.redirect = "urn:ietf:wg:oauth:2.0:oob"
         self.Providers = {}
-        self.Scope = ScopeWriter(self.configuration)
         self.revert()
 
-    @property
-    def Id(self):
-        return self.Scope.User.ProviderId
-    @Id.setter
-    def Id(self, id):
-        self.Scope.User.ProviderId = id
     @property
     def ClientId(self):
         id = ""
@@ -342,7 +451,9 @@ class ProviderWriter(unohelper.Base,
                 provider.replaceByName("ClientId", value["ClientId"])
                 provider.replaceByName("ClientSecret", value["ClientSecret"])
                 provider.replaceByName("AuthorizationUrl", value["AuthorizationUrl"])
+                provider.replaceByName("AuthorizationParameters", value["AuthorizationParameters"])
                 provider.replaceByName("TokenUrl", value["TokenUrl"])
+                provider.replaceByName("TokenParameters", value["TokenParameters"])
                 provider.replaceByName("CodeChallenge", value["CodeChallenge"])
                 provider.replaceByName("CodeChallengeMethod", value["CodeChallengeMethod"])
                 provider.replaceByName("HttpHandler", value["HttpHandler"])
@@ -374,7 +485,6 @@ class ProviderWriter(unohelper.Base,
         properties = {}
         readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
         transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        properties["Scope"] = getProperty("Scope", "com.sun.star.uno.XInterface", readonly)
         properties["ClientId"] = getProperty("ClientId", "string", transient)
         properties["ClientSecret"] = getProperty("ClientSecret", "string", transient)
         properties["AuthorizationUrl"] = getProperty("AuthorizationUrl", "string", transient)
@@ -388,116 +498,4 @@ class ProviderWriter(unohelper.Base,
         properties["RedirectPort"] = getProperty("RedirectPort", "short", transient)
         properties["RedirectUri"] = getProperty("RedirectUri", "string", readonly)
         properties["State"] = getProperty("State", "short", transient)
-        return properties
-
-
-class ScopeWriter(unohelper.Base,
-                  XTransactedObject,
-                  PropertySet):
-    def __init__(self, configuration):
-        self.configuration = configuration
-        self.Id = ""
-        self.Scopes = {}
-        self.User = UserWriter(self.configuration)
-        self.revert()
-
-    @property
-    def Value(self):
-        values = self.User._Scope
-        if self.Id in self.Scopes:
-            for value in self.Scopes[self.Id]["Values"]:
-                if value not in values:
-                    values.append(value)
-        return " ".join(values)
-    @property
-    def Values(self):
-        values = []
-        if self.Id in self.Scopes:
-            values = self.Scopes[self.Id]["Values"]
-        return tuple(values)
-    @Values.setter
-    def Values(self, values):
-        if self.Id in self.Scopes:
-            self.Scopes[self.Id]["Values"] = values
-    @property
-    def State(self):
-        state = 2
-        if self.Id in self.Scopes:
-            state = self.Scopes[self.Id]["State"]
-        return state
-    @State.setter
-    def State(self, state):
-        if self.Id in self.Scopes:
-            self.Scopes[self.Id]["State"] = state
-
-    # XTransactedObject
-    def commit(self):
-        scopes = self.configuration.getByName("Scopes")
-        for key, value in self.Scopes.items():
-            if value["State"] < 4:
-                continue
-            elif value["State"] < 8:
-                if not scopes.hasByName(key):
-                    scopes.insertByName(key, scopes.createInstance())
-                    scopes.getByName(key).replaceByName("Provider", value["Provider"])
-                scope = scopes.getByName(key)
-#               scope.replaceByName("Value", value["Values"])
-                arguments = ("Values", uno.Any("[]string", value["Values"]))
-                uno.invoke(scope, "replaceByName", arguments)
-            elif scopes.hasByName(key):
-                scopes.removeByName(key)
-        if self.configuration.hasPendingChanges():
-            self.configuration.commitChanges()
-    def revert(self):
-        self.Scopes = {}
-        scopes = self.configuration.getByName("Scopes")
-        for id in scopes.ElementNames:
-            scope = scopes.getByName(id)
-            self.Scopes[id] = {"Provider": scope.getByName("Provider"),
-                               "Values": scope.getByName("Values"),
-                               "State": 1}
-
-    def _getPropertySetInfo(self):
-        properties = {}
-        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        properties["Id"] = getProperty("Id", "string", transient)
-        properties["User"] = getProperty("User", "com.sun.star.uno.XInterface", readonly)
-        properties["Value"] = getProperty("Value", "string", readonly)
-        properties["Values"] = getProperty("Values", "[]string", transient)
-        properties["State"] = getProperty("State", "short", transient)
-        return properties
-
-
-class UserWriter(unohelper.Base,
-                 XUpdatable,
-                 PropertySet):
-    def __init__(self, configuration):
-        self.configuration = configuration
-        self.Id = ""
-        self.ProviderId = ""
-        self._Scope = []
-
-    @property
-    def Scope(self):
-        return " ".join(self._Scope)
-
-    # XUpdatable
-    def update(self):
-        scope = []
-        providers = self.configuration.getByName("Providers")
-        if providers.hasByName(self.ProviderId):
-            provider = providers.getByName(self.ProviderId)
-            users = provider.getByName("Users")
-            if users.hasByName(self.Id):
-                user = users.getByName(self.Id)
-                scope = list(user.getByName("Scopes"))
-        self._Scope = scope
-
-    def _getPropertySetInfo(self):
-        properties = {}
-        readonly = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.READONLY")
-        transient = uno.getConstantByName("com.sun.star.beans.PropertyAttribute.TRANSIENT")
-        properties["Id"] = getProperty("Id", "string", transient)
-        properties["Scope"] = getProperty("Scope", "string", readonly)
         return properties

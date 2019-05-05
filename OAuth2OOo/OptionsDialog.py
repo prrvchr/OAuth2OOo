@@ -68,29 +68,32 @@ class OptionsDialog(unohelper.Base,
     def _doChanged(self, dialog, control):
         item = control.Model.Tag
         text = control.getText()
+        print("OptionsDialog._doChanged() 1 %s - %s" % (item, text))
         if item == 'UserName':
             self.service.UserName = text
         elif item == 'Url':
             self.service.ResourceUrl = text
-            dialog.getControl('CommandButton2').Model.Enabled = text != ''
+        dialog.getControl('CommandButton2').Model.Enabled = text != ''
+        #dialog.getControl('CommandButton2').Model.Enabled = True
         self._updateUI(dialog)
+        print("OptionsDialog._doChanged() 2 %s - %s" % (item, text))
 
     def _doConnect(self, dialog):
         try:
             print("OptionsDialog._doConnect()")
-            token = self.service.getDefaultMethodName()
+            token = self.service.getToken('%s')
             self._updateUI(dialog)
         except Exception as e:
             print("OptionsDialog._doConnect().Error: %s - %s" % (e, traceback.print_exc()))
 
     def _doRemove(self, dialog):
-        user = self.service.Setting.Url.Provider.Scope.User
+        user = self.service.Setting.Url.Scope.User
         user.Scope = ''
         user.commit()
         self._updateUI(dialog)
 
     def _doReset(self, dialog):
-        user = self.service.Setting.Url.Provider.Scope.User
+        user = self.service.Setting.Url.Scope.User
         user.ExpiresIn = 0
         user.commit()
         self._updateUI(dialog)
@@ -108,11 +111,11 @@ class OptionsDialog(unohelper.Base,
         self._saveLoggerSetting(dialog)
 
     def _updateUI(self, dialog):
-        enabled = self.service.Setting.Url.Provider.Scope.Authorized
+        enabled = self.service.Setting.Url.Scope.Authorized
         if enabled:
-            dialog.getControl('Label8').setText(self.service.Setting.Url.Provider.Scope.User.RefreshToken)
-            dialog.getControl('Label10').setText(self.service.Setting.Url.Provider.Scope.User.AccessToken)
-            dialog.getControl('Label12').setText(self.service.Setting.Url.Provider.Scope.User.ExpiresIn)
+            dialog.getControl('Label8').setText(self.service.Setting.Url.Scope.User.RefreshToken)
+            dialog.getControl('Label10').setText(self.service.Setting.Url.Scope.User.AccessToken)
+            dialog.getControl('Label12').setText(self.service.Setting.Url.Scope.User.ExpiresIn)
         else:
             dialog.getControl('Label8').setText(self.stringResource.resolveString('OptionsDialog.Label8.Label'))
             dialog.getControl('Label10').setText(self.stringResource.resolveString('OptionsDialog.Label10.Label'))

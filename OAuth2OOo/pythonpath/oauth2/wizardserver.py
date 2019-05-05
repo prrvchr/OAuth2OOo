@@ -26,23 +26,22 @@ class WizardServer(unohelper.Base,
                    XRequestCallback):
     def __init__(self, ctx):
         self.ctx = ctx
-        self.lock = Condition()
         self.watchdog = None
 
     # XCancellable
     def cancel(self):
         print("HttpCodeHandler.cancel()")
-        with self.lock:
-            if self.watchdog and self.watchdog.is_alive():
-                self.watchdog.cancel()
-                print("HttpCodeHandler.wait()")
-                #self.lock.wait()
+        if self.watchdog and self.watchdog.is_alive():
+            self.watchdog.cancel()
+
+            print("HttpCodeHandler.wait()")
 
     # XRequestCallback
     def addCallback(self, page, controller):
-        server = Server(self.ctx, controller, self.lock)
+        lock = Condition()
+        server = Server(self.ctx, controller, lock)
         timeout = controller.Configuration.HandlerTimeout
-        self.watchdog = WatchDog(server, page, timeout, self.lock)
+        self.watchdog = WatchDog(server, page, timeout, lock)
         server.start()
         self.watchdog.start()
 
@@ -70,8 +69,9 @@ class WatchDog(Thread):
                 self.lock.wait(wait)
                 now = timer()
             if self.server.is_alive():
-                self.server.cancel()
                 print("WatchDog.server.cancel()")
+                self.server.cancel()
+                print("WatchDog.server.cancel() done")
             if self.end:
                 self.page.notify(100)
                 result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
@@ -79,8 +79,10 @@ class WatchDog(Thread):
             self.lock.notifyAll()
 
     def cancel(self):
-        print("WatchDog.cancel()")
-        self.end = 0
+        if self.server.is_alive():
+            print("WatchDog.cancel()")
+            self.end = 0
+            self.watchdog.join()
 
 
 class Server(Thread):
@@ -92,12 +94,12 @@ class Server(Thread):
         self.acceptor = createService(self.ctx, 'com.sun.star.connection.Acceptor')
 
     def run(self):
-        address = self.controller.Configuration.Url.Provider.RedirectAddress
-        port = self.controller.Configuration.Url.Provider.RedirectPort
+        address = self.controller.Configuration.Url.Scope.User.Provider.RedirectAddress
+        port = self.controller.Configuration.Url.Scope.User.Provider.RedirectPort
         result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
         connection = self.acceptor.accept('socket,host=%s,port=%s,tcpNoDelay=1' % (address, port))
-        with self.lock:
-            if connection:
+        if connection:
+            with self.lock:
                 result = self._getResult(connection)
                 basename = getResourceLocation(self.ctx, g_identifier, 'OAuth2OOo')
                 basename += '/OAuth2Success_%s.html' if result else '/OAuth2Error_%s.html'
@@ -115,7 +117,7 @@ Connection: Closed
                 self.acceptor.stopAccepting()
                 print("HttpServer.acceptor.stopAccepting()")
                 self.controller.Handler.Wizard.DialogWindow.endDialog(result)
-            self.lock.notifyAll()
+                self.lock.notifyAll()
         print("HttpServer.run() end")
 
     def cancel(self):

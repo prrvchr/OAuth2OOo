@@ -5,6 +5,7 @@ import uno
 import unohelper
 
 from com.sun.star.awt import XContainerWindowEventHandler
+from com.sun.star.awt import XDialogEventHandler
 
 from .unolib import PropertySet
 
@@ -20,7 +21,8 @@ from .oauth2tools import g_identifier
 
 class WizardHandler(unohelper.Base,
                     PropertySet,
-                    XContainerWindowEventHandler):
+                    XContainerWindowEventHandler,
+                    XDialogEventHandler):
     def __init__(self, ctx, configuration, controller):
         self.ctx = ctx
         self.Configuration = configuration
@@ -94,19 +96,21 @@ class WizardHandler(unohelper.Base,
     def _initDialog(self, dialog, method, item):
         if method == 'Edit':
             if item == 'Provider':
-                dialog.getControl('TextField1').setText(self.Configuration.Url.Provider.ClientId)
-                dialog.getControl('TextField2').setText(self.Configuration.Url.Provider.AuthorizationUrl)
-                dialog.getControl('TextField3').setText(self.Configuration.Url.Provider.TokenUrl)
-                dialog.getControl('TextField4').setText(self.Configuration.Url.Provider.ClientSecret)
-                method = self.Configuration.Url.Provider.CodeChallengeMethod
+                dialog.getControl('TextField1').setText(self.Configuration.Url.Scope.User.Provider.ClientId)
+                dialog.getControl('TextField2').setText(self.Configuration.Url.Scope.User.Provider.AuthorizationUrl)
+                dialog.getControl('TextField3').setText(self.Configuration.Url.Scope.User.Provider.TokenUrl)
+                dialog.getControl('TextField4').setText(self.Configuration.Url.Scope.User.Provider.ClientSecret)
+                dialog.getControl('TextField5').setText(self.Configuration.Url.Scope.User.Provider.AuthorizationParameters)
+                dialog.getControl('TextField6').setText(self.Configuration.Url.Scope.User.Provider.TokenParameters)
+                method = self.Configuration.Url.Scope.User.Provider.CodeChallengeMethod
                 name = 'OptionButton1' if method == 'S256' else 'OptionButton2'
                 dialog.getControl(name).State = 1
-                challenge = self.Configuration.Url.Provider.CodeChallenge
+                challenge = self.Configuration.Url.Scope.User.Provider.CodeChallenge
                 control = dialog.getControl('CheckBox1')
                 control.State = 1 if challenge else 0
                 self._updateUI(dialog, control)
             elif item == 'Scope':
-                values = self.Configuration.Url.Provider.Scope.Values
+                values = self.Configuration.Url.Scope.Values
                 dialog.getControl('ListBox1').Model.StringItemList = values
 
     def _saveData(self, window, dialog, method, item):
@@ -114,32 +118,36 @@ class WizardHandler(unohelper.Base,
             if item == 'Url':
                 self.Configuration.Url.State = 8
             elif item == 'Provider':
-                self.Configuration.Url.Provider.State = 8
+                self.Configuration.Url.Scope.User.Provider.State = 8
             elif item == 'Scope':
-                self.Configuration.Url.Provider.Scope.State = 8
+                self.Configuration.Url.Scope.State = 8
             elif item == 'Value':
                 control = window.getControl('ListBox1')
                 control.Model.removeItem(control.SelectedItemPos)
         else:
             if item == 'Provider':
                 clientid = dialog.getControl('TextField1').Text
-                self.Configuration.Url.Provider.ClientId = clientid
+                self.Configuration.Url.Scope.User.Provider.ClientId = clientid
                 authorizationUrl = dialog.getControl('TextField2').Text
-                self.Configuration.Url.Provider.AuthorizationUrl = authorizationUrl
+                self.Configuration.Url.Scope.User.Provider.AuthorizationUrl = authorizationUrl
                 tokenUrl = dialog.getControl('TextField3').Text
-                self.Configuration.Url.Provider.TokenUrl = tokenUrl
+                self.Configuration.Url.Scope.User.Provider.TokenUrl = tokenUrl
                 challenge = bool(dialog.getControl('CheckBox1').State)
-                self.Configuration.Url.Provider.CodeChallenge = challenge
+                self.Configuration.Url.Scope.User.Provider.CodeChallenge = challenge
                 method = 'S256' if dialog.getControl('OptionButton1').State else 'plain'
-                self.Configuration.Url.Provider.CodeChallengeMethod = method
+                self.Configuration.Url.Scope.User.Provider.CodeChallengeMethod = method
                 clientsecret = dialog.getControl('TextField4').Text
-                self.Configuration.Url.Provider.ClientSecret = clientsecret
-                self.Configuration.Url.Provider.State = 4
+                self.Configuration.Url.Scope.User.Provider.ClientSecret = clientsecret
+                authorizationparameters = dialog.getControl('TextField5').Text
+                self.Configuration.Url.Scope.User.Provider.AuthorizationParameters = authorizationparameters
+                tokenparameters = dialog.getControl('TextField6').Text
+                self.Configuration.Url.Scope.User.Provider.TokenParameters = tokenparameters
+                self.Configuration.Url.Scope.User.Provider.State = 4
             elif item == 'Scope':
                 values = dialog.getControl('ListBox1').Model.StringItemList
-                self.Configuration.Url.Provider.Scope.Values = values
-                self.Configuration.Url.Provider.Scope.State = 4
-            
+                self.Configuration.Url.Scope.Values = values
+                self.Configuration.Url.Scope.State = 4
+
     def _updateWindow(self, window, method, item, id):
         if method != 'Edit':
             if item == 'Url':
@@ -219,15 +227,15 @@ class WizardHandler(unohelper.Base,
             button.Model.Enabled = value != '' and value not in values
         elif item == 'HttpHandler':
             address = window.getControl('TextField2').getText()
-            self.Configuration.Url.Provider.RedirectAddress = address
+            self.Configuration.Url.Scope.User.Provider.RedirectAddress = address
             port = int(window.getControl('NumericField1').getValue())
-            self.Configuration.Url.Provider.RedirectPort = port
-            self.Configuration.Url.Provider.HttpHandler = True
+            self.Configuration.Url.Scope.User.Provider.RedirectPort = port
+            self.Configuration.Url.Scope.User.Provider.HttpHandler = True
             self.Wizard.activatePath(getActivePath(self.Configuration), True)
             window.getControl('TextField1').setText(self.AuthorizationStr)
             self.Wizard.updateTravelUI()
         elif item == 'GuiHandler':
-            self.Configuration.Url.Provider.HttpHandler = False
+            self.Configuration.Url.Scope.User.Provider.HttpHandler = False
             self.Wizard.activatePath(getActivePath(self.Configuration), True)
             window.getControl('TextField1').setText(self.AuthorizationStr)
             self.Wizard.updateTravelUI()

@@ -1,0 +1,22 @@
+#ifndef __com_sun_star_auth_XOAuth2Service_idl__
+#define __com_sun_star_auth_XOAuth2Service_idl__
+
+#include <com/sun/star/uno/XInterface.idl>
+
+module com { module sun { module star { module auth {
+
+interface XOAuth2Service: com::sun::star::uno::XInterface
+{
+
+    string getToken([in] string Format);
+
+    [attribute] string ResourceUrl;
+    [attribute] string UserName;
+    [attribute, readonly] com::sun::star::uno::XInterface Setting;
+
+};
+
+
+}; }; }; };
+
+#endif

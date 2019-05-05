@@ -48,7 +48,7 @@ class WizardPage(unohelper.Base,
             level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
             self.Logger.logp(level, 'WizardPage', 'activatePage()', 'PageId: %s...' % self.PageId)
             if self.PageId == 1:
-                username = self.Configuration.Url.Provider.Scope.User.Id
+                username = self.Configuration.Url.Scope.User.Id
                 self.Window.getControl('TextField1').setText(username)
                 urls = self.Configuration.UrlList
                 control = self.Window.getControl('ComboBox1')
@@ -61,9 +61,9 @@ class WizardPage(unohelper.Base,
             elif self.PageId == 2:
                 url = getAuthorizationStr(self.ctx, self.Configuration, self.Uuid)
                 self.Window.getControl('TextField1').setText(url)
-                address = self.Configuration.Url.Provider.RedirectAddress
+                address = self.Configuration.Url.Scope.User.Provider.RedirectAddress
                 self.Window.getControl('TextField2').setText(address)
-                port = self.Configuration.Url.Provider.RedirectPort
+                port = self.Configuration.Url.Scope.User.Provider.RedirectPort
                 self.Window.getControl('NumericField1').setValue(port)
                 option = 'OptionButton%s' % getActivePath(self.Configuration)
                 self.Window.getControl(option).setState(True)
@@ -86,7 +86,7 @@ class WizardPage(unohelper.Base,
             self.Window.setVisible(False)
             if self.PageId == 1 and reason == forward:
                 name = self.Window.getControl('TextField1').getText()
-                self.Configuration.Url.Provider.Scope.User.Id = name
+                self.Configuration.Url.Scope.User.Id = name
             elif self.PageId == 3:
                 pass
             elif self.PageId == 4 and reason == finish:

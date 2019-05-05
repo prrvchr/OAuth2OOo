@@ -28,7 +28,7 @@ service.ResourceUrl = your_registered_url
 
 ### Get the access token:
 
-token = service.getDefaultMethodName()
+token = service.getToken('Bearer %s')
 
 ## Has been tested with:
 

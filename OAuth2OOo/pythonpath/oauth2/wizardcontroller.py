@@ -54,13 +54,13 @@ class WizardController(unohelper.Base,
         self.Configuration.Url.Id = url
     @property
     def UserName(self):
-        return self.Configuration.Url.Provider.Scope.User.Id
+        return self.Configuration.Url.Scope.User.Id
     @UserName.setter
     def UserName(self, name):
-        self.Configuration.Url.Provider.Scope.User.Id = name
+        self.Configuration.Url.Scope.User.Id = name
     @property
     def ActivePath(self):
-        return 0 if self.Configuration.Url.Provider.HttpHandler else 1
+        return 0 if self.Configuration.Url.Scope.User.Provider.HttpHandler else 1
     @property
     def CodeVerifier(self):
         return self.Uuid + self.Uuid
@@ -77,6 +77,8 @@ class WizardController(unohelper.Base,
                               self.Handler,
                               self.Uuid,
                               self.AuthorizationCode)
+            if id == 3:
+                self.Server.addCallback(page, self)
             self.Pages[id] = page
         return self.Pages[id]
     def getPageTitle(self, id):
@@ -96,13 +98,6 @@ class WizardController(unohelper.Base,
             if id == 1:
                 self.Handler.Wizard.activatePath(self.ActivePath, True)
                 self.Handler.Wizard.updateTravelUI()
-            elif id == 3:
-                print("WizardController.onActivatePage.addCallback() 1 %s" % id)
-                page = self.Pages[id]
-                print("WizardController.onActivatePage.addCallback() 2 %s" % page)
-                if page:
-                    self.Server.addCallback(page, self)
-                    print("WizardController.onActivatePage.addCallback() 3")
             if self.advanceTo:
                 self.advanceTo = 0
                 self.Handler.Wizard.advanceTo(g_advance_to)
