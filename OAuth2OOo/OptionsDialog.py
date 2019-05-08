@@ -6,7 +6,7 @@ import unohelper
 
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.awt import XContainerWindowEventHandler
- com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
 from oauth2 import createService
