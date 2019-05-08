@@ -30,11 +30,8 @@ class WizardServer(unohelper.Base,
 
     # XCancellable
     def cancel(self):
-        print("HttpCodeHandler.cancel()")
         if self.watchdog and self.watchdog.is_alive():
             self.watchdog.cancel()
-
-            print("HttpCodeHandler.wait()")
 
     # XRequestCallback
     def addCallback(self, page, controller):
@@ -69,9 +66,7 @@ class WatchDog(Thread):
                 self.lock.wait(wait)
                 now = timer()
             if self.server.is_alive():
-                print("WatchDog.server.cancel()")
                 self.server.cancel()
-                print("WatchDog.server.cancel() done")
             if self.end:
                 self.page.notify(100)
                 result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
@@ -80,7 +75,6 @@ class WatchDog(Thread):
 
     def cancel(self):
         if self.server.is_alive():
-            print("WatchDog.cancel()")
             self.end = 0
             self.watchdog.join()
 
@@ -94,8 +88,8 @@ class Server(Thread):
         self.acceptor = createService(self.ctx, 'com.sun.star.connection.Acceptor')
 
     def run(self):
-        address = self.controller.Configuration.Url.Scope.User.Provider.RedirectAddress
-        port = self.controller.Configuration.Url.Scope.User.Provider.RedirectPort
+        address = self.controller.Configuration.Url.Scope.Provider.RedirectAddress
+        port = self.controller.Configuration.Url.Scope.Provider.RedirectPort
         result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
         connection = self.acceptor.accept('socket,host=%s,port=%s,tcpNoDelay=1' % (address, port))
         if connection:
@@ -115,15 +109,11 @@ Connection: Closed
                 connection.write(header + body)
                 connection.close()
                 self.acceptor.stopAccepting()
-                print("HttpServer.acceptor.stopAccepting()")
                 self.controller.Handler.Wizard.DialogWindow.endDialog(result)
                 self.lock.notifyAll()
-        print("HttpServer.run() end")
 
     def cancel(self):
-        print("HttpServer.cancel()")
         self.acceptor.stopAccepting()
-        print("HttpServer.stop()")
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)

@@ -24,10 +24,10 @@ class OAuth2Configuration(unohelper.Base,
     def __init__(self, ctx):
         self.ctx = ctx
         self.configuration = getConfiguration(self.ctx, g_identifier, True)
+        self.Url = UrlReader(self.configuration)
         self.RequestTimeout = self.configuration.getByName('RequestTimeout')
         self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
         self.Logger = getLogger(self.ctx)
-        self.Url = UrlReader(self.configuration)
 
     @property
     def UrlList(self):
@@ -60,8 +60,8 @@ class UrlReader(unohelper.Base,
                 PropertySet):
     def __init__(self, configuration):
         self.configuration = configuration
-        self._Id = ''
         self.Scope = ScopeReader(self.configuration)
+        self._Id = ''
 
     @property
     def Id(self):
@@ -78,8 +78,8 @@ class UrlReader(unohelper.Base,
         properties = {}
         readonly = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
         transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
-        properties['Id'] = getProperty('Id', 'string', transient)
         properties['Scope'] = getProperty('Scope', 'com.sun.star.uno.XInterface', readonly)
+        properties['Id'] = getProperty('Id', 'string', transient)
         return properties
 
 
@@ -87,9 +87,9 @@ class ScopeReader(unohelper.Base,
                   PropertySet):
     def __init__(self, configuration):
         self.configuration = configuration
+        self.Provider = ProviderReader(self.configuration)
         self._Id = ''
         self._Values = []
-        self.User = UserReader(self.configuration)
 
     @property
     def Id(self):
@@ -98,18 +98,18 @@ class ScopeReader(unohelper.Base,
     def Id(self, id):
         self._Id = id
         values = []
+        provider = ''
         scopes = self.configuration.getByName('Scopes')
         if scopes.hasByName(self.Id):
             scope = scopes.getByName(self.Id)
-            id = scope.getByName('Provider')
-            self.User.Provider.Id = id
-            self.User.update()
             values = list(scope.getByName('Values'))
+            provider = scope.getByName('Provider')
         self._Values = values
+        self.Provider.Id = provider
 
     @property
     def Values(self):
-        values = self.User._Scope
+        values = list(self.Provider.User.Scopes)
         for value in self._Values:
             if value not in values:
                 values.append(value)
@@ -118,7 +118,7 @@ class ScopeReader(unohelper.Base,
     def Authorized(self):
         authorized = True
         for value in self._Values:
-            if value not in self.User._Scope:
+            if value not in self.Provider.User.Scopes:
                 authorized = False
                 break
         return authorized
@@ -127,126 +127,24 @@ class ScopeReader(unohelper.Base,
         properties = {}
         readonly = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
         transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
+        properties['Provider'] = getProperty('Provider', 'com.sun.star.uno.XInterface', readonly)
         properties['Id'] = getProperty('Id', 'string', transient)
         properties['Values'] = getProperty('Values', 'string', readonly)
         properties['Authorized'] = getProperty('Authorized', 'boolean', readonly)
-        properties['User'] = getProperty('User', 'com.sun.star.uno.XInterface', readonly)
-        return properties
-
-
-class UserReader(unohelper.Base,
-                 XUpdatable,
-                 XTransactedObject,
-                 PropertySet):
-    def __init__(self, configuration):
-        self.configuration = configuration
-        self._Id = ''
-        self.AccessToken = ''
-        self.RefreshToken = ''
-        self.NeverExpires = False
-        self._TimeStamp = 0
-        self._Scope = []
-        self.Provider = ProviderReader(self.configuration)
-
-    @property
-    def Id(self):
-        return self._Id
-    @Id.setter
-    def Id(self, id):
-        self._Id = id
-        self.update()
-
-    @property
-    def HasExpired(self):
-        return False if self.NeverExpires else self.ExpiresIn < g_refresh_overlap
-    @property
-    def ExpiresIn(self):
-        return g_refresh_overlap if self.NeverExpires else max(0, self._TimeStamp - int(time.time()))
-    @ExpiresIn.setter
-    def ExpiresIn(self, second):
-        self._TimeStamp = second + int(time.time())
-    @property
-    def Scope(self):
-        return ' '.join(self._Scope)
-    @Scope.setter
-    def Scope(self, scope):
-        self._Scope = scope.split(' ')
-
-    # XUpdatable
-    def update(self):
-        accesstoken = ''
-        refreshtoken = ''
-        neverexpires = False
-        timestamp = 0
-        scope = []
-        providers = self.configuration.getByName('Providers')
-        if providers.hasByName(self.Provider.Id):
-            provider = providers.getByName(self.Provider.Id)
-            users = provider.getByName('Users')
-            if users.hasByName(self.Id):
-                user = users.getByName(self.Id)
-                accesstoken = user.getByName('AccessToken')
-                refreshtoken = user.getByName('RefreshToken')
-                neverexpires = user.getByName('NeverExpires')
-                timestamp = user.getByName('TimeStamp')
-                scope = list(user.getByName('Scopes'))
-        self.AccessToken = accesstoken
-        self.RefreshToken = refreshtoken
-        self.NeverExpires = neverexpires
-        self._TimeStamp = timestamp
-        self._Scope = scope
-
-    # XTransactedObject
-    def commit(self):
-        providers = self.configuration.getByName('Providers')
-        if providers.hasByName(self.Provider.Id):
-            provider = providers.getByName(self.Provider.Id)
-            users = provider.getByName('Users')
-            if not users.hasByName(self.Id):
-                users.insertByName(self.Id, users.createInstance())
-            user = users.getByName(self.Id)
-            user.replaceByName('AccessToken', self.AccessToken)
-            user.replaceByName('RefreshToken', self.RefreshToken)
-            user.replaceByName('NeverExpires', self.NeverExpires)
-            user.replaceByName('TimeStamp', self._TimeStamp)
-            # user.replaceByName('Scopes', self._Scope)
-            arguments = ('Scopes', uno.Any('[]string', tuple(self._Scope)))
-            uno.invoke(user, 'replaceByName', arguments)
-            if self.configuration.hasPendingChanges():
-                self.configuration.commitChanges()
-    def revert(self):
-        self.AccessToken = ''
-        self.RefreshToken = ''
-        self.NeverExpires = False
-        self._TimeStamp = 0
-        self._Scope = []
-
-    def _getPropertySetInfo(self):
-        properties = {}
-        readonly = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
-        transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
-        properties['Id'] = getProperty('Id', 'string', transient)
-        properties['AccessToken'] = getProperty('AccessToken', 'string', transient)
-        properties['RefreshToken'] = getProperty('RefreshToken', 'string', transient)
-        properties['NeverExpires'] = getProperty('NeverExpires', 'boolean', transient)
-        properties['ExpiresIn'] = getProperty('ExpiresIn', 'short', transient)
-        properties['HasExpired'] = getProperty('HasExpired', 'boolean', readonly)
-        properties['Scope'] = getProperty('Scope', 'string', transient)
-        properties['Provider'] = getProperty('Provider', 'com.sun.star.uno.XInterface', readonly)
         return properties
 
 
 class ProviderReader(unohelper.Base,
                      PropertySet):
     def __init__(self, configuration):
-        self._Id = ''
         self.configuration = configuration
+        self.User = UserReader(self.configuration)
         self.ClientId = ''
         self.ClientSecret = ''
         self.AuthorizationUrl = ''
-        self.AuthorizationParameters = ''
+        self.AuthorizationParameters = '{}'
         self.TokenUrl = ''
-        self.TokenParameters = ''
+        self.TokenParameters = '{}'
         self.CodeChallenge = True
         self.HttpHandler = True
         self.RedirectAddress = 'localhost'
@@ -255,21 +153,20 @@ class ProviderReader(unohelper.Base,
 
     @property
     def Id(self):
-        return self._Id
+        return self.User.ProviderId
     @Id.setter
     def Id(self, id):
-        self._Id = id
+        self.User.ProviderId = id
         clientid = ''
         clientsecret = ''
         authorizationurl = ''
-        authorizationparameters = ''
+        authorizationparameters = '{}'
         tokenurl = ''
-        tokenparameters = ''
+        tokenparameters = '{}'
         codechallenge = True
         httphandler = True
         redirectaddress = 'localhost'
         redirectport = 8080
-        print("OAuth2OOo.Provider.update() 1: %s - %s" % (authorizationparameters, authorizationurl))
         providers = self.configuration.getByName('Providers')
         if providers.hasByName(self.Id):
             provider = providers.getByName(self.Id)
@@ -283,7 +180,6 @@ class ProviderReader(unohelper.Base,
             httphandler = provider.getByName('HttpHandler')
             redirectaddress = provider.getByName('RedirectAddress')
             redirectport = provider.getByName('RedirectPort')
-            print("OAuth2OOo.Provider.update() 2: %s - %s" % (authorizationparameters, authorizationurl))
         self.ClientId = clientid
         self.ClientSecret = clientsecret
         self.AuthorizationUrl = authorizationurl
@@ -307,6 +203,7 @@ class ProviderReader(unohelper.Base,
         properties = {}
         readonly = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
         transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
+        properties['User'] = getProperty('User', 'com.sun.star.uno.XInterface', readonly)
         properties['Id'] = getProperty('Id', 'string', transient)
         properties['ClientId'] = getProperty('ClientId', 'string', readonly)
         properties['ClientSecret'] = getProperty('ClientSecret', 'string', readonly)
@@ -319,4 +216,116 @@ class ProviderReader(unohelper.Base,
         properties['RedirectAddress'] = getProperty('RedirectAddress', 'string', readonly)
         properties['RedirectPort'] = getProperty('RedirectPort', 'short', readonly)
         properties['RedirectUri'] = getProperty('RedirectUri', 'string', readonly)
+        return properties
+
+
+class UserReader(unohelper.Base,
+                 XUpdatable,
+                 XTransactedObject,
+                 PropertySet):
+    def __init__(self, configuration):
+        self.configuration = configuration
+        self._Id = ''
+        self._ProviderId = ''
+        self.AccessToken = ''
+        self.RefreshToken = ''
+        self.NeverExpires = False
+        self._TimeStamp = 0
+        self._Scopes = []
+
+    @property
+    def Id(self):
+        return self._Id
+    @Id.setter
+    def Id(self, id):
+        self._Id = id
+        self.update()
+    @property
+    def ProviderId(self):
+        return self._ProviderId
+    @ProviderId.setter
+    def ProviderId(self, id):
+        self._ProviderId = id
+        self.update()
+    @property
+    def HasExpired(self):
+        return False if self.NeverExpires else self.ExpiresIn < g_refresh_overlap
+    @property
+    def ExpiresIn(self):
+        return g_refresh_overlap if self.NeverExpires else max(0, self._TimeStamp - int(time.time()))
+    @ExpiresIn.setter
+    def ExpiresIn(self, second):
+        self._TimeStamp = second + int(time.time())
+    @property
+    def Scope(self):
+        return ' '.join(self._Scopes)
+    @Scope.setter
+    def Scope(self, scope):
+        self._Scopes = scope.split(' ')
+    @property
+    def Scopes(self):
+        return tuple(self._Scopes)
+
+    # XUpdatable
+    def update(self):
+        accesstoken = ''
+        refreshtoken = ''
+        neverexpires = False
+        timestamp = 0
+        scope = []
+        providers = self.configuration.getByName('Providers')
+        if providers.hasByName(self.ProviderId):
+            provider = providers.getByName(self.ProviderId)
+            users = provider.getByName('Users')
+            if users.hasByName(self.Id):
+                user = users.getByName(self.Id)
+                accesstoken = user.getByName('AccessToken')
+                refreshtoken = user.getByName('RefreshToken')
+                neverexpires = user.getByName('NeverExpires')
+                timestamp = user.getByName('TimeStamp')
+                scope = list(user.getByName('Scopes'))
+        self.AccessToken = accesstoken
+        self.RefreshToken = refreshtoken
+        self.NeverExpires = neverexpires
+        self._TimeStamp = timestamp
+        self._Scopes = scope
+
+    # XTransactedObject
+    def commit(self):
+        providers = self.configuration.getByName('Providers')
+        if providers.hasByName(self.ProviderId):
+            provider = providers.getByName(self.ProviderId)
+            users = provider.getByName('Users')
+            if not users.hasByName(self.Id):
+                users.insertByName(self.Id, users.createInstance())
+            user = users.getByName(self.Id)
+            user.replaceByName('AccessToken', self.AccessToken)
+            user.replaceByName('RefreshToken', self.RefreshToken)
+            user.replaceByName('NeverExpires', self.NeverExpires)
+            user.replaceByName('TimeStamp', self._TimeStamp)
+            # user.replaceByName('Scopes', self._Scopes)
+            arguments = ('Scopes', uno.Any('[]string', self.Scopes))
+            uno.invoke(user, 'replaceByName', arguments)
+            if self.configuration.hasPendingChanges():
+                self.configuration.commitChanges()
+    def revert(self):
+        self.AccessToken = ''
+        self.RefreshToken = ''
+        self.NeverExpires = False
+        self._TimeStamp = 0
+        self._Scopes = []
+
+    def _getPropertySetInfo(self):
+        properties = {}
+        readonly = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
+        transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
+        properties['Id'] = getProperty('Id', 'string', transient)
+        properties['ProviderId'] = getProperty('ProviderId', 'string', transient)
+        properties['AccessToken'] = getProperty('AccessToken', 'string', transient)
+        properties['RefreshToken'] = getProperty('RefreshToken', 'string', transient)
+        properties['NeverExpires'] = getProperty('NeverExpires', 'boolean', transient)
+        properties['ExpiresIn'] = getProperty('ExpiresIn', 'short', transient)
+        properties['HasExpired'] = getProperty('HasExpired', 'boolean', readonly)
+        properties['Scopes'] = getProperty('Scopes', '[]string', transient)
+        properties['Scope'] = getProperty('Scope', 'string', transient)
         return properties

@@ -43,60 +43,54 @@ class WizardPage(unohelper.Base,
 
     # XWizardPage Methods
     def activatePage(self):
-        try:
-            print("WizardPage.activatePage()")
-            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-            self.Logger.logp(level, 'WizardPage', 'activatePage()', 'PageId: %s...' % self.PageId)
-            if self.PageId == 1:
-                username = self.Configuration.Url.Scope.User.Id
-                self.Window.getControl('TextField1').setText(username)
-                urls = self.Configuration.UrlList
-                control = self.Window.getControl('ComboBox1')
-                control.Model.StringItemList = urls
-                providers = self.Configuration.Url.ProviderList
-                self.Window.getControl('ComboBox2').Model.StringItemList = providers
-                url = self.Configuration.Url.Id
-                if url:
-                    control.setText(url)
-            elif self.PageId == 2:
-                url = getAuthorizationStr(self.ctx, self.Configuration, self.Uuid)
-                self.Window.getControl('TextField1').setText(url)
-                address = self.Configuration.Url.Scope.User.Provider.RedirectAddress
-                self.Window.getControl('TextField2').setText(address)
-                port = self.Configuration.Url.Scope.User.Provider.RedirectPort
-                self.Window.getControl('NumericField1').setValue(port)
-                option = 'OptionButton%s' % getActivePath(self.Configuration)
-                self.Window.getControl(option).setState(True)
-            elif self.PageId == 3:
-                openUrl(self.ctx, self.Configuration, self.Uuid)
-            elif self.PageId == 4:
-                openUrl(self.ctx, self.Configuration, self.Uuid)
-            self.Window.setVisible(True)
-            self.Logger.logp(level, 'WizardPage', 'activatePage()', 'PageId: %s... Done' % self.PageId)
-        except Exception as e:
-            print("WizardPage.activatePage().Error: %s - %s" % (e, traceback.print_exc()))
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+        self.Logger.logp(level, 'WizardPage', 'activatePage()', 'PageId: %s...' % self.PageId)
+        if self.PageId == 1:
+            username = self.Configuration.Url.Scope.Provider.User.Id
+            self.Window.getControl('TextField1').setText(username)
+            urls = self.Configuration.UrlList
+            control = self.Window.getControl('ComboBox1')
+            control.Model.StringItemList = urls
+            providers = self.Configuration.Url.ProviderList
+            self.Window.getControl('ComboBox2').Model.StringItemList = providers
+            url = self.Configuration.Url.Id
+            if url:
+                control.setText(url)
+        elif self.PageId == 2:
+            url = getAuthorizationStr(self.ctx, self.Configuration, self.Uuid)
+            self.Window.getControl('TextField1').setText(url)
+            address = self.Configuration.Url.Scope.Provider.RedirectAddress
+            self.Window.getControl('TextField2').setText(address)
+            port = self.Configuration.Url.Scope.Provider.RedirectPort
+            self.Window.getControl('NumericField1').setValue(port)
+            option = 'OptionButton%s' % getActivePath(self.Configuration)
+            self.Window.getControl(option).setState(True)
+        elif self.PageId == 3:
+            openUrl(self.ctx, self.Configuration, self.Uuid)
+        elif self.PageId == 4:
+            openUrl(self.ctx, self.Configuration, self.Uuid)
+        self.Window.setVisible(True)
+        self.Logger.logp(level, 'WizardPage', 'activatePage()', 'PageId: %s... Done' % self.PageId)
+
     def commitPage(self, reason):
-        try:
-            print("WizardPage.commitPage()")
-            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-            self.Logger.logp(level, 'WizardPage', 'commitPage()', 'PageId: %s...' % self.PageId)
-            forward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardTravelType.FORWARD')
-            backward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardTravelType.BACKWARD')
-            finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardTravelType.FINISH')
-            self.Window.setVisible(False)
-            if self.PageId == 1 and reason == forward:
-                name = self.Window.getControl('TextField1').getText()
-                self.Configuration.Url.Scope.User.Id = name
-            elif self.PageId == 3:
-                pass
-            elif self.PageId == 4 and reason == finish:
-                code = self.Window.getControl('TextField1').getText()
-                self.AuthorizationCode.Value = code
-                self.AuthorizationCode.IsPresent = True
-            self.Logger.logp(level, 'WizardPage', 'commitPage()', 'PageId: %s... Done' % self.PageId)
-            return True
-        except Exception as e:
-            print("WizardPage.commitPage().Error: %s - %s" % (e, traceback.print_exc()))
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+        self.Logger.logp(level, 'WizardPage', 'commitPage()', 'PageId: %s...' % self.PageId)
+        forward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardTravelType.FORWARD')
+        backward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardTravelType.BACKWARD')
+        finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardTravelType.FINISH')
+        self.Window.setVisible(False)
+        if self.PageId == 1 and reason == forward:
+            name = self.Window.getControl('TextField1').getText()
+            self.Configuration.Url.Scope.Provider.User.Id = name
+        elif self.PageId == 3:
+            pass
+        elif self.PageId == 4 and reason == finish:
+            code = self.Window.getControl('TextField1').getText()
+            self.AuthorizationCode.Value = code
+            self.AuthorizationCode.IsPresent = True
+        self.Logger.logp(level, 'WizardPage', 'commitPage()', 'PageId: %s... Done' % self.PageId)
+        return True
+
     def canAdvance(self):
         advance = False
         if self.PageId == 1:
@@ -111,27 +105,6 @@ class WizardPage(unohelper.Base,
         elif self.PageId == 2:
             advance = checkUrl()
         return advance
-#    def dispose(self):
-#        print("WizardPage.dispose()")
-#        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-#        self.Logger.logp(level, 'WizardPage', 'dispose()', 'PageId: %s...' % self.PageId)
-#        event = uno.createUnoStruct('com.sun.star.lang.EventObject', self)
-#        for listener in self.listeners:
-#            listener.disposing(event)
-#        self.Window.dispose()
-#        self.Logger.logp(level, 'WizardPage', 'dispose()', 'PageId: %s... Done' % self.PageId)
-#    def addEventListener(self, listener):
-#        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-#        self.Logger.logp(level, 'WizardPage', 'addEventListener()', 'PageId: %s...' % self.PageId)
-#        if listener not in self.listeners:
-#            self.listeners.append(listener)
-#        self.Logger.logp(level, 'WizardPage', 'addEventListener()', 'PageId: %s... Done' % self.PageId)
-#    def removeEventListener(self, listener):
-#        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-#        self.Logger.logp(level, 'WizardPage', 'removeEventListener()', 'PageId: %s...' % self.PageId)
-#        if listener in self.listeners:
-#            self.listeners.remove(listener)
-#        self.Logger.logp(level, 'WizardPage', 'removeEventListener()', 'PageId: %s... Done' % self.PageId)
 
     # XCallback
     def notify(self, percent):

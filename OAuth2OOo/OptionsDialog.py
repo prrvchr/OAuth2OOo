@@ -6,9 +6,12 @@ import unohelper
 
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.awt import XContainerWindowEventHandler
+ com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import SEVERE
 
 from oauth2 import createService
 from oauth2 import getFileSequence
+from oauth2 import getLogger
 from oauth2 import getLoggerUrl
 from oauth2 import getLoggerSetting
 from oauth2 import setLoggerSetting
@@ -29,6 +32,7 @@ class OptionsDialog(unohelper.Base,
         self.ctx = ctx
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo', 'OptionsDialog')
         self.service = createService(self.ctx, '%s.OAuth2Service' % g_identifier)
+        self.Logger = getLogger(self.ctx)
 
     # XContainerWindowEventHandler
     def callHandlerMethod(self, dialog, event, method):
@@ -68,30 +72,29 @@ class OptionsDialog(unohelper.Base,
     def _doChanged(self, dialog, control):
         item = control.Model.Tag
         text = control.getText()
-        print("OptionsDialog._doChanged() 1 %s - %s" % (item, text))
         if item == 'UserName':
             self.service.UserName = text
         elif item == 'Url':
             self.service.ResourceUrl = text
         self._updateUI(dialog)
-        print("OptionsDialog._doChanged() 2 %s - %s" % (item, text))
 
     def _doConnect(self, dialog):
         try:
-            print("OptionsDialog._doConnect()")
             token = self.service.getToken('%s')
             self._updateUI(dialog)
         except Exception as e:
-            print("OptionsDialog._doConnect().Error: %s - %s" % (e, traceback.print_exc()))
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            self.Logger.logp(SEVERE, "OptionsDialog", "_doConnect()", msg)
+            print("OptionsDialog._doConnect() %s" % msg)
 
     def _doRemove(self, dialog):
-        user = self.service.Setting.Url.Scope.User
+        user = self.service.Setting.Url.Scope.Provider.User
         user.Scope = ''
         user.commit()
         self._updateUI(dialog)
 
     def _doReset(self, dialog):
-        user = self.service.Setting.Url.Scope.User
+        user = self.service.Setting.Url.Scope.Provider.User
         user.ExpiresIn = 0
         user.commit()
         self._updateUI(dialog)
@@ -111,11 +114,11 @@ class OptionsDialog(unohelper.Base,
     def _updateUI(self, dialog):
         enabled = self.service.ResourceUrl != '' and self.service.UserName != ''
         dialog.getControl('CommandButton2').Model.Enabled = enabled
-        enabled = self.service.Setting.Url.Scope.Authorized
+        enabled = enabled and self.service.Setting.Url.Scope.Authorized
         if enabled:
-            dialog.getControl('Label8').setText(self.service.Setting.Url.Scope.User.RefreshToken)
-            dialog.getControl('Label10').setText(self.service.Setting.Url.Scope.User.AccessToken)
-            dialog.getControl('Label12').setText(self.service.Setting.Url.Scope.User.ExpiresIn)
+            dialog.getControl('Label8').setText(self.service.Setting.Url.Scope.Provider.User.RefreshToken)
+            dialog.getControl('Label10').setText(self.service.Setting.Url.Scope.Provider.User.AccessToken)
+            dialog.getControl('Label12').setText(self.service.Setting.Url.Scope.Provider.User.ExpiresIn)
         else:
             dialog.getControl('Label8').setText(self.stringResource.resolveString('OptionsDialog.Label8.Label'))
             dialog.getControl('Label10').setText(self.stringResource.resolveString('OptionsDialog.Label10.Label'))
@@ -179,6 +182,6 @@ class OptionsDialog(unohelper.Base,
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
-g_ImplementationHelper.addImplementation(OptionsDialog,                             # UNO object class
-                                         g_ImplementationName,                      # Implementation name
-                                        (g_ImplementationName,))                    # List of implemented services
+g_ImplementationHelper.addImplementation(OptionsDialog,
+                                         g_ImplementationName,
+                                        (g_ImplementationName,))

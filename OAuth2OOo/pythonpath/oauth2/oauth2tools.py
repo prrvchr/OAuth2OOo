@@ -18,10 +18,10 @@ g_refresh_overlap = 10 # must be positive, in second
 
 
 def getActivePath(configuration):
-    return 0 if configuration.Url.Scope.User.Provider.HttpHandler else 1
+    return 0 if configuration.Url.Scope.Provider.HttpHandler else 1
 
 def getAuthorizationStr(ctx, configuration, uuid):
-    main = configuration.Url.Scope.User.Provider.AuthorizationUrl
+    main = configuration.Url.Scope.Provider.AuthorizationUrl
     parameters = _getUrlArguments(ctx, configuration, uuid)
     return '%s?%s' % (main, parameters)
 
@@ -38,7 +38,7 @@ def openUrl(ctx, configuration, uuid, option=''):
     ctx.ServiceManager.createInstance(service).execute(url, option, 0)
 
 def _getAuthorizationUrl(ctx, configuration, uuid):
-    main = configuration.Url.Scope.User.Provider.AuthorizationUrl
+    main = configuration.Url.Scope.Provider.AuthorizationUrl
     parameters = urlencode(_getUrlParameters(ctx, configuration, uuid))
     return '%s?%s' % (main, parameters)
 
@@ -52,20 +52,19 @@ def _getUrlArguments(ctx, configuration, uuid):
 def _getUrlParameters(ctx, configuration, uuid):
     parameters = _getUrlBaseParameters(configuration, uuid)
     optional = _getUrlOptionalParameters(ctx, configuration)
-    option = configuration.Url.Scope.User.Provider.AuthorizationParameters
+    option = configuration.Url.Scope.Provider.AuthorizationParameters
     parameters = _parseParameters(parameters, optional, option)
-    print("_getUrlParameters() %s" % (parameters, ))
     return parameters
 
 def _getUrlBaseParameters(configuration, uuid):
     parameters = {}
     parameters['response_type'] = 'code'
-    parameters['client_id'] = configuration.Url.Scope.User.Provider.ClientId
+    parameters['client_id'] = configuration.Url.Scope.Provider.ClientId
     parameters['state'] = uuid
-    if configuration.Url.Scope.User.Provider.HttpHandler:
-        parameters['redirect_uri'] = configuration.Url.Scope.User.Provider.RedirectUri
-    if configuration.Url.Scope.User.Provider.CodeChallenge:
-        method = configuration.Url.Scope.User.Provider.CodeChallengeMethod
+    if configuration.Url.Scope.Provider.HttpHandler:
+        parameters['redirect_uri'] = configuration.Url.Scope.Provider.RedirectUri
+    if configuration.Url.Scope.Provider.CodeChallenge:
+        method = configuration.Url.Scope.Provider.CodeChallengeMethod
         parameters['code_challenge_method'] = method
         parameters['code_challenge'] = _getCodeChallenge(uuid + uuid, method)
     return parameters
@@ -73,8 +72,8 @@ def _getUrlBaseParameters(configuration, uuid):
 def _getUrlOptionalParameters(ctx, configuration):
     parameters = {}
     parameters['scope'] = configuration.Url.Scope.Value
-    parameters['client_secret'] = configuration.Url.Scope.User.Provider.ClientSecret
-    parameters['current_user'] = configuration.Url.Scope.User.Id
+    parameters['client_secret'] = configuration.Url.Scope.Provider.ClientSecret
+    parameters['current_user'] = configuration.Url.Scope.Provider.User.Id
     parameters['current_language'] = getCurrentLocale(ctx).Language
     return parameters
 
@@ -89,7 +88,7 @@ def _getCodeChallenge(code, method):
 def getTokenParameters(setting, code, codeverifier):
     parameters = _getTokenBaseParameters(setting, code, codeverifier)
     optional = _getTokenOptionalParameters(setting)
-    option = setting.Url.Scope.User.Provider.TokenParameters
+    option = setting.Url.Scope.Provider.TokenParameters
     parameters = _parseParameters(parameters, optional, option)
     return parameters
 
@@ -97,55 +96,51 @@ def _getTokenBaseParameters(setting, code, codeverifier):
     parameters = {}
     parameters['code'] = code
     parameters['grant_type'] = 'authorization_code'
-    parameters['client_id'] = setting.Url.Scope.User.Provider.ClientId
-    if setting.Url.Scope.User.Provider.HttpHandler:
-        parameters['redirect_uri'] = setting.Url.Scope.User.Provider.RedirectUri
-    if setting.Url.Scope.User.Provider.CodeChallenge:
+    parameters['client_id'] = setting.Url.Scope.Provider.ClientId
+    if setting.Url.Scope.Provider.HttpHandler:
+        parameters['redirect_uri'] = setting.Url.Scope.Provider.RedirectUri
+    if setting.Url.Scope.Provider.CodeChallenge:
         parameters['code_verifier'] = codeverifier
     return parameters
 
 def _getTokenOptionalParameters(setting):
     parameters = {}
     parameters['scope'] = setting.Url.Scope.Values
-    parameters['client_secret'] = setting.Url.Scope.User.Provider.ClientSecret
+    parameters['client_secret'] = setting.Url.Scope.Provider.ClientSecret
     return parameters
 
 def getRefreshParameters(setting):
     parameters = _getRefreshBaseParameters(setting)
     optional = _getRefreshOptionalParameters(setting)
-    option = setting.Url.Scope.User.Provider.TokenParameters
+    option = setting.Url.Scope.Provider.TokenParameters
     parameters = _parseParameters(parameters, optional, option)
     return parameters
 
 def _getRefreshBaseParameters(setting):
     parameters = {}
-    parameters['refresh_token'] = setting.Url.Scope.User.RefreshToken
+    parameters['refresh_token'] = setting.Url.Scope.Provider.User.RefreshToken
     parameters['grant_type'] = 'refresh_token'
-    parameters['client_id'] = setting.Url.Scope.User.Provider.ClientId
-    if setting.Url.Scope.User.Provider.CodeChallenge:
-        parameters['redirect_uri'] = setting.Url.Scope.User.Provider.RedirectUri
+    parameters['client_id'] = setting.Url.Scope.Provider.ClientId
+    if setting.Url.Scope.Provider.CodeChallenge:
+        parameters['redirect_uri'] = setting.Url.Scope.Provider.RedirectUri
     return parameters
 
 def _getRefreshOptionalParameters(setting):
     parameters = {}
-    parameters['scope'] = setting.Url.Scope.User.Scope
-    parameters['client_secret'] = setting.Url.Scope.User.Provider.ClientSecret
+    parameters['scope'] = setting.Url.Scope.Provider.User.Scope
+    parameters['client_secret'] = setting.Url.Scope.Provider.ClientSecret
     return parameters
 
 def _parseParameters(base, optional, option):
     options = json.loads(option)
-    print("OAuth2OOo._parseParameters() 1 %s" % (options, ))
     for key, value in options.items():
         if value is None:
             if key in base:
                 del base[key]
-                print("OAuth2OOo._parseParameters() 2 del key: %s" % (key, ))
             elif key in optional:
                 base[key] = optional[key]
-                print("OAuth2OOo._parseParameters() 3 %s - %s" % (key, optional[key]))
         elif value in optional:
             base[key] = optional[value]
         else:
             base[key] = value
-    print("OAuth2OOo._parseParameters() 4 %s" % (base, ))
     return base

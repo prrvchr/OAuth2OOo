@@ -41,41 +41,35 @@ class OAuth2Service(unohelper.Base,
         self.Setting.Url.Id = url
     @property
     def UserName(self):
-        return self.Setting.Url.Scope.User.Id
+        return self.Setting.Url.Scope.Provider.User.Id
     @UserName.setter
     def UserName(self, name):
-        self.Setting.Url.Scope.User.Id = name
+        self.Setting.Url.Scope.Provider.User.Id = name
 
     # XOAuth2Service
     def getToken(self, format=''):
-        try:
-            print("OAuth2Service.getToken()")
-            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-            msg = "Request Token ... "
-            if not self.Setting.Url.Scope.Authorized:
-                msg += "AuthorizationCode needed ... "
-                code, codeverifier = self._getAuthorizationCode()
-                if code is not None:
-                    token = self._getTokens(code, codeverifier)
-                    print("OAuth2Service.getToken() %s" % (token, ))
-                    msg += "Done"
-                else:
-                    level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
-                    msg += "ERROR: Aborted!!!"
-                    token = ''
-            elif self.Setting.Url.Scope.User.HasExpired:
-                token = self._refreshToken()
-                msg += "Refresh needed ... Done"
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+        msg = "Request Token ... "
+        if not self.Setting.Url.Scope.Authorized:
+            msg += "AuthorizationCode needed ... "
+            code, codeverifier = self._getAuthorizationCode()
+            if code is not None:
+                token = self._getTokens(code, codeverifier)
+                msg += "Done"
             else:
-                token = self.Setting.Url.Scope.User.AccessToken
-                msg += "Get from configuration ... Done"
-            self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
-            if format:
-            	token = format % token
-            return token
-
-        except Exception as e:
-            print("OAUth2Service.getToken().Error: %s - %s" % (e, traceback.print_exc()))
+                level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
+                msg += "ERROR: Aborted!!!"
+                token = ''
+        elif self.Setting.Url.Scope.Provider.User.HasExpired:
+            token = self._refreshToken()
+            msg += "Refresh needed ... Done"
+        else:
+            token = self.Setting.Url.Scope.Provider.User.AccessToken
+            msg += "Get from configuration ... Done"
+        self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
+        if format:
+            token = format % token
+        return token
 
     def _getSession(self):
         if sys.version_info[0] < 3:
@@ -85,30 +79,23 @@ class OAuth2Service(unohelper.Base,
         return session
 
     def _getAuthorizationCode(self):
-        try:
-            code = None
-            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-            self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading...")
-            controller = WizardController(self.ctx, self.ResourceUrl, self.UserName)
-            self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading... Done")
-            print("OAuth2Service._getAuthorizationCode() 1")
-            if controller.Handler.Wizard.execute():
-                print("OAuth2Service._getAuthorizationCode() 2")
-                if controller.AuthorizationCode.IsPresent:
-                    print("OAuth2Service._getAuthorizationCode() 3")
-                    controller.Configuration.commit()
-                    code = controller.AuthorizationCode.Value
-                    self.UserName = controller.UserName
-                    self.ResourceUrl = controller.ResourceUrl
-            print("OAuth2Service._getAuthorizationCode() 4")
-            controller.Server.cancel()
-            self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController closed")
-            return code, controller.CodeVerifier
-        except Exception as e:
-            print("PyOptionsDialog.__init__().Error: %s - %s" % (e, traceback.print_exc()))
+        code = None
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading...")
+        controller = WizardController(self.ctx, self.ResourceUrl, self.UserName)
+        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading... Done")
+        if controller.Handler.Wizard.execute():
+            if controller.AuthorizationCode.IsPresent:
+                controller.Configuration.commit()
+                code = controller.AuthorizationCode.Value
+                self.UserName = controller.UserName
+                self.ResourceUrl = controller.ResourceUrl
+        controller.Server.cancel()
+        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController closed")
+        return code, controller.CodeVerifier
 
     def _getTokens(self, code, codeverifier):
-        url = self.Setting.Url.Scope.User.Provider.TokenUrl
+        url = self.Setting.Url.Scope.Provider.TokenUrl
         data = getTokenParameters(self.Setting, code, codeverifier)
         message = "Make Http Request: %s?%s" % (url, data)
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
@@ -117,7 +104,7 @@ class OAuth2Service(unohelper.Base,
         return self._getTokenFromResponse(response)
 
     def _refreshToken(self):
-        url = self.Setting.Url.Scope.User.Provider.TokenUrl
+        url = self.Setting.Url.Scope.Provider.TokenUrl
         data = getRefreshParameters(self.Setting)
         message = "Make Http Request: %s?%s" % (url, data)
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
@@ -148,17 +135,17 @@ class OAuth2Service(unohelper.Base,
     def _getTokenFromResponse(self, response):
         refresh = response.get('refresh_token', None)
         if refresh:
-            self.Setting.Url.Scope.User.RefreshToken = refresh
+            self.Setting.Url.Scope.Provider.User.RefreshToken = refresh
         expires = response.get('expires_in', None)
         if expires:
-            self.Setting.Url.Scope.User.ExpiresIn = expires
+            self.Setting.Url.Scope.Provider.User.ExpiresIn = expires
         token = response.get('access_token', '')
         if token:
-            self.Setting.Url.Scope.User.AccessToken = token
+            self.Setting.Url.Scope.Provider.User.AccessToken = token
             scope = self.Setting.Url.Scope.Values
-            self.Setting.Url.Scope.User.Scope = scope
-            self.Setting.Url.Scope.User.NeverExpires = expires is None
-            self.Setting.Url.Scope.User.commit()
+            self.Setting.Url.Scope.Provider.User.Scope = scope
+            self.Setting.Url.Scope.Provider.User.NeverExpires = expires is None
+            self.Setting.Url.Scope.Provider.User.commit()
             level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         else:
             level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
@@ -174,6 +161,6 @@ class OAuth2Service(unohelper.Base,
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
-g_ImplementationHelper.addImplementation(OAuth2Service,                             # UNO object class
-                                         g_ImplementationName,                      # Implementation name
-                                        (g_ImplementationName,))                    # List of implemented services
+g_ImplementationHelper.addImplementation(OAuth2Service,
+                                         g_ImplementationName,
+                                        (g_ImplementationName,))

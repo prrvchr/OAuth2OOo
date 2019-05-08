@@ -21,6 +21,7 @@ from .unotools import getStringResource
 
 from .logger import getLogger
 
+from .oauth2tools import getActivePath
 from .oauth2tools import g_identifier
 from .oauth2tools import g_advance_to
 
@@ -54,13 +55,13 @@ class WizardController(unohelper.Base,
         self.Configuration.Url.Id = url
     @property
     def UserName(self):
-        return self.Configuration.Url.Scope.User.Id
+        return self.Configuration.Url.Scope.Provider.User.Id
     @UserName.setter
     def UserName(self, name):
-        self.Configuration.Url.Scope.User.Id = name
+        self.Configuration.Url.Scope.Provider.User.Id = name
     @property
     def ActivePath(self):
-        return 0 if self.Configuration.Url.Scope.User.Provider.HttpHandler else 1
+        return getActivePath(self.Configuration)
     @property
     def CodeVerifier(self):
         return self.Uuid + self.Uuid
@@ -87,27 +88,22 @@ class WizardController(unohelper.Base,
     def canAdvance(self):
         return True
     def onActivatePage(self, id):
-        try:
-            print("WizardController.onActivatePage()")
-            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-            self.Logger.logp(level, "WizardController", "onActivatePage()", "PageId: %s..." % id)
-            title = self.stringResource.resolveString('PageWizard%s.Title' % (id, ))
-            self.Handler.Wizard.setTitle(title)
-            finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
-            self.Handler.Wizard.enableButton(finish, False)
-            if id == 1:
-                self.Handler.Wizard.activatePath(self.ActivePath, True)
-                self.Handler.Wizard.updateTravelUI()
-            if self.advanceTo:
-                self.advanceTo = 0
-                self.Handler.Wizard.advanceTo(g_advance_to)
-            self.Logger.logp(level, "WizardController", "onActivatePage()", "PageId: %s... Done" % id)
-        except Exception as e:
-            print("WizardController.onActivatePage().Error: %s - %s" % (e, traceback.print_exc()))
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+        self.Logger.logp(level, "WizardController", "onActivatePage()", "PageId: %s..." % id)
+        title = self.stringResource.resolveString('PageWizard%s.Title' % (id, ))
+        self.Handler.Wizard.setTitle(title)
+        finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
+        self.Handler.Wizard.enableButton(finish, False)
+        if id == 1:
+            self.Handler.Wizard.activatePath(self.ActivePath, True)
+            self.Handler.Wizard.updateTravelUI()
+        if self.advanceTo:
+            self.advanceTo = 0
+            self.Handler.Wizard.advanceTo(g_advance_to)
+        self.Logger.logp(level, "WizardController", "onActivatePage()", "PageId: %s... Done" % id)
     def onDeactivatePage(self, id):
         pass
     def confirmFinish(self):
-        print("WizardController.confirmFinish()")
         return True
 
     def _getPropertySetInfo(self):
