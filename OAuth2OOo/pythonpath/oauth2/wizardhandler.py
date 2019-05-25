@@ -226,10 +226,6 @@ class WizardHandler(unohelper.Base,
             button = window.getControl('CommandButton1')
             button.Model.Enabled = value != '' and value not in values
         elif item == 'HttpHandler':
-            address = window.getControl('TextField2').getText()
-            self.Configuration.Url.Scope.Provider.RedirectAddress = address
-            port = int(window.getControl('NumericField1').getValue())
-            self.Configuration.Url.Scope.Provider.RedirectPort = port
             self.Configuration.Url.Scope.Provider.HttpHandler = True
             self.Wizard.activatePath(getActivePath(self.Configuration), True)
             window.getControl('TextField1').setText(self.AuthorizationStr)

@@ -82,6 +82,11 @@ class WizardPage(unohelper.Base,
         if self.PageId == 1 and reason == forward:
             name = self.Window.getControl('TextField1').getText()
             self.Configuration.Url.Scope.Provider.User.Id = name
+        elif self.PageId == 2:
+            address = self.Window.getControl('TextField2').getText()
+            self.Configuration.Url.Scope.Provider.RedirectAddress = address
+            port = int(self.Window.getControl('NumericField1').getValue())
+            self.Configuration.Url.Scope.Provider.RedirectPort = port
         elif self.PageId == 3:
             pass
         elif self.PageId == 4 and reason == finish:
