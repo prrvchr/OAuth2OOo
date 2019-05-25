@@ -4,6 +4,17 @@
 from .oauth2configuration import OAuth2Configuration
 from .wizardcontroller import WizardController
 
+from .keymap import KeyMap
+
+from .request import OAuth2OOo
+from .request import NoOAuth2
+from .request import Enumerator
+from .request import InputStream
+from .request import Uploader
+from .request import getSessionMode
+from .request import execute
+
+
 from .oauth2tools import g_wizard_paths
 from .oauth2tools import g_identifier
 from .oauth2tools import getActivePath

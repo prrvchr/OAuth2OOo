@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./make_rdb.sh
+
 cd ./OAuth2OOo/
 
 zip -0 OAuth2OOo.zip mimetype

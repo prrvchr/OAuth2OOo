@@ -7,6 +7,15 @@ import unohelper
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.auth import XOAuth2Service
 
+from oauth2 import OAuth2OOo
+from oauth2 import NoOAuth2
+from oauth2 import Enumerator
+from oauth2 import InputStream
+from oauth2 import Uploader
+from oauth2 import KeyMap
+from oauth2 import getSessionMode
+from oauth2 import execute
+
 from oauth2 import OAuth2Configuration
 from oauth2 import WizardController
 from oauth2 import createService
@@ -32,6 +41,7 @@ class OAuth2Service(unohelper.Base,
         self.ctx = ctx
         self.Setting = OAuth2Configuration(self.ctx)
         self.Session = self._getSession()
+        self.Error = ''
 
     @property
     def ResourceUrl(self):
@@ -47,19 +57,25 @@ class OAuth2Service(unohelper.Base,
         self.Setting.Url.Scope.Provider.User.Id = name
 
     # XOAuth2Service
+    def initializeSession(self, url):
+        self.Setting.Url.Id = url
+
+    def initializeUser(self, name):
+        if not name:
+            return False
+        self.Setting.Url.Scope.Provider.User.Id = name
+        return self._isAuthorized()
+
+    def getSessionMode(self, host):
+        return getSessionMode(self.ctx, host)
+
     def getToken(self, format=''):
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         msg = "Request Token ... "
-        if not self.Setting.Url.Scope.Authorized:
-            msg += "AuthorizationCode needed ... "
-            code, codeverifier = self._getAuthorizationCode()
-            if code is not None:
-                token = self._getTokens(code, codeverifier)
-                msg += "Done"
-            else:
-                level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
-                msg += "ERROR: Aborted!!!"
-                token = ''
+        if not self._isAuthorized():
+            level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
+            msg += "ERROR: Cannot InitializeSession()..."
+            token = ''
         elif self.Setting.Url.Scope.Provider.User.HasExpired:
             token = self._refreshToken()
             msg += "Refresh needed ... Done"
@@ -71,10 +87,45 @@ class OAuth2Service(unohelper.Base,
             token = format % token
         return token
 
+    def execute(self, parameter):
+        return execute(self.Session, parameter)
+
+    def getEnumerator(self, parameter):
+        return Enumerator(self.Session, parameter)
+
+    def getInputStream(self, parameter, chunk, buffer):
+        return InputStream(self.Session, parameter, chunk, buffer)
+
+    def getUploader(self, connection, provider):
+        return Uploader(self.ctx, self.Session, connection, provider)
+
+    def _isAuthorized(self):
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+        msg = "OAuth2 initialization... "
+        if self.Setting.Url.Scope.Authorized:
+            msg += "Done"
+            self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
+            return True
+        else:
+            msg += "AuthorizationCode needed ... "
+            code, codeverifier = self._getAuthorizationCode()
+            if code is not None:
+                msg += "Done ... Request Token ... "
+                token = self._getTokens(code, codeverifier)
+                if token:
+                    msg += "Done"
+                    self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
+                    return True
+        level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
+        msg += "ERROR: Aborted!!!"
+        self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
+        return False
+
     def _getSession(self):
         if sys.version_info[0] < 3:
             requests.packages.urllib3.disable_warnings()
         session = requests.Session()
+        session.auth = OAuth2OOo(self)
         session.codes = requests.codes
         return session
 
@@ -124,7 +175,7 @@ class OAuth2Service(unohelper.Base,
         verify = self._getCertificat()
         try:
             with self.Session as s:
-                with s.post(url, data=data, timeout=timeout, verify=verify) as r:
+                with s.post(url, data=data, timeout=timeout, verify=verify, auth=NoOAuth2()) as r:
                     if r.status_code == s.codes.ok:
                         response = r.json()
         except Exception as e:

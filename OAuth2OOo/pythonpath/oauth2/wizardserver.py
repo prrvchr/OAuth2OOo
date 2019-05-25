@@ -76,7 +76,7 @@ class WatchDog(Thread):
     def cancel(self):
         if self.server.is_alive():
             self.end = 0
-            self.watchdog.join()
+            self.server.join()
 
 
 class Server(Thread):
