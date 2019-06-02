@@ -24,8 +24,7 @@ interface XOAuth2Service: com::sun::star::uno::XInterface
     ::com::sun::star::io::XInputStream getInputStream([in] RestRequestParameter Parameter,
                                                       [in] long Chunk,
                                                       [in] long Buffer);
-    ::com::sun::star::uno::XInterface getUploader([in] ::com::sun::star::sdbc::XConnection Connection,
-                                                  [in] ::com::sun::star::uno::XInterface Provider);
+    ::com::sun::star::uno::XInterface getUploader([in] ::com::sun::star::uno::XInterface DataSource);
 
     [attribute, readonly] ::com::sun::star::uno::XInterface Setting;
     [attribute, readonly] ::com::sun::star::uno::XInterface Session;

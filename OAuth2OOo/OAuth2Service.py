@@ -96,8 +96,8 @@ class OAuth2Service(unohelper.Base,
     def getInputStream(self, parameter, chunk, buffer):
         return InputStream(self.Session, parameter, chunk, buffer)
 
-    def getUploader(self, connection, provider):
-        return Uploader(self.ctx, self.Session, connection, provider)
+    def getUploader(self, datasource):
+        return Uploader(self.ctx, self.Session, datasource)
 
     def _isAuthorized(self):
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')

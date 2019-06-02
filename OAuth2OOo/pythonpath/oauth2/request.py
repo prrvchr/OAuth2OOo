@@ -326,9 +326,8 @@ class OutputStream(unohelper.Base,
 
 class StreamListener(unohelper.Base,
                      XStreamListener):
-    def __init__(self, connection, provider, item, response):
-        self.connection = connection
-        self.provider = provider
+    def __init__(self, datasource, item, response):
+        self.datasource = datasource
         self.item = item
         self.response = response
         print("StreamListener.__init__() *******************************\n%s" % self.response)
@@ -345,36 +344,8 @@ class StreamListener(unohelper.Base,
                 value = self.response.Value.getValue(key)
                 print("Response: Name: %s - Value: %s" % (key, value))
             print("StreamListener.closed() 2")
-            if self.response.IsPresent:
-                print("StreamListener.closed() 3")
-                call = self.connection.prepareCall('CALL "updateSync"(?, ?, ?, ?, ?, ?, ?)')
-                call.setString(1, self.item.getValue('UserId'))
-                #call.setLong(2, SYNC_RETRIEVED)
-                call.setLong(2, 0)
-                print("StreamListener.closed() 4")
-                oldid = self.provider.getItemId(self.item)
-                print("StreamListener.closed() 5")
-                call.setString(3, oldid)
-                print("StreamListener.closed() 6 %s - %s" % (oldid, self.response.Value))
-                newid = self.provider.getResponseId(self.response.Value, self.item)
-                print("StreamListener.closed() 7")
-                call.setString(4, newid)
-                print("StreamListener.closed() 8")
-                oldname = self.provider.getItemName(self.item)
-                print("StreamListener.closed() 9")
-                call.setString(5, oldname)
-                print("StreamListener.closed() 10")
-                newname = self.provider.getResponseName(self.response.Value, self.item)
-                print("StreamListener.closed() 11")
-                call.setString(6, newname)
-                print("StreamListener.closed() 12 %s - %s    %s - %s" % (oldid, newid, oldname, newname))
-                call.execute()
-                print("StreamListener.closed() 13")
-                error = call.getString(7)
-                call.close()
-                print("StreamListener.closed(): %s ***********************************************" % error)
-            else:
-                print("StreamListener.closed() ERROR * ERROR * ERROR * ERROR * ERROR * ERROR * ERROR")
+            self.datasource.callBack(self.item, self.response)
+            print("StreamListener.closed(): ***********************************************")
         except Exception as e:
             print("ProviderBase.closed().Error: %s - %s" % (e, traceback.print_exc()))
 
@@ -388,13 +359,12 @@ class StreamListener(unohelper.Base,
 
 class Uploader(unohelper.Base,
                XRestUploader):
-    def __init__(self, ctx, session, connection, provider):
+    def __init__(self, ctx, session, datasource):
         self.ctx = ctx
         self.session = session
-        self.connection = connection
-        self.provider = provider
-        self.chunk = provider.Chunk
-        self.url = provider.SourceURL
+        self.datasource = datasource
+        self.chunk = datasource.Provider.Chunk
+        self.url = datasource.Provider.SourceURL
 
     def start(self, item, parameter):
         input, size = self._getInputStream(item)
@@ -412,17 +382,18 @@ class Uploader(unohelper.Base,
         return False
 
     def _getInputStream(self, item):
-        url = '%s/%s' % (self.url, self.provider.getItemId(item))
+        id = self.datasource.Provider.getItemId(item)
+        url = '%s/%s' % (self.url, id)
         sf = self.ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
         if sf.exists(url):
             return sf.openFileRead(url), sf.getSize(url)
         return None, None
 
-    def _getOutputStream(self,  parameter, size, response):
+    def _getOutputStream(self, parameter, size, response):
         return OutputStream(self.session, parameter, size, self.chunk, response)
 
-    def _getStreamListener(self,  item, response):
-        return StreamListener(self.connection, self.provider, item, response)
+    def _getStreamListener(self, item, response):
+        return StreamListener(self.datasource, item, response)
 
 
 # Private method
