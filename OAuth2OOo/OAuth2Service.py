@@ -97,6 +97,7 @@ class OAuth2Service(unohelper.Base,
         return InputStream(self.Session, parameter, chunk, buffer)
 
     def getUploader(self, datasource):
+        print("OAuth2Service.getUploader()")
         return Uploader(self.ctx, self.Session, datasource)
 
     def _isAuthorized(self):

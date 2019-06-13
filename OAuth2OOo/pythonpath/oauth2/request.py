@@ -360,30 +360,37 @@ class StreamListener(unohelper.Base,
 class Uploader(unohelper.Base,
                XRestUploader):
     def __init__(self, ctx, session, datasource):
+        print("Uploader.__init__() 1")
         self.ctx = ctx
         self.session = session
         self.datasource = datasource
         self.chunk = datasource.Provider.Chunk
         self.url = datasource.Provider.SourceURL
+        print("Uploader.__init__() FIN")
 
     def start(self, item, parameter):
-        input, size = self._getInputStream(item)
-        if size:
-            optional = 'com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>'
-            response = uno.createUnoStruct(optional)
-            output = self._getOutputStream(parameter, size, response)
-            listener = self._getStreamListener(item, response)
-            pump = self.ctx.ServiceManager.createInstance('com.sun.star.io.Pump')
-            pump.setInputStream(input)
-            pump.setOutputStream(output)
-            pump.addListener(listener)
-            pump.start()
-            return True
-        return False
+        try:
+            print("Uploader.start() 1")
+            input, size = self._getInputStream(item)
+            if size:
+                optional = 'com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>'
+                response = uno.createUnoStruct(optional)
+                output = self._getOutputStream(parameter, size, response)
+                listener = self._getStreamListener(item, response)
+                pump = self.ctx.ServiceManager.createInstance('com.sun.star.io.Pump')
+                pump.setInputStream(input)
+                pump.setOutputStream(output)
+                pump.addListener(listener)
+                pump.start()
+                print("Uploader.start() 1")
+                return True
+            print("Uploader.start() FIN")
+            return False
+        except Exception as e:
+            print("Uploader.start().Error: %s - %s" % (e, traceback.print_exc()))
 
     def _getInputStream(self, item):
-        id = self.datasource.Provider.getItemId(item)
-        url = '%s/%s' % (self.url, id)
+        url = '%s/%s' % (self.url, item.getValue('Id'))
         sf = self.ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
         if sf.exists(url):
             return sf.openFileRead(url), sf.getSize(url)
