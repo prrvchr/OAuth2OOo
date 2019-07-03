@@ -10,7 +10,6 @@ from com.sun.star.util import XUpdatable
 from .unolib import PropertySet
 from .unotools import getProperty
 from .unotools import getConfiguration
-from .logger import getLogger
 from .oauth2tools import g_identifier
 from .oauth2tools import g_refresh_overlap
 
@@ -27,7 +26,6 @@ class OAuth2Configuration(unohelper.Base,
         self.Url = UrlReader(self.configuration)
         self.RequestTimeout = self.configuration.getByName('RequestTimeout')
         self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
-        self.Logger = getLogger(self.ctx)
 
     @property
     def UrlList(self):
@@ -52,7 +50,6 @@ class OAuth2Configuration(unohelper.Base,
         properties['UrlList'] = getProperty('UrlList', '[]string', readonly)
         properties['RequestTimeout'] = getProperty('RequestTimeout', 'short', transient)
         properties['HandlerTimeout'] = getProperty('HandlerTimeout', 'short', transient)
-        properties['Logger'] = getProperty('Logger', 'com.sun.star.logging.XLogger', readonly)
         return properties
 
 

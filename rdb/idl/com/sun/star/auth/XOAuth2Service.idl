@@ -9,6 +9,7 @@
 #include <com/sun/star/io/XOutputStream.idl>
 #include <com/sun/star/container/XEnumeration.idl>
 #include <com/sun/star/sdbc/XConnection.idl>
+#include <com/sun/star/logging/XLogger.idl>
 
 module com { module sun { module star { module auth {
 
@@ -17,6 +18,11 @@ interface XOAuth2Service: com::sun::star::uno::XInterface
 
     void initializeSession([in] string ResourceUrl);
     boolean initializeUser([in] string UserName);
+    void logp([in] long Level,
+              [in] string Source,
+              [in] string Method,
+              [in] string Message);
+    ::com::sun::star::auth::XRestKeyMap getKeyMap();
     short getSessionMode([in] string Host);
     string getToken([in] string Format);
     ::com::sun::star::beans::Optional<::com::sun::star::auth::XRestKeyMap> execute([in] RestRequestParameter Parameter);
@@ -28,6 +34,7 @@ interface XOAuth2Service: com::sun::star::uno::XInterface
 
     [attribute, readonly] ::com::sun::star::uno::XInterface Setting;
     [attribute, readonly] ::com::sun::star::uno::XInterface Session;
+    [attribute, readonly] ::com::sun::star::logging::XLogger Logger;
     [attribute] string ResourceUrl;
     [attribute] string UserName;
     [attribute] string Error;

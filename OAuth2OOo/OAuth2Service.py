@@ -15,6 +15,7 @@ from oauth2 import Uploader
 from oauth2 import KeyMap
 from oauth2 import getSessionMode
 from oauth2 import execute
+from oauth2 import getLogger
 
 from oauth2 import OAuth2Configuration
 from oauth2 import WizardController
@@ -41,6 +42,7 @@ class OAuth2Service(unohelper.Base,
         self.ctx = ctx
         self.Setting = OAuth2Configuration(self.ctx)
         self.Session = self._getSession()
+        self.Logger = getLogger(self.ctx)
         self.Error = ''
 
     @property
@@ -66,6 +68,9 @@ class OAuth2Service(unohelper.Base,
         self.Setting.Url.Scope.Provider.User.Id = name
         return self._isAuthorized()
 
+    def getKeyMap(self):
+        return KeyMap()
+
     def getSessionMode(self, host):
         return getSessionMode(self.ctx, host)
 
@@ -82,7 +87,7 @@ class OAuth2Service(unohelper.Base,
         else:
             token = self.Setting.Url.Scope.Provider.User.AccessToken
             msg += "Get from configuration ... Done"
-        self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
+        self.logp(level, "OAuth2Service", "getToken()", msg)
         if format:
             token = format % token
         return token
@@ -100,12 +105,16 @@ class OAuth2Service(unohelper.Base,
         print("OAuth2Service.getUploader()")
         return Uploader(self.ctx, self.Session, datasource)
 
+    def logp(self, level, source, method, message):
+        if self.Logger.isLoggable(level):
+            self.Logger.logp(level, source, method, message)
+
     def _isAuthorized(self):
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         msg = "OAuth2 initialization... "
         if self.Setting.Url.Scope.Authorized:
             msg += "Done"
-            self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
+            self.logp(level, "OAuth2Service", "getToken()", msg)
             return True
         else:
             msg += "AuthorizationCode needed ... "
@@ -115,11 +124,11 @@ class OAuth2Service(unohelper.Base,
                 token = self._getTokens(code, codeverifier)
                 if token:
                     msg += "Done"
-                    self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
+                    self.logp(level, "OAuth2Service", "getToken()", msg)
                     return True
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
         msg += "ERROR: Aborted!!!"
-        self.Setting.Logger.logp(level, "OAuth2Service", "getToken()", msg)
+        self.logp(level, "OAuth2Service", "getToken()", msg)
         return False
 
     def _getSession(self):
@@ -133,9 +142,9 @@ class OAuth2Service(unohelper.Base,
     def _getAuthorizationCode(self):
         code = None
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading...")
+        self.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading...")
         controller = WizardController(self.ctx, self.ResourceUrl, self.UserName)
-        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading... Done")
+        self.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController Loading... Done")
         if controller.Handler.Wizard.execute():
             if controller.AuthorizationCode.IsPresent:
                 controller.Configuration.commit()
@@ -143,7 +152,7 @@ class OAuth2Service(unohelper.Base,
                 self.UserName = controller.UserName
                 self.ResourceUrl = controller.ResourceUrl
         controller.Server.cancel()
-        self.Setting.Logger.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController closed")
+        self.logp(level, "OAuth2Service", "_getAuthorizationCode", "WizardController closed")
         return code, controller.CodeVerifier
 
     def _getTokens(self, code, codeverifier):
@@ -151,7 +160,7 @@ class OAuth2Service(unohelper.Base,
         data = getTokenParameters(self.Setting, code, codeverifier)
         message = "Make Http Request: %s?%s" % (url, data)
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-        self.Setting.Logger.logp(level, "OAuth2Service", "_getTokens", message)
+        self.logp(level, "OAuth2Service", "_getTokens", message)
         response = self._getResponseFromRequest(url, data)
         return self._getTokenFromResponse(response)
 
@@ -160,7 +169,7 @@ class OAuth2Service(unohelper.Base,
         data = getRefreshParameters(self.Setting)
         message = "Make Http Request: %s?%s" % (url, data)
         level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-        self.Setting.Logger.logp(level, "OAuth2Service", "_refreshToken", message)
+        self.logp(level, "OAuth2Service", "_refreshToken", message)
         response = self._getResponseFromRequest(url, data)
         return self._getTokenFromResponse(response)
 
@@ -181,7 +190,7 @@ class OAuth2Service(unohelper.Base,
                         response = r.json()
         except Exception as e:
             level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
-            self.Setting.Logger.logp(level, "OAuth2Service", "_getResponseFromRequest", "%s" % e)
+            self.logp(level, "OAuth2Service", "_getResponseFromRequest", "%s" % e)
         return response
 
     def _getTokenFromResponse(self, response):
@@ -201,7 +210,7 @@ class OAuth2Service(unohelper.Base,
             level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
         else:
             level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
-        self.Setting.Logger.logp(level, "OAuth2Service", "_getTokenFromResponse", "%s" % response)
+        self.logp(level, "OAuth2Service", "_getTokenFromResponse", "%s" % response)
         return token
 
     # XServiceInfo
