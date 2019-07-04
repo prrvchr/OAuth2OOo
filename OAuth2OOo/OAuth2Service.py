@@ -175,7 +175,7 @@ class OAuth2Service(unohelper.Base,
     def _getCertificat(self):
         verify = True
         if sys.version_info[0] < 3:
-            verify = certifi.where()
+            verify = certifi.old_where()
         return verify
 
     def _getResponseFromRequest(self, url, data):
@@ -184,7 +184,7 @@ class OAuth2Service(unohelper.Base,
         verify = self._getCertificat()
         try:
             with self.Session as s:
-                with s.post(url, data=data, timeout=timeout, verify=verify, auth=NoOAuth2()) as r:
+                with s.post(url, data=data, timeout=timeout, verify=True, auth=NoOAuth2()) as r:
                     if r.status_code == s.codes.ok:
                         response = r.json()
         except Exception as e:
