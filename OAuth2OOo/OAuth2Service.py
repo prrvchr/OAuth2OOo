@@ -31,11 +31,21 @@ import sys
 import certifi
 import traceback
 
-from oauth2 import requests
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationName = '%s.OAuth2Service' % g_identifier
+
+
+class SSLContextAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        context = create_urllib3_context()
+        kwargs['ssl_context'] = context
+        context.load_default_certs()
+        return super(SSLContextAdapter, self).init_poolmanager(*args, **kwargs)
 
 
 class OAuth2Service(unohelper.Base,
@@ -179,10 +189,12 @@ class OAuth2Service(unohelper.Base,
     def _getResponseFromRequest(self, url, data):
         response = {}
         timeout = self.Setting.RequestTimeout
-        verify = self._getCertificat()
+        #verify = self._getCertificat()
         try:
             with self.Session as s:
-                with s.post(url, data=data, timeout=timeout, verify=verify, auth=NoOAuth2()) as r:
+                adapter = SSLContextAdapter()
+                s.mount(url, adapter)
+                with s.post(url, data=data, timeout=timeout, auth=NoOAuth2()) as r:
                     if r.status_code == s.codes.ok:
                         response = r.json()
                     else:
