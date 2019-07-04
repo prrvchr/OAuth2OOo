@@ -37,6 +37,7 @@ from requests.packages.urllib3.poolmanager import PoolManager
 try:
     import ssl
 except Exception:
+    from oauth2 import ssl
     logger = getLogger(uno.getComponentContext())
     msg = "Can't import module ssl"
     logger.logp(SEVERE, "OAuth2Service", "import ssl", msg)
