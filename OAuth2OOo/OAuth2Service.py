@@ -33,7 +33,13 @@ import traceback
 
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
-#import ssl
+import socket
+try:
+    import ssl
+except ImportError as e:
+    logger = getLogger(uno.getComponentContext())
+    logger.logp(SEVERE, "OAuth2Service", "import ssl", e)
+
 
 class MyAdapter(HTTPAdapter):
     def init_poolmanager(self, connections, maxsize, block):
