@@ -179,10 +179,10 @@ class OAuth2Service(unohelper.Base,
     def _getResponseFromRequest(self, url, data):
         response = {}
         timeout = self.Setting.RequestTimeout
-        #verify = self._getCertificat()
+        verify = self._getCertificat()
         try:
             with self.Session as s:
-                with s.post(url, data=data, timeout=timeout, verify=False, auth=NoOAuth2()) as r:
+                with s.post(url, data=data, timeout=timeout, verify=verify, auth=NoOAuth2()) as r:
                     if r.status_code == s.codes.ok:
                         response = r.json()
                     else:
