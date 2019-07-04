@@ -33,7 +33,7 @@ import traceback
 
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
-import ssl
+#import ssl
 
 class MyAdapter(HTTPAdapter):
     def init_poolmanager(self, connections, maxsize, block):
