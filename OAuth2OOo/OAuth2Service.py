@@ -33,12 +33,13 @@ import traceback
 
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
-import socket
+
 try:
     import ssl
-except ImportError as e:
+except ImportError:
     logger = getLogger(uno.getComponentContext())
-    logger.logp(SEVERE, "OAuth2Service", "import ssl", e)
+    msg = "Can't import module ssl"
+    logger.logp(SEVERE, "OAuth2Service", "import ssl", msg)
 
 
 class MyAdapter(HTTPAdapter):
