@@ -29,30 +29,9 @@ from oauth2 import g_identifier
 
 import sys
 import certifi
-import traceback
-
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.poolmanager import PoolManager
-
-logger = getLogger(uno.getComponentContext())
-try:
-    import ssl
-    msg = "Import module ssl: %s" % ssl.PROTOCOL_TLSv1
-    logger.logp(SEVERE, "OAuth2Service", "import ssl", msg)
-except Exception:
-    from oauth2 import ssl
-    msg = "Can't import module ssl"
-    logger.logp(SEVERE, "OAuth2Service", "import ssl", msg)
-
-
-class MyAdapter(HTTPAdapter):
-    def init_poolmanager(self, connections, maxsize, block):
-        self.poolmanager = PoolManager(num_pools=connections,
-                                       maxsize=maxsize,
-                                       block=block,
-                                       ssl_version=3)
 import requests
 
+import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -68,6 +47,7 @@ class OAuth2Service(unohelper.Base,
         self.Session = self._getSession()
         self.Logger = getLogger(self.ctx)
         self.Error = ''
+        self._checkSSL()
 
     @property
     def ResourceUrl(self):
@@ -132,6 +112,12 @@ class OAuth2Service(unohelper.Base,
         if self.Logger.isLoggable(level):
             self.Logger.logp(level, source, method, message)
 
+    def _checkSSL(self):
+        try:
+            import ssl
+        except ImportError:
+            self.Error = "Can't load module: 'ssl.py'. Your Python SSL configuration is broken..."
+
     def _isAuthorized(self):
         msg = "OAuth2 initialization... "
         if self.Setting.Url.Scope.Authorized:
@@ -153,10 +139,10 @@ class OAuth2Service(unohelper.Base,
         return False
 
     def _getSession(self):
-        #if sys.version_info[0] < 3:
-        #    requests.packages.urllib3.disable_warnings()
+        if sys.version_info[0] < 3:
+            requests.packages.urllib3.disable_warnings()
         session = requests.Session()
-        session.mount('https://', MyAdapter())
+        #session.mount('https://', MyAdapter())
         session.auth = OAuth2OOo(self)
         session.codes = requests.codes
         return session
