@@ -34,11 +34,13 @@ import traceback
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 
+logger = getLogger(uno.getComponentContext())
 try:
     import ssl
+    msg = "Import module ssl: %s" % ssl.PROTOCOL_TLSv1
+    logger.logp(SEVERE, "OAuth2Service", "import ssl", msg)
 except Exception:
     from oauth2 import ssl
-    logger = getLogger(uno.getComponentContext())
     msg = "Can't import module ssl"
     logger.logp(SEVERE, "OAuth2Service", "import ssl", msg)
 
@@ -48,7 +50,7 @@ class MyAdapter(HTTPAdapter):
         self.poolmanager = PoolManager(num_pools=connections,
                                        maxsize=maxsize,
                                        block=block,
-                                       ssl_version=ssl.PROTOCOL_TLSv1)
+                                       ssl_version=3)
 import requests
 
 
