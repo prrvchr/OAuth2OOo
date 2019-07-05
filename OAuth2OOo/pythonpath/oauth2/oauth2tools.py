@@ -10,7 +10,6 @@ try:
     from ..requests.compat import urlencode
 except ImportError:
     print("oauth2tools import ERROR")
-        pass
 
 import json
 import base64

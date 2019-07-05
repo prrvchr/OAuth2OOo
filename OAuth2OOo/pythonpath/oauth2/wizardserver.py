@@ -19,7 +19,6 @@ try:
     from ..requests.compat import unquote_plus
 except ImportError:
     print("wizardserver import ERROR")
-        pass
 
 import time
 from threading import Thread
