@@ -1,11 +1,16 @@
 #!
 # -*- coding: utf-8 -*-
 
+from __futur__ import absolute_import
 import uno
 
 from .unotools import createService
 from .unotools import getCurrentLocale
-from .requests.compat import urlencode
+try:
+    from ..requests.compat import urlencode
+except ImportError:
+    print("oauth2tools import ERROR")
+        pass
 
 import json
 import base64

@@ -42,5 +42,3 @@ from .logger import getLogger
 from .logger import getLoggerSetting
 from .logger import getLoggerUrl
 from .logger import setLoggerSetting
-
-from . import ssl
