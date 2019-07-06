@@ -29,7 +29,7 @@ from oauth2 import g_identifier
 
 import sys
 import certifi
-import requests
+from oauth2 import requests
 
 import traceback
 

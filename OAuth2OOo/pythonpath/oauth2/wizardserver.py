@@ -1,7 +1,7 @@
 #!
 # -*- coding: utf_8 -*-
 
-from __futur__ import absolute_import
+#from __futur__ import absolute_import
 
 import uno
 import unohelper
@@ -14,11 +14,7 @@ from .unotools import getResourceLocation
 from .unotools import getCurrentLocale
 from .unotools import getFileSequence
 from .oauth2tools import g_identifier
-
-try:
-    from ..requests.compat import unquote_plus
-except ImportError:
-    print("wizardserver import ERROR")
+from .requests.compat import unquote_plus
 
 import time
 from threading import Thread

@@ -9,14 +9,17 @@ from com.sun.star.awt import XContainerWindowEventHandler
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from oauth2 import createService
-from oauth2 import getFileSequence
-from oauth2 import getLogger
-from oauth2 import getLoggerUrl
-from oauth2 import getLoggerSetting
-from oauth2 import setLoggerSetting
-from oauth2 import getStringResource
-from oauth2 import g_identifier
+try:
+    from oauth2 import createService
+    from oauth2 import getFileSequence
+    from oauth2 import getLogger
+    from oauth2 import getLoggerUrl
+    from oauth2 import getLoggerSetting
+    from oauth2 import setLoggerSetting
+    from oauth2 import getStringResource
+    from oauth2 import g_identifier
+except Exception:
+    print("OptionsDialog import ERROR")
 
 import traceback
 
