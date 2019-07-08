@@ -55,7 +55,6 @@ def execute(session, parameter, logger=None):
     response = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
     kwargs = _getKeyWordArguments(parameter)
     kwargs.update({'timeout': g_timeout})
-    print("Request.execute(): Url: %s \n%s" % (parameter.Url, kwargs))
     if logger:
         msg = "execute() 2"
         logger.logp(INFO, "OAuth2Service", "execute()", msg)
@@ -65,18 +64,17 @@ def execute(session, parameter, logger=None):
             logger.logp(INFO, "OAuth2Service", "execute()", msg)
         with s.request(parameter.Method, parameter.Url, **kwargs) as r:
             if logger:
-                msg = "execute() 4"
+                msg = "execute() 4 Status Code: %s" % r.status_code
                 logger.logp(INFO, "OAuth2Service", "execute()", msg)
-            print("Request.execute(): %s\n%s" % (r.status_code, r.headers))
             if r.status_code in (s.codes.ok, s.codes.found, s.codes.created, s.codes.accepted):
                 response.IsPresent = True
-                content = r.headers.get('Content-Type', '')
-                if content.startswith('application/json'):
-                    print("Request.execute(): \n%s" % (r.json(), ))
                 response.Value = _parseResponse(r)
-                print("Request.execute(): **********************")
-            else:
-                print("Request.execute(): ERROR: %s\n%s" % (r.status_code, r.text))
+                if logger:
+                    msg = "execute() 5"
+                    logger.logp(INFO, "OAuth2Service", "execute()", msg)
+            elif logger:
+                msg = "Request: %s - ERROR: %s - %s" % (parameter.Name, r.status_code, r.text)
+                logger.logp(SEVERE, "OAuth2Service", "execute()", msg)
     if logger:
         msg = "execute() 5"
         logger.logp(INFO, "OAuth2Service", "execute()", msg)
