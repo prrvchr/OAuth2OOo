@@ -46,6 +46,7 @@ class OAuth2Service(unohelper.Base,
         self.Setting = OAuth2Configuration(self.ctx)
         self.Session = self._getSession()
         self.Error = ''
+        self.Logger = getLogger(self.ctx)
         self._checkSSL()
 
     @property
@@ -60,9 +61,6 @@ class OAuth2Service(unohelper.Base,
     @UserName.setter
     def UserName(self, name):
         self.Setting.Url.Scope.Provider.User.Id = name
-    @property
-    def Logger(self):
-        return self.Setting.Logger
 
     # XOAuth2Service
     def initializeSession(self, url):
