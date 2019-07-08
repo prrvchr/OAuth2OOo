@@ -45,7 +45,6 @@ class OAuth2Service(unohelper.Base,
         self.ctx = ctx
         self.Setting = OAuth2Configuration(self.ctx)
         self.Session = self._getSession()
-        self.Logger = getLogger(self.ctx)
         self.Error = ''
         self._checkSSL()
 
@@ -61,6 +60,9 @@ class OAuth2Service(unohelper.Base,
     @UserName.setter
     def UserName(self, name):
         self.Setting.Url.Scope.Provider.User.Id = name
+    @property
+    def Logger(self):
+        return self.Setting.Logger
 
     # XOAuth2Service
     def initializeSession(self, url):
@@ -100,7 +102,7 @@ class OAuth2Service(unohelper.Base,
         return execute(self.Session, parameter)
 
     def getEnumerator(self, parameter):
-        return Enumerator(self.Session, parameter)
+        return Enumerator(self.Session, parameter, self.Logger)
 
     def getInputStream(self, parameter, chunk, buffer):
         return InputStream(self.Session, parameter, chunk, buffer)

@@ -12,6 +12,9 @@ from com.sun.star.io import IOException
 from com.sun.star.container import XEnumeration
 from com.sun.star.container import NoSuchElementException
 
+from com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import SEVERE
+
 from com.sun.star.ucb.ConnectionMode import ONLINE
 from com.sun.star.ucb.ConnectionMode import OFFLINE
 from com.sun.star.connection import NoConnectException
@@ -67,11 +70,14 @@ def execute(session, parameter):
 
 class Enumerator(unohelper.Base,
                  XEnumeration):
-    def __init__(self, session, parameter):
+    def __init__(self, session, parameter, logger):
         self.session = session
         self.parameter = parameter
         self.chunked = self.parameter.Enumerator.Token.Type != TOKEN_NONE
         self.elements, self.token = self._getElements()
+        self.logger = logger
+        msg = "Loading ... Done"
+        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
 
     # XEnumeration
     def hasMoreElements(self):
@@ -85,6 +91,8 @@ class Enumerator(unohelper.Base,
         raise NoSuchElementException()
 
     def _getElements(self, token=None):
+        msg = "_getElements() 1"
+        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
         if token:
             if self.parameter.Enumerator.Token.Type & TOKEN_URL:
                 self.parameter.Url = self.parameter.Enumerator.Token.Value
@@ -99,8 +107,14 @@ class Enumerator(unohelper.Base,
                 self.parameter.Json = '{"%s": "%s"}' % (name, token)
             token = None
         elements = []
+        msg = "_getElements() 2"
+        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
         response = execute(self.session, self.parameter)
+        msg = "_getElements() 3"
+        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
         if response.IsPresent:
+            msg = "_getElements() 4"
+            self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
             r = response.Value
             elements = list(r.getDefaultValue(self.parameter.Enumerator.Field, ()))
             if self.chunked:
@@ -111,6 +125,8 @@ class Enumerator(unohelper.Base,
                         token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
                 else:
                     token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
+        msg = "_getElements() 5"
+        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
         return elements, token
 
 
