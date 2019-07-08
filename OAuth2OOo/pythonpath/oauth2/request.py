@@ -77,7 +77,7 @@ class Enumerator(unohelper.Base,
         self.chunked = self.parameter.Enumerator.Token.Type != TOKEN_NONE
         self.elements, self.token = self._getElements()
         msg = "Loading ... Done"
-        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
+        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
 
     # XEnumeration
     def hasMoreElements(self):
@@ -92,7 +92,7 @@ class Enumerator(unohelper.Base,
 
     def _getElements(self, token=None):
         msg = "_getElements() 1"
-        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
+        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         if token:
             if self.parameter.Enumerator.Token.Type & TOKEN_URL:
                 self.parameter.Url = self.parameter.Enumerator.Token.Value
@@ -108,13 +108,13 @@ class Enumerator(unohelper.Base,
             token = None
         elements = []
         msg = "_getElements() 2"
-        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
+        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         response = execute(self.session, self.parameter)
         msg = "_getElements() 3"
-        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
+        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         if response.IsPresent:
             msg = "_getElements() 4"
-            self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
+            self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
             r = response.Value
             elements = list(r.getDefaultValue(self.parameter.Enumerator.Field, ()))
             if self.chunked:
@@ -126,7 +126,7 @@ class Enumerator(unohelper.Base,
                 else:
                     token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
         msg = "_getElements() 5"
-        self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
+        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         return elements, token
 
 
