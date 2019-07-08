@@ -97,13 +97,13 @@ class OAuth2Service(unohelper.Base,
         return token
 
     def execute(self, parameter):
-        return execute(self.Session, parameter)
+        return execute(self.Session, parameter, self.Logger)
 
     def getEnumerator(self, parameter):
         return Enumerator(self.Session, parameter, self.Logger)
 
     def getInputStream(self, parameter, chunk, buffer):
-        return InputStream(self.Session, parameter, chunk, buffer)
+        return InputStream(self.Session, parameter, chunk, buffer, self.Logger)
 
     def getUploader(self, datasource):
         return Uploader(self.ctx, self.Session, datasource)

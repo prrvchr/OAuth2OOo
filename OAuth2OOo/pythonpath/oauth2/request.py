@@ -48,36 +48,18 @@ def getSessionMode(ctx, host, port=80):
         mode = ONLINE
     return mode
 
-def execute(session, parameter, logger=None):
-    if logger:
-        msg = "execute() 1"
-        logger.logp(INFO, "OAuth2Service", "execute()", msg)
+def execute(session, parameter, logger):
     response = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
     kwargs = _getKeyWordArguments(parameter)
     kwargs.update({'timeout': g_timeout})
-    if logger:
-        msg = "execute() 2"
-        logger.logp(INFO, "OAuth2Service", "execute()", msg)
     with session as s:
-        if logger:
-            msg = "execute() 3"
-            logger.logp(INFO, "OAuth2Service", "execute()", msg)
         with s.request(parameter.Method, parameter.Url, **kwargs) as r:
-            if logger:
-                msg = "execute() 4 Status Code: %s" % r.status_code
-                logger.logp(INFO, "OAuth2Service", "execute()", msg)
             if r.status_code in (s.codes.ok, s.codes.found, s.codes.created, s.codes.accepted):
                 response.IsPresent = True
                 response.Value = _parseResponse(r)
-                if logger:
-                    msg = "execute() 5"
-                    logger.logp(INFO, "OAuth2Service", "execute()", msg)
-            elif logger:
+            else:
                 msg = "Request: %s - ERROR: %s - %s" % (parameter.Name, r.status_code, r.text)
                 logger.logp(SEVERE, "OAuth2Service", "execute()", msg)
-    if logger:
-        msg = "execute() 5"
-        logger.logp(INFO, "OAuth2Service", "execute()", msg)
     return response
 
 
@@ -89,8 +71,6 @@ class Enumerator(unohelper.Base,
         self.logger = logger
         self.chunked = self.parameter.Enumerator.Token.Type != TOKEN_NONE
         self.elements, self.token = self._getElements()
-        msg = "Loading ... Done"
-        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
 
     # XEnumeration
     def hasMoreElements(self):
@@ -104,8 +84,6 @@ class Enumerator(unohelper.Base,
         raise NoSuchElementException()
 
     def _getElements(self, token=None):
-        msg = "_getElements() 1"
-        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         if token:
             if self.parameter.Enumerator.Token.Type & TOKEN_URL:
                 self.parameter.Url = self.parameter.Enumerator.Token.Value
@@ -120,14 +98,8 @@ class Enumerator(unohelper.Base,
                 self.parameter.Json = '{"%s": "%s"}' % (name, token)
             token = None
         elements = []
-        msg = "_getElements() 2"
-        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         response = execute(self.session, self.parameter, self.logger)
-        msg = "_getElements() 3"
-        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         if response.IsPresent:
-            msg = "_getElements() 4"
-            self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
             r = response.Value
             elements = list(r.getDefaultValue(self.parameter.Enumerator.Field, ()))
             if self.chunked:
@@ -138,18 +110,15 @@ class Enumerator(unohelper.Base,
                         token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
                 else:
                     token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
-        msg = "_getElements() 5"
-        self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         return elements, token
 
 
 class InputStream(unohelper.Base,
                   XInputStream):
-    def __init__(self, session, parameter, chunk, buffer):
-        self.downloader = Downloader(session, parameter, chunk, buffer)
+    def __init__(self, session, parameter, chunk, buffer, logger):
+        self.downloader = Downloader(session, parameter, chunk, buffer, logger)
         self.chunks = self.downloader.getChunks()
         self.buffers = b''
-        print("Request.InputStream.__init__()")
 
     #XInputStream
     def readBytes(self, sequence, length):
@@ -164,7 +133,6 @@ class InputStream(unohelper.Base,
         while i > 0:
             chunk = next(self.chunks, b'')
             j = len(chunk)
-            print("Request.InputStream.readBytes()1: %s - %s" % (j, length))
             if j == 0:
                 break
             elif j > i:
@@ -173,7 +141,6 @@ class InputStream(unohelper.Base,
                 break
             sequence += chunk
             i = length - len(sequence)
-        print("Request.InputStream.readBytes()2: %s - %s" % (length, len(sequence)))
         return len(sequence), sequence
     def readSomeBytes(self, sequence, length):
         return self.readBytes(sequence, length)
@@ -186,8 +153,7 @@ class InputStream(unohelper.Base,
 
 
 class Downloader():
-    def __init__(self, session, parameter, chunk, buffer):
-        print("Request.Downloader.__init__() 1")
+    def __init__(self, session, parameter, chunk, buffer, logger):
         self.session = session
         self.method = parameter.Method
         self.url = parameter.Url
@@ -199,10 +165,10 @@ class Downloader():
         self.kwargs = kwargs
         self.chunk = chunk
         self.buffer = buffer
+        self.logger = logger
         self.start = 0
         self.size = 0
         self.closed = False
-        print("Request.Downloader.__init__() 2 - %s" % self.size)
     def _getSize(self, range):
         if range:
             return int(range.split('/').pop())
@@ -210,16 +176,13 @@ class Downloader():
     def _closed(self):
         return self.start == self.size if self.size else self.closed
     def getChunks(self):
-        print("Request.Downloader.__next__() 1")
         with self.session as s:
             while not self._closed():
                 end = self.start + self.chunk
                 if self.size:
                     end = min(end, self.size)
                 self.kwargs['headers'].update({'Range': 'bytes=%s-%s' % (self.start, end -1)})
-                print("Request.Downloader.__next__() 3: %s" % (self.kwargs['headers'], ))
                 with s.request(self.method, self.url, **self.kwargs) as r:
-                    print("Request.Downloader.__next__() 4: %s \n%s\n%s" % (r.status_code, r.request.headers, r.headers))
                     if r.status_code == s.codes.ok:
                         self.closed = True
                     elif r.status_code == s.codes.partial_content:
@@ -227,14 +190,12 @@ class Downloader():
                             self.size = self._getSize(r.headers.get('Content-Range'))
                     else:
                         self.closed = True
-                        print("Request.Downloader.__next__() 5 %s - %s" % (self.closed, self.start))
-                        print("Request.Downloader ERROR %s \n%s" % (r.status_code, r.text))
+                        msg = "getChunks() ERROR: %s" % (r.status_code, r.text)
+                        self.logger.logp(SEVERE, "OAuth2Service", "Downloader()", msg)
                         break
                     for c in r.iter_content(self.buffer):
                         self.start += len(c)
-                        print("Request.Downloader.__next__() 6 %s - %s" % (len(c), self.start))
                         yield c
-        print("Request.Downloader.__next__() 6")
     def close(self):
         self.session.close()
         self.closed = True
@@ -389,17 +350,14 @@ class StreamListener(unohelper.Base,
 class Uploader(unohelper.Base,
                XRestUploader):
     def __init__(self, ctx, session, datasource):
-        print("Uploader.__init__() 1")
         self.ctx = ctx
         self.session = session
         self.datasource = datasource
         self.chunk = datasource.Provider.Chunk
         self.url = datasource.Provider.SourceURL
-        print("Uploader.__init__() FIN")
 
     def start(self, item, parameter):
         try:
-            print("Uploader.start() 1")
             input, size = self._getInputStream(item)
             if size:
                 optional = 'com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>'
@@ -411,9 +369,7 @@ class Uploader(unohelper.Base,
                 pump.setOutputStream(output)
                 pump.addListener(listener)
                 pump.start()
-                print("Uploader.start() 1")
                 return True
-            print("Uploader.start() FIN")
             return False
         except Exception as e:
             print("Uploader.start().Error: %s - %s" % (e, traceback.print_exc()))
