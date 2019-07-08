@@ -48,13 +48,25 @@ def getSessionMode(ctx, host, port=80):
         mode = ONLINE
     return mode
 
-def execute(session, parameter):
+def execute(session, parameter, logger=None):
+    if logger:
+        msg = "execute() 1"
+        logger.logp(INFO, "OAuth2Service", "execute()", msg)
     response = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
     kwargs = _getKeyWordArguments(parameter)
     kwargs.update({'timeout': g_timeout})
     print("Request.execute(): Url: %s \n%s" % (parameter.Url, kwargs))
+    if logger:
+        msg = "execute() 2"
+        logger.logp(INFO, "OAuth2Service", "execute()", msg)
     with session as s:
+        if logger:
+            msg = "execute() 3"
+            logger.logp(INFO, "OAuth2Service", "execute()", msg)
         with s.request(parameter.Method, parameter.Url, **kwargs) as r:
+            if logger:
+                msg = "execute() 4"
+                logger.logp(INFO, "OAuth2Service", "execute()", msg)
             print("Request.execute(): %s\n%s" % (r.status_code, r.headers))
             if r.status_code in (s.codes.ok, s.codes.found, s.codes.created, s.codes.accepted):
                 response.IsPresent = True
@@ -65,6 +77,9 @@ def execute(session, parameter):
                 print("Request.execute(): **********************")
             else:
                 print("Request.execute(): ERROR: %s\n%s" % (r.status_code, r.text))
+    if logger:
+        msg = "execute() 5"
+        logger.logp(INFO, "OAuth2Service", "execute()", msg)
     return response
 
 
@@ -109,7 +124,7 @@ class Enumerator(unohelper.Base,
         elements = []
         msg = "_getElements() 2"
         self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
-        response = execute(self.session, self.parameter)
+        response = execute(self.session, self.parameter, self.logger)
         msg = "_getElements() 3"
         self.logger.logp(INFO, "OAuth2Service", "getEnumerator()", msg)
         if response.IsPresent:
