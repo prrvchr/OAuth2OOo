@@ -73,9 +73,9 @@ class Enumerator(unohelper.Base,
     def __init__(self, session, parameter, logger):
         self.session = session
         self.parameter = parameter
+        self.logger = logger
         self.chunked = self.parameter.Enumerator.Token.Type != TOKEN_NONE
         self.elements, self.token = self._getElements()
-        self.logger = logger
         msg = "Loading ... Done"
         self.logger.logp((INFO, "OAuth2Service", "getEnumerator()", msg))
 
