@@ -194,10 +194,10 @@ class OAuth2Service(unohelper.Base,
                     if r.status_code == s.codes.ok:
                         response = r.json()
                     else:
-                        msg = r.text
+                        msg = "ERROR: %s" % r.text
                         self.Logger.logp(SEVERE, "OAuth2Service", "_getResponseFromRequest", msg)
         except Exception as e:
-            self.Logger.logp(SEVERE, "OAuth2Service", "_getResponseFromRequest", "%s" % e)
+            self.Logger.logp(SEVERE, "OAuth2Service", "_getResponseFromRequest", "ERROR: %s" % e)
         return response
 
     def _getTokenFromResponse(self, response):

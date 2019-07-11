@@ -207,7 +207,7 @@ class Downloader():
 
 class OutputStream(unohelper.Base,
                    XOutputStream):
-    def __init__(self, session, parameter, size, chunk, response):
+    def __init__(self, session, parameter, size, chunk, response, logger):
         self.session = session
         self.method = parameter.Method
         self.url = parameter.Url
@@ -216,8 +216,7 @@ class OutputStream(unohelper.Base,
         self.chunked = size > chunk
         self.buffers = b''
         self.response = response
-        print("OutputStream.__init__() *******************************\n%s" % self.response)
-
+        self.logger = logger
         kwargs = _getKeyWordArguments(parameter)
         kwargs.update({'timeout': g_timeout})
         # If Chunked we need to use a "Content-Range" Header...
@@ -228,7 +227,6 @@ class OutputStream(unohelper.Base,
         self.start = 0
         self.closed = False
         self.error = ''
-        print("Request.OutputStream.__init__() %s" % size)
 
     @property
     def length(self):
@@ -237,34 +235,21 @@ class OutputStream(unohelper.Base,
     # XOutputStream
     def writeBytes(self, sequence):
         if self.closed:
-            print("gdrive.OutputStream.writeBytes(): ERROR %s" % self.length)
             raise IOException('OutputStream is closed...', self)
         self.buffers += sequence.value
         if self._flushable():
             self._flush()
-            print("gdrive.OutputStream.writeBytes(): %s" % self.length)
-            #raise IOException('Error Uploading file...', self)
-        else:
-            print("gdrive.OutputStream.writeBytes() Bufferize: %s - %s" % (self.start, self.length))
     def flush(self):
-        print("gdrive.OutputStream.flush() 1")
         if self.closed:
-            print("gdrive.OutputStream.flush() ERROR")
             raise IOException('OutputStream is closed...', self)
         if self._flushable(True):
             self._flush()
-            print("gdrive.OutputStream.flush() 2")
-            #raise IOException('Error Uploading file...', self)
     def closeOutput(self):
-        print("gdrive.OutputStream.closeOutput() 1")
         self.closed = True
         if self._flushable(True):
-            print("gdrive.OutputStream.closeOutput() 2")
             self._flush()
-            print("gdrive.OutputStream.closeOutput() 3")
         self.session.close()
         if self.error:
-            print("gdrive.OutputStream.closeOutput() ERROR")
             raise IOException('Error Uploading file...', self)
     def _flushable(self, last=False):
         if last:
@@ -273,76 +258,55 @@ class OutputStream(unohelper.Base,
             return self.length >= self.chunk
         return False
     def _flush(self):
-        print("gdrive.OutputStream._write() 1: %s" % (self.start, ))
         end = self.start + self.length -1
-        #end = 100
         header = {}
         if self.chunked:
             header = {'Content-Range': 'bytes %s-%s/%s' % (self.start, end, self.size)}
             self.kwargs['headers'].update(header)
         self.kwargs.update({'data': self.buffers})
-        print("gdrive.OutputStream._write() 2: %s - %s - %s\n%s" % \
-            (self.chunked, self.length, self.size, header))
         with self.session.request(self.method, self.url, **self.kwargs) as r:
-            print("gdrive.OutputStream._write() 3: %s" % (r.request.headers, ))
-            print("gdrive.OutputStream._write() 4: %s - %s" % (r.status_code, r.headers))
             if r.status_code == self.session.codes.ok:
-                print("gdrive.OutputStream._write() 5: %s" % (r.json(), ))
                 self.response.IsPresent = True
                 self.response.Value = _parseResponse(r)
                 self.start = end
                 self.buffers = b''
-                print("gdrive.OutputStream._write() 6: %s" % (self.response, ))
             elif r.status_code == self.session.codes.created:
-                print("gdrive.OutputStream._write() 7: %s" % (r.json(), ))
                 self.response.IsPresent = True
                 self.response.Value = _parseResponse(r)
                 self.start = end
                 self.buffers = b''
-                print("gdrive.OutputStream._write() 8: %s" % (self.response, ))
             elif r.status_code == self.session.codes.permanent_redirect:
-                print("gdrive.OutputStream._write() 9: %s" % (r.json(), ))
                 if 'Range' in r.headers:
                     self.start += int(r.headers['Range'].split('-')[-1]) +1
                     self.buffers = b''
             else:
-                error = 'Error : %s' % r.text
-                self.response.Value = KeyMap()
-                self.response.Value.insertValue('Error', error)
-                print("gdrive.OutputStream._write() 10 ERROR: \n%s" % error)
-                #raise IOException
+                msg = 'ERROR: %s - %s' % (r.status_code, r.text)
+                self.logger.logp(SEVERE, "OAuth2Service","OutputStream()", msg)
         return
 
 
 class StreamListener(unohelper.Base,
                      XStreamListener):
-    def __init__(self, datasource, item, response):
-        self.datasource = datasource
+    def __init__(self, callback, item, response, logger):
+        self.callback = callback
         self.item = item
         self.response = response
-        print("StreamListener.__init__() *******************************\n%s" % self.response)
+        self.logger = logger
 
     # XStreamListener
     def started(self):
-        print("StreamListener.started() *****************************************************")
+        pass
     def closed(self):
-        print("StreamListener.closed() *****************************************************")
-        try:
-            print("StreamListener.closed() 1 %s\n%s" % (self.response, self.response.IsPresent))
-            for i in range(self.response.Value.Count):
-                key = self.response.Value.getKeyByIndex(i)
-                value = self.response.Value.getValue(key)
-                print("Response: Name: %s - Value: %s" % (key, value))
-            print("StreamListener.closed() 2")
-            self.datasource.callBack(self.item, self.response)
-            print("StreamListener.closed(): ***********************************************")
-        except Exception as e:
-            print("ProviderBase.closed().Error: %s - %s" % (e, traceback.print_exc()))
-
+        if self.response.IsPresent:
+            self.callback(self.item, self.response)
+        else:
+            msg = "ERROR ..."
+            self.logger.logp(SEVERE, "OAuth2Service","StreamListener()", msg)
     def terminated(self):
         pass
     def error(self, error):
-        print("StreamListener.error() *****************************************************")
+        msg = "ERROR ..."
+        self.logger.logp(SEVERE, "OAuth2Service","StreamListener()", msg)
     def disposing(self, event):
         pass
 
@@ -352,27 +316,25 @@ class Uploader(unohelper.Base,
     def __init__(self, ctx, session, datasource):
         self.ctx = ctx
         self.session = session
-        self.datasource = datasource
         self.chunk = datasource.Provider.Chunk
         self.url = datasource.Provider.SourceURL
+        self.callback = datasource.callBack
+        self.logger = datasource.Logger
 
     def start(self, item, parameter):
-        try:
-            input, size = self._getInputStream(item)
-            if size:
-                optional = 'com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>'
-                response = uno.createUnoStruct(optional)
-                output = self._getOutputStream(parameter, size, response)
-                listener = self._getStreamListener(item, response)
-                pump = self.ctx.ServiceManager.createInstance('com.sun.star.io.Pump')
-                pump.setInputStream(input)
-                pump.setOutputStream(output)
-                pump.addListener(listener)
-                pump.start()
-                return True
-            return False
-        except Exception as e:
-            print("Uploader.start().Error: %s - %s" % (e, traceback.print_exc()))
+        input, size = self._getInputStream(item)
+        if size:
+            optional = 'com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>'
+            response = uno.createUnoStruct(optional)
+            output = self._getOutputStream(parameter, size, response)
+            listener = self._getStreamListener(item, response)
+            pump = self.ctx.ServiceManager.createInstance('com.sun.star.io.Pump')
+            pump.setInputStream(input)
+            pump.setOutputStream(output)
+            pump.addListener(listener)
+            pump.start()
+            return True
+        return False
 
     def _getInputStream(self, item):
         url = '%s/%s' % (self.url, item.getValue('Id'))
@@ -382,10 +344,10 @@ class Uploader(unohelper.Base,
         return None, None
 
     def _getOutputStream(self, parameter, size, response):
-        return OutputStream(self.session, parameter, size, self.chunk, response)
+        return OutputStream(self.session, parameter, size, self.chunk, response, self.logger)
 
     def _getStreamListener(self, item, response):
-        return StreamListener(self.datasource, item, response)
+        return StreamListener(self.callback, item, response, self.logger)
 
 
 # Private method
