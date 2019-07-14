@@ -61,6 +61,9 @@ class OAuth2Service(unohelper.Base,
     @UserName.setter
     def UserName(self, name):
         self.Setting.Url.Scope.Provider.User.Id = name
+    @property
+    def Timeout(self):
+        return self.Setting.Timeout
 
     # XOAuth2Service
     def initializeSession(self, url):
@@ -97,16 +100,16 @@ class OAuth2Service(unohelper.Base,
         return token
 
     def execute(self, parameter):
-        return execute(self.Session, parameter, self.Logger)
+        return execute(self.Session, parameter, self.Timeout, self.Logger)
 
     def getEnumerator(self, parameter):
-        return Enumerator(self.Session, parameter, self.Logger)
+        return Enumerator(self.Session, parameter, self.Timeout, self.Logger)
 
     def getInputStream(self, parameter, chunk, buffer):
-        return InputStream(self.Session, parameter, chunk, buffer, self.Logger)
+        return InputStream(self.Session, parameter, chunk, buffer, self.Timeout, self.Logger)
 
     def getUploader(self, datasource):
-        return Uploader(self.ctx, self.Session, datasource)
+        return Uploader(self.ctx, self.Session, datasource, self.Timeout)
 
     def logp(self, level, source, method, message):
         if self.Logger.isLoggable(level):
@@ -186,11 +189,10 @@ class OAuth2Service(unohelper.Base,
 
     def _getResponseFromRequest(self, url, data):
         response = {}
-        timeout = self.Setting.RequestTimeout
         #verify = self._getCertificat()
         try:
             with self.Session as s:
-                with s.post(url, data=data, timeout=timeout, auth=NoOAuth2()) as r:
+                with s.post(url, data=data, timeout=self.Timeout, auth=NoOAuth2()) as r:
                     if r.status_code == s.codes.ok:
                         response = r.json()
                     else:

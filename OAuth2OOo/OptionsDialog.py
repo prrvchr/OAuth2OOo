@@ -6,6 +6,7 @@ import unohelper
 
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.awt import XContainerWindowEventHandler
+from com.sun.star.awt import XDialogEventHandler
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
@@ -17,6 +18,7 @@ try:
     from oauth2 import getLoggerSetting
     from oauth2 import setLoggerSetting
     from oauth2 import getStringResource
+    from oauth2 import getNamedValueSet
     from oauth2 import g_identifier
 except Exception:
     print("OptionsDialog import ERROR")
@@ -30,14 +32,15 @@ g_ImplementationName = '%s.OptionsDialog' % g_identifier
 
 class OptionsDialog(unohelper.Base,
                     XServiceInfo,
-                    XContainerWindowEventHandler):
+                    XContainerWindowEventHandler,
+                    XDialogEventHandler):
     def __init__(self, ctx):
         self.ctx = ctx
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo', 'OptionsDialog')
         self.service = createService(self.ctx, '%s.OAuth2Service' % g_identifier)
         self.Logger = getLogger(self.ctx)
 
-    # XContainerWindowEventHandler
+    # XContainerWindowEventHandler, XDialogEventHandler
     def callHandlerMethod(self, dialog, event, method):
         handled = False
         if method == 'external_event':
@@ -65,12 +68,16 @@ class OptionsDialog(unohelper.Base,
         elif method == 'Reset':
             self._doReset(dialog)
             handled = True
-        elif method == 'View':
-            self._doView(dialog)
+        elif method == 'ViewLog':
+            self._doViewLog(dialog)
+            handled = True
+        elif method == 'ClearLog':
+            self._doClearLog(dialog)
             handled = True
         return handled
     def getSupportedMethodNames(self):
-        return ('external_event', 'Changed', 'Connect', 'Logger', 'Remove', 'Reset', 'View')
+        return ('external_event', 'Logger', 'Changed', 'Connect',
+                'Remove', 'Reset', 'ViewLog', 'ClearLog')
 
     def _doChanged(self, dialog, control):
         item = control.Model.Tag
@@ -103,14 +110,16 @@ class OptionsDialog(unohelper.Base,
         self._updateUI(dialog)
 
     def _loadSetting(self, dialog):
-        dialog.getControl('NumericField1').setValue(self.service.Setting.RequestTimeout)
-        dialog.getControl('NumericField2').setValue(self.service.Setting.HandlerTimeout)
+        dialog.getControl('NumericField1').setValue(self.service.Setting.ConnectTimeout)
+        dialog.getControl('NumericField2').setValue(self.service.Setting.ReadTimeout)
+        dialog.getControl('NumericField3').setValue(self.service.Setting.HandlerTimeout)
         dialog.getControl('ComboBox2').Model.StringItemList = self.service.Setting.UrlList
         self._loadLoggerSetting(dialog)
 
     def _saveSetting(self, dialog):
-        self.service.Setting.RequestTimeout = int(dialog.getControl('NumericField1').getValue())
-        self.service.Setting.HandlerTimeout = int(dialog.getControl('NumericField2').getValue())
+        self.service.Setting.ConnectTimeout = int(dialog.getControl('NumericField1').getValue())
+        self.service.Setting.ReadTimeout = int(dialog.getControl('NumericField2').getValue())
+        self.service.Setting.HandlerTimeout = int(dialog.getControl('NumericField3').getValue())
         self.service.Setting.commit()
         self._saveLoggerSetting(dialog)
 
@@ -119,36 +128,58 @@ class OptionsDialog(unohelper.Base,
         dialog.getControl('CommandButton2').Model.Enabled = enabled
         enabled = enabled and self.service.Setting.Url.Scope.Authorized
         if enabled:
-            dialog.getControl('Label8').setText(self.service.Setting.Url.Scope.Provider.User.RefreshToken)
-            dialog.getControl('Label10').setText(self.service.Setting.Url.Scope.Provider.User.AccessToken)
-            dialog.getControl('Label12').setText(self.service.Setting.Url.Scope.Provider.User.ExpiresIn)
+            dialog.getControl('Label9').setText(self.service.Setting.Url.Scope.Provider.User.RefreshToken)
+            dialog.getControl('Label11').setText(self.service.Setting.Url.Scope.Provider.User.AccessToken)
+            dialog.getControl('Label13').setText(self.service.Setting.Url.Scope.Provider.User.ExpiresIn)
         else:
-            dialog.getControl('Label8').setText(self.stringResource.resolveString('OptionsDialog.Label8.Label'))
-            dialog.getControl('Label10').setText(self.stringResource.resolveString('OptionsDialog.Label10.Label'))
-            dialog.getControl('Label12').setText(self.stringResource.resolveString('OptionsDialog.Label12.Label'))
+            dialog.getControl('Label9').setText(self.stringResource.resolveString('OptionsDialog.Label9.Label'))
+            dialog.getControl('Label11').setText(self.stringResource.resolveString('OptionsDialog.Label11.Label'))
+            dialog.getControl('Label13').setText(self.stringResource.resolveString('OptionsDialog.Label13.Label'))
         dialog.getControl('CommandButton3').Model.Enabled = enabled
         dialog.getControl('CommandButton4').Model.Enabled = enabled
 
     def _doLogger(self, dialog, enabled):
-        dialog.getControl('Label4').Model.Enabled = enabled
+        dialog.getControl('Label5').Model.Enabled = enabled
         dialog.getControl('ComboBox1').Model.Enabled = enabled
         dialog.getControl('OptionButton1').Model.Enabled = enabled
         dialog.getControl('OptionButton2').Model.Enabled = enabled
         dialog.getControl('CommandButton1').Model.Enabled = enabled
 
-    def _doView(self, window):
+    def _doViewLog(self, window):
         url = getLoggerUrl(self.ctx)
         length, sequence = getFileSequence(self.ctx, url)
         text = sequence.value.decode('utf-8')
-        dialog = self._getLogDialog()
+        dialog = self._getDialog(window, 'LogDialog')
         dialog.Title = url
         dialog.getControl('TextField1').Text = text
         dialog.execute()
         dialog.dispose()
 
-    def _getLogDialog(self):
-        url = 'vnd.sun.star.script:OAuth2OOo.LogDialog?location=application'
-        return createService(self.ctx, 'com.sun.star.awt.DialogProvider').createDialog(url)
+    def _doClearLog(self, dialog):
+        try:
+            url = getLoggerUrl(self.ctx)
+            sf = self.ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
+            if sf.exists(url):
+                sf.kill(url)
+            service = 'org.openoffice.logging.FileHandler'
+            args = getNamedValueSet({'FileURL': url})
+            handler = self.ctx.ServiceManager.createInstanceWithArgumentsAndContext(service, args, self.ctx)
+            logger = getLogger(self.ctx)
+            logger.addLogHandler(handler)
+            length, sequence = getFileSequence(self.ctx, url)
+            text = sequence.value.decode('utf-8')
+            dialog.getControl('TextField1').Text = text
+            print("OptionsDialog._doClearLog() 1")
+        except Exception as e:
+            print("OptionsDialog._doClearLog().Error: %s - %s" % (e, traceback.print_exc()))
+
+    def _getDialog(self, window, name):
+        url = 'vnd.sun.star.script:OAuth2OOo.%s?location=application' % name
+        service = 'com.sun.star.awt.DialogProvider'
+        provider = self.ctx.ServiceManager.createInstanceWithContext(service, self.ctx)
+        arguments = getNamedValueSet({'ParentWindow': window.Peer, 'EventHandler': self})
+        dialog = provider.createDialogWithArguments(url, arguments)
+        return dialog
 
     def _loadLoggerSetting(self, dialog):
         enabled, index, handler = getLoggerSetting(self.ctx)
@@ -158,17 +189,18 @@ class OptionsDialog(unohelper.Base,
         self._doLogger(dialog, enabled)
 
     def _setLoggerLevel(self, control, index):
-        name = control.Model.Name
-        text = self.stringResource.resolveString('OptionsDialog.%s.StringItemList.%s' % (name, index))
-        control.Text = text
+        control.Text = self._getLoggerLevelText(control.Model.Name, index)
 
     def _getLoggerLevel(self, control):
         name = control.Model.Name
         for index in range(control.ItemCount):
-            text = self.stringResource.resolveString('OptionsDialog.%s.StringItemList.%s' % (name, index))
-            if text == control.Text:
+            if self._getLoggerLevelText(name, index) == control.Text:
                 break
         return index
+
+    def _getLoggerLevelText(self, name, index):
+        text = 'OptionsDialog.%s.StringItemList.%s' % (name, index)
+        return self.stringResource.resolveString(text)
 
     def _saveLoggerSetting(self, dialog):
         enabled = bool(dialog.getControl('CheckBox1').State)

@@ -34,7 +34,6 @@ import json
 
 # Request / OAuth2 configuration
 g_auth = 'com.gmail.prrvchr.extensions.OAuth2OOo'
-g_timeout = (15, 60)
 
 
 def getSessionMode(ctx, host, port=80):
@@ -48,12 +47,11 @@ def getSessionMode(ctx, host, port=80):
         mode = ONLINE
     return mode
 
-def execute(session, parameter, logger):
+def execute(session, parameter, timeout, logger):
     response = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
     kwargs = _getKeyWordArguments(parameter)
-    kwargs.update({'timeout': g_timeout})
     with session as s:
-        with s.request(parameter.Method, parameter.Url, **kwargs) as r:
+        with s.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs) as r:
             if r.status_code in (s.codes.ok, s.codes.found, s.codes.created, s.codes.accepted):
                 response.IsPresent = True
                 response.Value = _parseResponse(r)
@@ -65,9 +63,10 @@ def execute(session, parameter, logger):
 
 class Enumerator(unohelper.Base,
                  XEnumeration):
-    def __init__(self, session, parameter, logger):
+    def __init__(self, session, parameter, timeout, logger):
         self.session = session
         self.parameter = parameter
+        self.timeout = timeout
         self.logger = logger
         self.chunked = self.parameter.Enumerator.Token.Type != TOKEN_NONE
         self.elements, self.token = self._getElements()
@@ -98,7 +97,7 @@ class Enumerator(unohelper.Base,
                 self.parameter.Json = '{"%s": "%s"}' % (name, token)
             token = None
         elements = []
-        response = execute(self.session, self.parameter, self.logger)
+        response = execute(self.session, self.parameter, self.timeout, self.logger)
         if response.IsPresent:
             r = response.Value
             elements = list(r.getDefaultValue(self.parameter.Enumerator.Field, ()))
@@ -115,8 +114,8 @@ class Enumerator(unohelper.Base,
 
 class InputStream(unohelper.Base,
                   XInputStream):
-    def __init__(self, session, parameter, chunk, buffer, logger):
-        self.downloader = Downloader(session, parameter, chunk, buffer, logger)
+    def __init__(self, session, parameter, chunk, buffer, timeout, logger):
+        self.downloader = Downloader(session, parameter, chunk, buffer, timeout, logger)
         self.chunks = self.downloader.getChunks()
         self.buffers = b''
 
@@ -153,18 +152,19 @@ class InputStream(unohelper.Base,
 
 
 class Downloader():
-    def __init__(self, session, parameter, chunk, buffer, logger):
+    def __init__(self, session, parameter, chunk, buffer, timeout, logger):
         self.session = session
         self.method = parameter.Method
         self.url = parameter.Url
         kwargs = _getKeyWordArguments(parameter)
-        kwargs.update({'timeout': g_timeout, 'stream': True})
+        kwargs.update({'stream': True})
         # We need to use a "Range" Header... but it's not shure that parameter has Headers...
         if 'headers' not in kwargs:
             kwargs.update({'headers': {}})
         self.kwargs = kwargs
         self.chunk = chunk
         self.buffer = buffer
+        self.timeout = timeout
         self.logger = logger
         self.start = 0
         self.size = 0
@@ -182,7 +182,7 @@ class Downloader():
                 if self.size:
                     end = min(end, self.size)
                 self.kwargs['headers'].update({'Range': 'bytes=%s-%s' % (self.start, end -1)})
-                with s.request(self.method, self.url, **self.kwargs) as r:
+                with s.request(self.method, self.url, timeout=self.timeout, **self.kwargs) as r:
                     if r.status_code == s.codes.ok:
                         self.closed = True
                     elif r.status_code == s.codes.partial_content:
@@ -207,7 +207,7 @@ class Downloader():
 
 class OutputStream(unohelper.Base,
                    XOutputStream):
-    def __init__(self, session, parameter, size, chunk, response, logger):
+    def __init__(self, session, parameter, size, chunk, response, timeout, logger):
         self.session = session
         self.method = parameter.Method
         self.url = parameter.Url
@@ -216,9 +216,9 @@ class OutputStream(unohelper.Base,
         self.chunked = size > chunk
         self.buffers = b''
         self.response = response
+        self.timeout = timeout
         self.logger = logger
         kwargs = _getKeyWordArguments(parameter)
-        kwargs.update({'timeout': g_timeout})
         # If Chunked we need to use a "Content-Range" Header...
         # but it's not shure that parameter has Headers...
         if self.chunked and 'headers' not in kwargs:
@@ -264,7 +264,7 @@ class OutputStream(unohelper.Base,
             header = {'Content-Range': 'bytes %s-%s/%s' % (self.start, end, self.size)}
             self.kwargs['headers'].update(header)
         self.kwargs.update({'data': self.buffers})
-        with self.session.request(self.method, self.url, **self.kwargs) as r:
+        with self.session.request(self.method, self.url, timeout=self.timeout, **self.kwargs) as r:
             if r.status_code == self.session.codes.ok:
                 self.response.IsPresent = True
                 self.response.Value = _parseResponse(r)
@@ -313,13 +313,14 @@ class StreamListener(unohelper.Base,
 
 class Uploader(unohelper.Base,
                XRestUploader):
-    def __init__(self, ctx, session, datasource):
+    def __init__(self, ctx, session, datasource, timeout):
         self.ctx = ctx
         self.session = session
         self.chunk = datasource.Provider.Chunk
         self.url = datasource.Provider.SourceURL
         self.callback = datasource.callBack
         self.logger = datasource.Logger
+        self.timeout = timeout
 
     def start(self, item, parameter):
         input, size = self._getInputStream(item)
@@ -343,8 +344,8 @@ class Uploader(unohelper.Base,
             return sf.openFileRead(url), sf.getSize(url)
         return None, None
 
-    def _getOutputStream(self, parameter, size, response):
-        return OutputStream(self.session, parameter, size, self.chunk, response, self.logger)
+    def _getOutputStream(self, param, size, resp):
+        return OutputStream(self.session, param, size, self.chunk, resp, self.timeout, self.logger)
 
     def _getStreamListener(self, item, response):
         return StreamListener(self.callback, item, response, self.logger)

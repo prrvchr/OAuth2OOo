@@ -22,7 +22,8 @@ class WizardConfiguration(unohelper.Base,
         self.configuration = getConfiguration(self.ctx, g_identifier, True)
         self.Url = UrlWriter(self.configuration)
         self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
-        self.RequestTimeout = self.configuration.getByName('RequestTimeout')
+        self.ConnectTimeout = self.configuration.getByName('ConnectTimeout')
+        self.ReadTimeout = self.configuration.getByName('ReadTimeout')
         self.Logger = getLogger(self.ctx)
 
     @property
@@ -47,7 +48,8 @@ class WizardConfiguration(unohelper.Base,
         properties['Url'] = getProperty('Url', 'com.sun.star.uno.XInterface', readonly)
         properties['UrlList'] = getProperty('UrlList', '[]string', readonly)
         properties['HandlerTimeout'] = getProperty('HandlerTimeout', 'short', readonly)
-        properties['RequestTimeout'] = getProperty('RequestTimeout', 'short', readonly)
+        properties['ConnectTimeout'] = getProperty('ConnectTimeout', 'short', readonly)
+        properties['ReadTimeout'] = getProperty('ReadTimeout', 'short', readonly)
         properties['Logger'] = getProperty('Logger', 'com.sun.star.logging.XLogger', readonly)
         return properties
 

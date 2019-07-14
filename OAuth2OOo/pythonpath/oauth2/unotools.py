@@ -8,26 +8,34 @@ import binascii
 from .unolib import InteractionHandler
 
 
+def getSimpleFile(ctx):
+    return ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
+
 def getFileSequence(ctx, url, default=None):
-    length = 0
-    sequence = uno.ByteSequence(b'')
-    fileservice = ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
-    if fileservice.exists(url):
-        inputstream = fileservice.openFileRead(url)
-        length, sequence = inputstream.readBytes(None, fileservice.getSize(url))
-        inputstream.closeInput()
-    elif default is not None and fileservice.exists(default):
-        inputstream = fileservice.openFileRead(default)
-        length, sequence = inputstream.readBytes(None, fileservice.getSize(default))
-        inputstream.closeInput()
+    length, sequence = 0, uno.ByteSequence(b'')
+    fs = getSimpleFile(ctx)
+    if fs.exists(url):
+        length, sequence = _getSequence(fs.openFileRead(url), fs.getSize(url))
+    elif default is not None and fs.exists(default):
+        length, sequence = _getSequence(fs.openFileRead(default), fs.getSize(default))
     return length, sequence
 
-def getProperty(name, typename, attributes, handle=-1):
-    return uno.createUnoStruct('com.sun.star.beans.Property',
-                               name,
-                               handle,
-                               uno.getTypeByName(typename),
-                               attributes)
+def _getSequence(inputstream, length):
+    length, sequence = inputstream.readBytes(None, length)
+    inputstream.closeInput()
+    return length, sequence
+
+def getProperty(name, type=None, attributes=None, handle=-1):
+    property = uno.createUnoStruct('com.sun.star.beans.Property')
+    property.Name = name
+    property.Handle = handle
+    if isinstance(type, uno.Type):
+        property.Type = type
+    elif type is not None:
+        property.Type = uno.getTypeByName(type)
+    if attributes is not None:
+        property.Attributes = attributes
+    return property
 
 def getResourceLocation(ctx, identifier, path=None):
     service = '/singletons/com.sun.star.deployment.PackageInformationProvider'
@@ -68,17 +76,58 @@ def generateUuid():
     return binascii.hexlify(uno.generateUuid().value).decode('utf-8')
 
 def createMessageBox(peer, message, title, box='message', buttons=2):
-    boxtypes = {'message': 'MESSAGEBOX', 'info': 'INFOBOX', 'warning': 'WARNINGBOX',
-                'error': 'ERRORBOX', 'query': 'QUERYBOX'}
-    box = uno.Enum('com.sun.star.awt.MessageBoxType', boxtypes[box] if box in boxtypes else 'MESSAGEBOX')
+    boxtypes = {'message': 'MESSAGEBOX',
+                'info': 'INFOBOX',
+                'warning': 'WARNINGBOX',
+                'error': 'ERRORBOX',
+                'query': 'QUERYBOX'}
+    box = uno.Enum('com.sun.star.awt.MessageBoxType', boxtypes.get(box, 'MESSAGEBOX'))
     return peer.getToolkit().createMessageBox(peer, box, buttons, title, message)
 
 def createService(ctx, name, **kwargs):
     if kwargs:
-        arguments = []
-        for key, value in kwargs.items():
-            arguments.append(uno.createUnoStruct('com.sun.star.beans.NamedValue', key, value))
-        service = ctx.ServiceManager.createInstanceWithArgumentsAndContext(name, tuple(arguments), ctx)
+        arguments = getNamedValueSet(kwargs)
+        s = ctx.ServiceManager.createInstanceWithArgumentsAndContext(name, arguments, ctx)
     else:
-        service = ctx.ServiceManager.createInstanceWithContext(name, ctx)
-    return service
+        s = ctx.ServiceManager.createInstanceWithContext(name, ctx)
+    return s
+
+def getPropertyValueSet(kwargs):
+    properties = []
+    for key, value in kwargs.items():
+        properties.append(getPropertyValue(key, value))
+    return tuple(properties)
+
+def getPropertyValue(name, value, state=None, handle=-1):
+    property = uno.createUnoStruct('com.sun.star.beans.PropertyValue')
+    property.Name = name
+    property.Handle = handle
+    property.Value = value
+    s = state if state else uno.Enum('com.sun.star.beans.PropertyState', 'DIRECT_VALUE')
+    property.State = s
+    return property
+
+def getNamedValueSet(kwargs):
+    namedvalues = []
+    for key, value in kwargs.items():
+        namedvalues.append(getNamedValue(key, value))
+    return tuple(namedvalues)
+
+def getNamedValue(name, value):
+    namedvalue = uno.createUnoStruct('com.sun.star.beans.NamedValue')
+    namedvalue.Name = name
+    namedvalue.Value = value
+    return namedvalue
+
+def getPropertySetInfoChangeEvent(source, name, reason, handle=-1):
+    event = uno.createUnoStruct('com.sun.star.beans.PropertySetInfoChangeEvent')
+    event.Source = source
+    event.Name = name
+    event.Handle = handle
+    event.Reason = reason
+
+def getInteractionHandler(ctx, message):
+    window = ctx.ServiceManager.createInstance('com.sun.star.frame.Desktop').ActiveFrame.ComponentWindow
+    args = (getPropertyValue('Parent', window), getPropertyValue('Context', message))
+    interaction = ctx.ServiceManager.createInstanceWithArguments('com.sun.star.task.InteractionHandler', args)
+    return interaction

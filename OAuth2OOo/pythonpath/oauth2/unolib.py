@@ -4,18 +4,24 @@
 import uno
 import unohelper
 
+from com.sun.star.beans import XPropertySet
+from com.sun.star.beans import XPropertySetInfo
+from com.sun.star.beans import XPropertiesChangeNotifier
+from com.sun.star.beans import XPropertySetInfoChangeNotifier
+from com.sun.star.beans import UnknownPropertyException
 from com.sun.star.lang import XInitialization
-from com.sun.star.beans import XPropertySet, XPropertySetInfo, UnknownPropertyException
 from com.sun.star.task import XInteractionHandler
 
 
-class InteractionHandler(unohelper.Base, XInteractionHandler):
+class InteractionHandler(unohelper.Base,
+                         XInteractionHandler):
     # XInteractionHandler
     def handle(self, requester):
         pass
 
 
-class PropertySetInfo(unohelper.Base, XPropertySetInfo):
+class PropertySetInfo(unohelper.Base,
+                      XPropertySetInfo):
     def __init__(self, properties={}):
         self.properties = properties
 
@@ -26,14 +32,6 @@ class PropertySetInfo(unohelper.Base, XPropertySetInfo):
         return self.properties[name] if name in self.properties else None
     def hasPropertyByName(self, name):
         return name in self.properties
-
-
-class Initialization(XInitialization):
-    # XInitialization
-    def initialize(self, namedvalues=()):
-        for namedvalue in namedvalues:
-            if hasattr(namedvalue, 'Name') and hasattr(namedvalue, 'Value'):
-                self.setPropertyValue(namedvalue.Name, namedvalue.Value)
 
 
 class PropertySet(XPropertySet):
@@ -65,3 +63,40 @@ class PropertySet(XPropertySet):
         pass
     def removeVetoableChangeListener(self, name, listener):
         pass
+
+class Initialization(XInitialization,
+                     PropertySet):
+    # XInitialization
+    def initialize(self, namedvalues=()):
+        for namedvalue in namedvalues:
+            if hasattr(namedvalue, 'Name') and hasattr(namedvalue, 'Value'):
+                self.setPropertyValue(namedvalue.Name, namedvalue.Value)
+
+class PropertiesChangeNotifier(XPropertiesChangeNotifier):
+    def __init__(self):
+        print("PyPropertiesChangeNotifier.__init__()")
+        self.propertiesListener = {}
+    #XPropertiesChangeNotifier
+    def addPropertiesChangeListener(self, names, listener):
+        print("PyPropertiesChangeNotifier.addPropertiesChangeListener() %s" % self.__class__.__name__)
+        for name in names:
+            if name not in self.propertiesListener:
+                self.propertiesListener[name] = []
+            self.propertiesListener[name].append(listener)
+    def removePropertiesChangeListener(self, names, listener):
+        print("PyPropertiesChangeNotifier.removePropertiesChangeListener()")
+        for name in names:
+            if name in self.propertiesListener:
+                if listener in self.propertiesListener[name]:
+                    self.propertiesListener[name].remove(listener)
+
+
+class PropertySetInfoChangeNotifier(XPropertySetInfoChangeNotifier):
+    def __init__(self):
+        self.propertyInfoListeners = []
+    # XPropertySetInfoChangeNotifier
+    def addPropertySetInfoChangeListener(self, listener):
+        self.propertyInfoListeners.append(listener)
+    def removePropertySetInfoChangeListener(self, listener):
+        if listener in self.propertyInfoListeners:
+            self.propertyInfoListeners.remove(listener)

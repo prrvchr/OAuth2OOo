@@ -24,21 +24,33 @@ class OAuth2Configuration(unohelper.Base,
         self.ctx = ctx
         self.configuration = getConfiguration(self.ctx, g_identifier, True)
         self.Url = UrlReader(self.configuration)
-        self.RequestTimeout = self.configuration.getByName('RequestTimeout')
+        self.ConnectTimeout = self.configuration.getByName('ConnectTimeout')
+        self.ReadTimeout = self.configuration.getByName('ReadTimeout')
         self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
 
     @property
     def UrlList(self):
         return self.configuration.getByName('Urls').ElementNames
+    @property
+    def Timeout(self):
+        if self.ConnectTimeout and self.ReadTimeout:
+            return self.ConnectTimeout, self.ReadTimeout
+        elif self.ConnectTimeout:
+            return self.ConnectTimeout
+        elif self.ReadTimeout:
+            return self.ReadTimeout
+        return None
 
     # XTransactedObject
     def commit(self):
-        self.configuration.replaceByName('RequestTimeout', self.RequestTimeout)
+        self.configuration.replaceByName('ConnectTimeout', self.ConnectTimeout)
+        self.configuration.replaceByName('ReadTimeout', self.ReadTimeout)
         self.configuration.replaceByName('HandlerTimeout', self.HandlerTimeout)
         if self.configuration.hasPendingChanges():
             self.configuration.commitChanges()
     def revert(self):
-        self.RequestTimeout = self.configuration.getByName('RequestTimeout')
+        self.ConnectTimeout = self.configuration.getByName('ConnectTimeout')
+        self.ReadTimeout = self.configuration.getByName('ReadTimeout')
         self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
 
     def _getPropertySetInfo(self):
@@ -48,8 +60,11 @@ class OAuth2Configuration(unohelper.Base,
         transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
         properties['Url'] = getProperty('Url', 'com.sun.star.uno.XInterface', readonly)
         properties['UrlList'] = getProperty('UrlList', '[]string', readonly)
-        properties['RequestTimeout'] = getProperty('RequestTimeout', 'short', transient)
+        properties['ConnectTimeout'] = getProperty('ConnectTimeout', 'short', transient)
+        properties['ReadTimeout'] = getProperty('ReadTimeout', 'short', transient)
         properties['HandlerTimeout'] = getProperty('HandlerTimeout', 'short', transient)
+        properties['Timeout'] = getProperty('Timeout', 'any', readonly)
+        properties['ReadTimeout'] = getProperty('ReadTimeout', 'short', transient)
         return properties
 
 

@@ -37,6 +37,7 @@ from .unotools import getFileSequence
 from .unotools import getConfiguration
 from .unotools import getStringResource
 from .unotools import generateUuid
+from .unotools import getNamedValueSet
 
 from .logger import getLogger
 from .logger import getLoggerSetting

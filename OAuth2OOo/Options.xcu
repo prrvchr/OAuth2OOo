@@ -6,8 +6,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   oor:package="com.gmail.prrvchr.extensions"
   oor:name="OAuth2OOo">
-    <prop oor:name="RequestTimeout">
+    <prop oor:name="ConnectTimeout">
         <value>5</value>
+    </prop>
+    <prop oor:name="ReadTimeout">
+        <value>30</value>
     </prop>
     <prop oor:name="HandlerTimeout">
         <value>90</value>

@@ -37,7 +37,8 @@
         </group>
     </templates>
     <component>
-        <prop oor:name="RequestTimeout" oor:type="xs:short" />
+        <prop oor:name="ConnectTimeout" oor:type="xs:short" />
+        <prop oor:name="ReadTimeout" oor:type="xs:short" />
         <prop oor:name="HandlerTimeout" oor:type="xs:short" />
         <set oor:name="Urls" oor:node-type="UrlSet" />
         <set oor:name="Scopes" oor:node-type="ScopeSet" />
