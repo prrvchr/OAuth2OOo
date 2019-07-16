@@ -139,7 +139,7 @@ class OptionsDialog(unohelper.Base,
         dialog.getControl('CommandButton4').Model.Enabled = enabled
 
     def _doLogger(self, dialog, enabled):
-        dialog.getControl('Label5').Model.Enabled = enabled
+        dialog.getControl('Label1').Model.Enabled = enabled
         dialog.getControl('ComboBox1').Model.Enabled = enabled
         dialog.getControl('OptionButton1').Model.Enabled = enabled
         dialog.getControl('OptionButton2').Model.Enabled = enabled
