@@ -5,6 +5,8 @@ import uno
 
 import binascii
 
+from com.sun.star.auth import OAuth2Request
+
 from .unolib import InteractionHandler
 
 
@@ -75,6 +77,14 @@ def getStringResource(ctx, identifier, path=None, filename='DialogStrings', loca
 def generateUuid():
     return binascii.hexlify(uno.generateUuid().value).decode('utf-8')
 
+def getDialog(ctx, window, handler, lib, name):
+    service = 'com.sun.star.awt.DialogProvider'
+    provider = ctx.ServiceManager.createInstanceWithContext(service, ctx)
+    url = 'vnd.sun.star.script:%s.%s?location=application' % (lib, name)
+    arguments = getNamedValueSet({'ParentWindow': window, 'EventHandler': handler})
+    dialog = provider.createDialogWithArguments(url, arguments)
+    return dialog
+
 def createMessageBox(peer, message, title, box='message', buttons=2):
     boxtypes = {'message': 'MESSAGEBOX',
                 'info': 'INFOBOX',
@@ -128,6 +138,14 @@ def getPropertySetInfoChangeEvent(source, name, reason, handle=-1):
 
 def getInteractionHandler(ctx, message):
     window = ctx.ServiceManager.createInstance('com.sun.star.frame.Desktop').ActiveFrame.ComponentWindow
-    args = (getPropertyValue('Parent', window), getPropertyValue('Context', message))
+    args = getPropertyValueSet({'Parent': window, 'Context': message})
     interaction = ctx.ServiceManager.createInstanceWithArguments('com.sun.star.task.InteractionHandler', args)
     return interaction
+
+def getOAuth2Request(source, url, message):
+    request = OAuth2Request()
+    request.ResourceUrl = url
+    request.Classification = uno.Enum('com.sun.star.task.InteractionClassification', 'QUERY')
+    request.Context = source
+    request.Message = message
+    return request

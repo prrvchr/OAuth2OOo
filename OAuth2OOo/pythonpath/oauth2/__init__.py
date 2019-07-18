@@ -14,6 +14,7 @@ from .request import Uploader
 from .request import getSessionMode
 from .request import execute
 
+from .oauth2lib import InteractionRequest
 
 from .oauth2tools import g_wizard_paths
 from .oauth2tools import g_identifier
@@ -38,6 +39,9 @@ from .unotools import getConfiguration
 from .unotools import getStringResource
 from .unotools import generateUuid
 from .unotools import getNamedValueSet
+from .unotools import getInteractionHandler
+from .unotools import getOAuth2Request
+from .unotools import getDialog
 
 from .logger import getLogger
 from .logger import getLoggerSetting

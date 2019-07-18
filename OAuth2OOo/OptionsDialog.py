@@ -10,18 +10,19 @@ from com.sun.star.awt import XDialogEventHandler
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-try:
-    from oauth2 import createService
-    from oauth2 import getFileSequence
-    from oauth2 import getLogger
-    from oauth2 import getLoggerUrl
-    from oauth2 import getLoggerSetting
-    from oauth2 import setLoggerSetting
-    from oauth2 import getStringResource
-    from oauth2 import getNamedValueSet
-    from oauth2 import g_identifier
-except Exception:
-    print("OptionsDialog import ERROR")
+from oauth2 import createService
+from oauth2 import getFileSequence
+from oauth2 import getLogger
+from oauth2 import getLoggerUrl
+from oauth2 import getLoggerSetting
+from oauth2 import setLoggerSetting
+from oauth2 import getStringResource
+from oauth2 import getNamedValueSet
+from oauth2 import g_identifier
+from oauth2 import getConfiguration
+from oauth2 import getInteractionHandler
+from oauth2 import InteractionRequest
+from oauth2 import getOAuth2Request
 
 import traceback
 
@@ -60,7 +61,8 @@ class OptionsDialog(unohelper.Base,
             self._doConnect(dialog)
             handled = True
         elif method == 'Logger':
-            self._doLogger(dialog, bool(event.Source.State))
+            enabled = event.Source.State == 1
+            self._toggleLogger(dialog, enabled)
             handled = True
         elif method == 'Remove':
             self._doRemove(dialog)
@@ -138,7 +140,7 @@ class OptionsDialog(unohelper.Base,
         dialog.getControl('CommandButton3').Model.Enabled = enabled
         dialog.getControl('CommandButton4').Model.Enabled = enabled
 
-    def _doLogger(self, dialog, enabled):
+    def _toggleLogger(self, dialog, enabled):
         dialog.getControl('Label1').Model.Enabled = enabled
         dialog.getControl('ComboBox1').Model.Enabled = enabled
         dialog.getControl('OptionButton1').Model.Enabled = enabled
@@ -156,6 +158,27 @@ class OptionsDialog(unohelper.Base,
         dialog.dispose()
 
     def _doClearLog(self, dialog):
+        try:
+            print("OptionsDialog._doClearLog() 1")
+            #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
+            #c1 = getConfiguration(self.ctx, 'org.openoffice.Interaction/InteractionHandlers')
+            #mri.inspect(c1)
+            scheme = 'vnd.google-apps'
+            message = "Authentication"
+            handler = getInteractionHandler(self.ctx, message)
+            response = uno.createUnoStruct('com.sun.star.beans.Optional<string>')
+            request = getOAuth2Request(self, scheme, message)
+            interaction = InteractionRequest(request, response)
+            print("OptionsDialog._doClearLog() 2")
+            if handler.handleInteractionRequest(interaction):
+                print("OptionsDialog._doClearLog() OK: %s - %s" % (response.IsPresent, response.Value))
+            else:
+                print("OptionsDialog._doClearLog() CANCEL")
+            print("OptionsDialog._doClearLog() 3")
+        except Exception as e:
+            print("OptionsDialog._doClearLog().Error: %s - %s" % (e, traceback.print_exc()))
+
+    def _doClearLog1(self, dialog):
         try:
             url = getLoggerUrl(self.ctx)
             sf = self.ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
@@ -186,7 +209,7 @@ class OptionsDialog(unohelper.Base,
         dialog.getControl('CheckBox1').State = int(enabled)
         self._setLoggerLevel(dialog.getControl('ComboBox1'), index)
         dialog.getControl('OptionButton%s' % handler).State = 1
-        self._doLogger(dialog, enabled)
+        self._toggleLogger(dialog, enabled)
 
     def _setLoggerLevel(self, control, index):
         control.Text = self._getLoggerLevelText(control.Model.Name, index)

@@ -4,10 +4,15 @@
 import uno
 import unohelper
 
+from com.sun.star.awt import XDialogEventHandler
 from com.sun.star.lang import XServiceInfo
+from com.sun.star.lang import XInitialization
+from com.sun.star.task import XInteractionHandler2
 from com.sun.star.auth import XOAuth2Service
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
+from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
+from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 
 
 from oauth2 import OAuth2OOo
@@ -19,6 +24,7 @@ from oauth2 import KeyMap
 from oauth2 import getSessionMode
 from oauth2 import execute
 from oauth2 import getLogger
+from oauth2 import getDialog
 
 from oauth2 import OAuth2Configuration
 from oauth2 import WizardController
@@ -40,12 +46,16 @@ g_ImplementationName = '%s.OAuth2Service' % g_identifier
 
 class OAuth2Service(unohelper.Base,
                     XServiceInfo,
+                    XInitialization,
+                    XInteractionHandler2,
+                    XDialogEventHandler,
                     XOAuth2Service):
     def __init__(self, ctx):
         self.ctx = ctx
         self.Setting = OAuth2Configuration(self.ctx)
         self.Session = self._getSession()
         self.Error = ''
+        self.Parent = None
         self.Logger = getLogger(self.ctx)
         self._checkSSL()
 
@@ -64,6 +74,40 @@ class OAuth2Service(unohelper.Base,
     @property
     def Timeout(self):
         return self.Setting.Timeout
+
+    # XInitialization
+    def initialize(self, properties):
+        for property in properties:
+            if property.Name == 'Parent':
+                self.Parent = property.Value
+
+    # XInteractionHandler2, XInteractionHandler
+    def handle(self, interaction):
+        self.handleInteractionRequest(interaction)
+    def handleInteractionRequest(self, interaction):
+        dialog = getDialog(self.ctx, self.Parent, self, 'OAuth2OOo', 'UserDialog')
+        # TODO: interaction.getRequest() does not seem to be functional under LibreOffice !!!
+        # dialog.setTitle(interaction.getRequest().Message)
+        status = dialog.execute()
+        approved = status == OK
+        continuation = interaction.getContinuations()[status]
+        if approved:
+            username = dialog.getControl('TextField1').Model.Text
+            continuation.setUserName(username)
+        continuation.select()
+        dialog.dispose()
+        return approved
+
+    # XDialogEventHandler
+    def callHandlerMethod(self, dialog, event, method):
+        if method == 'TextChanged':
+            control = event.Source
+            enabled = control.Model.Text != ''
+            dialog.getControl(control.Model.Tag).Model.Enabled = enabled
+            return True
+        return False
+    def getSupportedMethodNames(self):
+        return ('TextChanged', )
 
     # XOAuth2Service
     def initializeSession(self, url):

@@ -6,11 +6,13 @@ Path=$(dirname "${0}")
 
 rm ${Path}/${WorkBench}/types.rdb
 
+./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/OAuth2Request
 ./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/RestRequestTokenType
 ./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/RestRequestToken
 ./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/RestRequestEnumerator
 ./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/RestRequestParameter
 ./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/XRestKeyMap
+./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/XInteractionUserName
 ./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/XRestUploader
 ./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/XOAuth2Service
 ./rdb/make_rdb.sh ${WorkBench} com/sun/star/auth/OAuth2Service
