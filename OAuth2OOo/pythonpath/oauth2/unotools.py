@@ -97,10 +97,10 @@ def createMessageBox(peer, message, title, box='message', buttons=2):
 def createService(ctx, name, **kwargs):
     if kwargs:
         arguments = getNamedValueSet(kwargs)
-        s = ctx.ServiceManager.createInstanceWithArgumentsAndContext(name, arguments, ctx)
+        service = ctx.ServiceManager.createInstanceWithArgumentsAndContext(name, arguments, ctx)
     else:
-        s = ctx.ServiceManager.createInstanceWithContext(name, ctx)
-    return s
+        service = ctx.ServiceManager.createInstanceWithContext(name, ctx)
+    return service
 
 def getPropertyValueSet(kwargs):
     properties = []
