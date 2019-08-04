@@ -6,11 +6,12 @@ the privacy of our OAuth2OOo software users is very important to us, and we are 
 This policy explains what we do with your personal information.
 
 For simplicity, in the rest of this document, will be named:
-- "OAuth2OOo": the OAuth2OOo software in its integrity.
-- "Extension": all extensions installed under Libre/OpenOffice and using OAuth2OOo software services.
-- "Provider": the internet service provider delivering the tokens to the "OAuth2OOo" and/or Internet services to the "Extention".
+- `User`: the user of the OAuth2OOo software.
+- `OAuth2OOo`: the OAuth2OOo software in its integrity.
+- `Extension`: all extensions installed under Libre/OpenOffice and using OAuth2OOo software services.
+- `Supplier`: the internet service provider delivering the tokens to `OAuth2OOo` and/or Internet services to `Extention`.
 
-This policy, in addition to our "OAuth2OOo", also applies to all "Extension" that use "OAuth2OOo" software services.
+This policy, in addition to our `OAuth2OOo`, also applies to all `Extension` that use `OAuth2OOo` software services.
 
 ## Contact:
 
@@ -19,13 +20,27 @@ prrvchr@gmail.com
 
 ## Use of your personal data:
 
-To work "OAuth2OOo" and/or "Extension" need to keep data locally.
-The location of this data is in the "OAuth2OOo" and/or "Extension" application directory, respectively.
-"OAuth2OOo" and/or "Extension" does not collect data on external servers in any way.
+To work `OAuth2OOo` and/or `Extension` need to keep data locally.
+The location of this data is in the `OAuth2OOo` and/or `Extension` application directory, respectively.
+** `OAuth2OOo` and/or `Extension` does not collect any data on external servers in any way. **
 
-The deletion of data collected by "OAuth2OOo" and/or "Extension", is guaranteed, by the "OAuth2OOo" and/or "Extension" application desinstallation, respectively.
+The deletion of data collected by `OAuth2OOo` and/or `Extension`, is guaranteed, by the `OAuth2OOo` and/or `Extension` application desinstallation, respectively.
 
-The use of services from "Provider" through "OAuth2OOo" and/or "Extension", can submit you to the Data Protection Policy of "Provider". It is the responsibility of the user to take knowledge of these Policy from the "Provider" internet web site. "Provider" is solely responsible for the data it collects as described in its Policy.
+Use of the `Supplier` services through `OAuth2OOo` and/or `Extension`, may submit you to the Data Protection Policy of `Supplier`. It is the responsibility of the user to take knowledge of these Policy from the `Supplier` website.
+`Supplier` is solely responsible for the data it collects as described in its Policy.
 
 ## Security of your personal information:
 
+Since the data collected by `OAuth2OOo` and/or `Extension` is located on the user's computer, only the user is responsible for the security of the data collected.
+
+Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the user to review this Policy from the `Supplier` website.
+`Supplier` is solely responsible for the security of the data it collects as described in its Policy.
+
+
+## Expiration of collected data:
+
+Updating the data collected locally is done each time `OAuth2OOo` and/or `Extension` is used.
+** The deletion of data collected locally, is possible by the `OAuth2OOo` and/or `Extension` uninstallation. **
+
+Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the user to review this Policy from the `Supplier` website.
+`Supplier` is solely responsible for the expiration of the data it collects as described in its Policy.
