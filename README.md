@@ -17,7 +17,7 @@ No more password is stored in LibreOffice.
 ## Use:
 
 **The use of this software subjects you to our privacy policy rules as described in this document:**
-![Data Protection Policy](DATAPROTECTIONPOLICY.md)
+![Data Protection Policy](PrivacyPolicy.html)
 
 ### Create OAuth2 service:
 
