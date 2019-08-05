@@ -16,6 +16,9 @@ No more password is stored in LibreOffice.
 
 ## Use:
 
+The use of this software subjects you to our privacy policy rules as described in this document:
+![Data Protection Policy](DATAPROTECTIONPOLICY.md)
+
 ### Create OAuth2 service:
 
 service = context.ServiceManager.createInstanceWithContext("com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service", context)
