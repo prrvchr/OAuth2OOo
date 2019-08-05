@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/OAuth2OOo/assets/css/style.css?v=e7db65f70d377e3c502d64ac2310c5490db15af6">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+
+      <h1 id="oauth2ooo-v003">OAuth2OOo v.0.0.3</h1>
+
+<h2 id="uno-oauth20-api-for-libreoffice--openoffice">Uno OAuth2.0 API for LibreOffice / OpenOffice.</h2>
+
+<p><img src="/OAuth2OOo/OAuth2Wizard1.png" alt="OAuth2OOo Wizard Page1 screenshot" /></p>
+
+<p><img src="/OAuth2OOo/OAuth2Wizard2.png" alt="OAuth2OOo Wizard Page2 screenshot" /></p>
+
+<p><img src="/OAuth2OOo/OAuth2Wizard3.png" alt="OAuth2OOo Wizard Page3 screenshot" /></p>
+
+<p>The OAuth2.0 protocol allows the connection to resource servers, after acceptance of the connection authorization, by exchange of tokens.</p>
+
+<p>The revocation takes place in the management of the applications associated with your account.</p>
+
+<p>No more password is stored in LibreOffice.</p>
+
+<h2 id="use">Use:</h2>
+
+<p><strong>The use of this software subjects you to our privacy policy rules as described in this document:</strong>
+<a href="/OAuth2OOo/PrivacyPolicy.html">Data Protection Policy</a></p>
+
+<h3 id="create-oauth2-service">Create OAuth2 service:</h3>
+
+<p>service = context.ServiceManager.createInstanceWithContext(“com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service”, context)</p>
+
+<h3 id="optional-give-a-username-and-a-remote-resource-url">Optional (give a username and a remote resource url):</h3>
+
+<p>service.UserName = your_user_account</p>
+
+<p>service.ResourceUrl = your_registered_url</p>
+
+<h3 id="get-the-access-token">Get the access token:</h3>
+
+<p>token = service.getToken(‘Bearer %s’)</p>
+
+<h2 id="has-been-tested-with">Has been tested with:</h2>
+
+<ul>
+  <li>
+    <p>LibreOffice 6.0.2.1 x86_64 - Ubuntu 17.10 - LxQt 0.11.1</p>
+  </li>
+  <li>
+    <p>OpenOffice 4.1.5 x86_64 - Ubuntu 17.10 - LxQt 0.11.1</p>
+  </li>
+</ul>
+
+<p>I encourage you in case of problem to create an <a href="https://github.com/prrvchr/OAuth2OOo/issues/new">issue</a>
+I will try to solve it :-)</p>
+
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+
+  </body>
+</html>
