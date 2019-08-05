@@ -130,13 +130,13 @@ class OptionsDialog(unohelper.Base,
         dialog.getControl('CommandButton2').Model.Enabled = enabled
         enabled = enabled and self.service.Setting.Url.Scope.Authorized
         if enabled:
-            dialog.getControl('Label9').setText(self.service.Setting.Url.Scope.Provider.User.RefreshToken)
-            dialog.getControl('Label11').setText(self.service.Setting.Url.Scope.Provider.User.AccessToken)
-            dialog.getControl('Label13').setText(self.service.Setting.Url.Scope.Provider.User.ExpiresIn)
+            dialog.getControl('Label8').setText(self.service.Setting.Url.Scope.Provider.User.RefreshToken)
+            dialog.getControl('Label10').setText(self.service.Setting.Url.Scope.Provider.User.AccessToken)
+            dialog.getControl('Label12').setText(self.service.Setting.Url.Scope.Provider.User.ExpiresIn)
         else:
-            dialog.getControl('Label9').setText(self.stringResource.resolveString('OptionsDialog.Label9.Label'))
-            dialog.getControl('Label11').setText(self.stringResource.resolveString('OptionsDialog.Label11.Label'))
-            dialog.getControl('Label13').setText(self.stringResource.resolveString('OptionsDialog.Label13.Label'))
+            dialog.getControl('Label8').setText(self.stringResource.resolveString('OptionsDialog.Label8.Label'))
+            dialog.getControl('Label10').setText(self.stringResource.resolveString('OptionsDialog.Label10.Label'))
+            dialog.getControl('Label12').setText(self.stringResource.resolveString('OptionsDialog.Label12.Label'))
         dialog.getControl('CommandButton3').Model.Enabled = enabled
         dialog.getControl('CommandButton4').Model.Enabled = enabled
 
