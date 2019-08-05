@@ -1,5 +1,8 @@
 # OAuth2OOo v.0.0.3
 
+**The use of this software subjects you to our privacy policy rules as described in this document:**
+[Data Protection Policy](PrivacyPolicy.html)
+
 ## Uno OAuth2.0 API for LibreOffice / OpenOffice.
 
 ![OAuth2OOo Wizard Page1 screenshot](OAuth2Wizard1.png)
@@ -15,9 +18,6 @@ The revocation takes place in the management of the applications associated with
 No more password is stored in LibreOffice.
 
 ## Use:
-
-**The use of this software subjects you to our privacy policy rules as described in this document:**
-[Data Protection Policy](PrivacyPolicy.html)
 
 ### Create OAuth2 service:
 
