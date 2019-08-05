@@ -2,7 +2,7 @@
 
 ## Introduction:
 
-the privacy of our OAuth2OOo software users is very important to us, and we are commited to safguarding it.
+the privacy of our OAuth2OOo software users is very important to us, and we are commited to safeguarding it.
 
 This policy explains what we do with your personal information.
 
@@ -29,7 +29,7 @@ The location of this data is in the `OAuth2OOo` and/or `Extension` application d
 
 `OAuth2OOo` and/or `Extension` **does not collect any data on external servers in any way.**
 
-The deletion of data collected by `OAuth2OOo` and/or `Extension`, is guaranteed, by the `OAuth2OOo` and/or `Extension` application desinstallation, respectively.
+The deletion of data collected by `OAuth2OOo` and/or `Extension`, is guaranteed, by the `OAuth2OOo` and/or `Extension` application uninstall, respectively.
 
 Use of the `Supplier` services through `OAuth2OOo` and/or `Extension`, may submit you to the Data Protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
 
@@ -49,7 +49,7 @@ Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject yo
 
 Updating the data collected locally is done each time `OAuth2OOo` and/or `Extension` is used.
 
-**The deletion of data collected locally, is possible by the** `OAuth2OOo` and/or `Extension` **uninstallation.**
+**The deletion of data collected locally, is possible by the** `OAuth2OOo` and/or `Extension` **uninstall.**
 
 It is the responsibility of the `User` to uninstall `OAuth2OOo` and/or `Extension` in order to delete the collected data.
 
