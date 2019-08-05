@@ -1,7 +1,7 @@
-# OAuth2OOo v.0.0.3
-
 **The use of this software subjects you to our privacy policy rules as described in this document:**
 [Data Protection Policy](PrivacyPolicy.html)
+
+# OAuth2OOo v.0.0.3
 
 ## Uno OAuth2.0 API for LibreOffice / OpenOffice.
 
