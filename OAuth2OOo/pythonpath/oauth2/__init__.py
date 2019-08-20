@@ -43,6 +43,8 @@ from .unotools import getInteractionHandler
 from .unotools import getOAuth2Request
 from .unotools import getDialog
 
+from .dialoghandler import DialogHandler
+
 from .logger import getLogger
 from .logger import getLoggerSetting
 from .logger import getLoggerUrl

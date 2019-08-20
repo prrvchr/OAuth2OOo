@@ -128,7 +128,7 @@ class ScopeReader(unohelper.Base,
         return ' '.join(values)
     @property
     def Authorized(self):
-        authorized = True
+        authorized = len(self._Values) != 0
         for value in self._Values:
             if value not in self.Provider.User.Scopes:
                 authorized = False

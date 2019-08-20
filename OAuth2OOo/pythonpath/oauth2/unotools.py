@@ -3,12 +3,15 @@
 
 import uno
 
+from com.sun.star.lang import WrappedTargetRuntimeException
+
 import binascii
 
 from com.sun.star.auth import OAuth2Request
 
 from .unolib import InteractionHandler
 
+import traceback
 
 def getSimpleFile(ctx):
     return ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
@@ -77,13 +80,27 @@ def getStringResource(ctx, identifier, path=None, filename='DialogStrings', loca
 def generateUuid():
     return binascii.hexlify(uno.generateUuid().value).decode('utf-8')
 
-def getDialog(ctx, window, handler, lib, name):
-    service = 'com.sun.star.awt.DialogProvider'
-    provider = ctx.ServiceManager.createInstanceWithContext(service, ctx)
-    url = 'vnd.sun.star.script:%s.%s?location=application' % (lib, name)
+def getDialog(ctx, window, handler, library, xdl):
+    dialog = None
+    provider = ctx.ServiceManager.createInstance('com.sun.star.awt.DialogProvider')
+    url = getDialogUrl(library, xdl)
     arguments = getNamedValueSet({'ParentWindow': window, 'EventHandler': handler})
     dialog = provider.createDialogWithArguments(url, arguments)
     return dialog
+
+def getContainerWindow(ctx, parent, handler, library, xdl):
+    window = None
+    service = 'com.sun.star.awt.ContainerWindowProvider'
+    provider = ctx.ServiceManager.createInstanceWithContext(service, ctx)
+    url = getDialogUrl(library, xdl)
+    try:
+        window = provider.createContainerWindow(url, '', parent, handler)
+    except WrappedTargetRuntimeException as e:
+        print("unotools.getContainerWindow() ERROR: %s - %s" % (e, traceback.print_exc()))
+    return window
+
+def getDialogUrl(library, xdl):
+    return 'vnd.sun.star.script:%s.%s?location=application' % (library, xdl)
 
 def createMessageBox(peer, message, title, box='message', buttons=2):
     boxtypes = {'message': 'MESSAGEBOX',

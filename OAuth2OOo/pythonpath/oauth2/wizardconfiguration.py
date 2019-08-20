@@ -320,6 +320,12 @@ class ProviderWriter(unohelper.Base,
         if self.Id in self.Providers:
             parameters = self.Providers[self.Id]['AuthorizationParameters']
         return parameters
+    @AuthorizationParameters.setter
+    def AuthorizationParameters(self, parameters):
+        if self.Id in self.Providers and \
+           self.Providers[self.Id]['AuthorizationParameters'] != parameters:
+            self.Providers[self.Id]['AuthorizationParameters'] = parameters
+            self.State = 4
     @property
     def TokenUrl(self):
         url = ''
@@ -336,6 +342,11 @@ class ProviderWriter(unohelper.Base,
         if self.Id in self.Providers:
             parameters = self.Providers[self.Id]['TokenParameters']
         return parameters
+    @TokenParameters.setter
+    def TokenParameters(self, parameters):
+        if self.Id in self.Providers and self.Providers[self.Id]['TokenParameters'] != parameters:
+            self.Providers[self.Id]['TokenParameters'] = parameters
+            self.State = 4
     @property
     def CodeChallenge(self):
         enabled = True

@@ -114,13 +114,13 @@
                 <value>{"client_secret": null, "scope": null}</value>
             </prop>
             <prop oor:name="CodeChallenge">
-                <value>true</value>
+                <value>false</value>
             </prop>
             <prop oor:name="CodeChallengeMethod">
                 <value>S256</value>
             </prop>
             <prop oor:name="HttpHandler">
-                <value>true</value>
+                <value>false</value>
             </prop>
             <prop oor:name="RedirectAddress">
                 <value>localhost</value>

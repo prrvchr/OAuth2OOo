@@ -59,6 +59,7 @@ class WatchDog(Thread):
         start = now = timer()
         self.end = start + self.timeout
         self.page.notify(0)
+        canceled = True
         with self.lock:
             while now < self.end and self.server.is_alive():
                 elapsed = now - start
@@ -66,12 +67,11 @@ class WatchDog(Thread):
                 self.page.notify(percent)
                 self.lock.wait(wait)
                 now = timer()
-            if self.server.is_alive():
-                self.server.cancel()
-            if self.end:
+            if self.end != 0:
+                canceled = False
                 self.page.notify(100)
-                result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
-                self.server.controller.Handler.Wizard.DialogWindow.endDialog(result)
+            if self.server.is_alive():
+                self.server.cancel(canceled)
             self.lock.notifyAll()
 
     def cancel(self):
@@ -86,6 +86,7 @@ class Server(Thread):
         self.ctx = ctx
         self.controller = controller
         self.lock = lock
+        self.canceled = False
         self.acceptor = createService(self.ctx, 'com.sun.star.connection.Acceptor')
 
     def run(self):
@@ -93,8 +94,8 @@ class Server(Thread):
         port = self.controller.Configuration.Url.Scope.Provider.RedirectPort
         result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
         connection = self.acceptor.accept('socket,host=%s,port=%s,tcpNoDelay=1' % (address, port))
-        if connection:
-            with self.lock:
+        with self.lock:
+            if connection:
                 result = self._getResult(connection)
                 basename = getResourceLocation(self.ctx, g_identifier, 'OAuth2OOo')
                 basename += '/OAuth2Success_%s.html' if result else '/OAuth2Error_%s.html'
@@ -110,10 +111,12 @@ Connection: Closed
                 connection.write(header + body)
                 connection.close()
                 self.acceptor.stopAccepting()
-                self.controller.Handler.Wizard.DialogWindow.endDialog(result)
-                self.lock.notifyAll()
+            if not self.canceled:
+                self.controller.Wizard.DialogWindow.endDialog(result)
+            self.lock.notifyAll()
 
-    def cancel(self):
+    def cancel(self, state):
+        self.canceled = state
         self.acceptor.stopAccepting()
 
     def _readString(self, connection, length):

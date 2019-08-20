@@ -12,7 +12,7 @@ import json
 import base64
 import hashlib
 
-g_advance_to = 2 # 0 to disable
+g_advance_to = 0 # 0 to disable
 g_wizard_paths = ((1, 2, 3), (1, 2, 4))
 g_identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
 g_refresh_overlap = 10 # must be positive, in second
@@ -33,12 +33,11 @@ def checkUrl(ctx, configuration, uuid):
     success, url = transformer.parseStrict(url)
     return success
 
-def openUrl(ctx, configuration, uuid, option=''):
-    url = _getAuthorizationUrl(ctx, configuration, uuid)
+def openUrl(ctx, url, option=''):
     service = 'com.sun.star.system.SystemShellExecute'
     ctx.ServiceManager.createInstance(service).execute(url, option, 0)
 
-def _getAuthorizationUrl(ctx, configuration, uuid):
+def getAuthorizationUrl(ctx, configuration, uuid):
     main = configuration.Url.Scope.Provider.AuthorizationUrl
     parameters = urlencode(_getUrlParameters(ctx, configuration, uuid))
     return '%s?%s' % (main, parameters)

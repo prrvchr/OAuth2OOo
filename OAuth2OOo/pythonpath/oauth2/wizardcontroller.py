@@ -5,6 +5,8 @@ import uno
 import unohelper
 
 from com.sun.star.ui.dialogs import XWizardController
+from com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import SEVERE
 
 from .unolib import PropertySet
 
@@ -18,11 +20,14 @@ from .unotools import generateUuid
 from .unotools import getCurrentLocale
 from .unotools import getProperty
 from .unotools import getStringResource
+from .unotools import getContainerWindow
+from .unotools import getDialogUrl
 
 from .logger import getLogger
 
 from .oauth2tools import getActivePath
 from .oauth2tools import g_identifier
+from .oauth2tools import g_wizard_paths
 from .oauth2tools import g_advance_to
 
 import traceback
@@ -31,8 +36,7 @@ import traceback
 class WizardController(unohelper.Base,
                        PropertySet,
                        XWizardController):
-    def __init__(self, ctx, url, username):
-        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
+    def __init__(self, ctx, wizard, url, username):
         self.ctx = ctx
         self.Configuration = WizardConfiguration(self.ctx)
         self.ResourceUrl = url
@@ -41,11 +45,11 @@ class WizardController(unohelper.Base,
         self.Server = WizardServer(self.ctx)
         self.Uuid = generateUuid()
         self.advanceTo = g_advance_to # 0 to disable
-        self.Pages = {}
-        self.Handler = WizardHandler(self.ctx, self.Configuration, self)
+        self.Wizard = wizard
         self.Logger = getLogger(self.ctx)
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
-        self.Provider = createService(self.ctx, 'com.sun.star.awt.ContainerWindowProvider')
+        service = 'com.sun.star.awt.ContainerWindowProvider'
+        self.provider = self.ctx.ServiceManager.createInstanceWithContext(service, self.ctx)
 
     @property
     def ResourceUrl(self):
@@ -68,39 +72,54 @@ class WizardController(unohelper.Base,
 
     # XWizardController
     def createPage(self, parent, id):
-        if id not in self.Pages:
-            level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-            self.Logger.logp(level, "WizardController", "createPage()", "PageId: %s..." % id)
+        try:
+            print("WizardController.createPage() 1")
+            msg = "PageId: %s ..." % id
+            handler = WizardHandler(self.ctx, self.Configuration, self.Wizard)
+            url = getDialogUrl('OAuth2OOo', 'PageWizard%s' % id)
+            window = self.provider.createContainerWindow(url, '', parent, handler)
+            #window = getContainerWindow(self.ctx, parent, handler, 'OAuth2OOo', xdl)
+            #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
+            #mri.inspect(handler)
             page = WizardPage(self.ctx,
                               self.Configuration,
                               id,
-                              parent,
-                              self.Handler,
+                              window,
                               self.Uuid,
                               self.AuthorizationCode)
+            print("WizardController.createPage() 2")
             if id == 3:
                 self.Server.addCallback(page, self)
-            self.Pages[id] = page
-        return self.Pages[id]
+            msg += " Done"
+            self.Logger.logp(INFO, "WizardController", "createPage()", msg)
+            return page
+        except Exception as e:
+            print("WizardController.createPage() ERROR: %s - %s" % (e, traceback.print_exc()))
     def getPageTitle(self, id):
         title = self.stringResource.resolveString('PageWizard%s.Step' % (id, ))
         return title
     def canAdvance(self):
-        return True
+        return self.Wizard.CurrentPage.canAdvance()
     def onActivatePage(self, id):
-        level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-        self.Logger.logp(level, "WizardController", "onActivatePage()", "PageId: %s..." % id)
+        print("WizardController.onActivatePage(): %s" % id)
+        msg = "PageId: %s..." % id
         title = self.stringResource.resolveString('PageWizard%s.Title' % (id, ))
-        self.Handler.Wizard.setTitle(title)
+        self.Wizard.setTitle(title)
         finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
-        self.Handler.Wizard.enableButton(finish, False)
+        self.Wizard.enableButton(finish, False)
         if id == 1:
-            self.Handler.Wizard.activatePath(self.ActivePath, True)
-            self.Handler.Wizard.updateTravelUI()
-        if self.advanceTo:
-            self.advanceTo = 0
-            self.Handler.Wizard.advanceTo(g_advance_to)
-        self.Logger.logp(level, "WizardController", "onActivatePage()", "PageId: %s... Done" % id)
+            pass
+            #self.Wizard.activatePath(self.ActivePath, True)
+            #self.Wizard.updateTravelUI()
+        #travel = self.advanceTo - id
+        #if not self.canAdvance():
+        #    self.advanceTo = 0
+        #elif travel > 0:
+        #    if travel == 1:
+        #        self.advanceTo = 0
+        #    self.Wizard.travelNext()
+        msg += " Done"
+        self.Logger.logp(INFO, "WizardController", "onActivatePage()", msg)
     def onDeactivatePage(self, id):
         pass
     def confirmFinish(self):
@@ -108,20 +127,19 @@ class WizardController(unohelper.Base,
 
     def _getPropertySetInfo(self):
         properties = {}
+        interface = 'com.sun.star.uno.XInterface'
+        optional = 'com.sun.star.beans.Optional<string>'
         bound = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.BOUND')
         readonly = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
         transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
-        maybevoid = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.MAYBEVOID')
+        properties['Wizard'] = getProperty('Wizard', 'com.sun.star.ui.dialogs.XWizard', readonly)
         properties['ResourceUrl'] = getProperty('ResourceUrl', 'string', transient)
         properties['UserName'] = getProperty('UserName', 'string', transient)
         properties['ActivePath'] = getProperty('ActivePath', 'short', readonly)
-        properties['AuthorizationCode'] = getProperty('AuthorizationCode', 'com.sun.star.beans.Optional<string>', bound)
-        properties['AuthorizationStr'] = getProperty('AuthorizationStr', 'string', readonly)
-        properties['CheckUrl'] = getProperty('CheckUrl', 'boolean', readonly)
+        properties['AuthorizationCode'] = getProperty('AuthorizationCode', optional, bound)
         properties['Uuid'] = getProperty('Uuid', 'string', readonly)
         properties['CodeVerifier'] = getProperty('CodeVerifier', 'string', readonly)
-        properties['Configuration'] = getProperty('Configuration', 'com.sun.star.uno.XInterface', readonly)
-        properties['Server'] = getProperty('Server', 'com.sun.star.uno.XInterface', bound | readonly)
-        properties['Paths'] = getProperty('Paths', '[][]short', readonly)
-        properties['Handler'] = getProperty('Handler', 'com.sun.star.uno.XInterface', readonly)
+        properties['Configuration'] = getProperty('Configuration', interface, readonly)
+        properties['Server'] = getProperty('Server', interface, bound | readonly)
+#        properties['Handler'] = getProperty('Handler', interface, readonly)
         return properties
