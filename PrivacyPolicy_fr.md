@@ -29,7 +29,7 @@ L'emplacement de ces données est le répertoire d'installation de l'application
 
 `OAuth2OOo` et/ou `Extension` **ne collectent aucune donnée sur des serveurs externes, d'aucune manières.**
 
-La suppression des données collectées par `OAuth2OOo` et/ou `Extension` est garantie par la désinstallation de l'application `OAuth2OOo` et/ou `Extension`,  respectivement.
+La suppression des données collectées par `OAuth2OOo` et/ou `Extension` est garantie par la désinstallation de l'application `OAuth2OOo` et/ou `Extension`, respectivement.
 
 L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la politique de protection des données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
 
@@ -49,7 +49,7 @@ Le `Fournisseur` est seul responsable de la sécurité des données qu'il collec
 
 La mise à jour des données collectées localement est effectuée chaque fois que `OAuth2OOo` et/ou `Extension` sont utilisés.
 
-**La suppression des données collectées localement est possible en désinstallant** `OAuth2OOo` et/ou `Extension`.
+**La suppression des données collectées localement est possible en désinstallant** `OAuth2OOo` et/ou `Extension`, respectivement.
 
 Il est de la responsabilité de l'`Utilisateur` de désinstaller `OAuth2OOo` et/ou `Extension` afin de supprimer les données collectées.
 
