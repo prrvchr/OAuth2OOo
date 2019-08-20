@@ -1,5 +1,5 @@
 **The use of this software subjects you to our privacy policy rules as described in this document:**
-[Data Protection Policy](https://prrvchr.github.io/OAuth2OOo/PrivacyPolicy.html)
+[Data Protection Policy](https://prrvchr.github.io/OAuth2OOo/PrivacyPolicy_en.html)
 
 # OAuth2OOo v.0.0.3
 
