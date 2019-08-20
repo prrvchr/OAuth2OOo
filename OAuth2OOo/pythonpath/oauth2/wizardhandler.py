@@ -74,7 +74,7 @@ class WizardHandler(unohelper.Base,
                 'StateChange', 'TextChange', 'PerformAction')
 
     def _loadUrl(self, window, control):
-        url = 'https://prrvchr.github.io/OAuth2OOo/PrivacyPolicy.html'
+        url = self.stringResource.resolveString('PageWizard2.CommandButton1.Url')
         openUrl(self.ctx, url)
 
     def _addItem(self, window, item):
