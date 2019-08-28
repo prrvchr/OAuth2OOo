@@ -14,7 +14,7 @@ Pour plus de simplicité, dans la suite de ce document, on nommera:
 
 Cette politique, en plus de `OAuth2OOo`, s’applique également à toutes les `Extension` utilisant des services logiciels de `OAuth2OOo`.
 
-L'utilisation de ce logiciel vous soumet à nos **Conditions d'utilisation** comme décrites dans [ce document:](https://prrvchr.github.io/OAuth2OOo/TermsOfUse_fr)
+L'utilisation de ce logiciel vous soumet à nos **Conditions d'utilisation** comme décrites dans [ce document:](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_fr)
 
 ## Contact:
 

@@ -8,7 +8,7 @@ Full documentation is available [on this page](https://prrvchr.github.io/OAuth2O
 
 OAuth2OOo is distributed in the hope that it will be useful, but **WITHOUT ANY WARRANTY**; without even the implied warranty of **MERCHANTABILITY** or **FITNESS FOR A PARTICULAR PURPOSE**.
 
-Use of this software subjects you to our **Data Protection Policy** as described in [this document](https://prrvchr.github.io/OAuth2OOo/PrivacyPolicy_en).
+Use of this software subjects you to our **Data Protection Policy** as described in [this document](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_en).
 
 ## License:
 
