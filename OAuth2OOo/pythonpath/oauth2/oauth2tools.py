@@ -6,6 +6,7 @@
 import uno
 
 from .unotools import getCurrentLocale
+from .request import NoOAuth2
 from .requests.compat import urlencode
 
 import json
@@ -13,7 +14,7 @@ import base64
 import hashlib
 
 g_advance_to = 0 # 0 to disable
-g_wizard_paths = ((1, 2, 3), (1, 2, 4))
+g_wizard_paths = (((1, 2, 3), (1, 2, 4)), ((1, 2, 3, 5), (1, 2, 4, 5)))
 g_identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
 g_refresh_overlap = 10 # must be positive, in second
 
@@ -91,6 +92,40 @@ def getTokenParameters(setting, code, codeverifier):
     option = setting.Url.Scope.Provider.TokenParameters
     parameters = _parseParameters(parameters, optional, option)
     return parameters
+
+def getResponseFromRequest(session, url, data, timeout):
+    response = {}
+    message = ''
+    try:
+        with session as s:
+            with s.post(url, data=data, timeout=timeout, auth=NoOAuth2) as r:
+                if r.status_code == s.codes.ok:
+                    response = r.json()
+                else:
+                    message = "ERROR: %s" % r.text
+    except Exception as e:
+        message = "ERROR: %s" % e
+    return response, message
+
+def registerTokenFromResponse(configuration, response):
+    token = getTokenFromResponse(configuration, response)
+    return token != ''
+
+def getTokenFromResponse(configuration, response):
+    refresh = response.get('refresh_token', None)
+    if refresh:
+        configuration.Url.Scope.Provider.User.RefreshToken = refresh
+    expires = response.get('expires_in', None)
+    if expires:
+        configuration.Url.Scope.Provider.User.ExpiresIn = expires
+    token = response.get('access_token', '')
+    if token:
+        configuration.Url.Scope.Provider.User.AccessToken = token
+        scope = configuration.Url.Scope.Values
+        configuration.Url.Scope.Provider.User.Scope = scope
+        configuration.Url.Scope.Provider.User.NeverExpires = expires is None
+        configuration.Url.Scope.Provider.User.commit()
+    return token
 
 def _getTokenBaseParameters(setting, code, codeverifier):
     parameters = {}

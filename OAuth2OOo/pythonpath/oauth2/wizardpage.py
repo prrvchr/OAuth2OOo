@@ -117,8 +117,8 @@ class WizardPage(unohelper.Base,
             #self.Configuration.Url.Scope.Provider.RedirectPort = port
         elif self.PageId == 3:
             pass
-        elif self.PageId == 4 and reason == finish:
-            code = self.Window.getControl('TextField1').getText()
+        elif self.PageId == 4:
+            code = self.Window.getControl('TextField1').Text
             self.AuthorizationCode.Value = code
             self.AuthorizationCode.IsPresent = True
         msg += " Done"
@@ -126,7 +126,7 @@ class WizardPage(unohelper.Base,
         return True
 
     def canAdvance(self):
-        advance = False
+        advance = True
         if self.PageId == 1:
             advance = self.Window.getControl('TextField1').Text != ''
             advance &= self.Window.getControl('CommandButton2').Model.Enabled
@@ -142,6 +142,10 @@ class WizardPage(unohelper.Base,
         elif self.PageId == 2:
             advance = checkUrl(self.ctx, self.Configuration, self.Uuid)
             advance &= bool(self.Window.getControl('CheckBox1').Model.State)
+        elif self.PageId == 3:
+            advance = self.AuthorizationCode.IsPresent
+        elif self.PageId == 4:
+            advance = self.Window.getControl('TextField1').Text != ''
         print("WizardPage.canAdvance(): %s - %s" % (self.PageId, advance))
         return advance
 

@@ -92,10 +92,11 @@ class Server(Thread):
     def run(self):
         address = self.controller.Configuration.Url.Scope.Provider.RedirectAddress
         port = self.controller.Configuration.Url.Scope.Provider.RedirectPort
-        result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
+        ok = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.OK')
         connection = self.acceptor.accept('socket,host=%s,port=%s,tcpNoDelay=1' % (address, port))
         with self.lock:
             if connection:
+                print("WizardServer.run() 1")
                 result = self._getResult(connection)
                 basename = getResourceLocation(self.ctx, g_identifier, 'OAuth2OOo')
                 basename += '/OAuth2Success_%s.html' if result else '/OAuth2Error_%s.html'
@@ -110,9 +111,21 @@ Connection: Closed
 ''' % length)
                 connection.write(header + body)
                 connection.close()
+                print("WizardServer.run() 2")
                 self.acceptor.stopAccepting()
+                print("WizardServer.run() 3")
             if not self.canceled:
-                self.controller.Wizard.DialogWindow.endDialog(result)
+                print("WizardServer.run() 4")
+                if self.controller.Path:
+                    print("WizardServer.run() 5")
+                    self.controller.Wizard.updateTravelUI()
+                    if self.controller.canAdvance():
+                        print("WizardServer.run() 6")
+                        self.controller.Wizard.travelNext()
+                else:
+                    print("WizardServer.run() 7")
+                    self.controller.Wizard.DialogWindow.endDialog(ok)
+            print("WizardServer.run() 8")
             self.lock.notifyAll()
 
     def cancel(self, state):
@@ -180,13 +193,10 @@ Connection: Closed
     def _getResult(self, connection):
         parameters = self._getParameters(connection)
         response = self._getResponse(parameters)
-        level = uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE')
-        result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.CANCEL')
         if 'code' in response and 'state' in response:
             if response['state'] == self.controller.Uuid:
                 self.controller.AuthorizationCode.Value = response['code']
                 self.controller.AuthorizationCode.IsPresent = True
-                level = uno.getConstantByName('com.sun.star.logging.LogLevel.INFO')
-                result = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.OK')
-        self.controller.Configuration.Logger.logp(level, 'HttpServer', '_getResult', '%s' % response)
-        return result
+                return True
+        self.controller.Error = '%s' % response
+        return False

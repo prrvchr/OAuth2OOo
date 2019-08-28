@@ -13,7 +13,7 @@
         <value>30</value>
     </prop>
     <prop oor:name="HandlerTimeout">
-        <value>90</value>
+        <value>120</value>
     </prop>
     <node oor:name="Urls">
         <node oor:name="smtp.gmail.com/send" oor:op="fuse">

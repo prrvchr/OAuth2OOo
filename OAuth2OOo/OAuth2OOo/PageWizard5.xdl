@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="PageWizard5" dlg:left="85" dlg:top="0" dlg:width="285" dlg:height="180" dlg:help-text="&amp;PageWizard5.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;PageWizard5.Title" dlg:withtitlebar="false">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:font-weight="150"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:titledbox dlg:style-id="0" dlg:id="FrameControl1" dlg:tab-index="0" dlg:left="10" dlg:top="10" dlg:width="265" dlg:height="45" dlg:help-text="&amp;PageWizard5.FrameControl1.HelpText">
+   <dlg:title dlg:value="&amp;PageWizard5.FrameControl1.Label"/>
+  </dlg:titledbox>
+ </dlg:bulletinboard>
+</dlg:window>

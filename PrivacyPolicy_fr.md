@@ -14,10 +14,12 @@ Pour plus de simplicité, dans la suite de ce document, on nommera:
 
 Cette politique, en plus de `OAuth2OOo`, s’applique également à toutes les `Extension` utilisant des services logiciels de `OAuth2OOo`.
 
+L'utilisation de ce logiciel vous soumet à nos **Conditions d'utilisation** comme décrites dans [ce document:](https://prrvchr.github.io/OAuth2OOo/TermsOfUse_fr.html)
 
 ## Contact:
 
 Dans tous les cas, il est possible de contacter le responsable du traitement des données à l'adresse suivante:
+
 prrvchr@gmail.com
 
 

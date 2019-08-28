@@ -74,7 +74,8 @@ class WizardHandler(unohelper.Base,
                 'StateChange', 'TextChange', 'PerformAction')
 
     def _loadUrl(self, window, control):
-        url = self.stringResource.resolveString('PageWizard2.CommandButton1.Url')
+        name = control.Model.Name
+        url = self.stringResource.resolveString('PageWizard2.%s.Url' % name)
         openUrl(self.ctx, url)
 
     def _addItem(self, window, item):

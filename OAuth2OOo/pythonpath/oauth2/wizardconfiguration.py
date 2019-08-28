@@ -21,10 +21,18 @@ class WizardConfiguration(unohelper.Base,
         self.ctx = ctx
         self.configuration = getConfiguration(self.ctx, g_identifier, True)
         self.Url = UrlWriter(self.configuration)
-        self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
-        self.ConnectTimeout = self.configuration.getByName('ConnectTimeout')
-        self.ReadTimeout = self.configuration.getByName('ReadTimeout')
         self.Logger = getLogger(self.ctx)
+        self.revert()
+
+    @property
+    def Timeout(self):
+        if self.ConnectTimeout and self.ReadTimeout:
+            return self.ConnectTimeout, self.ReadTimeout
+        elif self.ConnectTimeout:
+            return self.ConnectTimeout
+        elif self.ReadTimeout:
+            return self.ReadTimeout
+        return None
 
     @property
     def UrlList(self):
@@ -40,7 +48,9 @@ class WizardConfiguration(unohelper.Base,
         self.Url.Scope.commit()
         self.Url.Scope.Provider.commit()
     def revert(self):
-        pass
+        self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
+        self.ConnectTimeout = self.configuration.getByName('ConnectTimeout')
+        self.ReadTimeout = self.configuration.getByName('ReadTimeout')
 
     def _getPropertySetInfo(self):
         properties = {}
@@ -50,6 +60,7 @@ class WizardConfiguration(unohelper.Base,
         properties['HandlerTimeout'] = getProperty('HandlerTimeout', 'short', readonly)
         properties['ConnectTimeout'] = getProperty('ConnectTimeout', 'short', readonly)
         properties['ReadTimeout'] = getProperty('ReadTimeout', 'short', readonly)
+        properties['Timeout'] = getProperty('Timeout', 'any', readonly)
         properties['Logger'] = getProperty('Logger', 'com.sun.star.logging.XLogger', readonly)
         return properties
 

@@ -112,7 +112,7 @@ class OptionsDialog(unohelper.Base,
             user = dialog.getControl('TextField1').Text
             url = dialog.getControl('ComboBox2').SelectedText
             print("OptionDialog._doConnect() 1 %s - %s" % (user, url))
-            enabled = self.service.getAuthorization(url, user)
+            enabled = self.service.getAuthorization(url, user, 1)
             print("OptionDialog._doConnect() 2")
             self._updateUI(dialog, enabled)
         except Exception as e:

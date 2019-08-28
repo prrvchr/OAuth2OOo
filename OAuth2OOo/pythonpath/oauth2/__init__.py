@@ -22,6 +22,8 @@ from .oauth2tools import getActivePath
 from .oauth2tools import getAuthorizationStr
 from .oauth2tools import getTokenParameters
 from .oauth2tools import getRefreshParameters
+from .oauth2tools import getTokenFromResponse
+from .oauth2tools import getResponseFromRequest
 from .oauth2tools import checkUrl
 from .oauth2tools import openUrl
 

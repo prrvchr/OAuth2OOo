@@ -31,6 +31,8 @@ from oauth2 import WizardController
 from oauth2 import createService
 from oauth2 import getTokenParameters
 from oauth2 import getRefreshParameters
+from oauth2 import getTokenFromResponse
+from oauth2 import getResponseFromRequest
 from oauth2 import g_identifier
 from oauth2 import g_wizard_paths
 
@@ -115,15 +117,12 @@ class OAuth2Service(unohelper.Base,
     def getSessionMode(self, host):
         return getSessionMode(self.ctx, host)
 
-    def getAuthorization(self, url, username):
+    def getAuthorization(self, url, username, path=0):
         code = None
         msg = "Wizard Loading ..."
-        wizard = createService(self.ctx, 'com.sun.star.ui.dialogs.Wizard')
-        controller = WizardController(self.ctx, wizard, url, username)
-        arguments = ((uno.Any('[][]short', (g_wizard_paths)), controller), )
-        uno.invoke(wizard, 'initialize', arguments)
+        controller = WizardController(self.ctx, self.Session, url, username, path)
         print("OAuth2Service.getAuthorizationCode() 1")
-        state = wizard.execute()
+        state = controller.Wizard.execute()
         msg += " Done ..."
         if state:
             msg +=  " Retrieving Authorization Code ..."
@@ -136,10 +135,11 @@ class OAuth2Service(unohelper.Base,
                 msg += " ERROR: cant retrieve Authorization Code"
         else:
             msg +=  " ERROR: Wizard as been aborted"
+            controller.Server.cancel()
         #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
         #mri.inspect(controller.Handler.Wizard)
-        wizard.DialogWindow.dispose()
-        controller.Server.cancel()
+        controller.Wizard.DialogWindow.dispose()
+
         if code is None:
             self.Logger.logp(SEVERE, 'OAuth2Service', 'getAuthorization()', msg)
             return False
@@ -214,7 +214,7 @@ class OAuth2Service(unohelper.Base,
         if not self.Setting.Url.Scope.Authorized:
             msg += " Done ... AuthorizationCode needed ..."
             print("OAuth2Service._isAuthorized() 2")
-            if not self.getAuthorization(self.ResourceUrl, self.UserName):
+            if not self.getAuthorization(self.ResourceUrl, self.UserName, 0):
                 print("OAuth2Service._isAuthorized() 3")
                 msg += " ERROR: Wizard Aborted!!!"
                 self.Logger.logp(SEVERE, 'OAuth2Service', '_isAuthorized()', msg)
@@ -223,8 +223,8 @@ class OAuth2Service(unohelper.Base,
         self.Logger.logp(INFO, 'OAuth2Service', '_isAuthorized()', msg)
         return True
 
-    def _getAuthorizationCode(self, controller):
-        print("OAuth2Service._getAuthorizationCode() 1")
+    def _showWizard(self, controller):
+        print("OAuth2Service._showWizard() 1")
         code = None
         msg = "Wizard Loading ..."
         state = controller.Wizard.execute()
@@ -240,10 +240,12 @@ class OAuth2Service(unohelper.Base,
                 msg += " ERROR: cant retrieve Authorization Code"
         else:
             msg +=  " ERROR: Wizard as been aborted"
+            if not controller.AuthorizationCode.IsPresent:
+                controller.Server.cancel()
         #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
         #mri.inspect(controller.Handler.Wizard)
-        controller.Wizard.DialogWindow.dispose()
-        controller.Server.cancel()
+        #controller.Wizard.DialogWindow.dispose()
+
         return code, msg
 
     def _registerTokens(self, code, codeverifier):
@@ -251,16 +253,18 @@ class OAuth2Service(unohelper.Base,
         data = getTokenParameters(self.Setting, code, codeverifier)
         message = "Make Http Request: %s?%s" % (url, data)
         self.Logger.logp(INFO, 'OAuth2Service', '_registerTokens', message)
-        response = self._getResponseFromRequest(url, data)
-        return self._registerTokenFromResponse(response)
+        timeout = self.Configuration.Timeout
+        response = getResponseFromRequest(self.Session, url, data, timeout)
+        return registerTokenFromResponse(self.Setting, response)
 
     def _refreshToken(self):
         url = self.Setting.Url.Scope.Provider.TokenUrl
         data = getRefreshParameters(self.Setting)
         message = "Make Http Request: %s?%s" % (url, data)
         self.Logger.logp(INFO, 'OAuth2Service', '_refreshToken', message)
-        response = self._getResponseFromRequest(url, data)
-        return self._getTokenFromResponse(response)
+        timeout = self.Configuration.Timeout
+        response = getResponseFromRequest(self.Session, url, data, timeout)
+        return getTokenFromResponse(self.Setting, response)
 
     def _getCertificat(self):
         verify = True
@@ -287,7 +291,7 @@ class OAuth2Service(unohelper.Base,
         token = self._getTokenFromResponse(response)
         return token != ''
 
-    def _getTokenFromResponse(self, response):
+    def _getTokenFromResponse(self, configuration, response):
         refresh = response.get('refresh_token', None)
         if refresh:
             self.Setting.Url.Scope.Provider.User.RefreshToken = refresh
