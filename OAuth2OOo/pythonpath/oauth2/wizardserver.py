@@ -99,17 +99,19 @@ class Server(Thread):
                 print("WizardServer.run() 1")
                 result = self._getResult(connection)
                 basename = getResourceLocation(self.ctx, g_identifier, 'OAuth2OOo')
-                basename += '/OAuth2Success_%s.html' if result else '/OAuth2Error_%s.html'
+                location = 'https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration'
+                location += '/OAuth2Success_%s' if result else '/OAuth2Error_%s'
+                basename += '/OAuth2Success_%s.md' if result else '/OAuth2Error_%s.md'
                 locale = getCurrentLocale(self.ctx)
-                length, body = getFileSequence(self.ctx, basename % locale.Language, basename % 'en')
+                location = location % locale.Language
+                #length, body = getFileSequence(self.ctx, basename % locale.Language, basename % 'en')
                 header = uno.ByteSequence(b'''\
-HTTP/1.1 200 OK
-Content-Length: %d
-Content-Type: text/html; charset=utf-8
+HTTP/1.1 302 Found
+Location: %s
 Connection: Closed
 
-''' % length)
-                connection.write(header + body)
+''' % location)
+                connection.write(header)
                 connection.close()
                 print("WizardServer.run() 2")
                 self.acceptor.stopAccepting()
