@@ -1,4 +1,4 @@
-# Politique de protection des données pour [OAuth2OOo](https://prrvchr.github.io/OAuth2OOo)
+# Politique de protection des données pour [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo)
 
 ## Introduction:
 
@@ -14,7 +14,7 @@ Pour plus de simplicité, dans la suite de ce document, on nommera:
 
 Cette politique, en plus de `OAuth2OOo`, s’applique également à toutes les `Extension` utilisant des services logiciels de `OAuth2OOo`.
 
-L'utilisation de ce logiciel vous soumet à nos **Conditions d'utilisation** comme décrites dans [ce document:](https://prrvchr.github.io/OAuth2OOo/TermsOfUse_fr.html)
+L'utilisation de ce logiciel vous soumet à nos **Conditions d'utilisation** comme décrites dans [ce document:](https://prrvchr.github.io/OAuth2OOo/TermsOfUse_fr)
 
 ## Contact:
 
