@@ -9,11 +9,14 @@ import unohelper
 from com.sun.star.awt import XRequestCallback
 from com.sun.star.util import XCancellable
 
+from .oauth2tools import g_identifier
+from .oauth2tools import g_response_url
+from .oauth2tools import g_response_path
 from .unotools import createService
 from .unotools import getResourceLocation
 from .unotools import getCurrentLocale
 from .unotools import getFileSequence
-from .oauth2tools import g_identifier
+from .unotools import getSimpleFile
 from .requests.compat import unquote_plus
 
 import time
@@ -98,19 +101,14 @@ class Server(Thread):
             if connection:
                 print("WizardServer.run() 1")
                 result = self._getResult(connection)
-                basename = getResourceLocation(self.ctx, g_identifier, 'OAuth2OOo')
-                location = 'https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration'
-                location += '/OAuth2Success_%s' if result else '/OAuth2Error_%s'
-                basename += '/OAuth2Success_%s.md' if result else '/OAuth2Error_%s.md'
-                locale = getCurrentLocale(self.ctx)
-                location = location % locale.Language
-                #length, body = getFileSequence(self.ctx, basename % locale.Language, basename % 'en')
+                filename = self._getResultFileName(result, g_response_path)
+                location = g_response_url + g_response_path + filename
                 header = uno.ByteSequence(b'''\
 HTTP/1.1 302 Found
 Location: %s
 Connection: Closed
 
-''' % location)
+''' % location.encode())
                 connection.write(header)
                 connection.close()
                 print("WizardServer.run() 2")
@@ -202,3 +200,13 @@ Connection: Closed
                 return True
         self.controller.Error = '%s' % response
         return False
+
+    def _getResultFileName(self, result, path):
+        basename = 'OAuth2Success_%s' if result else 'OAuth2Error_%s'
+        local = getCurrentLocale(self.ctx).Language
+        filename = basename % local
+        url = getResourceLocation(self.ctx, g_identifier, path + filename + '.md')
+        print("WizardServer._getResultFileName() %s" % url)
+        if getSimpleFile(self.ctx).exists(url):
+            return filename
+        return basename % 'en'

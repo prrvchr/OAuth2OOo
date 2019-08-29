@@ -6,7 +6,9 @@
 import uno
 
 from .unotools import getCurrentLocale
+
 from .request import NoOAuth2
+
 from .requests.compat import urlencode
 
 import json
@@ -16,6 +18,8 @@ import hashlib
 g_advance_to = 0 # 0 to disable
 g_wizard_paths = (((1, 2, 3), (1, 2, 4)), ((1, 2, 3, 5), (1, 2, 4, 5)))
 g_identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
+g_response_url = 'https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/'
+g_response_path = 'registration/'
 g_refresh_overlap = 10 # must be positive, in second
 
 
