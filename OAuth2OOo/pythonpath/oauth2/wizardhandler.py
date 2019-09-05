@@ -5,6 +5,8 @@ import uno
 import unohelper
 
 from com.sun.star.awt import XContainerWindowEventHandler
+from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
+from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 
 from .unolib import PropertySet
 
@@ -17,20 +19,21 @@ from .unotools import getProperty
 from .unotools import getStringResource
 from .oauth2tools import getActivePath
 from .oauth2tools import openUrl
+from .oauth2tools import updatePageTokenUI
 #from .oauth2tools import g_wizard_paths
 from .oauth2tools import g_identifier
+from .oauth2tools import getRefreshToken
 
 import traceback
 
 class WizardHandler(unohelper.Base,
                     XContainerWindowEventHandler):
-    def __init__(self, ctx, configuration, wizard):
+    def __init__(self, ctx, session, configuration, wizard, logger):
         self.ctx = ctx
+        self.session = session
         self.Configuration = configuration
         self.Wizard = wizard
-        #self.Wizard = createService(self.ctx, 'com.sun.star.ui.dialogs.Wizard')
-        #arguments = ((uno.Any('[][]short', (g_wizard_paths)), controller), )
-        #uno.invoke(self.Wizard, 'initialize', arguments)
+        self.logger = logger
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
         #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
         #mri.inspect(self.Wizard)
@@ -39,7 +42,6 @@ class WizardHandler(unohelper.Base,
     def callHandlerMethod(self, window, event, method):
         try:
             handled = False
-            print("WizardHandler.callHandlerMethod() %s - %s" % (method, handled))
             if method == 'Add':
                 item = event.Source.Model.Tag
                 id = self._addItem(window, item)
@@ -52,7 +54,10 @@ class WizardHandler(unohelper.Base,
                 handled = self._showDialog(window, method, item)
             elif method == 'Remove':
                 item = event.Source.Model.Tag
-                handled = self._showDialog(window, method, item)
+                if item == 'RemoveToken':
+                    handled = self._updateUI(window, event.Source)
+                else:
+                    handled = self._showDialog(window, method, item)
             elif method == 'Changed':
                 handled = self._updateUI(window, event.Source)
             elif method == 'Clicked':
@@ -65,12 +70,15 @@ class WizardHandler(unohelper.Base,
                 handled = self._updateUI(window, event.Source)
             elif method == 'PerformAction':
                 handled = True
-            print("WizardHandler.callHandlerMethod() %s - %s" % (method, handled))
+            elif method == 'Refresh':
+                handled = self._updateUI(window, event.Source)
+            elif method == 'Reset':
+                handled = self._updateUI(window, event.Source)
             return handled
         except Exception as e:
             print("WizardHandler.callHandlerMethod() ERROR: %s - %s" % (e, traceback.print_exc()))
     def getSupportedMethodNames(self):
-        return ('Add', 'Edit', 'Remove', 'Changed', 'Clicked', 'LoadUrl',
+        return ('Add', 'Edit', 'Remove', 'Refresh', 'Reset', 'Changed', 'Clicked', 'LoadUrl',
                 'StateChange', 'TextChange', 'PerformAction')
 
     def _loadUrl(self, window, control):
@@ -228,32 +236,24 @@ class WizardHandler(unohelper.Base,
                 control.setText(id)
         return True
 
-    def _updateControl1(self, window, control, selection=''):
-        return True
-
     def _updateControl(self, window, control, selection=''):
         item = control.Model.Tag
         if not selection:
             print("WizardHandler._updateControl() ******************************************")
             selection = control.SelectedText
-        print("WizardHandler._updateControl() 1 %s - %s" % (item, selection))
         if item == 'Url':
             self.Configuration.Url.Id = selection
             provider = self.Configuration.Url.ProviderName
             scope = self.Configuration.Url.ScopeName
-            print("WizardHandler._updateControl() 1 %s - %s - %s" % (item, provider, scope))
             window.getControl('ComboBox2').Text = provider
             window.getControl('ComboBox3').Text = scope
         elif item == 'Provider':
             self.Configuration.Url.ProviderName = selection
             scopes = window.getControl('ComboBox3')
-            print("WizardHandler._updateControl() 1 %s - %s" % (item, self.Configuration.Url.ScopeList))
             scopes.Model.StringItemList = self.Configuration.Url.ScopeList
             scopes.Text = ''
-            self.Wizard.activatePath(getActivePath(self.Configuration), True)
         elif item == 'Scope':
             self.Configuration.Url.ScopeName = selection
-            #self.Wizard.updateTravelUI()
         return True
 
     def _isSelected(self, control, item=''):
@@ -275,12 +275,16 @@ class WizardHandler(unohelper.Base,
     def _updateUI(self, window, control):
         try:
             item = control.Model.Tag
-            print("WizardHandler._updateUI() %s - %s" % (item, control.Model.Name))
             if item == 'User':
+                user = control.Text
+                enabled = user != ''
+                self.Configuration.Url.Scope.Provider.User.Id = user
+                self.Wizard.activatePath(getActivePath(self.Configuration), enabled)
                 self.Wizard.updateTravelUI()
             elif item == 'Url':
                 url = control.Text
-                if self._isSelected(control, url):
+                enabled = self._isSelected(control, url)
+                if enabled:
                     self._updateControl(window, control, url)
                     window.getControl('CommandButton1').Model.Enabled = False
                     window.getControl('CommandButton2').Model.Enabled = True
@@ -290,14 +294,14 @@ class WizardHandler(unohelper.Base,
                     canadd &= self._isSelected(window.getControl('ComboBox3'))
                     window.getControl('CommandButton1').Model.Enabled = canadd
                     window.getControl('CommandButton2').Model.Enabled = False
-                    providers = window.getControl('ComboBox2')
-                    #providers.setText('')
                 title = self.stringResource.resolveString('PageWizard1.FrameControl2.Label')
                 window.getControl('FrameControl2').Model.Label = title % url
+                self.Wizard.activatePath(getActivePath(self.Configuration), enabled)
                 self.Wizard.updateTravelUI()
             elif item == 'Provider':
                 provider = control.Text
-                if self._isSelected(control, provider):
+                enabled = self._isSelected(control, provider)
+                if enabled:
                     self._updateControl(window, control, provider)
                     canadd = self._isEdited(window.getControl('ComboBox1'))
                     canadd &= self._isSelected(window.getControl('ComboBox3'))
@@ -314,12 +318,13 @@ class WizardHandler(unohelper.Base,
                     window.getControl('CommandButton5').Model.Enabled = False
                     scopes = window.getControl('ComboBox3')
                     scopes.Model.StringItemList = ()
-                    scopes.setText('')
-                #self.Wizard.activatePath(getActivePath(self.Configuration), True)
+                    scopes.Text = ''
+                self.Wizard.activatePath(getActivePath(self.Configuration), enabled)
                 self.Wizard.updateTravelUI()
             elif item == 'Scope':
                 scope = control.Text
-                if self._isSelected(control, scope):
+                enabled = self._isSelected(control, scope)
+                if enabled:
                     self._updateControl(window, control, scope)
                     canadd = self._isEdited(window.getControl('ComboBox1'))
                     canadd &= self._isSelected(window.getControl('ComboBox2'))
@@ -336,16 +341,29 @@ class WizardHandler(unohelper.Base,
                     window.getControl('CommandButton3').Model.Enabled = canadd
                     window.getControl('CommandButton7').Model.Enabled = False
                     window.getControl('CommandButton8').Model.Enabled = False
-                print("WizardHandler._updateUI() %s  - %s - %s" % (item, scope, control.SelectedText))
+                self.Wizard.activatePath(getActivePath(self.Configuration), enabled)
                 self.Wizard.updateTravelUI()
             elif item == 'AcceptPolicy':
-                print("WizardHandler._updateUI() %s - %s" % (item, control.State))
                 self.Wizard.updateTravelUI()
             elif item == 'AuthorizationCode':
                 enabled = window.getControl('TextField1').Text != ''
                 finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
                 self.Wizard.enableButton(finish, enabled)
                 self.Wizard.updateTravelUI()
+            elif item == 'RefreshToken':
+                if self.Configuration.Url.Scope.Provider.User.HasExpired:
+                    token = getRefreshToken(self.logger, self.session, self.Configuration)
+                updatePageTokenUI(window, self.Configuration, self.stringResource)
+            elif item == 'RemoveToken':
+                user = self.Configuration.Url.Scope.Provider.User
+                user.Scope = ''
+                user.commit()
+                updatePageTokenUI(window, self.Configuration, self.stringResource)
+            elif item == 'ResetToken':
+                user = self.Configuration.Url.Scope.Provider.User
+                user.ExpiresIn = 0
+                user.commit()
+                updatePageTokenUI(window, self.Configuration, self.stringResource)
             return True
         except Exception as e:
             print("WizardHandler._updateUI() ERROR: %s - %s" % (e, traceback.print_exc()))

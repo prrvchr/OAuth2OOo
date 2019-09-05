@@ -12,6 +12,9 @@ from .unotools import getProperty
 from .unotools import getConfiguration
 from .logger import getLogger
 from .oauth2tools import g_identifier
+from .oauth2tools import g_refresh_overlap
+
+import time
 
 
 class WizardConfiguration(unohelper.Base,
@@ -47,6 +50,7 @@ class WizardConfiguration(unohelper.Base,
         self.Url.commit()
         self.Url.Scope.commit()
         self.Url.Scope.Provider.commit()
+        self.Url.Scope.Provider.User.commit()
     def revert(self):
         self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
         self.ConnectTimeout = self.configuration.getByName('ConnectTimeout')
@@ -230,6 +234,15 @@ class ScopeWriter(unohelper.Base,
         if self.Id in self.Scopes:
             self.Scopes[self.Id]['Values'] = values
     @property
+    def Authorized(self):
+        values = self.Values
+        authorized = len(values) != 0
+        for value in values:
+            if value not in self.Provider.User.Scopes:
+                authorized = False
+                break
+        return authorized
+    @property
     def State(self):
         state = 2
         if self.Id in self.Scopes:
@@ -275,6 +288,7 @@ class ScopeWriter(unohelper.Base,
         properties['Id'] = getProperty('Id', 'string', transient)
         properties['Value'] = getProperty('Value', 'string', readonly)
         properties['Values'] = getProperty('Values', '[]string', transient)
+        properties['Authorized'] = getProperty('Authorized', 'boolean', readonly)
         properties['State'] = getProperty('State', 'short', transient)
         return properties
 
@@ -499,12 +513,13 @@ class ProviderWriter(unohelper.Base,
 
 class UserWriter(unohelper.Base,
                  XUpdatable,
+                 XTransactedObject,
                  PropertySet):
     def __init__(self, configuration):
         self.configuration = configuration
         self._Id = ''
         self._ProviderId = ''
-        self._Scopes = []
+        self.revert()
 
     @property
     def Id(self):
@@ -521,14 +536,32 @@ class UserWriter(unohelper.Base,
         self._ProviderId = id
         self.update()
     @property
+    def HasExpired(self):
+        return False if self.NeverExpires else self.ExpiresIn < g_refresh_overlap
+    @property
+    def ExpiresIn(self):
+        now = int(time.time())
+        return g_refresh_overlap if self.NeverExpires else max(0, self._TimeStamp - now)
+    @ExpiresIn.setter
+    def ExpiresIn(self, second):
+        now = int(time.time())
+        self._TimeStamp = second + now
+    @property
     def Scope(self):
         return ' '.join(self._Scopes)
+    @Scope.setter
+    def Scope(self, scope):
+        self._Scopes = scope.split(' ')
     @property
     def Scopes(self):
         return tuple(self._Scopes)
 
     # XUpdatable
     def update(self):
+        accesstoken = ''
+        refreshtoken = ''
+        neverexpires = False
+        timestamp = 0
         scopes = []
         providers = self.configuration.getByName('Providers')
         if providers.hasByName(self.ProviderId):
@@ -536,8 +569,41 @@ class UserWriter(unohelper.Base,
             users = provider.getByName('Users')
             if users.hasByName(self.Id):
                 user = users.getByName(self.Id)
+                accesstoken = user.getByName('AccessToken')
+                refreshtoken = user.getByName('RefreshToken')
+                neverexpires = user.getByName('NeverExpires')
+                timestamp = user.getByName('TimeStamp')
                 scopes = list(user.getByName('Scopes'))
+        self.AccessToken = accesstoken
+        self.RefreshToken = refreshtoken
+        self.NeverExpires = neverexpires
+        self._TimeStamp = timestamp
         self._Scopes = scopes
+
+    # XTransactedObject
+    def commit(self):
+        providers = self.configuration.getByName('Providers')
+        if providers.hasByName(self.ProviderId):
+            provider = providers.getByName(self.ProviderId)
+            users = provider.getByName('Users')
+            if not users.hasByName(self.Id):
+                users.insertByName(self.Id, users.createInstance())
+            user = users.getByName(self.Id)
+            user.replaceByName('AccessToken', self.AccessToken)
+            user.replaceByName('RefreshToken', self.RefreshToken)
+            user.replaceByName('NeverExpires', self.NeverExpires)
+            user.replaceByName('TimeStamp', self._TimeStamp)
+            # user.replaceByName('Scopes', self._Scopes)
+            arguments = ('Scopes', uno.Any('[]string', self.Scopes))
+            uno.invoke(user, 'replaceByName', arguments)
+            if self.configuration.hasPendingChanges():
+                self.configuration.commitChanges()
+    def revert(self):
+        self.AccessToken = ''
+        self.RefreshToken = ''
+        self.NeverExpires = False
+        self._TimeStamp = 0
+        self._Scopes = []
 
     def _getPropertySetInfo(self):
         properties = {}
@@ -545,6 +611,11 @@ class UserWriter(unohelper.Base,
         transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
         properties['Id'] = getProperty('Id', 'string', transient)
         properties['ProviderId'] = getProperty('ProviderId', 'string', transient)
+        properties['AccessToken'] = getProperty('AccessToken', 'string', transient)
+        properties['RefreshToken'] = getProperty('RefreshToken', 'string', transient)
+        properties['NeverExpires'] = getProperty('NeverExpires', 'boolean', transient)
+        properties['ExpiresIn'] = getProperty('ExpiresIn', 'short', transient)
+        properties['HasExpired'] = getProperty('HasExpired', 'boolean', readonly)
         properties['Scopes'] = getProperty('Scopes', '[]string', readonly)
-        properties['Scope'] = getProperty('Scope', 'string', readonly)
+        properties['Scope'] = getProperty('Scope', 'string', transient)
         return properties

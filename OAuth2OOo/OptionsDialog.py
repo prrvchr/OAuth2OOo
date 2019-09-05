@@ -79,10 +79,12 @@ class OptionsDialog(unohelper.Base,
         elif method == 'ClearLog':
             self._doClearLog(dialog)
             handled = True
+        elif method == 'AutoClose':
+            handled = True
         return handled
     def getSupportedMethodNames(self):
         return ('external_event', 'Logger', 'TextChanged', 'SelectionChanged', 'Connect',
-                'Remove', 'Reset', 'ViewLog', 'ClearLog')
+                'Remove', 'Reset', 'ViewLog', 'ClearLog', 'AutoClose')
 
     def _doTextChanged(self, dialog, control):
         print("OptionsDialog._doTextChanged()")
@@ -104,33 +106,19 @@ class OptionsDialog(unohelper.Base,
             self.service.UserName = text
         elif item == 'Url':
             self.service.ResourceUrl = text
-        self._updateUI(dialog)
         print("OptionsDialog._doChanged()")
 
     def _doConnect(self, dialog):
         try:
-            user = dialog.getControl('TextField1').Text
+            user = ''
             url = dialog.getControl('ComboBox2').SelectedText
             print("OptionDialog._doConnect() 1 %s - %s" % (user, url))
-            enabled = self.service.getAuthorization(url, user, 1)
+            enabled = self.service.getAuthorization(url, user, False)
             print("OptionDialog._doConnect() 2")
-            self._updateUI(dialog, enabled)
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
             self.Logger.logp(SEVERE, "OptionsDialog", "_doConnect()", msg)
             print("OptionsDialog._doConnect() %s" % msg)
-
-    def _doRemove(self, dialog):
-        user = self.service.Setting.Url.Scope.Provider.User
-        user.Scope = ''
-        user.commit()
-        self._updateUI(dialog, False)
-
-    def _doReset(self, dialog):
-        user = self.service.Setting.Url.Scope.Provider.User
-        user.ExpiresIn = 0
-        user.commit()
-        self._updateUI(dialog, False)
 
     def _loadSetting(self, dialog):
         dialog.getControl('NumericField1').setValue(self.service.Setting.ConnectTimeout)
@@ -145,36 +133,6 @@ class OptionsDialog(unohelper.Base,
         self.service.Setting.HandlerTimeout = int(dialog.getControl('NumericField3').getValue())
         self.service.Setting.commit()
         self._saveLoggerSetting(dialog)
-
-    def _updateUI(self, dialog, enabled):
-        if enabled:
-            refresh = self.service.Setting.Url.Scope.Provider.User.RefreshToken
-            access = self.service.Setting.Url.Scope.Provider.User.AccessToken
-            expire = self.service.Setting.Url.Scope.Provider.User.ExpiresIn
-        else:
-            refresh = self.stringResource.resolveString('OptionsDialog.Label8.Label')
-            access = self.stringResource.resolveString('OptionsDialog.Label10.Label')
-            expire = self.stringResource.resolveString('OptionsDialog.Label12.Label')
-        dialog.getControl('Label8').setText(refresh)
-        dialog.getControl('Label10').setText(access)
-        dialog.getControl('Label12').setText(expire)
-        dialog.getControl('CommandButton3').Model.Enabled = enabled
-        dialog.getControl('CommandButton4').Model.Enabled = enabled
-
-    def _updateUI1(self, dialog):
-        enabled = self.service.ResourceUrl != '' and self.service.UserName != ''
-        dialog.getControl('CommandButton2').Model.Enabled = enabled
-        enabled = enabled and self.service.Setting.Url.Scope.Authorized
-        if enabled:
-            dialog.getControl('Label8').setText(self.service.Setting.Url.Scope.Provider.User.RefreshToken)
-            dialog.getControl('Label10').setText(self.service.Setting.Url.Scope.Provider.User.AccessToken)
-            dialog.getControl('Label12').setText(self.service.Setting.Url.Scope.Provider.User.ExpiresIn)
-        else:
-            dialog.getControl('Label8').setText(self.stringResource.resolveString('OptionsDialog.Label8.Label'))
-            dialog.getControl('Label10').setText(self.stringResource.resolveString('OptionsDialog.Label10.Label'))
-            dialog.getControl('Label12').setText(self.stringResource.resolveString('OptionsDialog.Label12.Label'))
-        dialog.getControl('CommandButton3').Model.Enabled = enabled
-        dialog.getControl('CommandButton4').Model.Enabled = enabled
 
     def _toggleLogger(self, dialog, enabled):
         dialog.getControl('Label1').Model.Enabled = enabled

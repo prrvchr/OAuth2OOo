@@ -5,6 +5,9 @@ import uno
 import unohelper
 
 from com.sun.star.ui.dialogs import XWizardController
+from com.sun.star.awt import XCallback
+from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
+from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
@@ -38,26 +41,28 @@ import traceback
 
 class WizardController(unohelper.Base,
                        PropertySet,
-                       XWizardController):
-    def __init__(self, ctx, session, url, username, path):
+                       XWizardController,
+                       XCallback):
+    def __init__(self, ctx, session, url, username, autoclose):
         self.ctx = ctx
         self.Session = session
         self.Configuration = WizardConfiguration(self.ctx)
         self.ResourceUrl = url
         self.UserName = username
+        self.AutoClose = autoclose
         self.AuthorizationCode = uno.createUnoStruct('com.sun.star.beans.Optional<string>')
         self.Server = WizardServer(self.ctx)
         self.Uuid = generateUuid()
-        self.advanceTo = g_advance_to # 0 to disable
         self.Wizard = createService(self.ctx, 'com.sun.star.ui.dialogs.Wizard')
-        self.Path = path
-        arguments = ((uno.Any('[][]short', (g_wizard_paths[path])), self), )
+        arguments = ((uno.Any('[][]short', g_wizard_paths), self), )
         uno.invoke(self.Wizard, 'initialize', arguments)
         self.Error = ''
         self.Logger = getLogger(self.ctx)
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
         service = 'com.sun.star.awt.ContainerWindowProvider'
         self.provider = self.ctx.ServiceManager.createInstanceWithContext(service, self.ctx)
+        #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
+        #mri.inspect(self.Wizard)
 
     @property
     def ResourceUrl(self):
@@ -78,25 +83,38 @@ class WizardController(unohelper.Base,
     def CodeVerifier(self):
         return self.Uuid + self.Uuid
 
+    # XCallback
+    def notify(self, percent):
+        page = self.Wizard.CurrentPage
+        if page.PageId == 3 and page.Window:
+            page.Window.getControl('ProgressBar1').Value = percent
+            if percent == 100:
+                print("WizardController.notify()")
+                self.Wizard.updateTravelUI()
+                #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
+                #mri.inspect(self.Wizard)
+                if page.canAdvance():
+                    self.Wizard.travelNext()
+                    #self.Wizard.DialogWindow.endDialog(OK)
+
     # XWizardController
     def createPage(self, parent, id):
         try:
             print("WizardController.createPage() %s" % id)
             msg = "PageId: %s ..." % id
-            handler = WizardHandler(self.ctx, self.Configuration, self.Wizard)
+            handler = WizardHandler(self.ctx,
+                                    self.Session,
+                                    self.Configuration,
+                                    self.Wizard,
+                                    self.Logger)
             url = getDialogUrl('OAuth2OOo', 'PageWizard%s' % id)
             window = self.provider.createContainerWindow(url, '', parent, handler)
-            #window = getContainerWindow(self.ctx, parent, handler, 'OAuth2OOo', xdl)
-            #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
-            #mri.inspect(handler)
             page = WizardPage(self.ctx,
                               self.Configuration,
                               id,
                               window,
                               self.Uuid,
                               self.AuthorizationCode)
-            #if id == 3:
-            #    self.Server.addCallback(page, self)
             msg += " Done"
             self.Logger.logp(INFO, "WizardController", "createPage()", msg)
             print("WizardController.createPage() %s Done" % id)
@@ -109,53 +127,77 @@ class WizardController(unohelper.Base,
     def canAdvance(self):
         return self.Wizard.CurrentPage.canAdvance()
     def onActivatePage(self, id):
-        print("WizardController.onActivatePage(): %s" % id)
-        msg = "PageId: %s..." % id
-        title = self.stringResource.resolveString('PageWizard%s.Title' % (id, ))
-        self.Wizard.setTitle(title)
-        backward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.PREVIOUS')
-        forward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.NEXT')
-        finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
-        self.Wizard.enableButton(finish, False)
-        if id == 1:
-            pass
-            #self.Wizard.activatePath(self.ActivePath, True)
-            #self.Wizard.updateTravelUI()
-        #travel = self.advanceTo - id
-        #if not self.canAdvance():
-        #    self.advanceTo = 0
-        #elif travel > 0:
-        #    if travel == 1:
-        #        self.advanceTo = 0
-        #    self.Wizard.travelNext()
-        elif id == 3:
-            self.Server.addCallback(self.Wizard.CurrentPage, self)
-            self.Wizard.enableButton(backward, False)
-            self.Wizard.enableButton(forward, False)
+        try:
+            print("WizardController.onActivatePage():1 %s" % id)
+            msg = "PageId: %s..." % id
+            title = self.stringResource.resolveString('PageWizard%s.Title' % (id, ))
+            self.Wizard.setTitle(title)
+            backward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.PREVIOUS')
+            forward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.NEXT')
+            finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
             self.Wizard.enableButton(finish, False)
-        elif id == 4:
-            self.Wizard.enableButton(backward, False)
-            self.Wizard.enableButton(forward, False)
-            self.Wizard.enableButton(finish, False)
-        msg += " Done"
-        self.Logger.logp(INFO, "WizardController", "onActivatePage()", msg)
+            if id == 1:
+                path = getActivePath(self.Configuration)
+                self.Wizard.activatePath(path, True)
+                page = self.Wizard.CurrentPage
+                if page.FirstLoad:
+                    page.FirstLoad = False
+                    if page.canAdvance():
+                        print("WizardController.onActivatePage():2 %s" % id)
+                        self.Wizard.travelNext()
+                        print("WizardController.onActivatePage():3 %s" % id)
+            elif id == 2:
+                pass
+                #if self.Shortened:
+                #    self.Wizard.activatePath(getActivePath(self.Configuration), False)
+            elif id == 3:
+                self.Server.addCallback(self, self.Configuration)
+                self.Wizard.enableButton(backward, False)
+                self.Wizard.enableButton(forward, False)
+                #self.Wizard.enableButton(finish, False)
+            elif id == 4:
+                self.Wizard.enableButton(backward, False)
+                self.Wizard.enableButton(forward, False)
+                #self.Wizard.enableButton(finish, False)
+            elif id == 5:
+                self.Wizard.enableButton(backward, False)
+                self.Wizard.enableButton(finish, True)
+            self.Wizard.updateTravelUI()
+            msg += " Done"
+            self.Logger.logp(INFO, "WizardController", "onActivatePage()", msg)
+        except Exception as e:
+            print("WizardController.onActivatePage() ERROR: %s - %s" % (e, traceback.print_exc()))
     def onDeactivatePage(self, id):
-        if id in (3, 4):
-            self._registerTokens()
-            #self.Server.cancel()
-        print("WizardController.onDeactivatePage(): %s" % id)
+        try:
+            print("WizardController.onDeactivatePage(): %s" % id)
+            if id == 1:
+                pass
+                #path = getActivePath(self.Configuration)
+                #self.Wizard.activatePath(path, True)
+                #self.Wizard.updateTravelUI()
+            elif id in (3, 4) and self.AuthorizationCode.IsPresent:
+                self._registerTokens()
+            print("WizardController.onDeactivatePage(): %s" % id)
+        except Exception as e:
+            print("WizardController.onDeactivatePage() ERROR: %s - %s" % (e, traceback.print_exc()))
     def confirmFinish(self):
         return True
 
     def _registerTokens(self):
+        result = False
         code = self.AuthorizationCode.Value
         url = self.Configuration.Url.Scope.Provider.TokenUrl
         data = getTokenParameters(self.Configuration, code, self.CodeVerifier)
         message = "Make Http Request: %s?%s" % (url, data)
         self.Logger.logp(INFO, 'WizardController', '_registerTokens', message)
         timeout = self.Configuration.Timeout
-        response = getResponseFromRequest(self.Session, url, data, timeout)
-        return registerTokenFromResponse(self.Configuration, response)
+        response = getResponseFromRequest(self.Logger, self.Session, url, data, timeout)
+        print("WizardController._registerTokens() %s" % (response, ))
+        result = registerTokenFromResponse(self.Configuration, response)
+        if result:
+            self.Configuration.commit()
+        print("WizardController._registerTokens() %s" % result)
+        return result
 
     def _getPropertySetInfo(self):
         properties = {}
@@ -167,7 +209,7 @@ class WizardController(unohelper.Base,
         properties['Wizard'] = getProperty('Wizard', 'com.sun.star.ui.dialogs.XWizard', readonly)
         properties['ResourceUrl'] = getProperty('ResourceUrl', 'string', transient)
         properties['UserName'] = getProperty('UserName', 'string', transient)
-        properties['Path'] = getProperty('Path', 'short', readonly)
+        properties['AutoClose'] = getProperty('AutoClose', 'boolean', readonly)
         properties['ActivePath'] = getProperty('ActivePath', 'short', readonly)
         properties['AuthorizationCode'] = getProperty('AuthorizationCode', optional, bound)
         properties['Uuid'] = getProperty('Uuid', 'string', readonly)

@@ -20,7 +20,7 @@ interface XOAuth2Service: com::sun::star::uno::XInterface
     boolean initializeUser([in] string UserName);
     boolean getAuthorization([in] string ResourceUrl,
                              [in] string UserName,
-                             [in] short Path);
+                             [in] boolean AutoClose);
     void logp([in] long Level,
               [in] string Source,
               [in] string Method,

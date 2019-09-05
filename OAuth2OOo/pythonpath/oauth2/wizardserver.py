@@ -8,6 +8,8 @@ import unohelper
 
 from com.sun.star.awt import XRequestCallback
 from com.sun.star.util import XCancellable
+from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
+from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 
 from .oauth2tools import g_identifier
 from .oauth2tools import g_response_url
@@ -38,20 +40,25 @@ class WizardServer(unohelper.Base,
             self.watchdog.cancel()
 
     # XRequestCallback
-    def addCallback(self, page, controller):
+    def addCallback(self, controller, configuration):
         lock = Condition()
-        server = Server(self.ctx, controller, lock)
-        timeout = controller.Configuration.HandlerTimeout
-        self.watchdog = WatchDog(server, page, timeout, lock)
+        code = controller.AuthorizationCode
+        uuid = controller.Uuid
+        error = controller.Error
+        address = configuration.Url.Scope.Provider.RedirectAddress
+        port = configuration.Url.Scope.Provider.RedirectPort
+        server = Server(self.ctx, code, uuid, error, address, port, lock)
+        timeout = configuration.HandlerTimeout
+        self.watchdog = WatchDog(server, controller, timeout, lock)
         server.start()
         self.watchdog.start()
 
 
 class WatchDog(Thread):
-    def __init__(self, server, page, timeout, lock):
+    def __init__(self, server, controller, timeout, lock):
         Thread.__init__(self)
         self.server = server
-        self.page = page
+        self.controller = controller
         self.timeout = timeout
         self.end = 0
         self.step = 50
@@ -61,20 +68,19 @@ class WatchDog(Thread):
         wait = self.timeout/self.step
         start = now = timer()
         self.end = start + self.timeout
-        self.page.notify(0)
+        self.controller.notify(0)
         canceled = True
         with self.lock:
             while now < self.end and self.server.is_alive():
                 elapsed = now - start
                 percent = int(elapsed / self.timeout * 100)
-                self.page.notify(percent)
+                self.controller.notify(percent)
                 self.lock.wait(wait)
                 now = timer()
-            if self.end != 0:
-                canceled = False
-                self.page.notify(100)
             if self.server.is_alive():
-                self.server.cancel(canceled)
+                self.server.acceptor.stopAccepting()
+            if self.end != 0:
+                self.controller.notify(100)
             self.lock.notifyAll()
 
     def cancel(self):
@@ -84,21 +90,20 @@ class WatchDog(Thread):
 
 
 class Server(Thread):
-    def __init__(self, ctx, controller, lock):
+    def __init__(self, ctx, code, uuid, error, address, port, lock):
         Thread.__init__(self)
         self.ctx = ctx
-        self.controller = controller
-        self.lock = lock
-        self.canceled = False
+        self.code = code
+        self.uuid = uuid
+        self.error = error
+        self.argument = 'socket,host=%s,port=%s,tcpNoDelay=1' % (address, port)
         self.acceptor = createService(self.ctx, 'com.sun.star.connection.Acceptor')
+        self.lock = lock
 
     def run(self):
-        address = self.controller.Configuration.Url.Scope.Provider.RedirectAddress
-        port = self.controller.Configuration.Url.Scope.Provider.RedirectPort
-        ok = uno.getConstantByName('com.sun.star.ui.dialogs.ExecutableDialogResults.OK')
-        connection = self.acceptor.accept('socket,host=%s,port=%s,tcpNoDelay=1' % (address, port))
-        with self.lock:
-            if connection:
+        connection = self.acceptor.accept(self.argument)
+        if connection:
+            with self.lock:
                 print("WizardServer.run() 1")
                 result = self._getResult(connection)
                 filename = self._getResultFileName(result, g_response_path)
@@ -114,23 +119,8 @@ Connection: Closed
                 print("WizardServer.run() 2")
                 self.acceptor.stopAccepting()
                 print("WizardServer.run() 3")
-            if not self.canceled:
+                self.lock.notifyAll()
                 print("WizardServer.run() 4")
-                if self.controller.Path:
-                    print("WizardServer.run() 5")
-                    self.controller.Wizard.updateTravelUI()
-                    if self.controller.canAdvance():
-                        print("WizardServer.run() 6")
-                        self.controller.Wizard.travelNext()
-                else:
-                    print("WizardServer.run() 7")
-                    self.controller.Wizard.DialogWindow.endDialog(ok)
-            print("WizardServer.run() 8")
-            self.lock.notifyAll()
-
-    def cancel(self, state):
-        self.canceled = state
-        self.acceptor.stopAccepting()
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)
@@ -194,11 +184,11 @@ Connection: Closed
         parameters = self._getParameters(connection)
         response = self._getResponse(parameters)
         if 'code' in response and 'state' in response:
-            if response['state'] == self.controller.Uuid:
-                self.controller.AuthorizationCode.Value = response['code']
-                self.controller.AuthorizationCode.IsPresent = True
+            if response['state'] == self.uuid:
+                self.code.Value = response['code']
+                self.code.IsPresent = True
                 return True
-        self.controller.Error = '%s' % response
+        self.error = 'Request response Error: %s - %s' % (parameters, response)
         return False
 
     def _getResultFileName(self, result, path):
@@ -206,7 +196,6 @@ Connection: Closed
         local = getCurrentLocale(self.ctx).Language
         filename = basename % local
         url = getResourceLocation(self.ctx, g_identifier, path + filename + '.md')
-        print("WizardServer._getResultFileName() %s" % url)
         if getSimpleFile(self.ctx).exists(url):
             return filename
         return basename % 'en'

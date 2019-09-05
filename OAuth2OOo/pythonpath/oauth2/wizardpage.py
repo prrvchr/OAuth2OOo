@@ -5,7 +5,6 @@ import uno
 import unohelper
 
 from com.sun.star.ui.dialogs import XWizardPage
-from com.sun.star.awt import XCallback
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
@@ -25,13 +24,14 @@ from .oauth2tools import getAuthorizationStr
 from .oauth2tools import getAuthorizationUrl
 from .oauth2tools import checkUrl
 from .oauth2tools import openUrl
+from .oauth2tools import updatePageTokenUI
 
 import traceback
 
 
 class WizardPage(unohelper.Base,
-                 XWizardPage,
-                 XCallback):
+                 PropertySet,
+                 XWizardPage):
     def __init__(self, ctx, configuration, id, window, uuid, result):
         try:
             msg = "PageId: %s ..." % id
@@ -45,6 +45,7 @@ class WizardPage(unohelper.Base,
             print("WizardPage.__init__() 4")
             self.Uuid = uuid
             self.AuthorizationCode = result
+            self.FirstLoad = True
             print("WizardPage.__init__() 5")
             self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
             msg += " Done"
@@ -61,41 +62,27 @@ class WizardPage(unohelper.Base,
         msg = "PageId: %s ..." % self.PageId
         if self.PageId == 1:
             username = self.Configuration.Url.Scope.Provider.User.Id
-            #if username:
             self.Window.getControl('TextField1').Text = username
-            urls = self.Configuration.UrlList
             control = self.Window.getControl('ComboBox1')
-            #if urls:
-            control.Model.StringItemList = urls
+            control.Model.StringItemList = self.Configuration.UrlList
             providers = self.Configuration.Url.ProviderList
-            #if providers:
             self.Window.getControl('ComboBox2').Model.StringItemList = providers
-            url = self.Configuration.Url.Id
-            #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
-            #mri.inspect(control)
-            #if url:
-            print("WizardPage.activatePage() 1 Url %s" % url)
-            control.Text = url
-            #else:
-            #    title = self.stringResource.resolveString('PageWizard1.FrameControl2.Label')
-            #    self.Window.getControl('FrameControl2').Model.Label = title % ''
-
-
+            control.Text = self.Configuration.Url.Id
         elif self.PageId == 2:
             url = getAuthorizationStr(self.ctx, self.Configuration, self.Uuid)
             self.Window.getControl('TextField1').Text = url
-            #address = self.Configuration.Url.Scope.Provider.RedirectAddress
-            #self.Window.getControl('TextField3').setText(address)
-            #port = self.Configuration.Url.Scope.Provider.RedirectPort
-            #self.Window.getControl('NumericField1').setValue(port)
-            #option = 'OptionButton%s' % getActivePath(self.Configuration)
-            #self.Window.getControl(option).setState(True)
         elif self.PageId == 3:
             url = getAuthorizationUrl(self.ctx, self.Configuration, self.Uuid)
             openUrl(self.ctx, url)
         elif self.PageId == 4:
             url = getAuthorizationUrl(self.ctx, self.Configuration, self.Uuid)
             openUrl(self.ctx, url)
+        elif self.PageId == 5:
+            username = self.Configuration.Url.Scope.Provider.User.Id
+            provider = self.Configuration.Url.ProviderName
+            title = self.stringResource.resolveString('PageWizard5.FrameControl1.Label')
+            self.Window.getControl('FrameControl1').Model.Label = title % (username, provider)
+            updatePageTokenUI(self.Window, self.Configuration, self.stringResource)
         self.Window.setVisible(True)
         msg += " Done"
         self.Logger.logp(level, 'WizardPage', 'activatePage()', msg)
@@ -107,14 +94,11 @@ class WizardPage(unohelper.Base,
         finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardTravelType.FINISH')
         self.Window.setVisible(False)
         if self.PageId == 1 and reason == forward:
-            name = self.Window.getControl('TextField1').Text
-            self.Configuration.Url.Scope.Provider.User.Id = name
+            pass
+            #name = self.Window.getControl('TextField1').Text
+            #self.Configuration.Url.Scope.Provider.User.Id = name
         elif self.PageId == 2:
             pass
-            #address = self.Window.getControl('TextField3').getText()
-            #self.Configuration.Url.Scope.Provider.RedirectAddress = address
-            #port = int(self.Window.getControl('NumericField1').getValue())
-            #self.Configuration.Url.Scope.Provider.RedirectPort = port
         elif self.PageId == 3:
             pass
         elif self.PageId == 4:
@@ -132,27 +116,16 @@ class WizardPage(unohelper.Base,
             advance &= self.Window.getControl('CommandButton2').Model.Enabled
             advance &= self.Window.getControl('CommandButton5').Model.Enabled
             advance &= self.Window.getControl('CommandButton8').Model.Enabled
-            #url = self.Window.getControl('ComboBox1').SelectedText
-            #urls = self.Window.getControl('ComboBox1').Model.StringItemList
-            #provider = self.Window.getControl('ComboBox2').SelectedText
-            #providers = self.Window.getControl('ComboBox2').Model.StringItemList
-            #scope = self.Window.getControl('ComboBox3').SelectedText
-            #scopes = self.Window.getControl('ComboBox3').Model.StringItemList
-            #advance = advance and (url in urls) and (provider in providers) and (scope in scopes)
         elif self.PageId == 2:
             advance = checkUrl(self.ctx, self.Configuration, self.Uuid)
             advance &= bool(self.Window.getControl('CheckBox1').Model.State)
         elif self.PageId == 3:
             advance = self.AuthorizationCode.IsPresent
+            advance = True
         elif self.PageId == 4:
             advance = self.Window.getControl('TextField1').Text != ''
         print("WizardPage.canAdvance(): %s - %s" % (self.PageId, advance))
         return advance
-
-    # XCallback
-    def notify(self, percent):
-        if self.PageId == 3 and self.Window:
-            self.Window.getControl('ProgressBar1').setValue(percent)
 
     def _getPropertySetInfo(self):
         properties = {}
@@ -165,4 +138,5 @@ class WizardPage(unohelper.Base,
         properties['Window'] = getProperty('Window', 'com.sun.star.awt.XWindow', readonly)
         properties['Uuid'] = getProperty('Uuid', 'string', readonly)
         properties['AuthorizationCode'] = getProperty('AuthorizationCode', optional, transient)
+        properties['FirstLoad'] = getProperty('FirstLoad', 'boolean', transient)
         return properties

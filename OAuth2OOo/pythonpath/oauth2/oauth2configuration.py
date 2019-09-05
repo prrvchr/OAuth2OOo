@@ -120,7 +120,7 @@ class ScopeReader(unohelper.Base,
         self.Provider.Id = provider
 
     @property
-    def Values(self):
+    def Value(self):
         values = list(self.Provider.User.Scopes)
         for value in self._Values:
             if value not in values:
@@ -141,7 +141,7 @@ class ScopeReader(unohelper.Base,
         transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
         properties['Provider'] = getProperty('Provider', 'com.sun.star.uno.XInterface', readonly)
         properties['Id'] = getProperty('Id', 'string', transient)
-        properties['Values'] = getProperty('Values', 'string', readonly)
+        properties['Value'] = getProperty('Value', 'string', readonly)
         properties['Authorized'] = getProperty('Authorized', 'boolean', readonly)
         return properties
 
@@ -284,7 +284,7 @@ class UserReader(unohelper.Base,
         refreshtoken = ''
         neverexpires = False
         timestamp = 0
-        scope = []
+        scopes = []
         providers = self.configuration.getByName('Providers')
         if providers.hasByName(self.ProviderId):
             provider = providers.getByName(self.ProviderId)
@@ -295,12 +295,12 @@ class UserReader(unohelper.Base,
                 refreshtoken = user.getByName('RefreshToken')
                 neverexpires = user.getByName('NeverExpires')
                 timestamp = user.getByName('TimeStamp')
-                scope = list(user.getByName('Scopes'))
+                scopes = list(user.getByName('Scopes'))
         self.AccessToken = accesstoken
         self.RefreshToken = refreshtoken
         self.NeverExpires = neverexpires
         self._TimeStamp = timestamp
-        self._Scopes = scope
+        self._Scopes = scopes
 
     # XTransactedObject
     def commit(self):

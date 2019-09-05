@@ -5,6 +5,9 @@
 
 import uno
 
+from com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import SEVERE
+
 from .unotools import getCurrentLocale
 
 from .request import NoOAuth2
@@ -16,7 +19,7 @@ import base64
 import hashlib
 
 g_advance_to = 0 # 0 to disable
-g_wizard_paths = (((1, 2, 3), (1, 2, 4)), ((1, 2, 3, 5), (1, 2, 4, 5)))
+g_wizard_paths = ((1, 2, 3, 5), (1, 2, 4, 5), (1, 5))
 g_identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
 g_response_url = 'https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/'
 g_response_path = 'registration/'
@@ -24,7 +27,13 @@ g_refresh_overlap = 10 # must be positive, in second
 
 
 def getActivePath(configuration):
-    return 0 if configuration.Url.Scope.Provider.HttpHandler else 1
+    if configuration.Url.Scope.Authorized:
+        activepath = 2
+    elif configuration.Url.Scope.Provider.HttpHandler:
+        activepath = 0
+    else:
+        activepath = 1
+    return activepath
 
 def getAuthorizationStr(ctx, configuration, uuid):
     main = configuration.Url.Scope.Provider.AuthorizationUrl
@@ -46,6 +55,26 @@ def getAuthorizationUrl(ctx, configuration, uuid):
     main = configuration.Url.Scope.Provider.AuthorizationUrl
     parameters = urlencode(_getUrlParameters(ctx, configuration, uuid))
     return '%s?%s' % (main, parameters)
+
+def updatePageTokenUI(window, configuration, strings):
+    enabled = configuration.Url.Scope.Authorized
+    if enabled:
+        scope = configuration.Url.Scope.Provider.User.Scope
+        refresh = configuration.Url.Scope.Provider.User.RefreshToken
+        access = configuration.Url.Scope.Provider.User.AccessToken
+        expire = configuration.Url.Scope.Provider.User.ExpiresIn
+    else:
+        scope = strings.resolveString('PageWizard5.Label2.Label')
+        refresh = strings.resolveString('PageWizard5.Label4.Label')
+        access = strings.resolveString('PageWizard5.Label6.Label')
+        expire = strings.resolveString('PageWizard5.Label8.Label')
+    window.getControl('Label2').Text = scope
+    window.getControl('Label4').Text = refresh
+    window.getControl('Label6').Text = access
+    window.getControl('Label8').Text = expire
+    window.getControl('CommandButton1').Model.Enabled = enabled
+    window.getControl('CommandButton2').Model.Enabled = enabled
+    window.getControl('CommandButton3').Model.Enabled = enabled
 
 def _getUrlArguments(ctx, configuration, uuid):
     arguments = []
@@ -97,23 +126,36 @@ def getTokenParameters(setting, code, codeverifier):
     parameters = _parseParameters(parameters, optional, option)
     return parameters
 
-def getResponseFromRequest(session, url, data, timeout):
+def getResponseFromRequest(logger, session, url, data, timeout):
     response = {}
-    message = ''
     try:
         with session as s:
-            with s.post(url, data=data, timeout=timeout, auth=NoOAuth2) as r:
+            with s.post(url, data=data, timeout=timeout, auth=NoOAuth2()) as r:
                 if r.status_code == s.codes.ok:
                     response = r.json()
                 else:
-                    message = "ERROR: %s" % r.text
+                    error = "ERROR: %s" % r.text
+                    logger.logp(SEVERE, 'oauth2tools', 'getResponseFromRequest', error)
     except Exception as e:
-        message = "ERROR: %s" % e
-    return response, message
+        error = "ERROR: %s" % e
+        logger.logp(SEVERE, 'oauth2tools', 'getResponseFromRequest', error)
+    return response
 
 def registerTokenFromResponse(configuration, response):
     token = getTokenFromResponse(configuration, response)
     return token != ''
+
+def getRefreshToken(logger, session, configuration):
+    url = configuration.Url.Scope.Provider.TokenUrl
+    data = getRefreshParameters(configuration)
+    message = "Make Http Request: %s?%s" % (url, data)
+    logger.logp(INFO, 'oauth2tools', 'refreshToken', message)
+    timeout = configuration.Timeout
+    response = getResponseFromRequest(logger, session, url, data, timeout)
+    token = getTokenFromResponse(configuration, response)
+    if token:
+        configuration.Url.Scope.Provider.User.commit()
+    return token
 
 def getTokenFromResponse(configuration, response):
     refresh = response.get('refresh_token', None)
@@ -125,10 +167,10 @@ def getTokenFromResponse(configuration, response):
     token = response.get('access_token', '')
     if token:
         configuration.Url.Scope.Provider.User.AccessToken = token
-        scope = configuration.Url.Scope.Values
+        scope = configuration.Url.Scope.Value
         configuration.Url.Scope.Provider.User.Scope = scope
         configuration.Url.Scope.Provider.User.NeverExpires = expires is None
-        configuration.Url.Scope.Provider.User.commit()
+        #configuration.Url.Scope.Provider.User.commit()
     return token
 
 def _getTokenBaseParameters(setting, code, codeverifier):
@@ -144,7 +186,7 @@ def _getTokenBaseParameters(setting, code, codeverifier):
 
 def _getTokenOptionalParameters(setting):
     parameters = {}
-    parameters['scope'] = setting.Url.Scope.Values
+    parameters['scope'] = setting.Url.Scope.Value
     parameters['client_secret'] = setting.Url.Scope.Provider.ClientSecret
     return parameters
 
