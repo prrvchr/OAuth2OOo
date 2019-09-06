@@ -6,6 +6,7 @@ import unohelper
 
 from com.sun.star.ui.dialogs import XWizardController
 from com.sun.star.awt import XCallback
+from com.sun.star.lang import IllegalArgumentException
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 from com.sun.star.logging.LogLevel import INFO
@@ -59,8 +60,8 @@ class WizardController(unohelper.Base,
         self.Error = ''
         self.Logger = getLogger(self.ctx)
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
-        service = 'com.sun.star.awt.ContainerWindowProvider'
-        self.provider = self.ctx.ServiceManager.createInstanceWithContext(service, self.ctx)
+        #service = 'com.sun.star.awt.ContainerWindowProvider'
+        #self.provider = self.ctx.ServiceManager.createInstanceWithContext(service, self.ctx)
         #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
         #mri.inspect(self.Wizard)
 
@@ -93,22 +94,27 @@ class WizardController(unohelper.Base,
                 self.Wizard.updateTravelUI()
                 #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
                 #mri.inspect(self.Wizard)
-                if page.canAdvance():
-                    self.Wizard.travelNext()
-                    #self.Wizard.DialogWindow.endDialog(OK)
+                #if page.canAdvance():
+                #    self.Wizard.travelNext()
+                if self.AutoClose:
+                    self.Wizard.DialogWindow.endDialog(OK)
 
     # XWizardController
     def createPage(self, parent, id):
         try:
-            print("WizardController.createPage() %s" % id)
+            print("WizardController.createPage() 1 %s" % id)
             msg = "PageId: %s ..." % id
             handler = WizardHandler(self.ctx,
                                     self.Session,
                                     self.Configuration,
                                     self.Wizard,
                                     self.Logger)
+            print("WizardController.createPage() 2 %s" % id)
             url = getDialogUrl('OAuth2OOo', 'PageWizard%s' % id)
-            window = self.provider.createContainerWindow(url, '', parent, handler)
+            provider = createService(self.ctx, 'com.sun.star.awt.ContainerWindowProvider')
+            print("WizardController.createPage() 3 %s" % id)
+            window = provider.createContainerWindow(url, '', parent, handler)
+            print("WizardController.createPage() 4 %s" % id)
             page = WizardPage(self.ctx,
                               self.Configuration,
                               id,
@@ -117,7 +123,9 @@ class WizardController(unohelper.Base,
                               self.AuthorizationCode)
             msg += " Done"
             self.Logger.logp(INFO, "WizardController", "createPage()", msg)
-            print("WizardController.createPage() %s Done" % id)
+            print("WizardController.createPage() 5 %s" % id)
+            #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
+            #mri.inspect(page)
             return page
         except Exception as e:
             print("WizardController.createPage() ERROR: %s - %s" % (e, traceback.print_exc()))

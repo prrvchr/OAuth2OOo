@@ -23,6 +23,7 @@ from .oauth2tools import getRefreshToken
 from .oauth2tools import getAuthorizationStr
 from .oauth2tools import checkUrl
 from .oauth2tools import openUrl
+from .oauth2tools import getUserNameFromHandler
 
 from .unolib import InteractionHandler
 from .unolib import Initialization
