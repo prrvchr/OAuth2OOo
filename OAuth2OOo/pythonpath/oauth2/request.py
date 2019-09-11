@@ -26,6 +26,7 @@ from com.sun.star.auth.RestRequestTokenType import TOKEN_REDIRECT
 from com.sun.star.auth.RestRequestTokenType import TOKEN_QUERY
 from com.sun.star.auth.RestRequestTokenType import TOKEN_JSON
 
+from .oauth2lib import NoOAuth2
 from .keymap import KeyMap
 
 import traceback
@@ -384,18 +385,3 @@ def _jsonParser(data):
             value = tuple(value)
         keymap.insertValue(key, value)
     return keymap
-
-
-class NoOAuth2(object):
-    def __call__(self, request):
-        return request
-
-
-# Wrapper to make callable OAuth2Service
-class OAuth2OOo(NoOAuth2):
-    def __init__(self, oauth2):
-        self.oauth2 = oauth2
-
-    def __call__(self, request):
-        request.headers['Authorization'] = self.oauth2.getToken('Bearer %s')
-        return request

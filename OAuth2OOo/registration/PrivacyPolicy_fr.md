@@ -1,4 +1,3 @@
-
 ## Politique de protection des données pour [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo)
 
 ### Introduction:

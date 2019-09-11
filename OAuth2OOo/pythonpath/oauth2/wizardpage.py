@@ -95,8 +95,6 @@ class WizardPage(unohelper.Base,
         self.Window.setVisible(False)
         if self.PageId == 1 and reason == forward:
             pass
-            #name = self.Window.getControl('TextField1').Text
-            #self.Configuration.Url.Scope.Provider.User.Id = name
         elif self.PageId == 2:
             pass
         elif self.PageId == 3:

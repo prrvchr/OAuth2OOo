@@ -9,12 +9,8 @@ from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
 from .unotools import getCurrentLocale
-from .unotools import getInteractionHandler
-from .unotools import getOAuth2Request
 
-from .oauth2lib import InteractionRequest
-
-from .request import NoOAuth2
+from .oauth2lib import NoOAuth2
 
 from .requests.compat import urlencode
 
@@ -25,22 +21,8 @@ import hashlib
 g_advance_to = 0 # 0 to disable
 g_wizard_paths = ((1, 2, 3, 5), (1, 2, 4, 5), (1, 5))
 g_identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
-g_response_url = 'https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/'
-g_response_path = 'registration/'
 g_refresh_overlap = 10 # must be positive, in second
 
-
-def getUserNameFromHandler(ctx, source, url, message=''):
-    username = ''
-    message = message if message else "Authentication"
-    handler = getInteractionHandler(ctx, message)
-    response = uno.createUnoStruct('com.sun.star.beans.Optional<string>')
-    request = getOAuth2Request(source, url, message)
-    interaction = InteractionRequest(request, response)
-    if handler.handleInteractionRequest(interaction):
-        if response.IsPresent:
-            username = response.Value
-    return username
 
 def getActivePath(configuration):
     if configuration.Url.Scope.Authorized:

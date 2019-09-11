@@ -1,4 +1,3 @@
-
 ## Data Protection Policy for [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo)
 
 ### Introduction:

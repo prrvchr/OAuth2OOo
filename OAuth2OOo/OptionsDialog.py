@@ -116,8 +116,8 @@ class OptionsDialog(unohelper.Base,
             if url != '':
                 message = "Authentication"
                 user = getUserNameFromHandler(self.ctx, self, url, message)
-            print("OptionDialog._doConnect() 1 %s - %s" % (user, url))
             autoclose = bool(dialog.getControl('CheckBox2').State)
+            print("OptionDialog._doConnect() 1 %s - %s - %s" % (user, url, autoclose))
             enabled = self.service.getAuthorization(url, user, autoclose)
             print("OptionDialog._doConnect() 2")
         except Exception as e:

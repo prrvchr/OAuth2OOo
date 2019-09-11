@@ -86,18 +86,17 @@ class WizardController(unohelper.Base,
 
     # XCallback
     def notify(self, percent):
+        print("WizardController.notify() %s" % percent)
         page = self.Wizard.CurrentPage
         if page.PageId == 3 and page.Window:
             page.Window.getControl('ProgressBar1').Value = percent
             if percent == 100:
-                print("WizardController.notify()")
                 self.Wizard.updateTravelUI()
-                #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
-                #mri.inspect(self.Wizard)
-                #if page.canAdvance():
-                #    self.Wizard.travelNext()
-                if self.AutoClose:
-                    self.Wizard.DialogWindow.endDialog(OK)
+                if self.AuthorizationCode.IsPresent:
+                    self._registerTokens()
+                    if self.AutoClose:
+                        print("WizardController.notify() ****")
+                        self.Wizard.DialogWindow.endDialog(OK)
 
     # XWizardController
     def createPage(self, parent, id):
@@ -183,7 +182,7 @@ class WizardController(unohelper.Base,
                 #path = getActivePath(self.Configuration)
                 #self.Wizard.activatePath(path, True)
                 #self.Wizard.updateTravelUI()
-            elif id in (3, 4) and self.AuthorizationCode.IsPresent:
+            elif id == 4 and self.AuthorizationCode.IsPresent:
                 self._registerTokens()
             print("WizardController.onDeactivatePage(): %s" % id)
         except Exception as e:

@@ -8,17 +8,10 @@ import unohelper
 
 from com.sun.star.awt import XRequestCallback
 from com.sun.star.util import XCancellable
-from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
-from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 
 from .oauth2tools import g_identifier
-from .oauth2tools import g_response_url
-from .oauth2tools import g_response_path
 from .unotools import createService
-from .unotools import getResourceLocation
-from .unotools import getCurrentLocale
-from .unotools import getFileSequence
-from .unotools import getSimpleFile
+from .unotools import getStringResource
 from .requests.compat import unquote_plus
 
 import time
@@ -73,7 +66,7 @@ class WatchDog(Thread):
         with self.lock:
             while now < self.end and self.server.is_alive():
                 elapsed = now - start
-                percent = int(elapsed / self.timeout * 100)
+                percent =  min(99, int(elapsed / self.timeout * 100))
                 self.controller.notify(percent)
                 self.lock.wait(wait)
                 now = timer()
@@ -104,10 +97,8 @@ class Server(Thread):
         connection = self.acceptor.accept(self.argument)
         if connection:
             with self.lock:
-                print("WizardServer.run() 1")
                 result = self._getResult(connection)
-                filename = self._getResultFileName(result, g_response_path)
-                location = g_response_url + g_response_path + filename
+                location = self._getResultLocation(result)
                 header = uno.ByteSequence(b'''\
 HTTP/1.1 302 Found
 Location: %s
@@ -116,11 +107,8 @@ Connection: Closed
 ''' % location.encode())
                 connection.write(header)
                 connection.close()
-                print("WizardServer.run() 2")
                 self.acceptor.stopAccepting()
-                print("WizardServer.run() 3")
                 self.lock.notifyAll()
-                print("WizardServer.run() 4")
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)
@@ -191,11 +179,8 @@ Connection: Closed
         self.error = 'Request response Error: %s - %s' % (parameters, response)
         return False
 
-    def _getResultFileName(self, result, path):
-        basename = 'OAuth2Success_%s' if result else 'OAuth2Error_%s'
-        local = getCurrentLocale(self.ctx).Language
-        filename = basename % local
-        url = getResourceLocation(self.ctx, g_identifier, path + filename + '.md')
-        if getSimpleFile(self.ctx).exists(url):
-            return filename
-        return basename % 'en'
+    def _getResultLocation(self, result):
+        basename = 'Success' if result else 'Error'
+        stringresource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
+        location = stringresource.resolveString('PageWizard3.%s.Url' % basename)
+        return location

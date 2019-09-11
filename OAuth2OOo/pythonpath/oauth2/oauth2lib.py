@@ -9,6 +9,21 @@ from com.sun.star.task import XInteractionAbort
 from com.sun.star.auth import XInteractionUserName
 
 
+# Wrapper to make callable OAuth2Service
+class NoOAuth2(object):
+    def __call__(self, request):
+        return request
+
+
+# Wrapper to make callable OAuth2Service
+class OAuth2OOo(NoOAuth2):
+    def __init__(self, oauth2):
+        self.oauth2 = oauth2
+
+    def __call__(self, request):
+        request.headers['Authorization'] = self.oauth2.getToken('Bearer %s')
+        return request
+
 class InteractionAbort(unohelper.Base,
                        XInteractionAbort):
     # XInteractionAbort
