@@ -151,7 +151,7 @@ class OAuth2Service(unohelper.Base,
             token = ''
         elif self.Setting.Url.Scope.Provider.User.HasExpired:
             print("OAuth2Service.getToken() 3")
-            token = getRefreshToken(self.Logger, self.Session, self.Configuration)
+            token = getRefreshToken(self.Logger, self.Session, self.Setting)
             msg += "Refresh needed ... Done"
         else:
             print("OAuth2Service.getToken() 4")
