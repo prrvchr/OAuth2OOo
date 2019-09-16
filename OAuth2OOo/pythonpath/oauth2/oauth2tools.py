@@ -18,6 +18,8 @@ import json
 import base64
 import hashlib
 
+import traceback
+
 g_advance_to = 0 # 0 to disable
 g_wizard_paths = ((1, 2, 3, 5), (1, 2, 4, 5), (1, 5))
 g_identifier = 'com.gmail.prrvchr.extensions.OAuth2OOo'
@@ -144,16 +146,20 @@ def registerTokenFromResponse(configuration, response):
     return token != ''
 
 def getRefreshToken(logger, session, configuration):
-    url = configuration.Url.Scope.Provider.TokenUrl
-    data = getRefreshParameters(configuration)
-    message = "Make Http Request: %s?%s" % (url, data)
-    logger.logp(INFO, 'oauth2tools', 'refreshToken', message)
-    timeout = configuration.Timeout
-    response = getResponseFromRequest(logger, session, url, data, timeout)
-    token = getTokenFromResponse(configuration, response)
-    if token:
-        configuration.Url.Scope.Provider.User.commit()
-    return token
+    try:
+        url = configuration.Url.Scope.Provider.TokenUrl
+        data = getRefreshParameters(configuration)
+        message = "Make Http Request: %s?%s" % (url, data)
+        logger.logp(INFO, 'oauth2tools', 'refreshToken', message)
+        timeout = configuration.Timeout
+        response = getResponseFromRequest(logger, session, url, data, timeout)
+        token = getTokenFromResponse(configuration, response)
+        if token:
+            configuration.Url.Scope.Provider.User.commit()
+        print("oauth2tools.getRefreshToken() *************************")
+        return token
+    except Exception as e:
+        print("oauth2tools.getRefreshToken() Error: %s - %s" % (e, traceback.print_exc()))
 
 def getTokenFromResponse(configuration, response):
     refresh = response.get('refresh_token', None)

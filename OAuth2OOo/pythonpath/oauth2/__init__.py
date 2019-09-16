@@ -1,7 +1,7 @@
 #!
 # -*- coding: utf-8 -*-
 
-from .oauth2configuration import OAuth2Configuration
+from .oauth2setting import OAuth2Setting
 from .wizardcontroller import WizardController
 
 from .keymap import KeyMap

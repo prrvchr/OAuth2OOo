@@ -14,7 +14,6 @@ from com.sun.star.logging.LogLevel import SEVERE
 
 from .unolib import PropertySet
 
-from .wizardconfiguration import WizardConfiguration
 from .wizardhandler import WizardHandler
 from .wizardserver import WizardServer
 from .wizardpage import WizardPage
@@ -44,10 +43,10 @@ class WizardController(unohelper.Base,
                        PropertySet,
                        XWizardController,
                        XCallback):
-    def __init__(self, ctx, session, url, username, autoclose):
+    def __init__(self, ctx, configuration, session, url, username, autoclose):
         self.ctx = ctx
         self.Session = session
-        self.Configuration = WizardConfiguration(self.ctx)
+        self.Configuration = configuration
         self.ResourceUrl = url
         self.UserName = username
         self.AutoClose = autoclose

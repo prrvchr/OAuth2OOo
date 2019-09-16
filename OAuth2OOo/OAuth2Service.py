@@ -26,7 +26,7 @@ from oauth2 import execute
 from oauth2 import getLogger
 from oauth2 import getDialog
 
-from oauth2 import OAuth2Configuration
+from oauth2 import OAuth2Setting
 from oauth2 import WizardController
 from oauth2 import createService
 from oauth2 import getRefreshToken
@@ -51,11 +51,12 @@ class OAuth2Service(unohelper.Base,
                     XOAuth2Service):
     def __init__(self, ctx):
         self.ctx = ctx
-        self.Setting = OAuth2Configuration(self.ctx)
+        logger = getLogger(self.ctx)
+        self.Setting = OAuth2Setting(self.ctx, logger)
         self.Session = self._getSession()
-        self.Error = ''
         self.Parent = None
-        self.Logger = getLogger(self.ctx)
+        self.Logger = logger
+        self.Error = ''
         self._checkSSL()
 
     @property
@@ -117,7 +118,7 @@ class OAuth2Service(unohelper.Base,
     def getAuthorization(self, url, username, close=True):
         authorized = False
         msg = "Wizard Loading ..."
-        controller = WizardController(self.ctx, self.Session, url, username, close)
+        controller = WizardController(self.ctx, self.Setting, self.Session, url, username, close)
         print("OAuth2Service.getAuthorizationCode() 1")
         msg += " Done ..."
         if controller.Wizard.execute() == OK:
@@ -129,8 +130,8 @@ class OAuth2Service(unohelper.Base,
             else:
                 msg += " Done"
                 authorized = True
-                self.ResourceUrl = controller.ResourceUrl
-                self.UserName = controller.UserName
+                #self.ResourceUrl = controller.ResourceUrl
+                #self.UserName = controller.UserName
                 print("OAuth2Service._getAuthorizationCode() 4")
         else:
             print("OAuth2Service._getAuthorizationCode() 5")

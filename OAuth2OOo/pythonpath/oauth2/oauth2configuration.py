@@ -64,7 +64,6 @@ class OAuth2Configuration(unohelper.Base,
         properties['ReadTimeout'] = getProperty('ReadTimeout', 'short', transient)
         properties['HandlerTimeout'] = getProperty('HandlerTimeout', 'short', transient)
         properties['Timeout'] = getProperty('Timeout', 'any', readonly)
-        properties['ReadTimeout'] = getProperty('ReadTimeout', 'short', transient)
         return properties
 
 
