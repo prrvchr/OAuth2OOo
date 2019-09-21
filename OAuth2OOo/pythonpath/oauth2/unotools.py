@@ -5,12 +5,9 @@ import uno
 
 from com.sun.star.lang import WrappedTargetRuntimeException
 
-import binascii
-
-from com.sun.star.auth import OAuth2Request
-
 from .unolib import InteractionHandler
 
+import binascii
 import traceback
 
 def getSimpleFile(ctx):
@@ -153,16 +150,9 @@ def getPropertySetInfoChangeEvent(source, name, reason, handle=-1):
     event.Handle = handle
     event.Reason = reason
 
-def getInteractionHandler(ctx, message):
-    window = ctx.ServiceManager.createInstance('com.sun.star.frame.Desktop').ActiveFrame.ComponentWindow
-    args = getPropertyValueSet({'Parent': window, 'Context': message})
-    interaction = ctx.ServiceManager.createInstanceWithArguments('com.sun.star.task.InteractionHandler', args)
+def getInteractionHandler(ctx):
+    service = 'com.sun.star.task.InteractionHandler'
+    desktop = ctx.ServiceManager.createInstance('com.sun.star.frame.Desktop')
+    args = getPropertyValueSet({'Parent': desktop.ActiveFrame.ComponentWindow})
+    interaction = ctx.ServiceManager.createInstanceWithArguments(service, args)
     return interaction
-
-def getOAuth2Request(source, url, message):
-    request = OAuth2Request()
-    request.ResourceUrl = url
-    request.Classification = uno.Enum('com.sun.star.task.InteractionClassification', 'QUERY')
-    request.Context = source
-    request.Message = message
-    return request

@@ -5,19 +5,15 @@
 
 import uno
 
-from .unotools import getInteractionHandler
-from .unotools import getOAuth2Request
-
 from .oauth2lib import InteractionRequest
+from .unotools import getInteractionHandler
 
 
-def getUserNameFromHandler(ctx, source, url, message=''):
+def getUserNameFromHandler(ctx, source, name, message=''):
     username = ''
-    message = message if message else "Authentication"
-    handler = getInteractionHandler(ctx, message)
+    handler = getInteractionHandler(ctx)
     response = uno.createUnoStruct('com.sun.star.beans.Optional<string>')
-    request = getOAuth2Request(source, url, message)
-    interaction = InteractionRequest(request, response)
+    interaction = InteractionRequest(source, name, message, response)
     if handler.handleInteractionRequest(interaction):
         if response.IsPresent:
             username = response.Value

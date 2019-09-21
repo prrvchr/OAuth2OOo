@@ -12,6 +12,7 @@ from .unotools import getProperty
 from .unotools import getConfiguration
 from .oauth2tools import g_identifier
 from .oauth2tools import g_refresh_overlap
+from .keymap import KeyMap
 
 import time
 
@@ -436,6 +437,14 @@ class ProviderSetting(unohelper.Base,
             uri = self.redirect
         return uri
     @property
+    def MetaData(self):
+        metadata = KeyMap()
+        metadata.insertValue('ClientSecret', self.ClientSecret)
+        metadata.insertValue('ClientId', self.ClientId)
+        metadata.insertValue('TokenUrl', self.TokenUrl)
+        metadata.insertValue('TokenParameters', self.TokenParameters)
+        return metadata
+    @property
     def State(self):
         state = 2
         if self.Id in self.Providers:
@@ -511,6 +520,7 @@ class ProviderSetting(unohelper.Base,
         properties['RedirectPort'] = getProperty('RedirectPort', 'short', transient)
         properties['RedirectUri'] = getProperty('RedirectUri', 'string', readonly)
         properties['State'] = getProperty('State', 'short', transient)
+        properties['MetaData'] = getProperty('MetaData', 'com.sun.star.auth.XRestKeyMap', readonly)
         return properties
 
 
@@ -558,6 +568,15 @@ class UserSetting(unohelper.Base,
     @property
     def Scopes(self):
         return tuple(self._Scopes)
+    @property
+    def MetaData(self):
+        metadata = KeyMap()
+        metadata.insertValue('AccessToken', self.AccessToken)
+        metadata.insertValue('RefreshToken', self.RefreshToken)
+        metadata.insertValue('NeverExpires', self.NeverExpires)
+        metadata.insertValue('TimeStamp', self._TimeStamp)
+        metadata.insertValue('Scopes', tuple(self._Scopes))
+        return metadata
 
     # XUpdatable
     def update(self):
@@ -621,4 +640,5 @@ class UserSetting(unohelper.Base,
         properties['HasExpired'] = getProperty('HasExpired', 'boolean', readonly)
         properties['Scopes'] = getProperty('Scopes', '[]string', readonly)
         properties['Scope'] = getProperty('Scope', 'string', transient)
+        properties['MetaData'] = getProperty('MetaData', 'com.sun.star.auth.XRestKeyMap', readonly)
         return properties

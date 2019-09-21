@@ -23,6 +23,7 @@ from .oauth2tools import updatePageTokenUI
 #from .oauth2tools import g_wizard_paths
 from .oauth2tools import g_identifier
 from .oauth2tools import getRefreshToken
+from .oauth2tools import saveTokenToConfiguration
 
 import traceback
 
@@ -352,7 +353,11 @@ class WizardHandler(unohelper.Base,
                 self.Wizard.updateTravelUI()
             elif item == 'RefreshToken':
                 if self.Configuration.Url.Scope.Provider.User.HasExpired:
-                    token = getRefreshToken(self.logger, self.session, self.Configuration)
+                    provider = self.Configuration.Url.Scope.Provider.MetaData
+                    user = self.Configuration.Url.Scope.Provider.User.MetaData
+                    timeout = self.Configuration.Timeout
+                    token = getRefreshToken(self.logger, self.session, provider, user, timeout)
+                    saveTokenToConfiguration(self.Configuration, token)
                 updatePageTokenUI(window, self.Configuration, self.stringResource)
             elif item == 'RemoveToken':
                 user = self.Configuration.Url.Scope.Provider.User

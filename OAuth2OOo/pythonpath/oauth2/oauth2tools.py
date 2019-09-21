@@ -11,12 +11,13 @@ from com.sun.star.logging.LogLevel import SEVERE
 from .unotools import getCurrentLocale
 
 from .oauth2lib import NoOAuth2
-
+from .keymap import KeyMap
 from .requests.compat import urlencode
 
 import json
 import base64
 import hashlib
+import time
 
 import traceback
 
@@ -142,26 +143,63 @@ def getResponseFromRequest(logger, session, url, data, timeout):
     return response
 
 def registerTokenFromResponse(configuration, response):
-    token = getTokenFromResponse(configuration, response)
-    return token != ''
+    token = getTokenFromResponse(response)
+    return saveTokenToConfiguration(configuration, token)
 
-def getRefreshToken(logger, session, configuration):
+def saveTokenToConfiguration(configuration, token):
+    if token.IsPresent:
+        if token.Value.hasValue('RefreshToken'):
+            refresh = token.Value.getValue('RefreshToken')
+            configuration.Url.Scope.Provider.User.RefreshToken = refresh
+        if token.Value.hasValue('AccessToken'):
+            access = token.Value.getValue('AccessToken')
+            configuration.Url.Scope.Provider.User.AccessToken = access
+        if token.Value.hasValue('NeverExpires'):
+            never = token.Value.getValue('NeverExpires')
+            configuration.Url.Scope.Provider.User.NeverExpires = never
+        if token.Value.hasValue('ExpiresIn'):
+            expires = token.Value.getValue('ExpiresIn')
+            configuration.Url.Scope.Provider.User.ExpiresIn = expires
+        scope = configuration.Url.Scope.Value
+        configuration.Url.Scope.Provider.User.Scope = scope
+        configuration.Url.Scope.Provider.User.commit()
+    return token.IsPresent
+
+def getRefreshToken(logger, session, provider, user, timeout):
     try:
-        url = configuration.Url.Scope.Provider.TokenUrl
-        data = getRefreshParameters(configuration)
+        url = provider.getValue('TokenUrl')
+        data = getRefreshParameters(provider, user)
         message = "Make Http Request: %s?%s" % (url, data)
         logger.logp(INFO, 'oauth2tools', 'refreshToken', message)
-        timeout = configuration.Timeout
+        #timeout = configuration.Timeout
         response = getResponseFromRequest(logger, session, url, data, timeout)
-        token = getTokenFromResponse(configuration, response)
-        if token:
-            configuration.Url.Scope.Provider.User.commit()
+        token = getTokenFromResponse(response)
+        #if token:
+        #    configuration.Url.Scope.Provider.User.commit()
         print("oauth2tools.getRefreshToken() *************************")
         return token
     except Exception as e:
         print("oauth2tools.getRefreshToken() Error: %s - %s" % (e, traceback.print_exc()))
 
-def getTokenFromResponse(configuration, response):
+def getTokenFromResponse(response):
+    token = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
+    token.Value = KeyMap()
+    refresh = response.get('refresh_token', None)
+    expires = response.get('expires_in', None)
+    access = response.get('access_token', None)
+    if refresh:
+        token.Value.insertValue('RefreshToken', refresh)
+    if expires:
+        timestamp = int(time.time()) + expires
+        token.Value.insertValue('ExpiresIn', expires)
+        token.Value.insertValue('TimeStamp', timestamp)
+    if access:
+        token.Value.insertValue('AccessToken', access)
+        token.Value.insertValue('NeverExpires', expires is None)
+    token.IsPresent = any((refresh, expires, access))
+    return token
+
+def getTokenFromResponse1(configuration, response):
     refresh = response.get('refresh_token', None)
     if refresh:
         configuration.Url.Scope.Provider.User.RefreshToken = refresh
@@ -194,26 +232,24 @@ def _getTokenOptionalParameters(setting):
     parameters['client_secret'] = setting.Url.Scope.Provider.ClientSecret
     return parameters
 
-def getRefreshParameters(setting):
-    parameters = _getRefreshBaseParameters(setting)
-    optional = _getRefreshOptionalParameters(setting)
-    option = setting.Url.Scope.Provider.TokenParameters
+def getRefreshParameters(provider, user):
+    parameters = _getRefreshBaseParameters(provider, user)
+    optional = _getRefreshOptionalParameters(provider, user)
+    option = provider.getValue('TokenParameters')
     parameters = _parseParameters(parameters, optional, option)
     return parameters
 
-def _getRefreshBaseParameters(setting):
+def _getRefreshBaseParameters(provider, user):
     parameters = {}
-    parameters['refresh_token'] = setting.Url.Scope.Provider.User.RefreshToken
+    parameters['refresh_token'] = user.getValue('RefreshToken')
     parameters['grant_type'] = 'refresh_token'
-    parameters['client_id'] = setting.Url.Scope.Provider.ClientId
-    if setting.Url.Scope.Provider.CodeChallenge:
-        parameters['redirect_uri'] = setting.Url.Scope.Provider.RedirectUri
+    parameters['client_id'] = provider.getValue('ClientId')
     return parameters
 
-def _getRefreshOptionalParameters(setting):
+def _getRefreshOptionalParameters(provider, user):
     parameters = {}
-    parameters['scope'] = setting.Url.Scope.Provider.User.Scope
-    parameters['client_secret'] = setting.Url.Scope.Provider.ClientSecret
+    parameters['scope'] = ' '.join(user.getValue('Scopes'))
+    parameters['client_secret'] = provider.getValue('ClientSecret')
     return parameters
 
 def _parseParameters(base, optional, option):

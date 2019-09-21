@@ -13,6 +13,7 @@ from com.sun.star.logging.LogLevel import SEVERE
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 
+from com.sun.star.uno import Exception as UnoException
 
 from oauth2 import OAuth2OOo
 from oauth2 import NoOAuth2
@@ -25,16 +26,19 @@ from oauth2 import getSessionMode
 from oauth2 import execute
 from oauth2 import getLogger
 from oauth2 import getDialog
+from oauth2 import getStringResource
 
 from oauth2 import OAuth2Setting
 from oauth2 import WizardController
 from oauth2 import createService
+from oauth2 import getConfiguration
 from oauth2 import getRefreshToken
 from oauth2 import g_identifier
 from oauth2 import g_wizard_paths
+from oauth2 import g_refresh_overlap
 
 import sys
-import certifi
+import time
 from oauth2 import requests
 
 import traceback
@@ -52,25 +56,67 @@ class OAuth2Service(unohelper.Base,
     def __init__(self, ctx):
         self.ctx = ctx
         logger = getLogger(self.ctx)
+        self.configuration = getConfiguration(self.ctx, g_identifier, True)
         self.Setting = OAuth2Setting(self.ctx, logger)
         self.Session = self._getSession()
+        self._Url = ''
+        self._Provider = KeyMap()
+        self._Users = None
+        self._UserName = ''
+        self._User = KeyMap()
         self.Parent = None
         self.Logger = logger
         self.Error = ''
+        self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
         self._checkSSL()
 
     @property
     def ResourceUrl(self):
-        return self.Setting.Url.Id
-    @ResourceUrl.setter
-    def ResourceUrl(self, url):
-        self.Setting.Url.Id = url
+        return self._Url
+    @property
+    def ProviderName(self):
+        return self._Provider.getDefaultValue('Name', 'Test')
+    @property
+    def TokenUrl(self):
+        return self._Provider.getDefaultValue('TokenUrl', '')
+    @property
+    def TokenParameters(self):
+        return self._Provider.getDefaultValue('TokenParameters', '')
+    @property
+    def RequiredScopes(self):
+        return self._Provider.getDefaultValue('RequiredScopes', ())
+    @property
+    def IsAuthorized(self):
+        scopes = self.RequiredScopes
+        authorized = len(scopes) > 0
+        for scope in scopes:
+            if scope not in self.AcquiredScopes:
+                authorized = False
+                break
+        return authorized
+    @property
+    def HasExpired(self):
+        expired = False
+        if not self.NeverExpires:
+            now = int(time.time())
+            expiresin = max(0, self.TimeStamp - now)
+            expired = expiresin < g_refresh_overlap
+        return expired
     @property
     def UserName(self):
-        return self.Setting.Url.Scope.Provider.User.Id
-    @UserName.setter
-    def UserName(self, name):
-        self.Setting.Url.Scope.Provider.User.Id = name
+        return self._UserName
+    @property
+    def AcquiredScopes(self):
+        return self._User.getDefaultValue('Scopes', ())
+    @property
+    def AccessToken(self):
+        return self._User.getDefaultValue('AccessToken', '')
+    @property
+    def TimeStamp(self):
+        return self._User.getDefaultValue('TimeStamp', 0)
+    @property
+    def NeverExpires(self):
+        return self._User.getDefaultValue('NeverExpires', False)
     @property
     def Timeout(self):
         return self.Setting.Timeout
@@ -78,6 +124,7 @@ class OAuth2Service(unohelper.Base,
     # XInitialization
     def initialize(self, properties):
         for property in properties:
+            print("OAuth2Service.initialize() %s: %s"  % (property.Name, property.Value))
             if property.Name == 'Parent':
                 self.Parent = property.Value
 
@@ -85,29 +132,87 @@ class OAuth2Service(unohelper.Base,
     def handle(self, interaction):
         self.handleInteractionRequest(interaction)
     def handleInteractionRequest(self, interaction):
-        handler = DialogHandler()
-        dialog = getDialog(self.ctx, self.Parent, handler, 'OAuth2OOo', 'UserDialog')
-        # TODO: interaction.getRequest() does not seem to be functional under LibreOffice !!!
-        # dialog.setTitle(interaction.getRequest().Message)
-        status = dialog.execute()
-        approved = status == OK
-        continuation = interaction.getContinuations()[status]
-        if approved:
-            username = dialog.getControl('TextField1').Model.Text
-            continuation.setUserName(username)
-        continuation.select()
-        dialog.dispose()
-        return approved
+        try:
+            handler = DialogHandler()
+            dialog = getDialog(self.ctx, self.Parent, handler, 'OAuth2OOo', 'UserDialog')
+            # TODO: interaction.getRequest() does not seem to be functional under LibreOffice !!!
+            # dialog.setTitle(interaction.getRequest().Message)
+            print("OAuth2Service.handleInteractionRequest() 4 %s" % interaction.getProviderName())
+            self._initUserDialog(dialog, interaction.getProviderName())
+            status = dialog.execute()
+            approved = status == OK
+            continuation = interaction.getContinuations()[status]
+            if approved:
+                username = dialog.getControl('TextField1').Model.Text
+                continuation.setUserName(username)
+            continuation.select()
+            dialog.dispose()
+            return approved
+        except Exception as e:
+            print("OAuth2Service.handleInteractionRequest() ERROR: %s - %s" % (e, traceback.print_exc()))
+
+    def _initUserDialog(self, dialog, name):
+        title = self.stringResource.resolveString('UserDialog.Title')
+        label = self.stringResource.resolveString('UserDialog.Label1.Label')
+        dialog.setTitle(title % name)
+        dialog.getControl('Label1').Text = label % name
 
     # XOAuth2Service
     def initializeSession(self, url):
-        self.Setting.Url.Id = url
+        try:
+            print("OAuth2Service.initializeSession() 1")
+            self._Url = url
+            self._Provider = KeyMap()
+            self._Users = None
+            provider = None
+            providername = ''
+            requiredscopes = ()
+            tokenurl = ''
+            tokenparameters = ''
+            urls = self.configuration.getByName('Urls')
+            if urls.hasByName(self._Url):
+                url = urls.getByName(self._Url)
+                if url.hasByName('Scope'):
+                    scopename = url.getByName('Scope')
+                    scopes = self.configuration.getByName('Scopes')
+                    if scopes.hasByName(scopename):
+                        scope = scopes.getByName(scopename)
+                        if scope.hasByName('Provider'):
+                            providername = scope.getByName('Provider')
+                            self._Provider.insertValue('Name', providername)
+                            print("OAuth2Service.initializeSession() 2 %s" % providername)
+                        if scope.hasByName('Values'):
+                            requiredscopes = scope.getByName('Values')
+                            self._Provider.insertValue('RequiredScopes', requiredscopes)
+                        providers = self.configuration.getByName('Providers')
+                        if providername and providers.hasByName(providername):
+                            provider = providers.getByName(providername)
+                            print("OAuth2Service.initializeSession() 3")
+                            if provider.hasByName('ClientId'):
+                                clientid = provider.getByName('ClientId')
+                                self._Provider.insertValue('ClientId', clientid)
+                            if provider.hasByName('ClientSecret'):
+                                clientsecret = provider.getByName('ClientSecret')
+                                self._Provider.insertValue('ClientSecret', clientsecret)
+                            if provider.hasByName('TokenUrl'):
+                                tokenurl = provider.getByName('TokenUrl')
+                                self._Provider.insertValue('TokenUrl', tokenurl)
+                            if provider.hasByName('TokenParameters'):
+                                tokenparameters = provider.getByName('TokenParameters')
+                                self._Provider.insertValue('TokenParameters', tokenparameters)
+                            if provider.hasByName('Users'):
+                                self._Users = provider.getByName('Users')
+            init = provider is not None
+            print("OAuth2Service.initializeSession() 4 %s" % (init, ))
+            return init
+            #self.Setting.Url.Id = url
+        except Exception as e:
+            print("OAuth2Service.initializeSession() ERROR: %s - %s" % (e, traceback.print_exc()))
 
     def initializeUser(self, name):
-        if not name or not self.ResourceUrl:
-            return False
-        self.UserName = name
-        return self._isAuthorized()
+        if self._initializeUser(name):
+            return self._isAuthorized()
+        return False
 
     def getKeyMap(self):
         return KeyMap()
@@ -150,13 +255,19 @@ class OAuth2Service(unohelper.Base,
             level = SEVERE
             msg += "ERROR: Cannot InitializeSession()..."
             token = ''
-        elif self.Setting.Url.Scope.Provider.User.HasExpired:
+        elif self.HasExpired:
             print("OAuth2Service.getToken() 3")
-            token = getRefreshToken(self.Logger, self.Session, self.Setting)
-            msg += "Refresh needed ... Done"
+            token = getRefreshToken(self.Logger, self.Session, self._Provider, self._User, self.Timeout)
+            if token.IsPresent:
+                self._User = token.Value
+                token = self.AccessToken
+                msg += "Refresh needed ... Done"
+            else:
+                token = ''
+                print("OAuth2Service.getToken() 4")
         else:
-            print("OAuth2Service.getToken() 4")
-            token = self.Setting.Url.Scope.Provider.User.AccessToken
+            print("OAuth2Service.getToken() 5")
+            token = self.AccessToken
             msg += "Get from configuration ... Done"
         self.Logger.logp(level, 'OAuth2Service', 'getToken()', msg)
         if format:
@@ -196,7 +307,7 @@ class OAuth2Service(unohelper.Base,
     def _isAuthorized(self):
         print("OAuth2Service._isAuthorized() 1")
         msg = "OAuth2 initialization ..."
-        if not self.Setting.Url.Scope.Authorized:
+        if not self.IsAuthorized:
             msg += " Done ... AuthorizationCode needed ..."
             print("OAuth2Service._isAuthorized() 2")
             if not self.getAuthorization(self.ResourceUrl, self.UserName, True):
@@ -207,6 +318,45 @@ class OAuth2Service(unohelper.Base,
         msg += " Done"
         self.Logger.logp(INFO, 'OAuth2Service', '_isAuthorized()', msg)
         return True
+
+    def _isAuthorized1(self, user):
+        print("OAuth2Service._isAuthorized() 1")
+        msg = "OAuth2 initialization ..."
+        if self._hasProviderUser(user):
+            return True
+        msg += " Done ... AuthorizationCode needed ..."
+        print("OAuth2Service._isAuthorized() 2")
+        if self.getAuthorization(self._Url, user, True):
+            print("OAuth2Service._isAuthorized() 3")
+            msg += " Done"
+            self.Logger.logp(SEVERE, 'OAuth2Service', '_isAuthorized()', msg)
+            return True
+        msg += " ERROR: Wizard Aborted!!!"
+        self.Logger.logp(INFO, 'OAuth2Service', '_isAuthorized()', msg)
+        return False
+
+    def _initializeUser(self, username):
+        self._UserName = ''
+        self._User = KeyMap()
+        if self._Users.hasByName(username):
+            user = self._Users.getByName(username)
+            self._UserName = username
+            if user.hasByName('AccessToken'):
+                access = user.getByName('AccessToken')
+                self._User.insertValue('AccessToken', access)
+            if user.hasByName('RefreshToken'):
+                refresh = user.getByName('RefreshToken')
+                self._User.insertValue('RefreshToken', refresh)
+            if user.hasByName('TimeStamp'):
+                timestamp = user.getByName('TimeStamp')
+                self._User.insertValue('TimeStamp', timestamp)
+            if user.hasByName('NeverExpires'):
+                neverexpires = user.getByName('NeverExpires')
+                self._User.insertValue('NeverExpires', neverexpires)
+            if user.hasByName('Scopes'):
+                scopes = user.getByName('Scopes')
+                self._User.insertValue('Scopes', scopes)
+        return self._UserName != ''
 
     # XServiceInfo
     def supportsService(self, service):

@@ -4,8 +4,10 @@
 import uno
 import unohelper
 
-from com.sun.star.task import XInteractionRequest
+from com.sun.star.task import ClassifiedInteractionRequest
 from com.sun.star.task import XInteractionAbort
+
+from com.sun.star.auth import XOAuth2Request
 from com.sun.star.auth import XInteractionUserName
 
 
@@ -26,6 +28,7 @@ class OAuth2OOo(NoOAuth2):
 
 class InteractionAbort(unohelper.Base,
                        XInteractionAbort):
+
     # XInteractionAbort
     def select(self):
         pass
@@ -36,6 +39,7 @@ class InteractionUserName(unohelper.Base,
     def __init__(self, result):
         self.result = result
         self.username = ''
+
     # XInteractionSupplyParameters
     def setUserName(self, name):
         self.username = name
@@ -45,12 +49,22 @@ class InteractionUserName(unohelper.Base,
 
 
 class InteractionRequest(unohelper.Base,
-                         XInteractionRequest):
-    def __init__(self, request, response):
-        self.request = request
-        self.continuations = (InteractionAbort(), InteractionUserName(response))
-    # XInteractionRequest
+                         XOAuth2Request):
+    def __init__(self, source, name, message, response):
+        self.source = source
+        self.name = name
+        self.message = message
+        self.response = response
+
+    # XOAuth2Request
+    def getProviderName(self):
+        return self.name
     def getRequest(self):
-        return self.request
+        request = ClassifiedInteractionRequest()
+        request.Classification = uno.Enum('com.sun.star.task.InteractionClassification', 'QUERY')
+        request.Context = self.source
+        request.Message = self.message
+        return request
     def getContinuations(self):
-        return self.continuations
+        continuations = (InteractionAbort(), InteractionUserName(self.response))
+        return continuations

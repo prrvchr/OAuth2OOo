@@ -22,7 +22,6 @@ from oauth2 import g_identifier
 from oauth2 import getConfiguration
 from oauth2 import getInteractionHandler
 from oauth2 import InteractionRequest
-from oauth2 import getOAuth2Request
 from oauth2 import getUserNameFromHandler
 
 import traceback
@@ -112,14 +111,18 @@ class OptionsDialog(unohelper.Base,
     def _doConnect(self, dialog):
         try:
             user = ''
+            print("OptionDialog._doConnect() 1")
             url = dialog.getControl('ComboBox2').SelectedText
             if url != '':
                 message = "Authentication"
-                user = getUserNameFromHandler(self.ctx, self, url, message)
+                if self.service.initializeSession(url):
+                    print("OptionDialog._doConnect() 2")
+                    provider = self.service.ProviderName
+                    user = getUserNameFromHandler(self.ctx, self, provider, message)
             autoclose = bool(dialog.getControl('CheckBox2').State)
-            print("OptionDialog._doConnect() 1 %s - %s - %s" % (user, url, autoclose))
+            print("OptionDialog._doConnect() 3 %s - %s - %s" % (user, url, autoclose))
             enabled = self.service.getAuthorization(url, user, autoclose)
-            print("OptionDialog._doConnect() 2")
+            print("OptionDialog._doConnect() 4")
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
             self.Logger.logp(SEVERE, "OptionsDialog", "_doConnect()", msg)

@@ -18,6 +18,7 @@ from .oauth2lib import OAuth2OOo
 
 from .oauth2tools import g_wizard_paths
 from .oauth2tools import g_identifier
+from .oauth2tools import g_refresh_overlap
 from .oauth2tools import getActivePath
 from .oauth2tools import getRefreshToken
 from .oauth2tools import getAuthorizationStr
@@ -41,7 +42,6 @@ from .unotools import getStringResource
 from .unotools import generateUuid
 from .unotools import getNamedValueSet
 from .unotools import getInteractionHandler
-from .unotools import getOAuth2Request
 from .unotools import getDialog
 
 from .dialoghandler import DialogHandler
