@@ -115,7 +115,7 @@ class OptionsDialog(unohelper.Base,
             url = dialog.getControl('ComboBox2').SelectedText
             if url != '':
                 message = "Authentication"
-                if self.service.initializeSession(url):
+                if self.service.initializeUrl(url):
                     print("OptionDialog._doConnect() 2")
                     provider = self.service.ProviderName
                     user = getUserNameFromHandler(self.ctx, self, provider, message)

@@ -87,8 +87,9 @@ class WizardController(unohelper.Base,
     def notify(self, percent):
         print("WizardController.notify() %s" % percent)
         page = self.Wizard.CurrentPage
-        if page.PageId == 3 and page.Window:
-            page.Window.getControl('ProgressBar1').Value = percent
+        if page.PageId == 3:
+            if page.Window:
+                page.Window.getControl('ProgressBar1').Value = percent
             if percent == 100:
                 self.Wizard.updateTravelUI()
                 if self.AuthorizationCode.IsPresent:
@@ -197,7 +198,7 @@ class WizardController(unohelper.Base,
         message = "Make Http Request: %s?%s" % (url, data)
         self.Logger.logp(INFO, 'WizardController', '_registerTokens', message)
         timeout = self.Configuration.Timeout
-        response = getResponseFromRequest(self.Logger, self.Session, url, data, timeout)
+        response, error = getResponseFromRequest(self.Session, url, data, timeout)
         print("WizardController._registerTokens() %s" % (response, ))
         result = registerTokenFromResponse(self.Configuration, response)
         if result:

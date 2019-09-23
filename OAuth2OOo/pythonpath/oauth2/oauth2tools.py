@@ -127,8 +127,9 @@ def getTokenParameters(setting, code, codeverifier):
     parameters = _parseParameters(parameters, optional, option)
     return parameters
 
-def getResponseFromRequest(logger, session, url, data, timeout):
+def getResponseFromRequest(session, url, data, timeout):
     response = {}
+    error = ''
     try:
         with session as s:
             with s.post(url, data=data, timeout=timeout, auth=NoOAuth2()) as r:
@@ -136,11 +137,9 @@ def getResponseFromRequest(logger, session, url, data, timeout):
                     response = r.json()
                 else:
                     error = "ERROR: %s" % r.text
-                    logger.logp(SEVERE, 'oauth2tools', 'getResponseFromRequest', error)
     except Exception as e:
         error = "ERROR: %s" % e
-        logger.logp(SEVERE, 'oauth2tools', 'getResponseFromRequest', error)
-    return response
+    return response, error
 
 def registerTokenFromResponse(configuration, response):
     token = getTokenFromResponse(response)
@@ -172,12 +171,12 @@ def getRefreshToken(logger, session, provider, user, timeout):
         message = "Make Http Request: %s?%s" % (url, data)
         logger.logp(INFO, 'oauth2tools', 'refreshToken', message)
         #timeout = configuration.Timeout
-        response = getResponseFromRequest(logger, session, url, data, timeout)
+        response, error = getResponseFromRequest(logger, session, url, data, timeout)
         token = getTokenFromResponse(response)
         #if token:
         #    configuration.Url.Scope.Provider.User.commit()
-        print("oauth2tools.getRefreshToken() *************************")
-        return token
+        print("oauth2tools.getRefreshToken() %s" % (error, ))
+        return token, error
     except Exception as e:
         print("oauth2tools.getRefreshToken() Error: %s - %s" % (e, traceback.print_exc()))
 
@@ -197,6 +196,7 @@ def getTokenFromResponse(response):
         token.Value.insertValue('AccessToken', access)
         token.Value.insertValue('NeverExpires', expires is None)
     token.IsPresent = any((refresh, expires, access))
+    print("getTokenFromResponse() %s" % (response, ))
     return token
 
 def getTokenFromResponse1(configuration, response):

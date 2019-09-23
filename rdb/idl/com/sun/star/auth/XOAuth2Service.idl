@@ -16,7 +16,9 @@ module com { module sun { module star { module auth {
 interface XOAuth2Service: com::sun::star::uno::XInterface
 {
 
-    boolean initializeSession([in] string ResourceUrl);
+    boolean initializeSession([in] string ResourceUrl,
+                              [in] string UserName);
+    boolean initializeUrl([in] string ResourceUrl);
     boolean initializeUser([in] string UserName);
     boolean getAuthorization([in] string ResourceUrl,
                              [in] string UserName,

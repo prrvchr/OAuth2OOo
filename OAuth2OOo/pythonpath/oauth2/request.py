@@ -48,18 +48,18 @@ def getSessionMode(ctx, host, port=80):
         mode = ONLINE
     return mode
 
-def execute(session, parameter, timeout, logger):
+def execute(session, parameter, timeout):
     response = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
     kwargs = _getKeyWordArguments(parameter)
+    error = ''
     with session as s:
         with s.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs) as r:
             if r.status_code in (s.codes.ok, s.codes.found, s.codes.created, s.codes.accepted):
                 response.IsPresent = True
                 response.Value = _parseResponse(r)
             else:
-                msg = "Request: %s - ERROR: %s - %s" % (parameter.Name, r.status_code, r.text)
-                logger.logp(SEVERE, "OAuth2Service", "execute()", msg)
-    return response
+                error = "Request: %s - ERROR: %s - %s" % (parameter.Name, r.status_code, r.text)
+    return response, error
 
 
 class Enumerator(unohelper.Base,
@@ -70,7 +70,9 @@ class Enumerator(unohelper.Base,
         self.timeout = timeout
         self.logger = logger
         self.chunked = self.parameter.Enumerator.Token.Type != TOKEN_NONE
-        self.elements, self.token = self._getElements()
+        self.elements, self.token, self.error = self._getElements()
+        if self.error:
+            self.logger.logp(SEVERE, "OAuth2Service","Enumerator()", self.error)
 
     # XEnumeration
     def hasMoreElements(self):
@@ -79,7 +81,9 @@ class Enumerator(unohelper.Base,
         if self.elements:
             return self.elements.pop(0)
         elif self.token:
-            self.elements, self.token = self._getElements(self.token)
+            self.elements, self.token, self.error = self._getElements(self.token)
+            if self.error:
+                self.logger.logp(SEVERE, "OAuth2Service","Enumerator()", self.error)
             return self.nextElement()
         raise NoSuchElementException()
 
@@ -98,7 +102,7 @@ class Enumerator(unohelper.Base,
                 self.parameter.Json = '{"%s": "%s"}' % (name, token)
             token = None
         elements = []
-        response = execute(self.session, self.parameter, self.timeout, self.logger)
+        response, error = execute(self.session, self.parameter, self.timeout)
         if response.IsPresent:
             r = response.Value
             elements = list(r.getDefaultValue(self.parameter.Enumerator.Field, ()))
@@ -110,7 +114,7 @@ class Enumerator(unohelper.Base,
                         token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
                 else:
                     token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
-        return elements, token
+        return elements, token, error
 
 
 class InputStream(unohelper.Base,

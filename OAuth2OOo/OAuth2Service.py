@@ -158,9 +158,14 @@ class OAuth2Service(unohelper.Base,
         dialog.getControl('Label1').Text = label % name
 
     # XOAuth2Service
-    def initializeSession(self, url):
+    def initializeSession(self, url, name):
+        if self.initializeUrl(url):
+            return self.initializeUser(name)
+        return False
+
+    def initializeUrl(self, url):
         try:
-            print("OAuth2Service.initializeSession() 1")
+            print("OAuth2Service.initializeUrl() 1")
             self._Url = url
             self._Provider = KeyMap()
             self._Users = None
@@ -170,47 +175,61 @@ class OAuth2Service(unohelper.Base,
             tokenurl = ''
             tokenparameters = ''
             urls = self.configuration.getByName('Urls')
-            if urls.hasByName(self._Url):
-                url = urls.getByName(self._Url)
-                if url.hasByName('Scope'):
-                    scopename = url.getByName('Scope')
-                    scopes = self.configuration.getByName('Scopes')
-                    if scopes.hasByName(scopename):
-                        scope = scopes.getByName(scopename)
-                        if scope.hasByName('Provider'):
-                            providername = scope.getByName('Provider')
-                            self._Provider.insertValue('Name', providername)
-                            print("OAuth2Service.initializeSession() 2 %s" % providername)
-                        if scope.hasByName('Values'):
-                            requiredscopes = scope.getByName('Values')
-                            self._Provider.insertValue('RequiredScopes', requiredscopes)
-                        providers = self.configuration.getByName('Providers')
-                        if providername and providers.hasByName(providername):
-                            provider = providers.getByName(providername)
-                            print("OAuth2Service.initializeSession() 3")
-                            if provider.hasByName('ClientId'):
-                                clientid = provider.getByName('ClientId')
-                                self._Provider.insertValue('ClientId', clientid)
-                            if provider.hasByName('ClientSecret'):
-                                clientsecret = provider.getByName('ClientSecret')
-                                self._Provider.insertValue('ClientSecret', clientsecret)
-                            if provider.hasByName('TokenUrl'):
-                                tokenurl = provider.getByName('TokenUrl')
-                                self._Provider.insertValue('TokenUrl', tokenurl)
-                            if provider.hasByName('TokenParameters'):
-                                tokenparameters = provider.getByName('TokenParameters')
-                                self._Provider.insertValue('TokenParameters', tokenparameters)
-                            if provider.hasByName('Users'):
-                                self._Users = provider.getByName('Users')
+            if not urls.hasByName(self._Url):
+                self.Error = "Can't retrieve ResourceUrl: %s from Configuration" % self._Url
+                return False
+            url = urls.getByName(self._Url)
+            if not url.hasByName('Scope'):
+                self.Error = "Can't retrieve Scope for ResourceUrl: %s from Configuration" % self._Url
+                return False
+            scopename = url.getByName('Scope')
+            scopes = self.configuration.getByName('Scopes')
+            if not scopes.hasByName(scopename):
+                self.Error = "Can't retrieve Scope: %s from Configuration" % scopename
+                return False
+            scope = scopes.getByName(scopename)
+            if not scope.hasByName('Provider'):
+                self.Error = "Can't retrieve Provider for Scope: %s from Configuration" % scopename
+                return False
+            providername = scope.getByName('Provider')
+            self._Provider.insertValue('Name', providername)
+            print("OAuth2Service.initializeUrl() 2 %s" % providername)
+            if not scope.hasByName('Values'):
+                self.Error = "Can't retrieve Values for Scope: %s from Configuration" % scopename
+                return False
+            requiredscopes = scope.getByName('Values')
+            self._Provider.insertValue('RequiredScopes', requiredscopes)
+            providers = self.configuration.getByName('Providers')
+            if not providers.hasByName(providername):
+                self.Error = "Can't retrieve Provider: %s from Configuration" % providername
+                return False
+            provider = providers.getByName(providername)
+            print("OAuth2Service.initializeUrl() 3")
+            if provider.hasByName('ClientId'):
+                clientid = provider.getByName('ClientId')
+                self._Provider.insertValue('ClientId', clientid)
+            if provider.hasByName('ClientSecret'):
+                clientsecret = provider.getByName('ClientSecret')
+                self._Provider.insertValue('ClientSecret', clientsecret)
+            if provider.hasByName('TokenUrl'):
+                tokenurl = provider.getByName('TokenUrl')
+                self._Provider.insertValue('TokenUrl', tokenurl)
+            if provider.hasByName('TokenParameters'):
+                tokenparameters = provider.getByName('TokenParameters')
+                self._Provider.insertValue('TokenParameters', tokenparameters)
+            if provider.hasByName('Users'):
+                self._Users = provider.getByName('Users')
             init = provider is not None
-            print("OAuth2Service.initializeSession() 4 %s" % (init, ))
-            return init
+            print("OAuth2Service.initializeUrl() 4 %s" % (init, ))
+            return provider is not None
             #self.Setting.Url.Id = url
         except Exception as e:
-            print("OAuth2Service.initializeSession() ERROR: %s - %s" % (e, traceback.print_exc()))
+            print("OAuth2Service.initializeUrl() ERROR: %s - %s" % (e, traceback.print_exc()))
 
     def initializeUser(self, name):
+        print("OAuth2Service.initializeUser() 1 %s" % name)
         if self._initializeUser(name):
+            print("OAuth2Service.initializeUser() 2")
             return self._isAuthorized()
         return False
 
@@ -234,7 +253,8 @@ class OAuth2Service(unohelper.Base,
                 msg += " ERROR: cant retrieve Authorization Code: %s" % controller.Error
             else:
                 msg += " Done"
-                authorized = True
+                authorized = self.initializeUrl(controller.ResourceUrl)
+                authorized &= self.initializeUser(controller.UserName)
                 #self.ResourceUrl = controller.ResourceUrl
                 #self.UserName = controller.UserName
                 print("OAuth2Service._getAuthorizationCode() 4")
@@ -275,7 +295,8 @@ class OAuth2Service(unohelper.Base,
         return token
 
     def execute(self, parameter):
-        return execute(self.Session, parameter, self.Timeout, self.Logger)
+        response, self.Error = execute(self.Session, parameter, self.Timeout)
+        return response
 
     def getEnumerator(self, parameter):
         return Enumerator(self.Session, parameter, self.Timeout, self.Logger)
@@ -336,11 +357,10 @@ class OAuth2Service(unohelper.Base,
         return False
 
     def _initializeUser(self, username):
-        self._UserName = ''
+        self._UserName = username
         self._User = KeyMap()
         if self._Users.hasByName(username):
             user = self._Users.getByName(username)
-            self._UserName = username
             if user.hasByName('AccessToken'):
                 access = user.getByName('AccessToken')
                 self._User.insertValue('AccessToken', access)
