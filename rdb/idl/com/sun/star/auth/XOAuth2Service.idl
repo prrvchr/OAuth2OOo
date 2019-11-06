@@ -4,6 +4,7 @@
 #include <com/sun/star/uno/XInterface.idl>
 #include <com/sun/star/auth/RestRequestParameter.idl>
 #include <com/sun/star/auth/XRestKeyMap.idl>
+#include <com/sun/star/auth/XRestEnumeration.idl>
 #include <com/sun/star/beans/Optional.idl>
 #include <com/sun/star/io/XInputStream.idl>
 #include <com/sun/star/io/XOutputStream.idl>
@@ -16,8 +17,15 @@ module com { module sun { module star { module auth {
 interface XOAuth2Service: com::sun::star::uno::XInterface
 {
 
+    any getWarnings();
+    void clearWarnings();
+
+    boolean isOnLine();
+    boolean isOffLine([in] string Host);
+
     boolean initializeSession([in] string ResourceUrl,
                               [in] string UserName);
+
     boolean initializeUrl([in] string ResourceUrl);
     boolean initializeUser([in] string UserName);
     boolean getAuthorization([in] string ResourceUrl,
@@ -31,7 +39,9 @@ interface XOAuth2Service: com::sun::star::uno::XInterface
     short getSessionMode([in] string Host);
     string getToken([in] string Format);
     ::com::sun::star::beans::Optional<::com::sun::star::auth::XRestKeyMap> execute([in] RestRequestParameter Parameter);
-    ::com::sun::star::container::XEnumeration getEnumerator([in] RestRequestParameter Parameter);
+    ::com::sun::star::auth::XRestEnumeration getEnumerator([in] RestRequestParameter Parameter);
+    ::com::sun::star::auth::XRestEnumeration getEnumeration([in] RestRequestParameter Parameter,
+                                                            [in] ::com::sun::star::uno::XInterface Parser);
     ::com::sun::star::io::XInputStream getInputStream([in] RestRequestParameter Parameter,
                                                       [in] long Chunk,
                                                       [in] long Buffer);

@@ -9,7 +9,6 @@ from com.sun.star.io import XOutputStream
 from com.sun.star.io import XStreamListener
 
 from com.sun.star.io import IOException
-from com.sun.star.container import XEnumeration
 from com.sun.star.container import NoSuchElementException
 
 from com.sun.star.logging.LogLevel import INFO
@@ -20,14 +19,17 @@ from com.sun.star.ucb.ConnectionMode import OFFLINE
 from com.sun.star.connection import NoConnectException
 
 from com.sun.star.auth import XRestUploader
+from com.sun.star.auth import XRestEnumeration
 from com.sun.star.auth.RestRequestTokenType import TOKEN_NONE
 from com.sun.star.auth.RestRequestTokenType import TOKEN_URL
 from com.sun.star.auth.RestRequestTokenType import TOKEN_REDIRECT
 from com.sun.star.auth.RestRequestTokenType import TOKEN_QUERY
 from com.sun.star.auth.RestRequestTokenType import TOKEN_JSON
+from com.sun.star.auth.RestRequestTokenType import TOKEN_SYNC
 
 from .oauth2lib import NoOAuth2
 from .keymap import KeyMap
+from . import requests
 
 import traceback
 import sys
@@ -48,74 +50,166 @@ def getSessionMode(ctx, host, port=80):
         mode = ONLINE
     return mode
 
-def execute(session, parameter, timeout):
+def execute(session, parameter, timeout, parser=None):
     response = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
-    kwargs = _getKeyWordArguments(parameter)
     error = ''
+    kwargs = _getKeyWordArguments(parameter)
     with session as s:
-        with s.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs) as r:
-            if r.status_code in (s.codes.ok, s.codes.found, s.codes.created, s.codes.accepted):
-                response.IsPresent = True
-                response.Value = _parseResponse(r)
+        try:
+            with s.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs) as r:
+                r.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            error = e.args[0]
+            print ("Http Error:", error)
+            #error = "Request: %s - ERROR: %s - %s" % (parameter.Name, r.status_code, r.text)
+        except requests.exceptions.ConnectionError as e:
+            cause = e.args[0]
+            error = str(cause.args[0])
+            print ("Error Connecting:", error)
+        except requests.exceptions.Timeout as e:
+            cause = e.args[0]
+            error = str(cause.args[0])
+            print ("Timeout Error:", error)
+        except requests.exceptions.RequestException as e:
+            cause = e.args[0]
+            error = str(cause.args[0])
+            print ("OOps: Something Else", error)
+        else:
+            response.IsPresent = True
+            print("OAuth2Service.execute():\n%s" % (r.json(), ))
+            if parser:
+                response.Value = r.json(object_pairs_hook=parser.jsonParser)
             else:
-                error = "Request: %s - ERROR: %s - %s" % (parameter.Name, r.status_code, r.text)
+                response.Value = _parseResponse(r)
     return response, error
 
 
+class Enumeration(unohelper.Base,
+                  XRestEnumeration):
+    def __init__(self, session, parameter, timeout, parser=None):
+        self.session = session
+        self.parameter = parameter
+        self.timeout = timeout
+
+        self.parser = parser
+        t = self.parameter.Enumerator.Token
+        self.chunked = t.Type != TOKEN_NONE
+        self.synchro = t.Type & TOKEN_SYNC
+        self.token = None
+        self.sync = ''
+
+    @property
+    def SyncToken(self):
+        return self.sync
+
+    # XRestEnumeration
+    def hasMoreElements(self):
+        return self.token is None or bool(self.token)
+    def nextElement(self):
+        if self.hasMoreElements():
+            response, self.error = self._getResponse()
+            return response
+        raise NoSuchElementException()
+
+    def _getResponse(self):
+        t = self.parameter.Enumerator.Token
+        if self.token:
+            if t.Type & TOKEN_URL:
+                self.parameter.Url = t.Value
+            if t.Type & TOKEN_QUERY:
+                query = json.loads(self.parameter.Query)
+                query.update({t.Value: self.token})
+                self.parameter.Query = json.dumps(query)
+            if t.Type & TOKEN_REDIRECT:
+                self.parameter.Url = self.token
+            if t.Type & TOKEN_JSON:
+                self.parameter.Json = '{"%s": "%s"}' % (t.Field, self.token)
+        self.token = False
+        self.sync = ''
+        response, error = execute(self.session, self.parameter, self.timeout, self.parser)
+        if response.IsPresent:
+            r = response.Value
+            #rows = list(r.getDefaultValue(self.parameter.Enumerator.Field, ()))
+            if self.chunked:
+                if t.IsConditional:
+                    if r.getDefaultValue(t.ConditionField, None) == t.ConditionValue:
+                        self.token = r.getDefaultValue(t.Field, False)
+                else:
+                    self.token = r.getDefaultValue(t.Field, False)
+            if self.synchro:
+                self.sync = r.getDefaultValue(t.SyncField, '')
+        return response, error
+
+
 class Enumerator(unohelper.Base,
-                 XEnumeration):
+                 XRestEnumeration):
     def __init__(self, session, parameter, timeout, logger):
+        print("request.Enumerator.__init__() 1")
         self.session = session
         self.parameter = parameter
         self.timeout = timeout
         self.logger = logger
-        self.chunked = self.parameter.Enumerator.Token.Type != TOKEN_NONE
-        self.elements, self.token, self.error = self._getElements()
+        t = self.parameter.Enumerator.Token
+        self.chunked = t.Type != TOKEN_NONE
+        self.synchro = t.Type & TOKEN_SYNC
+        print("request.Enumerator.__init__() 2")
+        self.rows, self.token, self.sync, self.error = self._getRows()
+        print("request.Enumerator.__init__() 3")
         if self.error:
+            print("request.Enumerator.__init__() 4")
             self.logger.logp(SEVERE, "OAuth2Service","Enumerator()", self.error)
+        print("request.Enumerator.__init__() 5")
 
-    # XEnumeration
+    @property
+    def SyncToken(self):
+        return self.sync
+
+    # XRestEnumeration
     def hasMoreElements(self):
-        return len(self.elements) > 0 or self.token is not None
+        return len(self.rows) > 0 or self.token is not None
     def nextElement(self):
-        if self.elements:
-            return self.elements.pop(0)
+        if self.rows:
+            return self.rows.pop(0)
         elif self.token:
-            self.elements, self.token, self.error = self._getElements(self.token)
+            self.rows, self.token, self.sync, self.error = self._getRows(self.token)
             if self.error:
+                print("request.Enumerator.nextElement() ERROR")
                 self.logger.logp(SEVERE, "OAuth2Service","Enumerator()", self.error)
             return self.nextElement()
         raise NoSuchElementException()
 
-    def _getElements(self, token=None):
-        if token:
-            if self.parameter.Enumerator.Token.Type & TOKEN_URL:
-                self.parameter.Url = self.parameter.Enumerator.Token.Value
-            if self.parameter.Enumerator.Token.Type & TOKEN_QUERY:
-                query = json.loads(self.parameter.Query)
-                query.update({self.parameter.Enumerator.Token.Value: token})
-                self.parameter.Query = json.dumps(query)
-            if self.parameter.Enumerator.Token.Type & TOKEN_REDIRECT:
-                self.parameter.Url = token
-            if self.parameter.Enumerator.Token.Type & TOKEN_JSON:
-                name = self.parameter.Enumerator.Token.Field
-                self.parameter.Json = '{"%s": "%s"}' % (name, token)
-            token = None
-        elements = []
-        response, error = execute(self.session, self.parameter, self.timeout)
-        if response.IsPresent:
-            r = response.Value
-            elements = list(r.getDefaultValue(self.parameter.Enumerator.Field, ()))
-            if self.chunked:
-                if self.parameter.Enumerator.Token.IsConditional:
-                    field = self.parameter.Enumerator.Token.ConditionField
-                    value = self.parameter.Enumerator.Token.ConditionValue
-                    if r.getDefaultValue(field, None) == value:
-                        token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
-                else:
-                    token = r.getDefaultValue(self.parameter.Enumerator.Token.Field, None)
-        return elements, token, error
-
+    def _getRows(self, token=None):
+        try:
+            t = self.parameter.Enumerator.Token
+            if token:
+                if t.Type & TOKEN_URL:
+                    self.parameter.Url = t.Value
+                if t.Type & TOKEN_QUERY:
+                    query = json.loads(self.parameter.Query)
+                    query.update({t.Value: token})
+                    self.parameter.Query = json.dumps(query)
+                if t.Type & TOKEN_REDIRECT:
+                    self.parameter.Url = token
+                if t.Type & TOKEN_JSON:
+                    self.parameter.Json = '{"%s": "%s"}' % (t.Field, token)
+                token = None
+            rows = []
+            sync = ''
+            response, error = execute(self.session, self.parameter, self.timeout)
+            if response.IsPresent:
+                r = response.Value
+                rows = list(r.getDefaultValue(self.parameter.Enumerator.Field, ()))
+                if self.chunked:
+                    if t.IsConditional:
+                        if r.getDefaultValue(t.ConditionField, None) == t.ConditionValue:
+                            token = r.getDefaultValue(t.Field, None)
+                    else:
+                        token = r.getDefaultValue(t.Field, None)
+                if self.synchro:
+                    sync = r.getDefaultValue(t.SyncField, '')
+            return rows, token, sync, error
+        except Exception as e:
+            print("Enumerator._getRows() ERROR: %s - %s" % (e, traceback.print_exc()))
 
 class InputStream(unohelper.Base,
                   XInputStream):
@@ -195,7 +289,7 @@ class Downloader():
                             self.size = self._getSize(r.headers.get('Content-Range'))
                     else:
                         self.closed = True
-                        msg = "getChunks() ERROR: %s" % (r.status_code, r.text)
+                        msg = "getChunks() ERROR: %s - %s" % (r.status_code, r.text)
                         self.logger.logp(SEVERE, "OAuth2Service", "Downloader()", msg)
                         break
                     for c in r.iter_content(self.buffer):
@@ -377,6 +471,7 @@ def _getKeyWordArguments(parameter):
 def _parseResponse(response):
     content = response.headers.get('Content-Type', '')
     if content.startswith('application/json'):
+        #result = KeyMap(**response.json())
         result = response.json(object_pairs_hook=_jsonParser)
     else:
         result = KeyMap(**response.headers)
@@ -387,5 +482,5 @@ def _jsonParser(data):
     for key, value in data:
         if isinstance(value, list):
             value = tuple(value)
-        keymap.insertValue(key, value)
+        keymap.setValue(key, value)
     return keymap

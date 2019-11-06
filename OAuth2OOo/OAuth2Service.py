@@ -10,6 +10,8 @@ from com.sun.star.task import XInteractionHandler2
 from com.sun.star.auth import XOAuth2Service
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
+from com.sun.star.ucb.ConnectionMode import OFFLINE
+from com.sun.star.ucb.ConnectionMode import ONLINE
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 
@@ -17,6 +19,7 @@ from com.sun.star.uno import Exception as UnoException
 
 from oauth2 import OAuth2OOo
 from oauth2 import NoOAuth2
+from oauth2 import Enumeration
 from oauth2 import Enumerator
 from oauth2 import InputStream
 from oauth2 import Uploader
@@ -66,8 +69,11 @@ class OAuth2Service(unohelper.Base,
         self._User = KeyMap()
         self.Parent = None
         self.Logger = logger
+        self._Warnings = []
+        self._Error = None
         self.Error = ''
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
+        self._SessionMode = OFFLINE
         self._checkSSL()
 
     @property
@@ -158,9 +164,22 @@ class OAuth2Service(unohelper.Base,
         dialog.getControl('Label1').Text = label % name
 
     # XOAuth2Service
+    def getWarnings(self):
+        if self._Warnings:
+            return self._Warnings.pop(0)
+        return None
+    def clearWarnings(self):
+        self._Warnings = []
+
+    def isOnLine(self):
+        return self._SessionMode != OFFLINE
+    def isOffLine(self, host):
+        self._SessionMode = getSessionMode(self.ctx, host)
+        return self._SessionMode != ONLINE
+
     def initializeSession(self, url, name):
         if self.initializeUrl(url):
-            return self.initializeUser(name)
+            return self._initializeUser(name)
         return False
 
     def initializeUrl(self, url):
@@ -277,7 +296,7 @@ class OAuth2Service(unohelper.Base,
             token = ''
         elif self.HasExpired:
             print("OAuth2Service.getToken() 3")
-            token = getRefreshToken(self.Logger, self.Session, self._Provider, self._User, self.Timeout)
+            token, self._Error = getRefreshToken(self.Logger, self.Session, self._Provider, self._User, self.Timeout)
             if token.IsPresent:
                 self._User = token.Value
                 token = self.AccessToken
@@ -295,8 +314,13 @@ class OAuth2Service(unohelper.Base,
         return token
 
     def execute(self, parameter):
-        response, self.Error = execute(self.Session, parameter, self.Timeout)
+        response, error = execute(self.Session, parameter, self.Timeout)
+        if error:
+            self._Warnings.append(self._getException(error))
         return response
+
+    def getEnumeration(self, parameter, parser):
+        return Enumeration(self.Session, parameter, self.Timeout, parser)
 
     def getEnumerator(self, parameter):
         return Enumerator(self.Session, parameter, self.Timeout, self.Logger)
@@ -377,6 +401,12 @@ class OAuth2Service(unohelper.Base,
                 scopes = user.getByName('Scopes')
                 self._User.insertValue('Scopes', scopes)
         return self._UserName != ''
+
+    def _getException(self, message):
+        error = UnoException()
+        error.Message = message
+        error.Context = self
+        return error
 
     # XServiceInfo
     def supportsService(self, service):

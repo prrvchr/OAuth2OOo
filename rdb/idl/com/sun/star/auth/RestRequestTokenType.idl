@@ -11,6 +11,7 @@ constants RestRequestTokenType
     const long TOKEN_REDIRECT = 2;
     const long TOKEN_QUERY = 4;
     const long TOKEN_JSON = 8;
+    const long TOKEN_SYNC = 16;
 
 };
 

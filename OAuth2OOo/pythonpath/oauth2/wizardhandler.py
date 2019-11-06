@@ -356,8 +356,9 @@ class WizardHandler(unohelper.Base,
                     provider = self.Configuration.Url.Scope.Provider.MetaData
                     user = self.Configuration.Url.Scope.Provider.User.MetaData
                     timeout = self.Configuration.Timeout
-                    token = getRefreshToken(self.logger, self.session, provider, user, timeout)
-                    saveTokenToConfiguration(self.Configuration, token)
+                    token, error = getRefreshToken(self.logger, self.session, provider, user, timeout)
+                    if error is None:
+                        saveTokenToConfiguration(self.Configuration, token)
                 updatePageTokenUI(window, self.Configuration, self.stringResource)
             elif item == 'RemoveToken':
                 user = self.Configuration.Url.Scope.Provider.User

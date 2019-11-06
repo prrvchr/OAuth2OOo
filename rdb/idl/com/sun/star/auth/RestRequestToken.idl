@@ -12,6 +12,7 @@ struct RestRequestToken
     boolean IsConditional;
     string ConditionField;
     any ConditionValue;
+    string SyncField;
 
 };
 

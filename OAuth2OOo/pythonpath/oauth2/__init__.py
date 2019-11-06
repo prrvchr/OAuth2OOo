@@ -6,6 +6,7 @@ from .wizardcontroller import WizardController
 
 from .keymap import KeyMap
 
+from .request import Enumeration
 from .request import Enumerator
 from .request import InputStream
 from .request import Uploader

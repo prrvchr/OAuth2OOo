@@ -129,16 +129,14 @@ def getTokenParameters(setting, code, codeverifier):
 
 def getResponseFromRequest(session, url, data, timeout):
     response = {}
-    error = ''
-    try:
-        with session as s:
+    error = None
+    with session as s:
+        try:
             with s.post(url, data=data, timeout=timeout, auth=NoOAuth2()) as r:
-                if r.status_code == s.codes.ok:
-                    response = r.json()
-                else:
-                    error = "ERROR: %s" % r.text
-    except Exception as e:
-        error = "ERROR: %s" % e
+                r.raise_for_status()
+                response = r.json()
+        except Exception as e:
+            error = e
     return response, error
 
 def registerTokenFromResponse(configuration, response):
@@ -171,7 +169,7 @@ def getRefreshToken(logger, session, provider, user, timeout):
         message = "Make Http Request: %s?%s" % (url, data)
         logger.logp(INFO, 'oauth2tools', 'refreshToken', message)
         #timeout = configuration.Timeout
-        response, error = getResponseFromRequest(logger, session, url, data, timeout)
+        response, error = getResponseFromRequest(session, url, data, timeout)
         token = getTokenFromResponse(response)
         #if token:
         #    configuration.Url.Scope.Provider.User.commit()

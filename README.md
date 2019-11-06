@@ -1,6 +1,6 @@
 **The use of this software subjects you to our** [Terms Of Use](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_en) **and** [Data Protection Policy](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_en)
 
-## OAuth2OOo v.0.0.3
+## OAuth2OOo v.0.0.4
 
 ### Uno OAuth2.0 API for LibreOffice / OpenOffice.
 
