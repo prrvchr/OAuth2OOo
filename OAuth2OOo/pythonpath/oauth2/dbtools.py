@@ -193,7 +193,7 @@ def _getValueFromResult(result, dbtype, index):
 
 def getCreateTableQueries(statement):
     queries = []
-    call = getDataSourceCall(statement.getConnection(), 'getTableColumn')
+    call = getDataSourceCall(statement.getConnection(), 'getTables')
     tables = getSequenceFromResult(statement.executeQuery(getSqlQuery('getTableName')))
     for table in tables:
         columns = []

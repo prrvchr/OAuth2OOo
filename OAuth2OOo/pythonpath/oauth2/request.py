@@ -469,13 +469,16 @@ def _getKeyWordArguments(parameter):
     return kwargs
 
 def _parseResponse(response):
-    content = response.headers.get('Content-Type', '')
-    if content.startswith('application/json'):
-        #result = KeyMap(**response.json())
-        result = response.json(object_pairs_hook=_jsonParser)
-    else:
-        result = KeyMap(**response.headers)
-    return result
+    try:
+        content = response.headers.get('Content-Type', '')
+        if content.startswith('application/json'):
+            #result = KeyMap(**response.json())
+            result = response.json(object_pairs_hook=_jsonParser)
+        else:
+            result = KeyMap(**response.headers)
+        return result
+    except Exception as e:
+        print("request._parseResponse() ERROR: %s - %s" % (e, traceback.print_exc()))
 
 def _jsonParser(data):
     keymap = KeyMap()
