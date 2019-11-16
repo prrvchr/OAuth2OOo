@@ -191,11 +191,12 @@ def _getValueFromResult(result, dbtype, index):
         value = None
     return value
 
-def getCreateTableQueries(statement):
-    queries = []
+def getTablesAndStatements(statement):
+    tables = []
+    statements = {}
     call = getDataSourceCall(statement.getConnection(), 'getTables')
-    tables = getSequenceFromResult(statement.executeQuery(getSqlQuery('getTableName')))
-    for table in tables:
+    for table in getSequenceFromResult(statement.executeQuery(getSqlQuery('getTableName'))):
+        statement = False
         columns = []
         primary = []
         unique = []
@@ -204,6 +205,7 @@ def getCreateTableQueries(statement):
         result = call.executeQuery()
         while result.next():
             data = getKeyMapFromResult(result, KeyMap())
+            statement = data.getValue('View')
             column = data.getValue('Column')
             definition = '"%s"' % column
             definition += ' %s' % data.getValue('Type')
@@ -232,6 +234,20 @@ def getCreateTableQueries(statement):
         format = (table, ','.join(columns))
         query = getSqlQuery('createTable', format)
         print("dbtool._createDynamicTable(): %s" % query)
-        queries.append(query)
+        tables.append(query)
+        if statement:
+            names = ['"Value"']
+            values = ['?']
+            where = []
+            for format in constraint:
+                names.append('"%s"' % format['Column'])
+                values.append('?')
+                where.append('"%s"=?' % format['Column'])
+            insert = 'INSERT INTO "%s" (%s) VALUES (%s)' % (table, ','.join(names), ','.join(values))
+            update = 'UPDATE "%s" SET "Value"=?,"TimeStamp"=? WHERE %s' % (table, ' AND '.join(where))
+            print("dbtools.getCreateTableQueries() Insert: %s" % insert)
+            print("dbtools.getCreateTableQueries() Update: %s" % update)
+            statements['insert%s' % table] = insert
+            statements['update%s' % table] = update
     call.close()
-    return queries
+    return tables, statements
