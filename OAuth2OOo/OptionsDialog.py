@@ -144,11 +144,11 @@ class OptionsDialog(unohelper.Base,
             self.Logger.logp(SEVERE, "OptionsDialog", "_loadSetting()", msg)
 
     def _saveSetting(self, dialog):
+        self._saveLoggerSetting(dialog)
         self.service.Setting.ConnectTimeout = int(dialog.getControl('NumericField1').getValue())
         self.service.Setting.ReadTimeout = int(dialog.getControl('NumericField2').getValue())
         self.service.Setting.HandlerTimeout = int(dialog.getControl('NumericField3').getValue())
         self.service.Setting.commit()
-        self._saveLoggerSetting(dialog)
 
     def _toggleLogger(self, dialog, enabled):
         dialog.getControl('Label1').Model.Enabled = enabled
@@ -216,7 +216,6 @@ class OptionsDialog(unohelper.Base,
 
     def _loadLoggerSetting(self, dialog):
         enabled, index, handler = getLoggerSetting(self.ctx)
-        #enabled, index, handler = True, 7, 2
         dialog.getControl('CheckBox1').State = int(enabled)
         self._setLoggerLevel(dialog.getControl('ComboBox1'), index)
         dialog.getControl('OptionButton%s' % handler).State = 1
