@@ -145,10 +145,14 @@ class OptionsDialog(unohelper.Base,
 
     def _saveSetting(self, dialog):
         self._saveLoggerSetting(dialog)
-        self.service.Setting.ConnectTimeout = int(dialog.getControl('NumericField1').getValue())
-        self.service.Setting.ReadTimeout = int(dialog.getControl('NumericField2').getValue())
-        self.service.Setting.HandlerTimeout = int(dialog.getControl('NumericField3').getValue())
-        self.service.Setting.commit()
+        try:
+            self.service.Setting.ConnectTimeout = int(dialog.getControl('NumericField1').getValue())
+            self.service.Setting.ReadTimeout = int(dialog.getControl('NumericField2').getValue())
+            self.service.Setting.HandlerTimeout = int(dialog.getControl('NumericField3').getValue())
+            self.service.Setting.commit()
+        except Exception as e:
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            self.Logger.logp(SEVERE, "OptionsDialog", "_saveSetting()", msg)
 
     def _toggleLogger(self, dialog, enabled):
         dialog.getControl('Label1').Model.Enabled = enabled
