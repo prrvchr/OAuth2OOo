@@ -1,8 +1,6 @@
 #!
 # -*- coding: utf_8 -*-
 
-from __future__ import print_function
-
 import uno
 import unohelper
 
@@ -18,7 +16,6 @@ from oauth2 import getLogger
 from oauth2 import getLoggerUrl
 from oauth2 import getLoggerSetting
 from oauth2 import setLoggerSetting
-from oauth2 import getResourceLocation
 from oauth2 import getStringResource
 from oauth2 import getNamedValueSet
 from oauth2 import g_identifier
@@ -27,20 +24,7 @@ from oauth2 import getInteractionHandler
 from oauth2 import InteractionRequest
 from oauth2 import getUserNameFromHandler
 
-import os
-import sys
 import traceback
-
-dbg = True
-
-#no stderr under windows, output to oauth2ooo.log with no buffering
-if dbg and os.name == 'nt':
-    ctx = uno.getComponentContext()
-    url = getResourceLocation(ctx, g_identifier, 'oauth2ooo.log')
-    path = uno.fileUrlToSystemPath(url)
-    dbgout = open(path, 'w', 0)
-else:
-    dbgout = sys.stderr
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -54,12 +38,11 @@ class OptionsDialog(unohelper.Base,
     def __init__(self, ctx):
         try:
             self.ctx = ctx
+            self.Logger = getLogger(self.ctx)
             self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo', 'OptionsDialog')
             self.service = createService(self.ctx, '%s.OAuth2Service' % g_identifier)
-            self.Logger = getLogger(self.ctx)
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            print("OptionsDialog.__init__() %s" % msg, file=dbgout)
             self.Logger.logp(SEVERE, "OptionsDialog", "__init__()", msg)
 
     # XContainerWindowEventHandler, XDialogEventHandler
@@ -232,7 +215,8 @@ class OptionsDialog(unohelper.Base,
         return dialog
 
     def _loadLoggerSetting(self, dialog):
-        enabled, index, handler = getLoggerSetting(self.ctx)
+        #enabled, index, handler = getLoggerSetting(self.ctx)
+        enabled, index, handler = True, 7, 2
         dialog.getControl('CheckBox1').State = int(enabled)
         self._setLoggerLevel(dialog.getControl('ComboBox1'), index)
         dialog.getControl('OptionButton%s' % handler).State = 1
