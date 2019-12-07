@@ -215,8 +215,8 @@ class OptionsDialog(unohelper.Base,
         return dialog
 
     def _loadLoggerSetting(self, dialog):
-        #enabled, index, handler = getLoggerSetting(self.ctx)
-        enabled, index, handler = True, 7, 2
+        enabled, index, handler = getLoggerSetting(self.ctx)
+        #enabled, index, handler = True, 7, 2
         dialog.getControl('CheckBox1').State = int(enabled)
         self._setLoggerLevel(dialog.getControl('ComboBox1'), index)
         dialog.getControl('OptionButton%s' % handler).State = 1
