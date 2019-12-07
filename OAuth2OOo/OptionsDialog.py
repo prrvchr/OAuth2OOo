@@ -129,11 +129,15 @@ class OptionsDialog(unohelper.Base,
             print("OptionsDialog._doConnect() %s" % msg)
 
     def _loadSetting(self, dialog):
-        dialog.getControl('NumericField1').setValue(self.service.Setting.ConnectTimeout)
-        dialog.getControl('NumericField2').setValue(self.service.Setting.ReadTimeout)
-        dialog.getControl('NumericField3').setValue(self.service.Setting.HandlerTimeout)
-        dialog.getControl('ComboBox2').Model.StringItemList = self.service.Setting.UrlList
-        self._loadLoggerSetting(dialog)
+        try:
+            dialog.getControl('NumericField1').setValue(self.service.Setting.ConnectTimeout)
+            dialog.getControl('NumericField2').setValue(self.service.Setting.ReadTimeout)
+            dialog.getControl('NumericField3').setValue(self.service.Setting.HandlerTimeout)
+            dialog.getControl('ComboBox2').Model.StringItemList = self.service.Setting.UrlList
+            self._loadLoggerSetting(dialog)
+        except Exception as e:
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            self.Logger.logp(SEVERE, "OptionsDialog", "_loadSetting()", msg)
 
     def _saveSetting(self, dialog):
         self.service.Setting.ConnectTimeout = int(dialog.getControl('NumericField1').getValue())
