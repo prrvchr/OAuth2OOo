@@ -35,7 +35,7 @@ dbg = True
 
 #no stderr under windows, output to oauth2ooo.log with no buffering
 if dbg and os.name == 'nt':
-    ctx = XSCRIPTCONTEXT.getComponentContext()
+    ctx = uno.getComponentContext()
     url = getResourceLocation(ctx, g_identifier, 'oauth2ooo.log')
     path = uno.fileUrlToSystemPath(url)
     dbgout = open(path, 'w', 0)
