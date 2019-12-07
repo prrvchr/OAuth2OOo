@@ -62,11 +62,12 @@ class OAuth2Setting(unohelper.Base,
     def _getPropertySetInfo(self):
         properties = {}
         readonly = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
+        transient = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.TRANSIENT')
         properties['Url'] = getProperty('Url', 'com.sun.star.uno.XInterface', readonly)
         properties['UrlList'] = getProperty('UrlList', '[]string', readonly)
-        properties['HandlerTimeout'] = getProperty('HandlerTimeout', 'short', readonly)
-        properties['ConnectTimeout'] = getProperty('ConnectTimeout', 'short', readonly)
-        properties['ReadTimeout'] = getProperty('ReadTimeout', 'short', readonly)
+        properties['HandlerTimeout'] = getProperty('HandlerTimeout', 'short', transient)
+        properties['ConnectTimeout'] = getProperty('ConnectTimeout', 'short', transient)
+        properties['ReadTimeout'] = getProperty('ReadTimeout', 'short', transient)
         properties['Timeout'] = getProperty('Timeout', 'any', readonly)
         properties['Logger'] = getProperty('Logger', 'com.sun.star.logging.XLogger', readonly)
         return properties
