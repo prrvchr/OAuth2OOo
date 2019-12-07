@@ -6,6 +6,14 @@ import uno
 from .unotools import getConfiguration
 
 
+def logMessage(ctx, level, msg, cls=None, mtd=None, log='org.openoffice.logging.DefaultLogger'):
+    logger = getLogger(ctx, log)
+    if logger.isLoggable(level):
+        if cls is None or mtd is None:
+            logger.log(level, msg)
+        else:
+            logger.logn(level, cls, mtd, msg)
+
 def getLogger(ctx, logger='org.openoffice.logging.DefaultLogger'):
     return ctx.getValueByName('/singletons/com.sun.star.logging.LoggerPool').getNamedLogger(logger)
 

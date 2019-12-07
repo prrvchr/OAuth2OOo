@@ -8,11 +8,19 @@ import unohelper
 
 from com.sun.star.awt import XRequestCallback
 from com.sun.star.util import XCancellable
+from com.sun.star.connection import AlreadyAcceptingException
+from com.sun.star.connection import ConnectionSetupException
+from com.sun.star.lang import IllegalArgumentException
+from com.sun.star.io import IOException
+from com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import SEVERE
 
 from .oauth2tools import g_identifier
 from .unotools import createService
 from .unotools import getStringResource
 from .requests.compat import unquote_plus
+from .logger import getLogger
+from .logger import logMessage
 
 import time
 from threading import Thread
@@ -75,6 +83,7 @@ class WatchDog(Thread):
             if self.end != 0:
                 self.controller.notify(100)
             self.lock.notifyAll()
+            logMessage(self.server.ctx, INFO, "WatchDog Running ... Done", 'WatchDog', 'run()')
 
     def cancel(self):
         if self.server.is_alive():
@@ -94,7 +103,18 @@ class Server(Thread):
         self.lock = lock
 
     def run(self):
-        connection = self.acceptor.accept(self.argument)
+        connection = None
+        try:
+            connection = self.acceptor.accept(self.argument)
+        except AlreadyAcceptingException as e:
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
+        except ConnectionSetupException as e:
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
+        except IllegalArgumentException as e:
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
         if connection:
             with self.lock:
                 result = self._getResult(connection)
@@ -105,10 +125,16 @@ Location: %s
 Connection: Closed
 
 ''' % location.encode())
-                connection.write(header)
+                try:
+                    connection.write(header)
+                except IOException as e:
+                    msg = "Error: %s - %s" % (e, traceback.print_exc())
+                    logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
+                connection.flush()
                 connection.close()
                 self.acceptor.stopAccepting()
                 self.lock.notifyAll()
+                logMessage(self.ctx, INFO, "Server Running ... Done", 'Server', 'run()')
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)
@@ -176,7 +202,8 @@ Connection: Closed
                 self.code.Value = response['code']
                 self.code.IsPresent = True
                 return True
-        self.error = 'Request response Error: %s - %s' % (parameters, response)
+        msg = 'Request response Error: %s - %s' % (parameters, response)
+        logMessage(self.ctx, SEVERE, msg, 'Server', '_getResult()')
         return False
 
     def _getResultLocation(self, result):
