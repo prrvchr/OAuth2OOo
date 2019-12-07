@@ -18,6 +18,7 @@ from oauth2 import getLogger
 from oauth2 import getLoggerUrl
 from oauth2 import getLoggerSetting
 from oauth2 import setLoggerSetting
+from oauth2 import getResourceLocation
 from oauth2 import getStringResource
 from oauth2 import getNamedValueSet
 from oauth2 import g_identifier
@@ -34,7 +35,10 @@ dbg = True
 
 #no stderr under windows, output to oauth2ooo.log with no buffering
 if dbg and os.name == 'nt':
-    dbgout = open('oauth2ooo.log', 'w', 0)
+    ctx = XSCRIPTCONTEXT.getComponentContext()
+    url = getResourceLocation(ctx, g_identifier, 'oauth2ooo.log')
+    path = uno.fileUrlToSystemPath(url)
+    dbgout = open(path, 'w', 0)
 else:
     dbgout = sys.stderr
 
