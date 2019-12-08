@@ -26,7 +26,7 @@ from .unotools import getStringResource
 from .unotools import getContainerWindow
 from .unotools import getDialogUrl
 
-from .logger import getLogger
+from .logger import logMessage
 
 from .oauth2tools import getActivePath
 from .oauth2tools import getTokenParameters
@@ -57,7 +57,6 @@ class WizardController(unohelper.Base,
         arguments = ((uno.Any('[][]short', g_wizard_paths), self), )
         uno.invoke(self.Wizard, 'initialize', arguments)
         self.Error = ''
-        self.Logger = getLogger(self.ctx)
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
         #service = 'com.sun.star.awt.ContainerWindowProvider'
         #self.provider = self.ctx.ServiceManager.createInstanceWithContext(service, self.ctx)
@@ -85,7 +84,8 @@ class WizardController(unohelper.Base,
 
     # XCallback
     def notify(self, percent):
-        print("WizardController.notify() %s" % percent)
+        msg = "WizardController.notify() %s" % percent
+        logMessage(self.ctx, msg, 'WizardController', 'notify()')
         page = self.Wizard.CurrentPage
         if page.PageId == 3:
             if page.Window:
@@ -95,25 +95,25 @@ class WizardController(unohelper.Base,
                 if self.AuthorizationCode.IsPresent:
                     self._registerTokens()
                     if self.AutoClose:
-                        print("WizardController.notify() ****")
+                        logMessage(self.ctx, "WizardController.notify() 2", 'WizardController', 'notify()')
                         self.Wizard.DialogWindow.endDialog(OK)
+                        logMessage(self.ctx, "WizardController.notify() 3", 'WizardController', 'notify()')
+                    else:
+                        logMessage(self.ctx, "WizardController.notify() 4", 'WizardController', 'notify()')
+                        self.Wizard.travelNext()
+                        logMessage(self.ctx, "WizardController.notify() 5", 'WizardController', 'notify()')
 
     # XWizardController
     def createPage(self, parent, id):
         try:
-            print("WizardController.createPage() 1 %s" % id)
             msg = "PageId: %s ..." % id
             handler = WizardHandler(self.ctx,
                                     self.Session,
                                     self.Configuration,
-                                    self.Wizard,
-                                    self.Logger)
-            print("WizardController.createPage() 2 %s" % id)
+                                    self.Wizard)
             url = getDialogUrl('OAuth2OOo', 'PageWizard%s' % id)
             provider = createService(self.ctx, 'com.sun.star.awt.ContainerWindowProvider')
-            print("WizardController.createPage() 3 %s" % id)
             window = provider.createContainerWindow(url, '', parent, handler)
-            print("WizardController.createPage() 4 %s" % id)
             page = WizardPage(self.ctx,
                               self.Configuration,
                               id,
@@ -121,13 +121,12 @@ class WizardController(unohelper.Base,
                               self.Uuid,
                               self.AuthorizationCode)
             msg += " Done"
-            self.Logger.logp(INFO, "WizardController", "createPage()", msg)
-            print("WizardController.createPage() 5 %s" % id)
-            #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
-            #mri.inspect(page)
+            logMessage(self.ctx, INFO, msg, "WizardController", "createPage()")
             return page
         except Exception as e:
-            print("WizardController.createPage() ERROR: %s - %s" % (e, traceback.print_exc()))
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, "WizardController", "createPage()")
+
     def getPageTitle(self, id):
         title = self.stringResource.resolveString('PageWizard%s.Step' % (id, ))
         return title
@@ -135,7 +134,6 @@ class WizardController(unohelper.Base,
         return self.Wizard.CurrentPage.canAdvance()
     def onActivatePage(self, id):
         try:
-            print("WizardController.onActivatePage():1 %s" % id)
             msg = "PageId: %s..." % id
             title = self.stringResource.resolveString('PageWizard%s.Title' % (id, ))
             self.Wizard.setTitle(title)
@@ -150,9 +148,7 @@ class WizardController(unohelper.Base,
                 if page.FirstLoad:
                     page.FirstLoad = False
                     if page.canAdvance():
-                        print("WizardController.onActivatePage():2 %s" % id)
                         self.Wizard.travelNext()
-                        print("WizardController.onActivatePage():3 %s" % id)
             elif id == 2:
                 pass
                 #if self.Shortened:
@@ -171,22 +167,24 @@ class WizardController(unohelper.Base,
                 self.Wizard.enableButton(finish, True)
             self.Wizard.updateTravelUI()
             msg += " Done"
-            self.Logger.logp(INFO, "WizardController", "onActivatePage()", msg)
+            logMessage(self.ctx, INFO, msg, "WizardController", "onActivatePage()")
         except Exception as e:
-            print("WizardController.onActivatePage() ERROR: %s - %s" % (e, traceback.print_exc()))
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, "WizardController", "onActivatePage()")
+
     def onDeactivatePage(self, id):
         try:
-            print("WizardController.onDeactivatePage(): %s" % id)
             if id == 1:
                 pass
                 #path = getActivePath(self.Configuration)
                 #self.Wizard.activatePath(path, True)
                 #self.Wizard.updateTravelUI()
             elif id == 4 and self.AuthorizationCode.IsPresent:
-                self._registerTokens()
-            print("WizardController.onDeactivatePage(): %s" % id)
+                pass
+                #self._registerTokens()
         except Exception as e:
-            print("WizardController.onDeactivatePage() ERROR: %s - %s" % (e, traceback.print_exc()))
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, 'WizardController', 'onDeactivatePage()')
     def confirmFinish(self):
         return True
 
@@ -195,15 +193,13 @@ class WizardController(unohelper.Base,
         code = self.AuthorizationCode.Value
         url = self.Configuration.Url.Scope.Provider.TokenUrl
         data = getTokenParameters(self.Configuration, code, self.CodeVerifier)
-        message = "Make Http Request: %s?%s" % (url, data)
-        self.Logger.logp(INFO, 'WizardController', '_registerTokens', message)
+        msg = "Make Http Request: %s?%s" % (url, data)
+        logMessage(self.ctx, INFO, msg, 'WizardController', '_registerTokens()')
         timeout = self.Configuration.Timeout
         response, error = getResponseFromRequest(self.Session, url, data, timeout)
-        print("WizardController._registerTokens() %s" % (response, ))
         result = registerTokenFromResponse(self.Configuration, response)
         if result:
             self.Configuration.commit()
-        print("WizardController._registerTokens() %s" % result)
         return result
 
     def _getPropertySetInfo(self):

@@ -140,7 +140,8 @@ def getResponseFromRequest(session, url, data, timeout):
     return response, error
 
 def registerTokenFromResponse(configuration, response):
-    token = getTokenFromResponse(response)
+    token = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
+    token = getTokenFromResponse(response, token)
     return saveTokenToConfiguration(configuration, token)
 
 def saveTokenToConfiguration(configuration, token):
@@ -162,24 +163,21 @@ def saveTokenToConfiguration(configuration, token):
         configuration.Url.Scope.Provider.User.commit()
     return token.IsPresent
 
-def getRefreshToken(logger, session, provider, user, timeout):
+def getRefreshToken(session, provider, user, timeout):
     try:
+        token = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
         url = provider.getValue('TokenUrl')
         data = getRefreshParameters(provider, user)
-        message = "Make Http Request: %s?%s" % (url, data)
-        logger.logp(INFO, 'oauth2tools', 'refreshToken', message)
-        #timeout = configuration.Timeout
         response, error = getResponseFromRequest(session, url, data, timeout)
-        token = getTokenFromResponse(response)
+        if error is None:
+            token = getTokenFromResponse(response, token)
         #if token:
         #    configuration.Url.Scope.Provider.User.commit()
-        print("oauth2tools.getRefreshToken() %s" % (error, ))
         return token, error
     except Exception as e:
         print("oauth2tools.getRefreshToken() Error: %s - %s" % (e, traceback.print_exc()))
 
-def getTokenFromResponse(response):
-    token = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
+def getTokenFromResponse(response, token):
     token.Value = KeyMap()
     refresh = response.get('refresh_token', None)
     expires = response.get('expires_in', None)
@@ -194,7 +192,6 @@ def getTokenFromResponse(response):
         token.Value.insertValue('AccessToken', access)
         token.Value.insertValue('NeverExpires', expires is None)
     token.IsPresent = any((refresh, expires, access))
-    print("getTokenFromResponse() %s" % (response, ))
     return token
 
 def getTokenFromResponse1(configuration, response):

@@ -200,7 +200,7 @@ class OptionsDialog(unohelper.Base,
             handler = self.ctx.ServiceManager.createInstanceWithArgumentsAndContext(service, args, self.ctx)
             logger = getLogger(self.ctx)
             logMessage(self.ctx, INFO, "ClearingLog ... 3", 'OptionsDialog', '_doClearLog()')
-            logger.removeLogHandler(handler)
+            #logger.removeLogHandler(handler)
             sf = self.ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
             if sf.exists(url):
                 sf.kill(url)

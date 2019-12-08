@@ -11,12 +11,14 @@ from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 from .unolib import PropertySet
 
 from .dialoghandler import DialogHandler
+
 from .unotools import getDialog
 from .unotools import createMessageBox
 from .unotools import createService
 from .unotools import getCurrentLocale
 from .unotools import getProperty
 from .unotools import getStringResource
+
 from .oauth2tools import getActivePath
 from .oauth2tools import openUrl
 from .oauth2tools import updatePageTokenUI
@@ -25,16 +27,17 @@ from .oauth2tools import g_identifier
 from .oauth2tools import getRefreshToken
 from .oauth2tools import saveTokenToConfiguration
 
+from .logger import logMessage
+
 import traceback
 
 class WizardHandler(unohelper.Base,
                     XContainerWindowEventHandler):
-    def __init__(self, ctx, session, configuration, wizard, logger):
+    def __init__(self, ctx, session, configuration, wizard):
         self.ctx = ctx
         self.session = session
         self.Configuration = configuration
         self.Wizard = wizard
-        self.logger = logger
         self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
         #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
         #mri.inspect(self.Wizard)
@@ -356,7 +359,7 @@ class WizardHandler(unohelper.Base,
                     provider = self.Configuration.Url.Scope.Provider.MetaData
                     user = self.Configuration.Url.Scope.Provider.User.MetaData
                     timeout = self.Configuration.Timeout
-                    token, error = getRefreshToken(self.logger, self.session, provider, user, timeout)
+                    token, error = getRefreshToken(self.session, provider, user, timeout)
                     if error is None:
                         saveTokenToConfiguration(self.Configuration, token)
                 updatePageTokenUI(window, self.Configuration, self.stringResource)
