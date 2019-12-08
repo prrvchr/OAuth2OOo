@@ -123,14 +123,14 @@ class Server(Thread):
                     logMessage(self.ctx, INFO, "Server Running ... Done 2", 'Server', 'run()')
                     result = self._getResult(connection)
                     logMessage(self.ctx, INFO, "Server Running ... Done 3", 'Server', 'run()')
-                    location = self._getResultLocation(result)
+                    location = self._getResultLocation(result).encode('utf8')
                     logMessage(self.ctx, INFO, "Server Running ... Done 4", 'Server', 'run()')
                     header = uno.ByteSequence(b'''\
 HTTP/1.1 302 Found
-Location: %s
+Location: %b
 Connection: Closed
 
-''' % location.encode())
+''' % location)
                     logMessage(self.ctx, INFO, "Server Running ... Done 5", 'Server', 'run()')
                 except Exception as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
