@@ -27,7 +27,7 @@ def clearLogger(ctx, logger='org.openoffice.logging.DefaultLogger'):
         url = getLoggerUrl(ctx, logger)
         del g_logPool[logger]
         fs = getSimpleFile(ctx)
-        if fs.exist(url):
+        if fs.exists(url):
             fs.kill(url)
 
 def isLoggerEnabled(ctx, logger='org.openoffice.logging.DefaultLogger'):
