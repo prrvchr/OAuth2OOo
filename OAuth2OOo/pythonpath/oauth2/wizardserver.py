@@ -117,7 +117,9 @@ class Server(Thread):
             msg = "Error: %s - %s" % (e, traceback.print_exc())
             logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
         if connection:
+            logMessage(self.ctx, INFO, "Server Running ... Done 1", 'Server', 'run()')
             with self.lock:
+                logMessage(self.ctx, INFO, "Server Running ... Done 2", 'Server', 'run()')
                 result = self._getResult(connection)
                 location = self._getResultLocation(result)
                 header = uno.ByteSequence(b'''\
@@ -127,15 +129,19 @@ Connection: Closed
 
 ''' % location.encode())
                 try:
+                    logMessage(self.ctx, INFO, "Server Running ... Done 3", 'Server', 'run()')
                     connection.write(header)
+                    logMessage(self.ctx, INFO, "Server Running ... Done 4", 'Server', 'run()')
                 except IOException as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
                     logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
+                logMessage(self.ctx, INFO, "Server Running ... Done 5", 'Server', 'run()')
                 connection.flush()
                 connection.close()
                 self.acceptor.stopAccepting()
+                logMessage(self.ctx, INFO, "Server Running ... Done 6", 'Server', 'run()')
                 self.lock.notifyAll()
-                logMessage(self.ctx, INFO, "Server Running ... Done", 'Server', 'run()')
+                logMessage(self.ctx, INFO, "Server Running ... Done 7", 'Server', 'run()')
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)
