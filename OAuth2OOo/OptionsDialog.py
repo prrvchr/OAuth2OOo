@@ -42,10 +42,10 @@ class OptionsDialog(unohelper.Base,
             self.Logger = getLogger(self.ctx)
             self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo', 'OptionsDialog')
             self.service = createService(self.ctx, '%s.OAuth2Service' % g_identifier)
-            logMessage(self.ctx, INFO, "Loading ... Done", "OptionsDialog", "__init__()")
+            #logMessage(self.ctx, INFO, "Loading ... Done", 'OptionsDialog', '__init__()')
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "__init__()")
+            self.Logger.logn(SEVERE, 'OptionsDialog', '__init__()', msg)
 
     # XContainerWindowEventHandler, XDialogEventHandler
     def callHandlerMethod(self, dialog, event, method):

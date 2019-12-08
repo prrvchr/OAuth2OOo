@@ -26,6 +26,7 @@ import time
 from threading import Thread
 from threading import Condition
 from timeit import default_timer as timer
+import traceback
 
 
 class WizardServer(unohelper.Base,
