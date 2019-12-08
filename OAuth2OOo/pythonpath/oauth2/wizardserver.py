@@ -46,10 +46,9 @@ class WizardServer(unohelper.Base,
         lock = Condition()
         code = controller.AuthorizationCode
         uuid = controller.Uuid
-        error = controller.Error
         address = configuration.Url.Scope.Provider.RedirectAddress
         port = configuration.Url.Scope.Provider.RedirectPort
-        server = Server(self.ctx, code, uuid, error, address, port, lock)
+        server = Server(self.ctx, code, uuid, address, port, lock)
         timeout = configuration.HandlerTimeout
         self.watchdog = WatchDog(server, controller, timeout, lock)
         server.start()
