@@ -123,22 +123,26 @@ class Server(Thread):
                     logMessage(self.ctx, INFO, "Server Running ... Done 2", 'Server', 'run()')
                     result = self._getResult(connection)
                     logMessage(self.ctx, INFO, "Server Running ... Done 3", 'Server', 'run()')
-                    location = self._getResultLocation(result).encode('utf8')
+                    location = self._getResultLocation(result)
                     logMessage(self.ctx, INFO, "Server Running ... Done 4", 'Server', 'run()')
-                    header = uno.ByteSequence(b'''\
+                    header = '''\
 HTTP/1.1 302 Found
-Location: %b
+Location: %s
 Connection: Closed
 
 ''' % location)
-                    logMessage(self.ctx, INFO, "Server Running ... Done 5", 'Server', 'run()')
+                    logMessage(self.ctx, INFO, "Server Running ... Done 5: %s" % header, 'Server', 'run()')
                 except Exception as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
                     logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
                 try:
-                    connection.write(header)
+                    response = uno.ByteSequence(header.encode('utf8'))
+                    connection.write(response)
                     logMessage(self.ctx, INFO, "Server Running ... Done 6", 'Server', 'run()')
                 except IOException as e:
+                    msg = "Error: %s - %s" % (e, traceback.print_exc())
+                    logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
+                except Exception as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
                     logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
                 logMessage(self.ctx, INFO, "Server Running ... Done 7", 'Server', 'run()')
