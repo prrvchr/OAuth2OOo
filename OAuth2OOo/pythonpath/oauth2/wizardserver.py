@@ -54,7 +54,7 @@ class WizardServer(unohelper.Base,
         self.watchdog = WatchDog(server, controller, timeout, lock)
         server.start()
         self.watchdog.start()
-
+        logMessage(self.ctx, INFO, "WizardServer Started ... Done", 'WizardServer', 'addCallback()')
 
 class WatchDog(Thread):
     def __init__(self, server, controller, timeout, lock):
@@ -117,36 +117,20 @@ class Server(Thread):
             msg = "Error: %s - %s" % (e, traceback.print_exc())
             logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
         if connection:
-            logMessage(self.ctx, INFO, "Server Running ... Done 1", 'Server', 'run()')
             with self.lock:
+                result = self._getResult(connection)
+                location = self._getResultLocation(result)
+                header = 'HTTP/1.1 302 Found\r\nLocation: %s\r\nConnection: Closed\r\n\r\n' % location
                 try:
-                    logMessage(self.ctx, INFO, "Server Running ... Done 2", 'Server', 'run()')
-                    result = self._getResult(connection)
-                    logMessage(self.ctx, INFO, "Server Running ... Done 3", 'Server', 'run()')
-                    location = self._getResultLocation(result)
-                    logMessage(self.ctx, INFO, "Server Running ... Done 4", 'Server', 'run()')
-                    header = u'HTTP/1.1 302 Found\r\nLocation: %s\r\nConnection: Closed\r\n\r\n' % location
-                    logMessage(self.ctx, INFO, "Server Running ... Done 5: %s" % header, 'Server', 'run()')
-                except Exception as e:
-                    msg = "Error: %s - %s" % (e, traceback.print_exc())
-                    logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
-                try:
-                    response = uno.ByteSequence(header.encode('utf8'))
-                    connection.write(response)
-                    logMessage(self.ctx, INFO, "Server Running ... Done 6", 'Server', 'run()')
+                    connection.write(uno.ByteSequence(header.encode('utf8')))
                 except IOException as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
                     logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
-                except Exception as e:
-                    msg = "Error: %s - %s" % (e, traceback.print_exc())
-                    logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
-                logMessage(self.ctx, INFO, "Server Running ... Done 7", 'Server', 'run()')
                 connection.flush()
                 connection.close()
                 self.acceptor.stopAccepting()
-                logMessage(self.ctx, INFO, "Server Running ... Done 8", 'Server', 'run()')
                 self.lock.notifyAll()
-                logMessage(self.ctx, INFO, "Server Running ... Done 9", 'Server', 'run()')
+                logMessage(self.ctx, INFO, "Server Running ... Done", 'Server', 'run()')
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)
