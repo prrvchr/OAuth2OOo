@@ -130,7 +130,7 @@ HTTP/1.1 302 Found
 Location: %s
 Connection: Closed
 
-''' % location)
+''' % location
                     logMessage(self.ctx, INFO, "Server Running ... Done 5: %s" % header, 'Server', 'run()')
                 except Exception as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
