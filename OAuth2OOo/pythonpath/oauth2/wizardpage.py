@@ -15,7 +15,7 @@ from .unotools import getContainerWindow
 from .unotools import getProperty
 from .unotools import getStringResource
 
-from .logger import getLogger
+from .logger import logMessage
 
 from .oauth2tools import g_identifier
 from .oauth2tools import g_wizard_paths
@@ -35,29 +35,22 @@ class WizardPage(unohelper.Base,
     def __init__(self, ctx, configuration, id, window, uuid, result):
         try:
             msg = "PageId: %s ..." % id
-            print("WizardPage.__init__() 1")
             self.ctx = ctx
             self.Configuration = configuration
-            print("WizardPage.__init__() 2")
             self.PageId = id
-            print("WizardPage.__init__() 3")
             self.Window = window
-            print("WizardPage.__init__() 4")
             self.Uuid = uuid
             self.AuthorizationCode = result
             self.FirstLoad = True
-            print("WizardPage.__init__() 5")
             self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
             msg += " Done"
-            self.Logger = getLogger(self.ctx)
-            self.Logger.logp(INFO, 'WizardPage', '__init__()', msg)
-            print("WizardPage.__init__() 6")
+            logMessage(self.ctx, INFO, msg, 'WizardPage', '__init__()')
         except Exception as e:
-            print("WizardPage.__init__() ERROR: %s - %s" % (e, traceback.print_exc()))
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, 'WizardPage', '__init__()')
 
     # XWizardPage Methods
     def activatePage(self):
-        print("WizardPage.activatePage(): %s" % self.PageId)
         self.Window.setVisible(False)
         msg = "PageId: %s ..." % self.PageId
         if self.PageId == 1:
@@ -85,7 +78,7 @@ class WizardPage(unohelper.Base,
             updatePageTokenUI(self.Window, self.Configuration, self.stringResource)
         self.Window.setVisible(True)
         msg += " Done"
-        self.Logger.logp(level, 'WizardPage', 'activatePage()', msg)
+        logMessage(self.ctx, INFO, msg, 'WizardPage', 'activatePage()')
 
     def commitPage(self, reason):
         msg = "PageId: %s ..." % self.PageId
@@ -104,7 +97,7 @@ class WizardPage(unohelper.Base,
             self.AuthorizationCode.Value = code
             self.AuthorizationCode.IsPresent = True
         msg += " Done"
-        self.Logger.logp(INFO, 'WizardPage', 'commitPage()', msg)
+        logMessage(self.ctx, INFO, msg, 'WizardPage', 'commitPage()')
         return True
 
     def canAdvance(self):
@@ -122,7 +115,6 @@ class WizardPage(unohelper.Base,
             advance = True
         elif self.PageId == 4:
             advance = self.Window.getControl('TextField1').Text != ''
-        print("WizardPage.canAdvance(): %s - %s" % (self.PageId, advance))
         return advance
 
     def _getPropertySetInfo(self):

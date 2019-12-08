@@ -85,7 +85,7 @@ class WizardController(unohelper.Base,
     # XCallback
     def notify(self, percent):
         msg = "WizardController.notify() %s" % percent
-        logMessage(self.ctx, msg, 'WizardController', 'notify()')
+        logMessage(self.ctx, INFO, msg, 'WizardController', 'notify()')
         page = self.Wizard.CurrentPage
         if page.PageId == 3:
             if page.Window:
@@ -95,13 +95,13 @@ class WizardController(unohelper.Base,
                 if self.AuthorizationCode.IsPresent:
                     self._registerTokens()
                     if self.AutoClose:
-                        logMessage(self.ctx, "WizardController.notify() 2", 'WizardController', 'notify()')
+                        logMessage(self.ctx, INFO, "WizardController.notify() 2", 'WizardController', 'notify()')
                         self.Wizard.DialogWindow.endDialog(OK)
                         logMessage(self.ctx, "WizardController.notify() 3", 'WizardController', 'notify()')
                     else:
-                        logMessage(self.ctx, "WizardController.notify() 4", 'WizardController', 'notify()')
+                        logMessage(self.ctx, INFO, "WizardController.notify() 4", 'WizardController', 'notify()')
                         self.Wizard.travelNext()
-                        logMessage(self.ctx, "WizardController.notify() 5", 'WizardController', 'notify()')
+                        logMessage(self.ctx, INFO, "WizardController.notify() 5", 'WizardController', 'notify()')
 
     # XWizardController
     def createPage(self, parent, id):
