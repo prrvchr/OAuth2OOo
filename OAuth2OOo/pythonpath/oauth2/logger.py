@@ -4,6 +4,7 @@
 import uno
 
 from .unotools import getConfiguration
+from .unotools import getSimpleFile
 
 g_logPool = {}
 
@@ -16,15 +17,18 @@ def logMessage(ctx, level, msg, cls=None, mtd=None, log='org.openoffice.logging.
             logger.logp(level, cls, mtd, msg)
 
 def getLogger(ctx, logger='org.openoffice.logging.DefaultLogger'):
-    if logger in g_logPool:
-        return g_logPool[logger]
-    log = ctx.getValueByName('/singletons/com.sun.star.logging.LoggerPool').getNamedLogger(logger)
-    g_logPool[logger] = log
-    return log
+    if logger not in g_logPool:
+        log = ctx.getValueByName('/singletons/com.sun.star.logging.LoggerPool').getNamedLogger(logger)
+        g_logPool[logger] = log
+    return g_logPool[logger]
 
-def clearLogger(logger='org.openoffice.logging.DefaultLogger'):
+def clearLogger(ctx, logger='org.openoffice.logging.DefaultLogger'):
     if logger in g_logPool:
+        url = getLoggerUrl(ctx, logger)
         del g_logPool[logger]
+        fs = getSimpleFile(ctx)
+        if fs.exist(url):
+            fs.kill(url)
 
 def isLoggerEnabled(ctx, logger='org.openoffice.logging.DefaultLogger'):
     level = _getLoggerConfiguration(ctx, logger).LogLevel
