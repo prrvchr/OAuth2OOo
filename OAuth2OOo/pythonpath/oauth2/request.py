@@ -29,6 +29,7 @@ from com.sun.star.auth.RestRequestTokenType import TOKEN_SYNC
 
 from .oauth2lib import NoOAuth2
 from .keymap import KeyMap
+from .logger import logMessage
 from . import requests
 
 import traceback
@@ -90,7 +91,6 @@ class Enumeration(unohelper.Base,
         self.session = session
         self.parameter = parameter
         self.timeout = timeout
-
         self.parser = parser
         t = self.parameter.Enumerator.Token
         self.chunked = t.Type != TOKEN_NONE
@@ -143,22 +143,17 @@ class Enumeration(unohelper.Base,
 
 class Enumerator(unohelper.Base,
                  XRestEnumeration):
-    def __init__(self, session, parameter, timeout, logger):
-        print("request.Enumerator.__init__() 1")
+    def __init__(self, ctx, session, parameter, timeout):
+        self.ctx = ctx
         self.session = session
         self.parameter = parameter
         self.timeout = timeout
-        self.logger = logger
         t = self.parameter.Enumerator.Token
         self.chunked = t.Type != TOKEN_NONE
         self.synchro = t.Type & TOKEN_SYNC
-        print("request.Enumerator.__init__() 2")
-        self.rows, self.token, self.sync, self.error = self._getRows()
-        print("request.Enumerator.__init__() 3")
-        if self.error:
-            print("request.Enumerator.__init__() 4")
-            self.logger.logp(SEVERE, "OAuth2Service","Enumerator()", self.error)
-        print("request.Enumerator.__init__() 5")
+        self.rows, self.token, self.sync, error = self._getRows()
+        if error:
+            logMessage(self.ctx, SEVERE, error, "OAuth2Service","Enumerator()")
 
     @property
     def SyncToken(self):
@@ -171,11 +166,10 @@ class Enumerator(unohelper.Base,
         if self.rows:
             return self.rows.pop(0)
         elif self.token:
-            self.rows, self.token, self.sync, self.error = self._getRows(self.token)
-            if self.error:
-                print("request.Enumerator.nextElement() ERROR")
-                self.logger.logp(SEVERE, "OAuth2Service","Enumerator()", self.error)
-            return self.nextElement()
+            self.rows, self.token, self.sync, error = self._getRows(self.token)
+            if not error:
+                return self.nextElement()
+            logMessage(self.ctx, SEVERE, error, "OAuth2Service","Enumerator()")
         raise NoSuchElementException()
 
     def _getRows(self, token=None):
@@ -209,12 +203,13 @@ class Enumerator(unohelper.Base,
                     sync = r.getDefaultValue(t.SyncField, '')
             return rows, token, sync, error
         except Exception as e:
-            print("Enumerator._getRows() ERROR: %s - %s" % (e, traceback.print_exc()))
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, 'OAuth2Service', 'Enumerator()')
 
 class InputStream(unohelper.Base,
                   XInputStream):
-    def __init__(self, session, parameter, chunk, buffer, timeout, logger):
-        self.downloader = Downloader(session, parameter, chunk, buffer, timeout, logger)
+    def __init__(self, ctx, session, parameter, chunk, buffer, timeout):
+        self.downloader = Downloader(ctx, session, parameter, chunk, buffer, timeout)
         self.chunks = self.downloader.getChunks()
         self.buffers = b''
 
@@ -251,7 +246,8 @@ class InputStream(unohelper.Base,
 
 
 class Downloader():
-    def __init__(self, session, parameter, chunk, buffer, timeout, logger):
+    def __init__(self, ctx, session, parameter, chunk, buffer, timeout):
+        self.ctx = ctx
         self.session = session
         self.method = parameter.Method
         self.url = parameter.Url
@@ -264,7 +260,6 @@ class Downloader():
         self.chunk = chunk
         self.buffer = buffer
         self.timeout = timeout
-        self.logger = logger
         self.start = 0
         self.size = 0
         self.closed = False
@@ -290,7 +285,7 @@ class Downloader():
                     else:
                         self.closed = True
                         msg = "getChunks() ERROR: %s - %s" % (r.status_code, r.text)
-                        self.logger.logp(SEVERE, "OAuth2Service", "Downloader()", msg)
+                        logMessage(self.ctx, SEVERE, msg, "OAuth2Service", "Downloader()")
                         break
                     for c in r.iter_content(self.buffer):
                         self.start += len(c)
@@ -306,7 +301,8 @@ class Downloader():
 
 class OutputStream(unohelper.Base,
                    XOutputStream):
-    def __init__(self, session, parameter, size, chunk, response, timeout, logger):
+    def __init__(self, ctx, session, parameter, size, chunk, response, timeout):
+        self.ctx = ctx
         self.session = session
         self.method = parameter.Method
         self.url = parameter.Url
@@ -316,7 +312,6 @@ class OutputStream(unohelper.Base,
         self.buffers = b''
         self.response = response
         self.timeout = timeout
-        self.logger = logger
         kwargs = _getKeyWordArguments(parameter)
         # If Chunked we need to use a "Content-Range" Header...
         # but it's not shure that parameter has Headers...
@@ -380,17 +375,17 @@ class OutputStream(unohelper.Base,
                     self.buffers = b''
             else:
                 msg = 'ERROR: %s - %s' % (r.status_code, r.text)
-                self.logger.logp(SEVERE, "OAuth2Service","OutputStream()", msg)
+                logMessage(self.ctx, SEVERE, msg, "OAuth2Service","OutputStream()")
         return
 
 
 class StreamListener(unohelper.Base,
                      XStreamListener):
-    def __init__(self, callback, item, response, logger):
+    def __init__(self, ctx, callback, item, response):
+        self.ctx = ctx
         self.callback = callback
         self.item = item
         self.response = response
-        self.logger = logger
 
     # XStreamListener
     def started(self):
@@ -400,12 +395,12 @@ class StreamListener(unohelper.Base,
             self.callback(self.item, self.response)
         else:
             msg = "ERROR ..."
-            self.logger.logp(SEVERE, "OAuth2Service","StreamListener()", msg)
+            logMessage(self.ctx, SEVERE, msg, "OAuth2Service","StreamListener()")
     def terminated(self):
         pass
     def error(self, error):
         msg = "ERROR ..."
-        self.logger.logp(SEVERE, "OAuth2Service","StreamListener()", msg)
+        logMessage(self.ctx, SEVERE, msg, "OAuth2Service","StreamListener()")
     def disposing(self, event):
         pass
 
@@ -418,7 +413,6 @@ class Uploader(unohelper.Base,
         self.chunk = datasource.Provider.Chunk
         self.url = datasource.Provider.SourceURL
         self.callback = datasource.callBack
-        self.logger = datasource.Logger
         self.timeout = timeout
 
     def start(self, item, parameter):
@@ -444,10 +438,10 @@ class Uploader(unohelper.Base,
         return None, None
 
     def _getOutputStream(self, param, size, resp):
-        return OutputStream(self.session, param, size, self.chunk, resp, self.timeout, self.logger)
+        return OutputStream(self.ctx, self.session, param, size, self.chunk, resp, self.timeout)
 
     def _getStreamListener(self, item, response):
-        return StreamListener(self.callback, item, response, self.logger)
+        return StreamListener(self.ctx, self.callback, item, response)
 
 
 # Private method

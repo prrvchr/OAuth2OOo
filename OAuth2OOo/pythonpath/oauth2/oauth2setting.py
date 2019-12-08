@@ -20,9 +20,8 @@ import time
 class OAuth2Setting(unohelper.Base,
                     XTransactedObject,
                     PropertySet):
-    def __init__(self, ctx, logger):
+    def __init__(self, ctx):
         self.ctx = ctx
-        self.Logger = logger
         self.configuration = getConfiguration(self.ctx, g_identifier, True)
         self.Url = UrlSetting(self.configuration)
         self.revert()
