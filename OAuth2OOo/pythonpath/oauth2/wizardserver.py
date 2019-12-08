@@ -119,15 +119,19 @@ class Server(Thread):
         if connection:
             logMessage(self.ctx, INFO, "Server Running ... Done 1", 'Server', 'run()')
             with self.lock:
-                logMessage(self.ctx, INFO, "Server Running ... Done 2", 'Server', 'run()')
-                result = self._getResult(connection)
-                location = self._getResultLocation(result)
-                header = uno.ByteSequence(b'''\
+                try:
+                    logMessage(self.ctx, INFO, "Server Running ... Done 2", 'Server', 'run()')
+                    result = self._getResult(connection)
+                    location = self._getResultLocation(result)
+                    header = uno.ByteSequence(b'''\
 HTTP/1.1 302 Found
 Location: %s
 Connection: Closed
 
 ''' % location.encode())
+                except IOException as e:
+                    msg = "Error: %s - %s" % (e, traceback.print_exc())
+                    logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
                 try:
                     logMessage(self.ctx, INFO, "Server Running ... Done 3", 'Server', 'run()')
                     connection.write(header)
