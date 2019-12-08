@@ -125,12 +125,7 @@ class Server(Thread):
                     logMessage(self.ctx, INFO, "Server Running ... Done 3", 'Server', 'run()')
                     location = self._getResultLocation(result)
                     logMessage(self.ctx, INFO, "Server Running ... Done 4", 'Server', 'run()')
-                    header = '''\
-HTTP/1.1 302 Found
-Location: %s
-Connection: Closed
-
-''' % location
+                    header = u'HTTP/1.1 302 Found\r\nLocation: %s\r\nConnection: Closed\r\n\r\n' % location
                     logMessage(self.ctx, INFO, "Server Running ... Done 5: %s" % header, 'Server', 'run()')
                 except Exception as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
