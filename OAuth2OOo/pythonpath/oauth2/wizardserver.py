@@ -122,30 +122,32 @@ class Server(Thread):
                 try:
                     logMessage(self.ctx, INFO, "Server Running ... Done 2", 'Server', 'run()')
                     result = self._getResult(connection)
+                    logMessage(self.ctx, INFO, "Server Running ... Done 3", 'Server', 'run()')
                     location = self._getResultLocation(result)
+                    logMessage(self.ctx, INFO, "Server Running ... Done 4", 'Server', 'run()')
                     header = uno.ByteSequence(b'''\
 HTTP/1.1 302 Found
 Location: %s
 Connection: Closed
 
 ''' % location.encode())
-                except IOException as e:
+                except Exception as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
                     logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
                 try:
-                    logMessage(self.ctx, INFO, "Server Running ... Done 3", 'Server', 'run()')
+                    logMessage(self.ctx, INFO, "Server Running ... Done 5", 'Server', 'run()')
                     connection.write(header)
-                    logMessage(self.ctx, INFO, "Server Running ... Done 4", 'Server', 'run()')
+                    logMessage(self.ctx, INFO, "Server Running ... Done 6", 'Server', 'run()')
                 except IOException as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
                     logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
-                logMessage(self.ctx, INFO, "Server Running ... Done 5", 'Server', 'run()')
+                logMessage(self.ctx, INFO, "Server Running ... Done 7", 'Server', 'run()')
                 connection.flush()
                 connection.close()
                 self.acceptor.stopAccepting()
-                logMessage(self.ctx, INFO, "Server Running ... Done 6", 'Server', 'run()')
+                logMessage(self.ctx, INFO, "Server Running ... Done 8", 'Server', 'run()')
                 self.lock.notifyAll()
-                logMessage(self.ctx, INFO, "Server Running ... Done 7", 'Server', 'run()')
+                logMessage(self.ctx, INFO, "Server Running ... Done 9", 'Server', 'run()')
 
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)
