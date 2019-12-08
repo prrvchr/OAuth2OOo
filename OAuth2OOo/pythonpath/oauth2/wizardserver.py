@@ -131,11 +131,11 @@ Location: %s
 Connection: Closed
 
 ''' % location.encode())
+                    logMessage(self.ctx, INFO, "Server Running ... Done 5", 'Server', 'run()')
                 except Exception as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
                     logMessage(self.ctx, SEVERE, msg, 'Server', 'run()')
                 try:
-                    logMessage(self.ctx, INFO, "Server Running ... Done 5", 'Server', 'run()')
                     connection.write(header)
                     logMessage(self.ctx, INFO, "Server Running ... Done 6", 'Server', 'run()')
                 except IOException as e:
