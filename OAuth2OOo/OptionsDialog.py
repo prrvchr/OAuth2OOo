@@ -39,13 +39,12 @@ class OptionsDialog(unohelper.Base,
     def __init__(self, ctx):
         try:
             self.ctx = ctx
-            self.Logger = getLogger(self.ctx)
             self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo', 'OptionsDialog')
             self.service = createService(self.ctx, '%s.OAuth2Service' % g_identifier)
             logMessage(self.ctx, INFO, "Loading ... Done", 'OptionsDialog', '__init__()')
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            self.Logger.logp(SEVERE, 'OptionsDialog', '__init__()', msg)
+            logMessage(self.ctx, SEVERE, msg, 'OptionsDialog', '__init__()')
 
     # XContainerWindowEventHandler, XDialogEventHandler
     def callHandlerMethod(self, dialog, event, method):
@@ -93,12 +92,10 @@ class OptionsDialog(unohelper.Base,
                 'Remove', 'Reset', 'ViewLog', 'ClearLog', 'AutoClose')
 
     def _doTextChanged(self, dialog, control):
-        print("OptionsDialog._doTextChanged()")
         enabled = control.Text != ''
         dialog.getControl('CommandButton2').Model.Enabled = True
 
     def _doSelectionChanged(self, dialog, control):
-        print("OptionsDialog._doSelectionChanged()")
         enabled = control.SelectedText != ''
         dialog.getControl('CommandButton2').Model.Enabled = True
 
@@ -131,8 +128,7 @@ class OptionsDialog(unohelper.Base,
             print("OptionDialog._doConnect() 4")
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            self.Logger.logp(SEVERE, "OptionsDialog", "_doConnect()", msg)
-            print("OptionsDialog._doConnect() %s" % msg)
+            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_doConnect()")
 
     def _loadSetting(self, dialog):
         try:
@@ -143,18 +139,18 @@ class OptionsDialog(unohelper.Base,
             self._loadLoggerSetting(dialog)
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            self.Logger.logp(SEVERE, "OptionsDialog", "_loadSetting()", msg)
+            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_loadSetting()")
 
     def _saveSetting(self, dialog):
-        self._saveLoggerSetting(dialog)
         try:
+            self._saveLoggerSetting(dialog)
             self.service.Setting.ConnectTimeout = int(dialog.getControl('NumericField1').getValue())
             self.service.Setting.ReadTimeout = int(dialog.getControl('NumericField2').getValue())
             self.service.Setting.HandlerTimeout = int(dialog.getControl('NumericField3').getValue())
             self.service.Setting.commit()
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            self.Logger.logp(SEVERE, "OptionsDialog", "_saveSetting()", msg)
+            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_saveSetting()")
 
     def _toggleLogger(self, dialog, enabled):
         dialog.getControl('Label1').Model.Enabled = enabled
@@ -173,7 +169,7 @@ class OptionsDialog(unohelper.Base,
         dialog.execute()
         dialog.dispose()
 
-    def _doClearLog(self, dialog):
+    def _doClearLog1(self, dialog):
         try:
             print("OptionsDialog._doClearLog() 1")
             #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
@@ -194,23 +190,25 @@ class OptionsDialog(unohelper.Base,
         except Exception as e:
             print("OptionsDialog._doClearLog().Error: %s - %s" % (e, traceback.print_exc()))
 
-    def _doClearLog1(self, dialog):
+    def _doClearLog(self, dialog):
         try:
             url = getLoggerUrl(self.ctx)
-            sf = self.ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
-            if sf.exists(url):
-                sf.kill(url)
             service = 'org.openoffice.logging.FileHandler'
             args = getNamedValueSet({'FileURL': url})
             handler = self.ctx.ServiceManager.createInstanceWithArgumentsAndContext(service, args, self.ctx)
             logger = getLogger(self.ctx)
+            logger.removeLogHandler(handler)
+            sf = self.ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
+            if sf.exists(url):
+                sf.kill(url)
             logger.addLogHandler(handler)
             length, sequence = getFileSequence(self.ctx, url)
             text = sequence.value.decode('utf-8')
             dialog.getControl('TextField1').Text = text
-            print("OptionsDialog._doClearLog() 1")
+            logMessage(self.ctx, INFO, "ClearingLog ... Done", 'OptionsDialog', '_doClearLog()')
         except Exception as e:
-            print("OptionsDialog._doClearLog().Error: %s - %s" % (e, traceback.print_exc()))
+            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_doClearLog()")
 
     def _getDialog(self, window, name):
         url = 'vnd.sun.star.script:OAuth2OOo.%s?location=application' % name

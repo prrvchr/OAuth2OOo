@@ -56,15 +56,16 @@ class WizardServer(unohelper.Base,
         self.watchdog.start()
         logMessage(self.ctx, INFO, "WizardServer Started ... Done", 'WizardServer', 'addCallback()')
 
+
 class WatchDog(Thread):
     def __init__(self, server, controller, timeout, lock):
         Thread.__init__(self)
         self.server = server
         self.controller = controller
         self.timeout = timeout
-        self.end = 0
-        self.step = 50
         self.lock = lock
+        self.step = 50
+        self.end = 0
 
     def run(self):
         wait = self.timeout/self.step
@@ -93,12 +94,11 @@ class WatchDog(Thread):
 
 
 class Server(Thread):
-    def __init__(self, ctx, code, uuid, error, address, port, lock):
+    def __init__(self, ctx, code, uuid, address, port, lock):
         Thread.__init__(self)
         self.ctx = ctx
         self.code = code
         self.uuid = uuid
-        self.error = error
         self.argument = 'socket,host=%s,port=%s,tcpNoDelay=1' % (address, port)
         self.acceptor = createService(self.ctx, 'com.sun.star.connection.Acceptor')
         self.lock = lock
