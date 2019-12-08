@@ -16,6 +16,7 @@ from oauth2 import getLogger
 from oauth2 import getLoggerUrl
 from oauth2 import getLoggerSetting
 from oauth2 import setLoggerSetting
+from oauth2 import clearLogger
 from oauth2 import logMessage
 from oauth2 import getStringResource
 from oauth2 import getNamedValueSet
@@ -192,25 +193,12 @@ class OptionsDialog(unohelper.Base,
 
     def _doClearLog(self, dialog):
         try:
-            logMessage(self.ctx, INFO, "ClearingLog ... 1", 'OptionsDialog', '_doClearLog()')
+            clearLogger()
+            logMessage(self.ctx, INFO, "ClearingLog ... Done", 'OptionsDialog', '_doClearLog()')
             url = getLoggerUrl(self.ctx)
-            service = 'org.openoffice.logging.FileHandler'
-            args = getNamedValueSet({'FileURL': url})
-            logMessage(self.ctx, INFO, "ClearingLog ... 2", 'OptionsDialog', '_doClearLog()')
-            handler = self.ctx.ServiceManager.createInstanceWithArgumentsAndContext(service, args, self.ctx)
-            logger = getLogger(self.ctx)
-            logMessage(self.ctx, INFO, "ClearingLog ... 3", 'OptionsDialog', '_doClearLog()')
-            #logger.removeLogHandler(handler)
-            sf = self.ctx.ServiceManager.createInstance('com.sun.star.ucb.SimpleFileAccess')
-            if sf.exists(url):
-                sf.kill(url)
-            logMessage(self.ctx, INFO, "ClearingLog ... 4", 'OptionsDialog', '_doClearLog()')
-            logger.addLogHandler(handler)
             length, sequence = getFileSequence(self.ctx, url)
-            logMessage(self.ctx, INFO, "ClearingLog ... 5", 'OptionsDialog', '_doClearLog()')
             text = sequence.value.decode('utf-8')
             dialog.getControl('TextField1').Text = text
-            logMessage(self.ctx, INFO, "ClearingLog ... Done", 'OptionsDialog', '_doClearLog()')
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
             logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_doClearLog()")
