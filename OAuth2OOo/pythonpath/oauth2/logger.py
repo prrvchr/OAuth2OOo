@@ -12,7 +12,7 @@ def logMessage(ctx, level, msg, cls=None, mtd=None, log='org.openoffice.logging.
         if cls is None or mtd is None:
             logger.log(level, msg)
         else:
-            logger.logn(level, cls, mtd, msg)
+            logger.logp(level, cls, mtd, msg)
 
 def getLogger(ctx, logger='org.openoffice.logging.DefaultLogger'):
     return ctx.getValueByName('/singletons/com.sun.star.logging.LoggerPool').getNamedLogger(logger)

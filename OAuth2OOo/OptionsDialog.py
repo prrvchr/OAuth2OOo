@@ -45,7 +45,7 @@ class OptionsDialog(unohelper.Base,
             #logMessage(self.ctx, INFO, "Loading ... Done", 'OptionsDialog', '__init__()')
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            self.Logger.logn(SEVERE, 'OptionsDialog', '__init__()', msg)
+        self.Logger.logp(SEVERE, 'OptionsDialog', '__init__()', msg)
 
     # XContainerWindowEventHandler, XDialogEventHandler
     def callHandlerMethod(self, dialog, event, method):
