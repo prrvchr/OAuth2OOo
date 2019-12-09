@@ -120,7 +120,7 @@
                 <value>S256</value>
             </prop>
             <prop oor:name="HttpHandler">
-                <value>false</value>
+                <value>true</value>
             </prop>
             <prop oor:name="RedirectAddress">
                 <value>localhost</value>
