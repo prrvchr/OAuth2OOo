@@ -98,19 +98,10 @@ class OptionsDialog(unohelper.Base,
 
     def _doSelectionChanged(self, dialog, control):
         enabled = control.SelectedText != ''
-        dialog.getControl('CommandButton2').Model.Enabled = True
+        dialog.getControl('CommandButton2').Model.Enabled = enabled
 
-    def _doChanged1(self, dialog, control):
-        item = control.Model.Tag
-        text = control.getText()
-        mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
-        mri.inspect(control)
-        print("OptionsDialog._doChanged() %s - %s" % (item, text))
-        if item == 'UserName':
-            self.service.UserName = text
-        elif item == 'Url':
-            self.service.ResourceUrl = text
-        print("OptionsDialog._doChanged()")
+    def _toogleViewer(self, dialog, enabled):
+        dialog.getControl('CommandButton1').Model.Enabled = enabled
 
     def _doConnect(self, dialog):
         try:
@@ -158,50 +149,29 @@ class OptionsDialog(unohelper.Base,
         dialog.getControl('ComboBox1').Model.Enabled = enabled
         dialog.getControl('OptionButton1').Model.Enabled = enabled
         dialog.getControl('OptionButton2').Model.Enabled = enabled
-        dialog.getControl('CommandButton1').Model.Enabled = enabled
+        #dialog.getControl('CommandButton1').Model.Enabled = enabled
 
     def _doViewLog(self, window):
-        url = getLoggerUrl(self.ctx)
-        length, sequence = getFileSequence(self.ctx, url)
-        text = sequence.value.decode('utf-8')
         dialog = self._getDialog(window, 'LogDialog')
+        url = getLoggerUrl(self.ctx)
         dialog.Title = url
-        dialog.getControl('TextField1').Text = text
+        self._setDialogText(dialog, url)
         dialog.execute()
         dialog.dispose()
-
-    def _doClearLog1(self, dialog):
-        try:
-            print("OptionsDialog._doClearLog() 1")
-            #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
-            #c1 = getConfiguration(self.ctx, 'org.openoffice.Interaction/InteractionHandlers')
-            #mri.inspect(c1)
-            scheme = 'vnd.google-apps'
-            message = "Authentication"
-            handler = getInteractionHandler(self.ctx, message)
-            response = uno.createUnoStruct('com.sun.star.beans.Optional<string>')
-            request = getOAuth2Request(self, scheme, message)
-            interaction = InteractionRequest(request, response)
-            print("OptionsDialog._doClearLog() 2")
-            if handler.handleInteractionRequest(interaction):
-                print("OptionsDialog._doClearLog() OK: %s - %s" % (response.IsPresent, response.Value))
-            else:
-                print("OptionsDialog._doClearLog() CANCEL")
-            print("OptionsDialog._doClearLog() 3")
-        except Exception as e:
-            print("OptionsDialog._doClearLog().Error: %s - %s" % (e, traceback.print_exc()))
 
     def _doClearLog(self, dialog):
         try:
             clearLogger()
             logMessage(self.ctx, INFO, "ClearingLog ... Done", 'OptionsDialog', '_doClearLog()')
             url = getLoggerUrl(self.ctx)
-            length, sequence = getFileSequence(self.ctx, url)
-            text = sequence.value.decode('utf-8')
-            dialog.getControl('TextField1').Text = text
+            self._setDialogText(dialog, url)
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
             logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_doClearLog()")
+
+    def _setDialogText(self, dialog, url):
+        length, sequence = getFileSequence(self.ctx, url)
+        dialog.getControl('TextField1').Text = sequence.value.decode('utf-8')
 
     def _getDialog(self, window, name):
         url = 'vnd.sun.star.script:OAuth2OOo.%s?location=application' % name
@@ -212,11 +182,12 @@ class OptionsDialog(unohelper.Base,
         return dialog
 
     def _loadLoggerSetting(self, dialog):
-        enabled, index, handler = getLoggerSetting(self.ctx)
+        enabled, index, handler, viewer = getLoggerSetting(self.ctx)
         dialog.getControl('CheckBox1').State = int(enabled)
         self._setLoggerLevel(dialog.getControl('ComboBox1'), index)
         dialog.getControl('OptionButton%s' % handler).State = 1
         self._toggleLogger(dialog, enabled)
+        self._toogleViewer(dialog, enabled and viewer)
 
     def _setLoggerLevel(self, control, index):
         control.Text = self._getLoggerLevelText(control.Model.Name, index)

@@ -1,50 +1,63 @@
 #!
 # -*- coding: utf_8 -*-
 
-import uno
+from com.sun.star.logging.LogLevel import SEVERE
+from com.sun.star.logging.LogLevel import WARNING
+from com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import CONFIG
+from com.sun.star.logging.LogLevel import FINE
+from com.sun.star.logging.LogLevel import FINER
+from com.sun.star.logging.LogLevel import FINEST
+from com.sun.star.logging.LogLevel import ALL
+from com.sun.star.logging.LogLevel import OFF
 
 from .unotools import getConfiguration
 from .unotools import getSimpleFile
 
-g_logPool = {}
 
-def logMessage(ctx, level, msg, cls=None, mtd=None, log='org.openoffice.logging.DefaultLogger'):
-    logger = getLogger(ctx, log)
-    if logger.isLoggable(level):
+g_loggerPool = {}
+g_defaultLogger = 'org.openoffice.logging.DefaultLogger'
+
+
+def logMessage(ctx, level, msg, cls=None, mtd=None, logger=g_defaultLogger):
+    log = getLogger(ctx, logger)
+    if log.isLoggable(level):
         if cls is None or mtd is None:
-            logger.log(level, msg)
+            log.log(level, msg)
         else:
-            logger.logp(level, cls, mtd, msg)
+            log.logp(level, cls, mtd, msg)
 
-def getLogger(ctx, logger='org.openoffice.logging.DefaultLogger'):
-    if logger not in g_logPool:
+def getLogger(ctx, logger=g_defaultLogger):
+    if logger not in g_loggerPool:
         log = ctx.getValueByName('/singletons/com.sun.star.logging.LoggerPool').getNamedLogger(logger)
-        g_logPool[logger] = log
-    return g_logPool[logger]
+        g_loggerPool[logger] = log
+    return g_loggerPool[logger]
 
-def clearLogger(ctx, logger='org.openoffice.logging.DefaultLogger'):
-    if logger in g_logPool:
-        url = getLoggerUrl(ctx, logger)
-        del g_logPool[logger]
-        fs = getSimpleFile(ctx)
-        if fs.exists(url):
-            fs.kill(url)
+def clearLogger(logger=g_defaultLogger):
+    if logger in g_loggerPool:
+        del g_loggerPool[logger]
 
-def isLoggerEnabled(ctx, logger='org.openoffice.logging.DefaultLogger'):
+def isLoggerEnabled(ctx, logger=g_defaultLogger):
     level = _getLoggerConfiguration(ctx, logger).LogLevel
     enabled = _isLoggerEnabled(level)
     return enabled
 
-def getLoggerSetting(ctx, logger='org.openoffice.logging.DefaultLogger'):
-    enabled, index = _getLogIndex(ctx, logger)
-    handler = _getLogHandler(ctx, logger)
-    return enabled, index, handler
+def getLoggerSetting(ctx, logger=g_defaultLogger):
+    configuration = _getLoggerConfiguration(ctx, logger)
+    enabled, index = _getLogIndex(configuration)
+    handler, viewer = _getLogHandler(configuration)
+    return enabled, index, handler, viewer
 
-def setLoggerSetting(ctx, enabled, index, handler, logger='org.openoffice.logging.DefaultLogger'):
-    _setLogIndex(ctx, enabled, index, logger)
-    _setLogHandler(ctx, handler, None, logger)
+def setLoggerSetting(ctx, enabled, index, handler, logger=g_defaultLogger):
+    configuration = _getLoggerConfiguration(ctx, logger)
+    _setLogIndex(configuration, enabled, index)
+    _setLogHandler(configuration, handler, index)
+    if configuration.hasPendingChanges():
+        print("logger.setLoggerSetting() configuration.hasPendingChanges")
+        configuration.commitChanges()
+        clearLogger(ctx)
 
-def getLoggerUrl(ctx, logger='org.openoffice.logging.DefaultLogger'):
+def getLoggerUrl(ctx, logger=g_defaultLogger):
     url = '$(userurl)/$(loggername).log'
     settings = _getLoggerConfiguration(ctx, logger).getByName('HandlerSettings')
     if settings.hasByName('FileURL'):
@@ -52,47 +65,35 @@ def getLoggerUrl(ctx, logger='org.openoffice.logging.DefaultLogger'):
     service = ctx.ServiceManager.createInstance('com.sun.star.util.PathSubstitution')
     return service.substituteVariables(url.replace('$(loggername)', logger), True)
 
-def _getLogIndex(ctx, logger='org.openoffice.logging.DefaultLogger'):
+def _getLogIndex(configuration):
     index = 7
-    level = _getLoggerConfiguration(ctx, logger).LogLevel
+    level = configuration.LogLevel
     enabled = _isLoggerEnabled(level)
     if enabled:
         index = _getLogLevels().index(level)
     return enabled, index
 
-def _isLoggerEnabled(level):
-    return level != uno.getConstantByName('com.sun.star.logging.LogLevel.OFF')
+def _setLogIndex(configuration, enabled, index):
+    level = _getLogLevels()[index] if enabled else OFF
+    if configuration.LogLevel != level:
+        configuration.LogLevel = level
 
-def _setLogIndex(ctx, enabled, index, logger='org.openoffice.logging.DefaultLogger'):
-    level = uno.getConstantByName('com.sun.star.logging.LogLevel.OFF')
-    if enabled:
-        level = _getLogLevels()[index]
-    configuration = _getLoggerConfiguration(ctx, logger)
-    configuration.LogLevel = level
-    configuration.commitChanges()
+def _getLogHandler(configuration):
+    handler = 1 if configuration.DefaultHandler != 'com.sun.star.logging.FileHandler' else 2
+    return handler, handler != 1
 
-def _getLogHandler(ctx, logger='org.openoffice.logging.DefaultLogger'):
-    handler = _getLoggerConfiguration(ctx, logger).DefaultHandler
-    return 1 if handler != 'com.sun.star.logging.FileHandler' else 2
-
-def _setLogHandler(ctx, handler, option=None, logger='org.openoffice.logging.DefaultLogger'):
-    if handler:
-        _logToConsole(ctx, option, logger)
+def _setLogHandler(configuration, console, index):
+    handler = 'com.sun.star.logging.ConsoleHandler' if console else 'com.sun.star.logging.FileHandler'
+    if configuration.DefaultHandler != handler:
+        configuration.DefaultHandler = handler
+    settings = configuration.getByName('HandlerSettings')
+    if settings.hasByName('Threshold'):
+        if settings.getByName('Threshold') != index:
+            settings.replaceByName('Threshold', index)
     else:
-        _logToFile(ctx, option, logger)
+        settings.insertByName('Threshold', index)
 
-def _getLogLevels():
-    levels = (uno.getConstantByName('com.sun.star.logging.LogLevel.SEVERE'),
-              uno.getConstantByName('com.sun.star.logging.LogLevel.WARNING'),
-              uno.getConstantByName('com.sun.star.logging.LogLevel.INFO'),
-              uno.getConstantByName('com.sun.star.logging.LogLevel.CONFIG'),
-              uno.getConstantByName('com.sun.star.logging.LogLevel.FINE'),
-              uno.getConstantByName('com.sun.star.logging.LogLevel.FINER'),
-              uno.getConstantByName('com.sun.star.logging.LogLevel.FINEST'),
-              uno.getConstantByName('com.sun.star.logging.LogLevel.ALL'))
-    return levels
-
-def _getLoggerConfiguration(ctx, logger='org.openoffice.logging.DefaultLogger'):
+def _getLoggerConfiguration(ctx, logger):
     nodepath = '/org.openoffice.Office.Logging/Settings'
     configuration = getConfiguration(ctx, nodepath, True)
     if not configuration.hasByName(logger):
@@ -101,24 +102,16 @@ def _getLoggerConfiguration(ctx, logger='org.openoffice.logging.DefaultLogger'):
     nodepath += '/%s' % logger
     return getConfiguration(ctx, nodepath, True)
 
-def _logToConsole(ctx, threshold=None, logger='org.openoffice.logging.DefaultLogger'):
-    configuration = _getLoggerConfiguration(ctx, logger)
-    configuration.DefaultHandler = 'com.sun.star.logging.ConsoleHandler'
-    if threshold is not None:
-        settings = configuration.getByName('HandlerSettings')
-        if settings.hasByName('Threshold'):
-            settings.replaceByName('Threshold', threshold)
-        else:
-            settings.insertByName('Threshold', threshold)
-    configuration.commitChanges()
+def _getLogLevels():
+    levels = (SEVERE,
+              WARNING,
+              INFO,
+              CONFIG,
+              FINE,
+              FINER,
+              FINEST,
+              ALL)
+    return levels
 
-def _logToFile(ctx, url=None, logger='org.openoffice.logging.DefaultLogger'):
-    configuration = _getLoggerConfiguration(ctx, logger)
-    configuration.DefaultHandler = 'com.sun.star.logging.FileHandler'
-    if url is not None:
-        settings = configuration.getByName('HandlerSettings')
-        if settings.hasByName('FileURL'):
-            settings.replaceByName('FileURL', url)
-        else:
-            settings.insertByName('FileURL', url)
-    configuration.commitChanges()
+def _isLoggerEnabled(level):
+    return level != OFF
