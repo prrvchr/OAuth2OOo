@@ -197,6 +197,7 @@ def getTablesAndStatements(statement):
     call = getDataSourceCall(statement.getConnection(), 'getTables')
     for table in getSequenceFromResult(statement.executeQuery(getSqlQuery('getTableName'))):
         statement = False
+        versioned = False
         columns = []
         primary = []
         unique = []
@@ -206,6 +207,7 @@ def getTablesAndStatements(statement):
         while result.next():
             data = getKeyMapFromResult(result, KeyMap())
             statement = data.getValue('View')
+            versioned = data.getValue('Versioned')
             column = data.getValue('Column')
             definition = '"%s"' % column
             definition += ' %s' % data.getValue('Type')
@@ -231,8 +233,12 @@ def getTablesAndStatements(statement):
             columns.append(getSqlQuery('getUniqueConstraint', format))
         for format in constraint:
             columns.append(getSqlQuery('getForeignConstraint', format))
+        if versioned:
+            columns.append(getSqlQuery('getPeriodColumns'))
         format = (table, ','.join(columns))
         query = getSqlQuery('createTable', format)
+        if versioned:
+            query += getSqlQuery('getSystemVersioning')
         print("dbtool._createDynamicTable(): %s" % query)
         tables.append(query)
         if statement:
