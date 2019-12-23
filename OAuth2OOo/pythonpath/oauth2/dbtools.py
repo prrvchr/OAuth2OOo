@@ -49,9 +49,13 @@ def getDataSourceCall(connection, name, format=None):
     return call
 
 def checkDataBase(connection):
+    error = None
     version = connection.getMetaData().getDriverVersion()
-    print("dbtools.checkDataBase() %s - %s - %s" % (version, type(version), g_version))
-    return None
+    if version != g_version:
+        error = SQLException()
+        error.Message = "DataBase ERROR: hsqldb driver %s is not the correct version... " % g_jar
+        error.Message += "Requiered version: %s - loaded version: %s" % (g_version, version)
+    return error
 
 def executeQueries(statement, queries):
     for query in queries:
