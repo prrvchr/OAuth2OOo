@@ -26,7 +26,6 @@ from .oauth2tools import openUrl
 
 from .dialoghandler import DialogHandler
 
-from .logger import getLogger
 from .logger import getLoggerSetting
 from .logger import getLoggerUrl
 from .logger import setLoggerSetting

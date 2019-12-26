@@ -20,7 +20,6 @@ from unolib import getStringResource
 
 from .requests.compat import unquote_plus
 
-from .logger import getLogger
 from .logger import logMessage
 
 from .configuration import g_identifier

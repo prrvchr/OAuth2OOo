@@ -29,8 +29,8 @@ from com.sun.star.auth.RestRequestTokenType import TOKEN_SYNC
 
 from unolib import KeyMap
 from unolib import NoOAuth2
-from unolib import logMessage
 
+from .logger import logMessage
 from . import requests
 
 import traceback
