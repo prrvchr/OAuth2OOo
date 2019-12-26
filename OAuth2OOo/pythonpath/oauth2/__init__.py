@@ -1,7 +1,11 @@
 #!
 # -*- coding: utf-8 -*-
 
+from .configuration import g_identifier
 from .configuration import g_oauth2
+from .configuration import g_logger
+from .configuration import g_wizard_paths
+from .configuration import g_refresh_overlap
 
 from .oauth2setting import OAuth2Setting
 from .wizardcontroller import WizardController
@@ -20,9 +24,6 @@ from .oauth2lib import InteractionRequest
 from .oauth2lib import NoOAuth2
 from .oauth2lib import OAuth2OOo
 
-from .oauth2tools import g_wizard_paths
-from .oauth2tools import g_identifier
-from .oauth2tools import g_refresh_overlap
 from .oauth2tools import getActivePath
 from .oauth2tools import getRefreshToken
 from .oauth2tools import getAuthorizationStr
