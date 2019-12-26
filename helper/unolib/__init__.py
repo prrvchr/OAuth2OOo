@@ -33,6 +33,8 @@ from .unotools import parseDateTime
 
 from .unocore import PropertyContainer
 
+from .oauth2config import g_oauth2
+
 from .oauth2lib import InteractionRequest
 from .oauth2lib import NoOAuth2
 from .oauth2lib import OAuth2OOo
