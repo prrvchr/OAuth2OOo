@@ -12,6 +12,7 @@ from .unolib import PropertySetInfoChangeNotifier
 
 from .unotools import createMessageBox
 from .unotools import createService
+from .unotools import getContainerWindow
 from .unotools import getProperty
 from .unotools import getPropertyValue
 from .unotools import getPropertyValueSet
