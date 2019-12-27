@@ -9,11 +9,11 @@ from com.sun.star.sdbc import SQLWarning
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from oauth2 import KeyMap
-from oauth2 import getPropertyValue
-from oauth2 import getPropertyValueSet
-from oauth2 import getResourceLocation
-from oauth2 import getSimpleFile
+from unolib import KeyMap
+from unolib import getPropertyValue
+from unolib import getPropertyValueSet
+from unolib import getResourceLocation
+from unolib import getSimpleFile
 
 from .dbqueries import getSqlQuery
 
@@ -47,6 +47,12 @@ def getDataSourceCall(connection, name, format=None):
     query = getSqlQuery(name, format)
     call = connection.prepareCall(query)
     return call
+
+def createDataSource(dbcontext, location, dbname, shutdown=False):
+    datasource = dbcontext.createInstance()
+    datasource.URL = getDataSourceLocation(location, dbname, shutdown)
+    datasource.Info = getDataSourceInfo() + getDataSourceJavaInfo(location)
+    return datasource
 
 def checkDataBase(connection):
     error = None
@@ -261,3 +267,16 @@ def getTablesAndStatements(statement):
             statements['update%s' % table] = update
     call.close()
     return tables, statements
+
+def createStaticTable(statement, tables, readonly=False):
+    for table in tables:
+        query = getSqlQuery('createTable' + table)
+        statement.executeQuery(query)
+    for table in tables:
+        statement.executeQuery(getSqlQuery('setTableSource', table))
+        if readonly:
+            statement.executeQuery(getSqlQuery('setTableReadOnly', table))
+
+def executeSqlQueries(statement, queries):
+    for query in queries:
+        statement.executeQuery(query)

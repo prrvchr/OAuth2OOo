@@ -10,21 +10,23 @@ from com.sun.star.awt import XDialogEventHandler
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from oauth2 import createService
-from oauth2 import getFileSequence
-from oauth2 import getLogger
+from unolib import createService
+from unolib import getFileSequence
+from unolib import getStringResource
+from unolib import getNamedValueSet
+from unolib import getConfiguration
+from unolib import getInteractionHandler
+from unolib import InteractionRequest
+from unolib import getUserNameFromHandler
+from unolib import getDialog
+
 from oauth2 import getLoggerUrl
 from oauth2 import getLoggerSetting
 from oauth2 import setLoggerSetting
 from oauth2 import clearLogger
 from oauth2 import logMessage
-from oauth2 import getStringResource
-from oauth2 import getNamedValueSet
 from oauth2 import g_identifier
-from oauth2 import getConfiguration
-from oauth2 import getInteractionHandler
-from oauth2 import InteractionRequest
-from oauth2 import getUserNameFromHandler
+from oauth2 import g_oauth2
 
 import traceback
 
@@ -41,7 +43,7 @@ class OptionsDialog(unohelper.Base,
         try:
             self.ctx = ctx
             self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo', 'OptionsDialog')
-            self.service = createService(self.ctx, '%s.OAuth2Service' % g_identifier)
+            self.service = createService(self.ctx, g_oauth2)
             logMessage(self.ctx, INFO, "Loading ... Done", 'OptionsDialog', '__init__()')
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
@@ -69,28 +71,35 @@ class OptionsDialog(unohelper.Base,
         elif method == 'Connect':
             self._doConnect(dialog)
             handled = True
-        elif method == 'Logger':
-            enabled = event.Source.State == 1
-            self._toggleLogger(dialog, enabled)
-            handled = True
         elif method == 'Remove':
             self._doRemove(dialog)
             handled = True
         elif method == 'Reset':
             self._doReset(dialog)
             handled = True
-        elif method == 'ViewLog':
-            self._doViewLog(dialog)
-            handled = True
-        elif method == 'ClearLog':
-            self._doClearLog(dialog)
-            handled = True
         elif method == 'AutoClose':
             handled = True
+        elif method == 'ToggleLogger':
+            enabled = event.Source.State == 1
+            self._toggleLogger(dialog, enabled)
+            handled = True
+        elif method == 'EnableViewer':
+            self._toggleViewer(dialog, True)
+            handled = True
+        elif method == 'DisableViewer':
+            self._toggleViewer(dialog, False)
+            handled = True
+        elif method == 'ViewLog':
+            self._viewLog(dialog)
+            handled = True
+        elif method == 'ClearLog':
+            self._clearLog(dialog)
+            handled = True
+
         return handled
     def getSupportedMethodNames(self):
-        return ('external_event', 'Logger', 'TextChanged', 'SelectionChanged', 'Connect',
-                'Remove', 'Reset', 'ViewLog', 'ClearLog', 'AutoClose')
+        return ('external_event', 'TextChanged', 'SelectionChanged', 'Connect', 'Remove', 'Reset',
+                'AutoClose', 'ToggleLogger', 'EnableViewer', 'DisableViewer', 'ViewLog', 'ClearLog')
 
     def _doTextChanged(self, dialog, control):
         enabled = control.Text != ''
@@ -99,9 +108,6 @@ class OptionsDialog(unohelper.Base,
     def _doSelectionChanged(self, dialog, control):
         enabled = control.SelectedText != ''
         dialog.getControl('CommandButton2').Model.Enabled = enabled
-
-    def _toogleViewer(self, dialog, enabled):
-        dialog.getControl('CommandButton1').Model.Enabled = enabled
 
     def _doConnect(self, dialog):
         try:
@@ -148,18 +154,22 @@ class OptionsDialog(unohelper.Base,
         dialog.getControl('Label1').Model.Enabled = enabled
         dialog.getControl('ComboBox1').Model.Enabled = enabled
         dialog.getControl('OptionButton1').Model.Enabled = enabled
-        dialog.getControl('OptionButton2').Model.Enabled = enabled
-        #dialog.getControl('CommandButton1').Model.Enabled = enabled
+        control = dialog.getControl('OptionButton2')
+        control.Model.Enabled = enabled
+        self._toggleViewer(dialog, enabled and control.State)
 
-    def _doViewLog(self, window):
-        dialog = self._getDialog(window, 'LogDialog')
+    def _toggleViewer(self, dialog, enabled):
+        dialog.getControl('CommandButton1').Model.Enabled = enabled
+
+    def _viewLog(self, window):
+        dialog = getDialog(self.ctx, window.Peer, self, 'OAuth2OOo', 'LogDialog')
         url = getLoggerUrl(self.ctx)
         dialog.Title = url
         self._setDialogText(dialog, url)
         dialog.execute()
         dialog.dispose()
 
-    def _doClearLog(self, dialog):
+    def _clearLog(self, dialog):
         try:
             clearLogger()
             logMessage(self.ctx, INFO, "ClearingLog ... Done", 'OptionsDialog', '_doClearLog()')
@@ -173,21 +183,12 @@ class OptionsDialog(unohelper.Base,
         length, sequence = getFileSequence(self.ctx, url)
         dialog.getControl('TextField1').Text = sequence.value.decode('utf-8')
 
-    def _getDialog(self, window, name):
-        url = 'vnd.sun.star.script:OAuth2OOo.%s?location=application' % name
-        service = 'com.sun.star.awt.DialogProvider'
-        provider = self.ctx.ServiceManager.createInstanceWithContext(service, self.ctx)
-        arguments = getNamedValueSet({'ParentWindow': window.Peer, 'EventHandler': self})
-        dialog = provider.createDialogWithArguments(url, arguments)
-        return dialog
-
     def _loadLoggerSetting(self, dialog):
-        enabled, index, handler, viewer = getLoggerSetting(self.ctx)
+        enabled, index, handler = getLoggerSetting(self.ctx)
         dialog.getControl('CheckBox1').State = int(enabled)
         self._setLoggerLevel(dialog.getControl('ComboBox1'), index)
         dialog.getControl('OptionButton%s' % handler).State = 1
         self._toggleLogger(dialog, enabled)
-        self._toogleViewer(dialog, enabled and viewer)
 
     def _setLoggerLevel(self, control, index):
         control.Text = self._getLoggerLevelText(control.Model.Name, index)
