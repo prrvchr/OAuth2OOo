@@ -48,7 +48,7 @@ def getDataSourceConnection(ctx, url, dbname, name='', password='', shutdown=Fal
         info += getPropertyValueSet({'user', name})
         if password:
             info += getPropertyValueSet({'password', password})
-    path = getDataSourceLocation(url, dbname)
+    path = getDataSourceLocation(url, dbname, shutdown)
     manager = ctx.ServiceManager.createInstance('com.sun.star.sdbc.DriverManager')
     connection, error = None, None
     try:
@@ -156,7 +156,7 @@ def getDriverInfo():
     info['ViewAlterationServiceName'] = ''
     return info
 
-def getDataSourceLocation(location, dbname, shutdown):
+def getDataSourceLocation(location, dbname, shutdown=False):
     url = uno.fileUrlToSystemPath('%s/%s' % (location, dbname))
     return '%sfile:%s%s%s' % (g_protocol, url, g_options, g_shutdown if shutdown else '')
 
