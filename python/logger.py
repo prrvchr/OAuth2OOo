@@ -69,7 +69,6 @@ def setLoggerSetting(ctx, enabled, index, handler, logger=g_logger):
     _setLogIndex(configuration, enabled, index)
     _setLogHandler(configuration, handler, index)
     if configuration.hasPendingChanges():
-        print("logger.setLoggerSetting() configuration.hasPendingChanges")
         configuration.commitChanges()
         clearLogger(logger)
 
