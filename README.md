@@ -33,7 +33,7 @@ This extension is not made to be used alone, but provide OAuth2 service to other
 
 #### Create OAuth2 service:
 
-> identifier = "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service"
+> identifier = "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service"  
 > service = ctx.ServiceManager.createInstanceWithContext(identifier, ctx)
 
 #### Initialize Session or at least Url:
@@ -46,7 +46,7 @@ This extension is not made to be used alone, but provide OAuth2 service to other
 
 > initialized = service.initializeUrl(registered_url)
 
-The returned value: 'initialized' is True if 'registered_url' and/or 'user_account' has been retreived from the OAuth2 service configuration.
+The returned value: `initialized` is True if `registered_url` and/or `user_account` has been retreived from the OAuth2 service configuration.
 
 #### Get the access token:
 
