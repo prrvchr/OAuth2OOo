@@ -50,7 +50,7 @@ The returned value: `initialized` is True if `registered_url` and/or `user_accou
 
 #### Get the access token:
 
-> format = 'Bearer %s'
+> format = 'Bearer %s'  
 > token = service.getToken(format)
 
 
