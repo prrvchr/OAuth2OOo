@@ -100,37 +100,34 @@ class OAuth2Service(unohelper.Base,
     def handle(self, interaction):
         self.handleInteractionRequest(interaction)
     def handleInteractionRequest(self, interaction):
-        try:
-            print("OAuth2Service.handleInteractionRequest() 1")
-            handler = DialogHandler()
-            dialog = getDialog(self.ctx, self.Parent, handler, 'OAuth2OOo', 'UserDialog')
-            # TODO: interaction.getRequest() does not seem to be functional under LibreOffice !!!
-            # TODO: throw error AttributeError: "args"
-            # TODO: on File "/usr/lib/python3/dist-packages/uno.py"
-            # TODO: at line 525 in "_uno_struct__setattr__"
-            # TODO: as a workaround we must set an "args" attribute of type "sequence<any>" to
-            # TODO: IDL file of com.sun.star.auth.OAuth2Request Exception who is normally returned...
-            url = interaction.getRequest().ResourceUrl
-            provider = self._getProviderNameFromUrl(url)
-            self._initUserDialog(dialog, provider)
-            status = dialog.execute()
-            approved = status == OK
-            continuation = interaction.getContinuations()[status]
-            if approved:
-                username = dialog.getControl('TextField1').Model.Text
-                continuation.setUserName(username)
-            continuation.select()
-            dialog.dispose()
-            return approved
-        except Exception as e:
-            msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self.ctx, SEVERE, msg, 'OAuth2Service', 'handleInteractionRequest()')
+        # TODO: interaction.getRequest() does not seem to be functional under LibreOffice !!!
+        # TODO: throw error AttributeError: "args"
+        # TODO: on File "/usr/lib/python3/dist-packages/uno.py"
+        # TODO: at line 525 in "_uno_struct__setattr__"
+        # TODO: as a workaround we must set an "args" attribute of type "sequence<any>" to
+        # TODO: IDL file of com.sun.star.auth.OAuth2Request Exception who is normally returned...
+        url = interaction.getRequest().ResourceUrl
+        provider = self._getProviderNameFromUrl(url)
+        dialog = getDialog(self.ctx, self.Parent, DialogHandler(), 'OAuth2OOo', 'UserDialog')
+        self._initUserDialog(dialog, provider)
+        status = dialog.execute()
+        approved = status == OK
+        continuation = interaction.getContinuations()[status]
+        if approved:
+            continuation.setUserName(self._getUserName(dialog))
+        continuation.select()
+        dialog.dispose()
+        return approved
 
     def _initUserDialog(self, dialog, name=''):
         title = self.stringResource.resolveString('UserDialog.Title')
         label = self.stringResource.resolveString('UserDialog.Label1.Label')
         dialog.setTitle(title % name)
         dialog.getControl('Label1').Text = label % name
+
+    def _getUserName(self, dialog):
+        return dialog.getControl('TextField1').Model.Text
+
 
     # XOAuth2Service
     def getWarnings(self):

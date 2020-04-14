@@ -4,12 +4,10 @@
 import uno
 import unohelper
 
-from com.sun.star.task import ClassifiedInteractionRequest
 from com.sun.star.task import XInteractionRequest
 from com.sun.star.task import XInteractionAbort
-
-from com.sun.star.auth import OAuth2Request
 from com.sun.star.auth import XInteractionUserName
+from com.sun.star.auth import OAuth2Request
 
 
 # Wrapper to make callable OAuth2Service
@@ -42,7 +40,7 @@ class InteractionUserName(unohelper.Base,
         self.result = result
         self.username = ''
 
-    # XInteractionSupplyParameters
+    # XInteractionUserName
     def setUserName(self, name):
         self.username = name
     def select(self):
@@ -60,9 +58,9 @@ class InteractionRequest(unohelper.Base,
 
     # XInteractionRequest
     def getRequest(self):
-        #request = OAuth2Request()
-        request = uno.createUnoStruct('com.sun.star.auth.OAuth2Request')
-        request.Classification = uno.Enum('com.sun.star.task.InteractionClassification', 'QUERY')
+        request = OAuth2Request()
+        classification = 'com.sun.star.task.InteractionClassification'
+        request.Classification = uno.Enum(classification, 'QUERY')
         request.ResourceUrl = self.url
         request.Context = self.source
         if self.message is not None:
