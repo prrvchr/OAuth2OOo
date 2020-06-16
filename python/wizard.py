@@ -91,12 +91,9 @@ class Wizard(unohelper.Base,
     # XItemListener
     def itemStateChanged(self, event):
         page = event.ItemId
-        print("Wizard.itemStateChanged() 1")
         if self._currentPage != page:
             if not self._setPage(self._currentPage, page):
                 self._getRoadmap().CurrentItemID = self._currentPage
-                print("Wizard.itemStateChanged() 2")
-            print("Wizard.itemStateChanged() 3")
 
     def disposing(self, event):
         pass
@@ -189,24 +186,20 @@ class Wizard(unohelper.Base,
             return
         if index not in range(len(self._paths)):
             raise self._getNoSuchElementException(301)
-        print("Wizard.activatePath() 1: %s - %s" % (index, self._currentPath))
         path = self._paths[index]
         if self._currentPage != -1 and self._currentPage not in path:
             raise self._getInvalidStateException(302)
         if self._currentPath != index or self._isFinal != final:
             self._initPaths(index, final)
-            print("Wizard.activatePath() 2: %s - %s" % (index, self._currentPath))
 
     # XExecutableDialog -> XWizard
     def setTitle(self, title):
         self._dialog.setTitle(title)
 
     def execute(self):
-        print("Wizard.execute() 1")
         if self._currentPath == -1:
             self._initPaths(0, False)
         self._initPage()
-        print("Wizard.execute() 2")
         #self._setButtonFocus()
         return self._dialog.execute()
 
@@ -246,10 +239,7 @@ class Wizard(unohelper.Base,
         if self._isLastPage():
             if self._pages[self._currentPage].commitPage(self._getCommitReason()):
                 if self._controller.confirmFinish():
-                    #mri = self.ctx.ServiceManager.createInstance('mytools.Mri')
-                    #mri.inspect(self._dialog)
                     self._dialog.endDialog(OK)
-                    #self._dialog.endExecute()
         return True
 
     def _setCurrentPage(self, old, new):
@@ -265,7 +255,6 @@ class Wizard(unohelper.Base,
         self._firstPage = min(path)
         self._lastPage = max(path)
         self._initRoadmap(path, final)
-        #self._updateButton()
 
     def _initSinglePathWizard(self):
         return True, self._paths
@@ -348,7 +337,6 @@ class Wizard(unohelper.Base,
             id = item.ID
         
     def _updateButton(self):
-        print("Wizard._updateButton() 1")
         self._dialog.getControl('CommandButton2').Model.Enabled = not self._isFirstPage()
         enabled = self._getNextPage() is not None and self._canAdvance()
         self._dialog.getControl('CommandButton3').Model.Enabled = enabled
@@ -356,7 +344,6 @@ class Wizard(unohelper.Base,
         self._dialog.getControl('CommandButton4').Model.Enabled = enabled
         button = 'CommandButton4' if enabled else 'CommandButton3'
         self._dialog.getControl(button).Model.DefaultButton = True
-        print("Wizard._updateButton() 2")
 
     def _setButtonFocus(self):
         button = 'CommandButton4' if self._isLastPage() else 'CommandButton3'
@@ -371,13 +358,10 @@ class Wizard(unohelper.Base,
         return False
 
     def _initPage(self):
-        print("Wizard._initPage() 1")
         self._setPageStep(self._firstPage)
         nextpage = self._isAutoLoad()
         while nextpage and self._canAdvance():
             nextpage = self._initNextPage()
-            print("Wizard._initPage() 2 %s" % nextpage)
-        #self._updateButton()
 
     def _initNextPage(self):
         page = self._getNextPage()
