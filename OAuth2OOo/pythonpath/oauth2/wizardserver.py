@@ -124,7 +124,7 @@ class Server(Thread):
             with self.lock:
                 result = self._getResult(connection)
                 location = self._getResultLocation(result)
-                location += '?user=%s' % urlencode(self.user)
+                location += '?%s' % urlencode({'user': self.user})
                 header = '''\
 HTTP/1.1 302 Found
 Location: %s
