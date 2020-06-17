@@ -10,7 +10,3 @@ function getParameter(name) {
 }
 
 document.getElementById('user').innerHTML = getParameter('user');
-document.getElementById('close').click(function() {
-    window.open('','_parent','');
-    window.close();
-});
