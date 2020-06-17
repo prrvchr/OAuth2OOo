@@ -190,7 +190,7 @@ class Wizard(unohelper.Base,
         if self._currentPage != -1 and self._currentPage not in path:
             raise self._getInvalidStateException(302)
         if self._currentPath != index or self._isFinal != final:
-            self._initPaths(index, final)
+            self._initPath(index, final)
 
     # XExecutableDialog -> XWizard
     def setTitle(self, title):
@@ -198,7 +198,7 @@ class Wizard(unohelper.Base,
 
     def execute(self):
         if self._currentPath == -1:
-            self._initPaths(0, False)
+            self._initPath(0, False)
         self._initPage()
         #self._setButtonFocus()
         return self._dialog.execute()
@@ -247,71 +247,53 @@ class Wizard(unohelper.Base,
             return True
         return False
 
-    def _initPaths(self, index, final):
+    def _initPath(self, index, final):
+        final, paths = self._getActivePath(index, final)
+        self._firstPage = min(paths)
+        self._lastPage = max(paths)
+        self._initRoadmap(paths, final)
+
+    def _getActivePath(self, index, final):
         if self._multiPaths:
-            final, path = self._initMultiplePathsWizard(index, final)
+            paths = self._paths[index] if final else self._getFollowingPath(index)
+            self._currentPath = index
+            final = paths == self._paths[self._currentPath]
         else:
-            final, path = self._initSinglePathWizard()
-        self._firstPage = min(path)
-        self._lastPage = max(path)
-        self._initRoadmap(path, final)
+            final, paths = True, self._paths
+        return final, paths
 
-    def _initSinglePathWizard(self):
-        return True, self._paths
-
-    def _initMultiplePathsWizard(self, index, final):
-        path = self._getActivePath(self._paths, index, final)
-        self._currentPath = index
-        final = path == self._paths[self._currentPath]
-        return final, path
-
-    def _getActivePath(self, paths, index, final):
-        if final:
-            return paths[index]
-        if index != -1:
-            return self._getUniquePaths(paths, index)
-        return self._getCommunPaths(paths)
-
-    def _getUniquePaths(self, paths, index):
-        commun = []
+    def _getFollowingPath(self, index):
+        paths = []
         i = 0
-        for p in paths[index]:
-            for j in range(0, len(paths)):
-                if p != paths[j][i]:
-                    return tuple(commun)
-            commun.append(p)
+        for page in self._paths[index]:
+            if page > self._currentPage:
+                for j in range(len(self._paths)):
+                    if j in (index, self._currentPath):
+                        continue
+                    if i >= len(self._paths[j]) or page != self._paths[j][i]:
+                        return tuple(paths)
+            paths.append(page)
             i += 1
-        return tuple(commun)
-
-    def _getCommunPaths(self, paths):
-        commun = []
-        i = 0
-        for p in paths[0]:
-            for j in range(1, len(paths)):
-                if p != paths[j][i]:
-                    return tuple(commun)
-            commun.append(p)
-            i += 1
-        return tuple(commun)
+        return tuple(paths)
 
     def _getPath(self, enabled=True):
-        path = []
+        paths = []
         roadmap = self._getRoadmap()
         for i in range(roadmap.getCount()):
             item = roadmap.getByIndex(i)
             if not enabled:
-                path.append(item.ID)
+                paths.append(item.ID)
             elif item.Enabled:
-                path.append(item.ID)
-        return tuple(path)
+                paths.append(item.ID)
+        return tuple(paths)
 
-    def _initRoadmap(self, path, final):
+    def _initRoadmap(self, paths, final):
         roadmap = self._getRoadmap()
         initialized = roadmap.CurrentItemID != -1
         for i in range(roadmap.getCount() -1, -1, -1):
             roadmap.removeByIndex(i)
         i = 0
-        for page in path:
+        for page in paths:
             item = roadmap.createInstance()
             item.ID = page
             item.Label = self._controller.getPageTitle(page)
@@ -391,10 +373,10 @@ class Wizard(unohelper.Base,
             self._dialog.addControl(model.Name, page.Window)
             self._pages[id] = page
         self._currentPage = self._getRoadmap().CurrentItemID = id
-        self._setDialogStep(step)
         self._updateRoadmap()
         self._updateButton()
         self._activatePage(id)
+        self._setDialogStep(step)
 
     def _setModelStep(self, model, step):
         model.PositionX = self._getRoadmap().Width
