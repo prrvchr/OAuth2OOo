@@ -2,6 +2,6 @@
 
 ### La configuration OAuth2OOo pour: <span id="user"></span> a réussi.
 
-## Vous pouvez <a href="#" class="button" onclick="window.open('', '_self', ''); window.close();">fermer</a> cette page.
+### Vous pouvez <a id="close" href="#" class="button" >fermer</a> cette page.
 
 <script type="text/javascript" src="script.js"></script>

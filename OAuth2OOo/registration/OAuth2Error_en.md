@@ -2,6 +2,6 @@
 
 ### The OAuth2OOo configuration for: <span id="user"></span> failed.
 
-## You can <a href="#" class="button" onclick="window.open('', '_self', ''); window.close();">close</a> this page.
+### You can <a id="close" href="#" class="button">close</a> this page.
 
 <script type="text/javascript" src="script.js"></script>

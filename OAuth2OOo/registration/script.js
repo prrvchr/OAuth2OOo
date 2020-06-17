@@ -1,12 +1,16 @@
 function getParameter(name) {
     var parameter = null,
         tmp = [];
-    var items = location.search.substr(1).split("&");
+    var items = location.search.substr(1).split('&');
     for (var i = 0; i < items.length; i++) {
-        tmp = items[i].split("=");
+        tmp = items[i].split('=');
         if (tmp.length === 2 && tmp[0] === name) parameter = decodeURIComponent(tmp[1]);
     }
     return parameter;
 }
 
-document.getElementById("user").innerHTML = getParameter("user");
+document.getElementById('user').innerHTML = getParameter('user');
+document.getElementById('close').click(function() {
+    window.open('','_parent','');
+    window.close();
+});
