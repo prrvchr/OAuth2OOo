@@ -6,11 +6,16 @@
 ### What has been done for version 0.0.5
 
 Writing of a new [XWizard interface](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py) in order to replace the Wizard service which became defective with version 6.4.x and 7.x of LibreOffice (see [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
-This new interface also fixes [bug 132661] (https://bugs.documentfoundation.org/show_bug.cgi?id=132661) and [bug 132666] (https://bugs.documentfoundation.org/show_bug.cgi?id=132666) and allows access to versions 6.4.x and 7.x of LibreOffice...
+
+This new interface also fixes [bug 132661](https://bugs.documentfoundation.org/show_bug.cgi?id=132661) and [bug 132666](https://bugs.documentfoundation.org/show_bug.cgi?id=132666) and allows access to versions 6.4.x and 7.x of LibreOffice...
+
 In addition this new XWizard adds new functionality such as:
+
     - Automatic resizing of the Wizard to the dimensions of the first displayed page.
-    - Automatic move to page N on opening if possible.
+    - Automatic move to page X on opening if possible.
+
 Fixed an issue with tokens without expiration (as used by Dropbox) on testing their validity…
+
 Many other fix...
 
 
