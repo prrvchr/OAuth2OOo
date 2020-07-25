@@ -14,9 +14,18 @@
     - Automatic resizing of the Wizard to the dimensions of the first displayed page.
     - Automatic move to page X on opening if possible.
 
-- Fixed an issue with tokens without expiration (as used by Dropbox) on testing their validity…
+- Fixed an issue with tokens without expiration (as used by Dropbox) on testing their validity...
 
 - Many other fix...
+
+
+### What remains to be done for version 0.0.5
+
+- Write the implementation of the Help button (CommandButton5) in the new [XWizard interface](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py)
+
+- Add new language for internationalization...
+
+- Anything welcome...
 
 
 ### Uno OAuth2.0 API for LibreOffice / OpenOffice.
