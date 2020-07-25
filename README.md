@@ -11,8 +11,8 @@ This new interface also fixes [bug 132661](https://bugs.documentfoundation.org/s
 
 In addition this new XWizard adds new functionality such as:
 
-    - Automatic resizing of the Wizard to the dimensions of the first displayed page.
-    - Automatic move to page X on opening if possible.
+- Automatic resizing of the Wizard to the dimensions of the first displayed page.
+- Automatic move to page X on opening if possible.
 
 Fixed an issue with tokens without expiration (as used by Dropbox) on testing their validity…
 
