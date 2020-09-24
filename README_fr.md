@@ -102,7 +102,7 @@ J'essaierai de la résoudre ;-)
 
 #### Que reste-t-il à faire pour la version 0.0.5:
 
-- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py)
+- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py).
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 

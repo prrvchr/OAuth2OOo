@@ -106,7 +106,7 @@ I will try to solve it ;-)
 
 #### What remains to be done for version 0.0.5:
 
-- Write the implementation of the Help button (CommandButton5) in the new [XWizard interface](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py)
+- Write the implementation of the Help button (CommandButton5) in the new [XWizard](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py) interface.
 
 - Add new language for internationalization...
 
