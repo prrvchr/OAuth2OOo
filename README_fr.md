@@ -2,8 +2,18 @@
 
 **L'utilisation de ce logiciel vous soumet à nos** [**Conditions d'utilisation**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_fr) **et à notre** [**Politique de protection des données**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_fr)
 
-## [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo/README_fr) [v.0.0.5](https://prrvchr.github.io/OAuth2OOo/README_fr#historique)
+## [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo) [v.0.0.5](https://prrvchr.github.io/OAuth2OOo/README_fr#historique)
 
+### Introduction:
+
+**OAuth2OOo** est une extension LibreOffice et/ou OpenOffice permettant de vous offrir des services inovants dans ces suites bureautique publiées en logiciel libre.  
+A savoir, l'implémentation du protocole OAuth 2.0. Protocole permettant d'obtenir votre consentement pour qu'une application puisse accéder à vos données présentes chez les GAFA.
+
+Etant un logiciel libre je vous encourage:
+- A dupliquer le code source.
+- A apporter des modifications, des corrections, des ameliorations.
+
+Bref, à participer au developpement de cette extension, car c'est ensemble que nous pouvons rendre le Logiciel Libre plus intelligent.
 
 ### Uno OAuth2.0 API pour LibreOffice / OpenOffice.
 
@@ -15,42 +25,41 @@
 
 ![OAuth2OOo Wizard Page4 screenshot](OAuth2Wizard4.png)
 
-The OAuth2.0 protocol allows the connection to resource servers, after acceptance of the connection authorization, by exchange of tokens.
+Le protocole OAuth2.0 permet la connexion aux ressources de serveurs, après acceptation de l'autorisation de connexion, par échange de jetons.
 
-The revocation takes place in the management of the applications associated with your account.
+La révocation a lieu dans la gestion des applications associées à votre compte.
 
-No more password is stored in LibreOffice.
-
+Plus aucun mot de passe n'est stocké dans LibreOffice / OpenOffice.
 
 ### Installation:
 
-- Download the [extension](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt)
+- Installer l'extension [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt)
 
-- Install the extension in LibreOffice / OpenOffice.
-
+- Redémarrez LibreOffice / OpenOffice après l'installation.
 
 ### Utilisation:
 
-This extension is not made to be used alone, but provide OAuth2 service to other LibreOffice / OpenOffice extensions. Here's how we use its API:
+Cette extension n'est pas faite pour être utilisée seule, mais fournit le service OAuth2 à d'autres extensions LibreOffice / OpenOffice.  
+Voici comment nous utilisons son API:
 
-#### Create OAuth2 service:
+#### Créer le service OAuth2:
 
 > identifier = "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service"  
 > service = ctx.ServiceManager.createInstanceWithContext(identifier, ctx)
 
-#### Initialize Session or at least Url:
+#### Initialiser la session ou au moins l'Url:
 
-- Initialize session: 
+- Initialiser la session: 
 
 > initialized = service.initializeSession(registered_url, user_account)
 
-- Initialize Url:
+- Initialiser l'Url:
 
 > initialized = service.initializeUrl(registered_url)
 
-The returned value: `initialized` is True if `registered_url` and/or `user_account` has been retreived from the OAuth2 service configuration.
+La valeur renvoyée:: `initialized` est True si `registered_url` et/ou `user_account` a été récupérée de la configuration du service OAuth2.
 
-#### Get the access token:
+#### Obtenir le jeton d'accès:
 
 > format = 'Bearer %s'  
 > token = service.getToken(format)
@@ -70,32 +79,31 @@ The returned value: `initialized` is True if `registered_url` and/or `user_accou
 
 * LibreOffice 6.4.4.2 (x64) - Windows 7 SP1
 
-I encourage you in case of problem :-(  
-to create an [issue](https://github.com/prrvchr/OAuth2OOo/issues/new)  
-I will try to solve it ;-)
+Je vous encourage en cas de problème :-(  
+de créer une [issue](https://github.com/prrvchr/OAuth2OOo/issues/new)  
+J'essaierai de la résoudre ;-)
 
 ### Historique:
 
 #### Ce qui a été fait pour la version 0.0.5:
 
-- Writing of a new [XWizard interface](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py) in order to replace the Wizard service which became defective with version 6.4.x and 7.x of LibreOffice (see [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
+- Ecriture d'une nouvelle interface [XWizard](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py) afin de remplacer le service Wizard devenu défectueux avec les versions 6.4.x et 7.x de LibreOffice (voir [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
 
-    This new interface also fixes [bug 132661](https://bugs.documentfoundation.org/show_bug.cgi?id=132661) and [bug 132666](https://bugs.documentfoundation.org/show_bug.cgi?id=132666) and allows access to versions 6.4.x and 7.x of LibreOffice...
+    Cette nouvelle interface corrige également le [bug 132661](https://bugs.documentfoundation.org/show_bug.cgi?id=132661) et le [bug 132666](https://bugs.documentfoundation.org/show_bug.cgi?id=132666) et permet d'accéder aux versions 6.4.x et 7.x de LibreOffice...
 
-    In addition this new XWizard adds new functionality such as:
+    De plus, ce nouveau XWizard ajoute de nouvelles fonctionnalités telles que:
 
-    - Automatic resizing of the Wizard to the dimensions of the first displayed page.
-    - Automatic move to page X on opening if possible.
+    - Redimensionnement automatique de l'assistant aux dimensions de la première page affichée.
+    - Déplacement automatique vers la page X à l'ouverture si possible.
 
-- Fixed an issue with tokens without expiration (as used by Dropbox) on testing their validity...
+- Correction d'un problème avec les jetons sans expiration (tels qu'utilisés par Dropbox) lors du test de leur validité...
 
-- Many other fix...
-
+- Beaucoup d'autres correctifs...
 
 #### Que reste-t-il à faire pour la version 0.0.5:
 
-- Write the implementation of the Help button (CommandButton5) in the new [XWizard interface](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py)
+- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py)
 
-- Add new language for internationalization...
+- Ajouter de nouvelles langue pour l'internationalisation...
 
-- Anything welcome...
+- Tout ce qui est bienvenu...

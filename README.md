@@ -4,6 +4,17 @@
 
 ## [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo) [v.0.0.5](https://prrvchr.github.io/OAuth2OOo#historical)
 
+### Introduction:
+
+**OAuth2OOo** is a LibreOffice and/or OpenOffice extension allowing to offer you innovative services in these office suites published in free software.  
+Namely, the implementation of the OAuth 2.0 protocol. Protocol allowing you to obtain your consent so that an application can access your data present at the GAFA.
+
+Being free software I encourage you:
+- To duplicate the source code.
+- To make changes, corrections, improvements.
+
+In short, to participate in the development of this extension.
+Because it is together that we can make Free Software smarter.
 
 ### Uno OAuth2.0 API for LibreOffice / OpenOffice.
 
@@ -19,7 +30,7 @@ The OAuth2.0 protocol allows the connection to resource servers, after acceptanc
 
 The revocation takes place in the management of the applications associated with your account.
 
-No more password is stored in LibreOffice.
+No more password is stored in LibreOffice / OpenOffice.
 
 
 ### Install:
@@ -31,7 +42,8 @@ No more password is stored in LibreOffice.
 
 ### Use:
 
-This extension is not made to be used alone, but provide OAuth2 service to other LibreOffice / OpenOffice extensions. Here's how we use its API:
+This extension is not made to be used alone, but provide OAuth2 service to other LibreOffice / OpenOffice extensions.  
+Here's how we use its API:
 
 #### Create OAuth2 service:
 
@@ -78,7 +90,7 @@ I will try to solve it ;-)
 
 #### What has been done for version 0.0.5:
 
-- Writing of a new [XWizard interface](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py) in order to replace the Wizard service which became defective with version 6.4.x and 7.x of LibreOffice (see [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
+- Writing of a new [XWizard](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py) interface in order to replace the Wizard service which became defective with version 6.4.x and 7.x of LibreOffice (see [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
 
     This new interface also fixes [bug 132661](https://bugs.documentfoundation.org/show_bug.cgi?id=132661) and [bug 132666](https://bugs.documentfoundation.org/show_bug.cgi?id=132666) and allows access to versions 6.4.x and 7.x of LibreOffice...
 
