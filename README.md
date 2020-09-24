@@ -35,7 +35,7 @@ No more password is stored in LibreOffice / OpenOffice.
 
 ### Install:
 
-- Download the [extension](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt)
+- Download the [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt) extension
 
 - Install the extension in LibreOffice / OpenOffice.
 
