@@ -2,7 +2,7 @@
 
 **The use of this software subjects you to our** [**Terms Of Use**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_en) **and** [**Data Protection Policy**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_en)
 
-## [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo) [v.0.0.5](https://prrvchr.github.io/OAuth2OOo/README_fr#historical)
+## [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo) [v.0.0.5](https://prrvchr.github.io/OAuth2OOo#historical)
 
 
 ### Uno OAuth2.0 API for LibreOffice / OpenOffice.
