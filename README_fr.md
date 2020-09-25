@@ -51,9 +51,9 @@ Voici comment nous utilisons son API:
 > identifier = "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service"  
 > service = ctx.ServiceManager.createInstanceWithContext(identifier, ctx)
 
-### Initialiser la session ou au moins l'Url:
+### Initialiser la Session ou au moins l'Url:
 
-- Initialiser la session: 
+- Initialiser la Session: 
 
 > initialized = service.initializeSession(registered_url, user_account)
 

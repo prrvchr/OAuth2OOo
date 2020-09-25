@@ -53,7 +53,7 @@ Here's how we use its API:
 
 ### Initialize Session or at least Url:
 
-- Initialize session: 
+- Initialize Session: 
 
 > initialized = service.initializeSession(registered_url, user_account)
 
