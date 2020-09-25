@@ -1,13 +1,13 @@
+# Version [0.0.5](https://prrvchr.github.io/OAuth2OOo#historical)
+
 [**Ce document en français**](https://prrvchr.github.io/OAuth2OOo/README_fr)
 
 **The use of this software subjects you to our** [**Terms Of Use**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_en) **and** [**Data Protection Policy**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_en).
 
-# [OAuth2OOo](https://github.com/prrvchr/OAuth2OOo) version [0.0.5](https://prrvchr.github.io/OAuth2OOo#historical):
-
 ## Introduction:
 
-**OAuth2OOo** is a [LibreOffice](https://fr.libreoffice.org/download/telecharger-libreoffice/) and/or [OpenOffice](https://www.openoffice.org/fr/Telecharger/) extension allowing to offer you innovative services in these office suites published in free software.  
-Namely, the implementation of the OAuth 2.0 protocol. Protocol allowing you to obtain your consent so that an application can access your data present at the GAFA.
+**OAuth2OOo** is a [LibreOffice](https://fr.libreoffice.org/download/telecharger-libreoffice/) and/or [OpenOffice](https://www.openoffice.org/fr/Telecharger/) extension allowing to offer you innovative services in these office suites.  
+This extension is the implementation of the OAuth 2.0 protocol. Protocol allowing you to obtain your consent so that an application can access your data present at the GAFA.
 
 Being free software I encourage you:
 - To duplicate its [source code](https://github.com/prrvchr/OAuth2OOo).
