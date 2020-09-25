@@ -1,4 +1,4 @@
-# Version [0.0.5](https://prrvchr.github.io/OAuth2OOo#historical)
+# version [0.0.5](https://prrvchr.github.io/OAuth2OOo#historical)
 
 [**Ce document en français**](https://prrvchr.github.io/OAuth2OOo/README_fr)
 
