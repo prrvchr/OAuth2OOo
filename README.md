@@ -12,6 +12,7 @@ This extension is the implementation of the OAuth 2.0 protocol. Protocol allowin
 Being free software I encourage you:
 - To duplicate its [source code](https://github.com/prrvchr/OAuth2OOo).
 - To make changes, corrections, improvements.
+- To open [issue](https://github.com/prrvchr/OAuth2OOo/issues/new) if needed.
 
 In short, to participate in the development of this extension.
 Because it is together that we can make Free Software smarter.
