@@ -34,6 +34,7 @@ from .configuration import g_identifier
 from .configuration import g_extension
 
 from .logger import getMessage
+g_message = 'wizard'
 
 import traceback
 
@@ -459,18 +460,18 @@ class Wizard(unohelper.Base,
     def _getIllegalArgumentException(self, position, code):
         e = IllegalArgumentException()
         e.ArgumentPosition = position
-        e.Message = getMessage(self.ctx, __name__, code)
+        e.Message = getMessage(self.ctx, g_message, code)
         e.Context = self
         return e
 
     def _getInvalidStateException(self, code):
         e = InvalidStateException()
-        e.Message = getMessage(self.ctx, __name__, code)
+        e.Message = getMessage(self.ctx, g_message, code)
         e.Context = self
         return e
 
     def _getNoSuchElementException(self, code):
         e = NoSuchElementException()
-        e.Message = getMessage(self.ctx, __name__, code)
+        e.Message = getMessage(self.ctx, g_message, code)
         e.Context = self
         return e
