@@ -20,7 +20,6 @@ from .configuration import g_identifier
 g_loggerPool = {}
 g_stringResource = {}
 g_pathResource = 'resource'
-g_fileResource = 'MessageStrings'
 
 
 def getMessage(ctx, fileresource, resource, format=()):
