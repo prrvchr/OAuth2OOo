@@ -166,14 +166,15 @@ def execute(session, parameter, timeout, parser=None):
             error = str(cause.args[0])
             print ("OOps: Something Else", error)
         else:
-            response.IsPresent = True
-            if parser is not None:
-                if parser.DataType == 'Json':
-                    response.Value = r.json(object_pairs_hook=parser.parseResponse)
-                elif parser.DataType == 'Xml':
-                    response.Value = parser.parseResponse(r.text)
-            else:
+            if parser is None:
                 response.Value = _parseResponse(r)
+                response.IsPresent = True
+            elif parser.DataType == 'Json':
+                response.Value = r.json(object_pairs_hook=parser.parseResponse)
+                response.IsPresent = True
+            elif parser.DataType == 'Xml':
+                response.Value = parser.parseResponse(r.text)
+                response.IsPresent = True
     return response, error
 
 class Request(unohelper.Base,
