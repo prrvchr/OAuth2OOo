@@ -200,7 +200,7 @@ class OptionsDialog(unohelper.Base,
             msg = ''
             try:
                 import ssl
-            except ImportError as e:
+            except Exception as e:
                 msg = getExceptionMessage(e)
             msg = getMessage(self.ctx, g_message, 115, msg)
         else:
