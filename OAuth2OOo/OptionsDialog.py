@@ -202,7 +202,7 @@ class OptionsDialog(unohelper.Base,
                 import ssl
             except ImportError as e:
                 print("OptionsDialog._logInfo() 1")
-                msg = repr(e)
+                msg = traceback.format_exc()
                 print("OptionsDialog._logInfo() 2")
                 #msg = getExceptionMessage(e)
             msg = getMessage(self.ctx, g_message, 115, msg)
