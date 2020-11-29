@@ -74,9 +74,15 @@ def getOAuth2(ctx, url, name):
     return oauth2
 
 def getExceptionMessage(exception):
-    messages = [arg for arg in exception.args if isinstance(arg, six.string_types)]
+    if hasattr(exception, 'args'):
+        messages = [arg for arg in exception.args if isinstance(arg, six.string_types)]
+    else:
+        messages = []
     if len(messages) == 0:
-        message = str(exception)
+        try:
+            message = str(exception)
+        except UnicodeDecodeError:
+            message = repr(exception)
     elif len(messages) == 1:
         message = messages[0]
     else:
