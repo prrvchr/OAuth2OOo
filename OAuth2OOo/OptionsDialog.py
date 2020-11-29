@@ -19,6 +19,7 @@ from unolib import getInteractionHandler
 from unolib import InteractionRequest
 from unolib import getOAuth2UserName
 from unolib import getDialog
+from unolib import getExceptionMessage
 
 from oauth2 import getLoggerUrl
 from oauth2 import getLoggerSetting
@@ -196,7 +197,12 @@ class OptionsDialog(unohelper.Base,
         msg = getMessage(self.ctx, g_message, 113, requests.urllib3.__version__)
         logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
         if requests.ssl is None:
-            msg = getMessage(self.ctx, g_message, 115)
+            msg = ''
+            try:
+                import ssl
+            except ImportError as e:
+                msg = getExceptionMessage(e)
+            msg = getMessage(self.ctx, g_message, 115, msg)
         else:
             msg = getMessage(self.ctx, g_message, 114, requests.ssl.OPENSSL_VERSION)
         logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
