@@ -249,6 +249,7 @@ class OAuth2Service(unohelper.Base,
     def execute(self, parameter):
         response, error = execute(self.Session, parameter, self.Timeout)
         if error:
+            logMessage(self.ctx, SEVERE, error, 'OAuth2Service', 'execute()')
             self._Warnings.append(self._getException(error))
         return response
 
