@@ -59,6 +59,7 @@ from oauth2 import g_identifier
 from oauth2 import g_oauth2
 
 from oauth2 import requests
+import os
 import sys
 import traceback
 
@@ -218,9 +219,12 @@ class OptionsDialog(unohelper.Base,
         version  = ' '.join(sys.version.split())
         msg = getMessage(self.ctx, g_message, 111, version)
         logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
-        msg = getMessage(self.ctx, g_message, 112, requests.__version__)
+        path = os.pathsep.join(sys.path)
+        msg = getMessage(self.ctx, g_message, 112, path)
         logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
-        msg = getMessage(self.ctx, g_message, 113, requests.urllib3.__version__)
+        msg = getMessage(self.ctx, g_message, 113, requests.__version__)
+        logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
+        msg = getMessage(self.ctx, g_message, 114, requests.urllib3.__version__)
         logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
         if requests.ssl is None:
             msg = ''
@@ -230,9 +234,9 @@ class OptionsDialog(unohelper.Base,
                 print("OptionsDialog._logInfo() 1")
                 msg = getExceptionMessage(e)
                 print("OptionsDialog._logInfo() 2")
-            msg = getMessage(self.ctx, g_message, 115, msg)
+            msg = getMessage(self.ctx, g_message, 116, msg)
         else:
-            msg = getMessage(self.ctx, g_message, 114, requests.ssl.OPENSSL_VERSION)
+            msg = getMessage(self.ctx, g_message, 115, requests.ssl.OPENSSL_VERSION)
         logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
         url = getLoggerUrl(self.ctx)
         self._setDialogText(dialog, url)
