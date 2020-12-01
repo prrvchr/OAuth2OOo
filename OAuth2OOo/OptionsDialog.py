@@ -229,14 +229,17 @@ class OptionsDialog(unohelper.Base,
         if requests.ssl is None:
             msg = ''
             try:
-                import ssl
+                from oauth2 import ssl
             except ImportError as e:
                 print("OptionsDialog._logInfo() 1")
                 msg = getExceptionMessage(e)
+                msg = getMessage(self.ctx, g_message, 116, msg)
+            else:
+                msg = getMessage(self.ctx, g_message, 115, ssl.OPENSSL_VERSION)
                 print("OptionsDialog._logInfo() 2")
-            msg = getMessage(self.ctx, g_message, 116, msg)
         else:
             msg = getMessage(self.ctx, g_message, 115, requests.ssl.OPENSSL_VERSION)
+            print("OptionsDialog._logInfo() 3")
         logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
         url = getLoggerUrl(self.ctx)
         self._setDialogText(dialog, url)
