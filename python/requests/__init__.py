@@ -113,6 +113,9 @@ try:
         print("requests.__init__.py 6")
 except ImportError as e:
     print("requests.__init__.py 7 %s" % repr(e))
+except Exception as e:
+    print("requests.__init__.py 8 %s" % repr(e))
+
 
 # urllib3's DependencyWarnings should be silenced.
 from urllib3.exceptions import DependencyWarning
