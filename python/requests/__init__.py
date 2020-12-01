@@ -95,17 +95,21 @@ except (AssertionError, ValueError):
 # 'ssl' library isn't available.
 try:
     try:
+        print("requests.__init__.py 1")
         import ssl
     except ImportError:
         ssl = None
+        print("requests.__init__.py 2")
 
     if not getattr(ssl, "HAS_SNI", False):
+        print("requests.__init__.py 3")
         from urllib3.contrib import pyopenssl
         pyopenssl.inject_into_urllib3()
-
+        print("requests.__init__.py 4")
         # Check cryptography version
         from cryptography import __version__ as cryptography_version
         _check_cryptography(cryptography_version)
+        print("requests.__init__.py 5")
 except ImportError:
     pass
 
