@@ -104,14 +104,15 @@ try:
     if not getattr(ssl, "HAS_SNI", False):
         print("requests.__init__.py 3")
         from urllib3.contrib import pyopenssl
-        pyopenssl.inject_into_urllib3()
         print("requests.__init__.py 4")
+        pyopenssl.inject_into_urllib3()
+        print("requests.__init__.py 5")
         # Check cryptography version
         from cryptography import __version__ as cryptography_version
         _check_cryptography(cryptography_version)
-        print("requests.__init__.py 5")
-except ImportError:
-    pass
+        print("requests.__init__.py 6")
+except ImportError as e:
+    print("requests.__init__.py 7 %s" % repr(e))
 
 # urllib3's DependencyWarnings should be silenced.
 from urllib3.exceptions import DependencyWarning
