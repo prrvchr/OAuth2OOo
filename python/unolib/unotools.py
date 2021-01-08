@@ -61,7 +61,7 @@ def getUrlTransformer(ctx):
 
 def getUrl(ctx, location, protocol=None):
     transformer = getUrlTransformer(ctx)
-    return parseUrl(transformer, location, protocol=None)
+    return parseUrl(transformer, location, protocol)
 
 def parseUrl(transformer, location, protocol=None):
     url = uno.createUnoStruct('com.sun.star.util.URL')
