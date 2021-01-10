@@ -98,12 +98,13 @@ class Connection(unohelper.Base,
                  XTableUIProvider,
                  XConnectionTools,
                  XWeak):
-    def __init__(self, ctx, datasource, url, user, password, event=None):
+    def __init__(self, ctx, datasource, url, user, password, event=None, patched=False):
         self.ctx = ctx
         self._connection = datasource.getConnection(user, password)
         self._url = url
         self._username = user
         self._event = event
+        self._patched = patched
 
     # XComponent
     def dispose(self):
@@ -158,7 +159,10 @@ class Connection(unohelper.Base,
         elif commandtype == COMMAND:
             query = command
         if query is not None:
-            return PreparedStatement(self, query)
+            if self._patched:
+                return CallableStatement(self, query)
+            else:
+                return PreparedStatement(self, query)
         raise SQLException()
 
     # XQueriesSupplier
@@ -228,7 +232,7 @@ class Connection(unohelper.Base,
     def createStatement(self):
         return Statement(self)
     def prepareStatement(self, sql):
-        return PreparedStatement(self, sql)
+        return PreparedStatement(self, sql, self._patched)
     def prepareCall(self, sql):
         return CallableStatement(self, sql)
     def nativeSQL(self, sql):
