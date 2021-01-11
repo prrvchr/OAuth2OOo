@@ -260,9 +260,9 @@ class PreparedStatement(BaseStatement,
                         XColumnsSupplier,
                         XPreparedBatchExecution):
     def __init__(self, connection, sql, patched=False):
-        # TODO: cannot use: result = self._statement.executeQuery()
+        # TODO: sometime we cannot use: connection.prepareStatement(sql)
         # TODO: it trow a: java.lang.IncompatibleClassChangeError
-        # TODO: fallback to: self._statement as connection.prepareCall(sql)
+        # TODO: if patched: fallback to connection.prepareCall(sql)
         self._connection = connection
         if patched:
             self._statement = connection._connection.prepareCall(sql)
