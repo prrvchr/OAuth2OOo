@@ -37,6 +37,7 @@ from oauth2lib import NoOAuth2
 from unolib import KeyMap
 from unolib import getCurrentLocale
 
+from .requests import Session
 from .requests.compat import urlencode
 
 import json
@@ -148,11 +149,12 @@ def getTokenParameters(setting, code, codeverifier):
     return parameters
 
 def getResponseFromRequest(session, url, data, timeout):
+    session = Session()
     response = {}
     error = None
     with session as s:
         try:
-            with s.post(url, data=data, timeout=timeout, auth=NoOAuth2()) as r:
+            with s.post(url, data=data, timeout=timeout) as r:
                 r.raise_for_status()
                 response = r.json()
         except Exception as e:

@@ -41,7 +41,9 @@ from com.sun.star.ucb.ConnectionMode import ONLINE
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 
+from com.sun.star.frame import XDispatchResultListener
 from com.sun.star.frame.FrameSearchFlag import GLOBAL
+from com.sun.star.frame.DispatchResultState import SUCCESS
 
 from com.sun.star.uno import Exception as UnoException
 from com.sun.star.auth import OAuth2Request
@@ -52,10 +54,12 @@ from oauth2lib import NoOAuth2
 from unolib import KeyMap
 from unolib import getStringResource
 from unolib import createService
+from unolib import executeDispatch
 from unolib import getConfiguration
 from unolib import getDialog
 from unolib import getInterfaceTypes
 from unolib import getParentWindow
+from unolib import getPropertyValueSet
 
 from oauth2 import Request
 from oauth2 import Enumeration
@@ -94,9 +98,10 @@ class OAuth2Service(unohelper.Base,
                     XInteractionHandler2,
                     XOAuth2Service):
     def __init__(self, ctx):
-        self.ctx = ctx
-        self.configuration = getConfiguration(self.ctx, g_identifier, True)
-        self.Setting = OAuth2Setting(self.ctx)
+        self._ctx = ctx
+        self._result = None
+        self.configuration = getConfiguration(self._ctx, g_identifier, True)
+        self.Setting = OAuth2Setting(self._ctx)
         version = self._getSSLVersion()
         self.Session = self._getSession(version)
         self._Url = ''
@@ -108,7 +113,7 @@ class OAuth2Service(unohelper.Base,
         self._Warnings = []
         self._Error = None
         self.Error = ''
-        self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
+        self.stringResource = getStringResource(self._ctx, g_identifier, 'OAuth2OOo')
         self._SessionMode = OFFLINE
         #self._checkSSL()
 
@@ -166,7 +171,7 @@ class OAuth2Service(unohelper.Base,
 
     def _showUserDialog(self, interaction, url, message):
         provider = self._getProviderNameFromUrl(url)
-        dialog = getDialog(self.ctx, g_extension, 'UserDialog', DialogHandler(), self._parent)
+        dialog = getDialog(self._ctx, g_extension, 'UserDialog', DialogHandler(), self._parent)
         self._initUserDialog(dialog, provider, message)
         status = dialog.execute()
         approved = status == OK
@@ -198,7 +203,7 @@ class OAuth2Service(unohelper.Base,
     def isOnLine(self):
         return self._SessionMode != OFFLINE
     def isOffLine(self, host):
-        self._SessionMode = getSessionMode(self.ctx, host)
+        self._SessionMode = getSessionMode(self._ctx, host)
         return self._SessionMode != ONLINE
 
     def initializeUrl(self, url):
@@ -220,15 +225,34 @@ class OAuth2Service(unohelper.Base,
         return KeyMap()
 
     def getSessionMode(self, host):
-        return getSessionMode(self.ctx, host)
+        return getSessionMode(self._ctx, host)
 
     def getAuthorization(self, url, username, close=True, parent=None):
+        print("OAuth2Service.getAuthorization() 1")
+        authorized = False
+        self._result = None
+        listener = DispatchListener(self)
+        arguments = getPropertyValueSet({'Url': url,
+                                         'UserName': username,
+                                         'Close': close})
+        executeDispatch(self._ctx, 'oauth2:wizard', arguments, listener)
+        print("OAuth2Service.getAuthorization() 2")
+        if self._result is not None:
+            authorized = self.initializeSession(*self._result)
+        print("OAuth2Service.getAuthorization() 3")
+        return authorized
+
+    def dispatchFinished(self, result):
+        print("OAuth2Service.dispatchFinished()  %s ***********************" % (result, ))
+        self._result = result
+
+    def getAuthorization1(self, url, username, close=True, parent=None):
         authorized = False
         msg = "Wizard Loading ..."
         print("OAuth2Service.getAuthorization() 1")
-        wizard = Wizard(self.ctx, g_wizard_page, True, parent)
+        wizard = Wizard(self._ctx, g_wizard_page, True, parent)
         print("OAuth2Service.getAuthorization() 2")
-        controller = WizardController(self.ctx, wizard, self.Session, url, username, close)
+        controller = WizardController(self._ctx, wizard, self.Session, url, username, close)
         print("OAuth2Service.getAuthorization() 3")
         arguments = (g_wizard_paths, controller)
         print("OAuth2Service.getAuthorization() 4")
@@ -247,7 +271,7 @@ class OAuth2Service(unohelper.Base,
             msg +=  " ERROR: Wizard as been aborted"
             controller.Server.cancel()
         wizard.DialogWindow.dispose()
-        logMessage(self.ctx, INFO, msg, 'OAuth2Service', 'getAuthorization()')
+        logMessage(self._ctx, INFO, msg, 'OAuth2Service', 'getAuthorization()')
         return authorized
 
     def getToken(self, format=''):
@@ -272,7 +296,7 @@ class OAuth2Service(unohelper.Base,
         else:
             token = self.Setting.Url.Scope.Provider.User.AccessToken
             msg += "Get from configuration ... Done"
-        logMessage(self.ctx, level, msg, 'OAuth2Service', 'getToken()')
+        logMessage(self._ctx, level, msg, 'OAuth2Service', 'getToken()')
         if format:
             token = format % token
         return token
@@ -280,7 +304,7 @@ class OAuth2Service(unohelper.Base,
     def execute(self, parameter):
         response, error = execute(self.Session, parameter, self.Timeout)
         if error:
-            logMessage(self.ctx, SEVERE, error, 'OAuth2Service', 'execute()')
+            logMessage(self._ctx, SEVERE, error, 'OAuth2Service', 'execute()')
             self._Warnings.append(self._getException(error))
         return response
 
@@ -294,13 +318,13 @@ class OAuth2Service(unohelper.Base,
         return Enumeration(self.Session, parameter, self.Timeout, parser)
 
     def getEnumerator(self, parameter):
-        return Enumerator(self.ctx, self.Session, parameter, self.Timeout)
+        return Enumerator(self._ctx, self.Session, parameter, self.Timeout)
 
     def getInputStream(self, parameter, chunk, buffer):
-        return InputStream(self.ctx, self.Session, parameter, chunk, buffer, self.Timeout)
+        return InputStream(self._ctx, self.Session, parameter, chunk, buffer, self.Timeout)
 
     def getUploader(self, chunk, url, user):
-        return Uploader(self.ctx, self.Session, chunk, url, user.callBack, self.Timeout)
+        return Uploader(self._ctx, self.Session, chunk, url, user.callBack, self.Timeout)
 
     def _getSession(self, version):
         print("OAuth2Service._getSession() 1 %s" % version)
@@ -334,20 +358,20 @@ class OAuth2Service(unohelper.Base,
             return True
         print("OAuth2Service._isAuthorized() 2")
         msg = "OAuth2 initialization ... AuthorizationCode needed ..."
-        parent = getParentWindow(self.ctx) if self._parent is None else self._parent
+        parent = getParentWindow(self._ctx) if self._parent is None else self._parent
         print("OAuth2Service._isAuthorized() 3")
         if self.getAuthorization(self.ResourceUrl, self.UserName, True, parent):
             print("OAuth2Service._isAuthorized() 4")
             msg += " Done"
-            logMessage(self.ctx, INFO, msg, 'OAuth2Service', '_isAuthorized()')
+            logMessage(self._ctx, INFO, msg, 'OAuth2Service', '_isAuthorized()')
             return True
         msg += " ERROR: Wizard Aborted!!!"
-        logMessage(self.ctx, SEVERE, msg, 'OAuth2Service', '_isAuthorized()')
+        logMessage(self._ctx, SEVERE, msg, 'OAuth2Service', '_isAuthorized()')
         print("OAuth2Service._isAuthorized() 5")
         return False
 
     def _getToolkit(self):
-        return createService(self.ctx, 'com.sun.star.awt.Toolkit')
+        return createService(self._ctx, 'com.sun.star.awt.Toolkit')
 
     def _isDocument(self, frame):
         controller = frame.getController()
@@ -371,3 +395,21 @@ class OAuth2Service(unohelper.Base,
 g_ImplementationHelper.addImplementation(OAuth2Service,
                                          g_ImplementationName,
                                         (g_ImplementationName,))
+
+
+class DispatchListener(unohelper.Base,
+                       XDispatchResultListener):
+    def __init__(self, manager):
+        self._manager = manager
+
+    # XDispatchResultListener
+    def dispatchFinished(self, notification):
+        try:
+            if notification.State == SUCCESS:
+                self._manager.dispatchFinished(notification.Result)
+        except Exception as e:
+            msg = "Error: %s" % traceback.print_exc()
+            print(msg)
+
+    def disposing(self, source):
+        pass
