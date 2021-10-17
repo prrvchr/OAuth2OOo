@@ -19,13 +19,13 @@ Because it is together that we can make Free Software smarter.
 
 ## Uno OAuth2.0 API for LibreOffice / OpenOffice.
 
-![OAuth2OOo Wizard Page1 screenshot](OAuth2Wizard1.png)
+![OAuth2OOo Wizard Page1 screenshot](img/OAuth2Wizard1.png)
 
-![OAuth2OOo Wizard Page2 screenshot](OAuth2Wizard2.png)
+![OAuth2OOo Wizard Page2 screenshot](img/OAuth2Wizard2.png)
 
-![OAuth2OOo Wizard Page3 screenshot](OAuth2Wizard3.png)
+![OAuth2OOo Wizard Page3 screenshot](img/OAuth2Wizard3.png)
 
-![OAuth2OOo Wizard Page4 screenshot](OAuth2Wizard4.png)
+![OAuth2OOo Wizard Page4 screenshot](img/OAuth2Wizard4.png)
 
 The OAuth2.0 protocol allows the connection to resource servers, after acceptance of the connection authorization, by exchange of tokens.
 
