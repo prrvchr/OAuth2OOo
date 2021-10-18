@@ -1,4 +1,4 @@
-![Logo OAuth2](https://prrvchr.github.io/OAuth2OOo/OAuth2.png)
+![Logo OAuth2](OAuth2.png)
 
 ### The OAuth2OOo configuration for: <span id="user"></span> failed.
 
