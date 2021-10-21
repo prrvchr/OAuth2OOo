@@ -1,4 +1,4 @@
-![Logo OAuth2](OAuth2.png)
+![OAuth2OOo logo](OAuth2OOo.png)
 
 ### The OAuth2OOo configuration for: <span id="user"></span> failed.
 

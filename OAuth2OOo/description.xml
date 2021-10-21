@@ -55,8 +55,8 @@
         <name lang="en-US">OAuth2OOo</name>
     </display-name>
     <icon>
-        <default xlink:href="OAuth2OOo/OAuth2.png"/>
-        <high-contrast xlink:href="OAuth2OOo/OAuth2.png"/>
+        <default xlink:href="OAuth2OOo/OAuth2OOo.png"/>
+        <high-contrast xlink:href="OAuth2OOo/OAuth2OOo.png"/>
     </icon>
     <extension-description>
         <src xlink:href="description/desc_en.txt" lang="en-US"/>

@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo](img/OAuth2.png) OAuth2OOo
+# ![OAuth2OOo logo](img/OAuth2OOo.png) OAuth2OOo
 
 **This [document](https://prrvchr.github.io/OAuth2OOo) in English.**
 
