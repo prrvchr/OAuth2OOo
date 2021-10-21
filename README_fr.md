@@ -1,3 +1,5 @@
+# OAuth2OOo ![OAuth2OOo logo](OAuth2OOo/OAuth2OOo/OAuth2.png)
+
 **This [document](https://prrvchr.github.io/OAuth2OOo) in English.**
 
 **L'utilisation de ce logiciel vous soumet à nos** [**Conditions d'utilisation**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_fr) **et à notre** [**Politique de protection des données**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_fr).

@@ -1,3 +1,5 @@
+# OAuth2OOo ![OAuth2OOo logo](OAuth2OOo/OAuth2OOo/OAuth2.png)
+
 **Ce [document](https://prrvchr.github.io/OAuth2OOo/README_fr) en français.**
 
 **The use of this software subjects you to our** [**Terms Of Use**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_en) **and** [**Data Protection Policy**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_en).
