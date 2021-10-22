@@ -1,8 +1,8 @@
+# ![OAuth2OOo logo](https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png) OAuth2OOo - Conditions d'utilisation
+
 **L'utilisation de ce logiciel vous soumet également à nos [Règles de Confidentialité](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_fr).**
 
 Concernant l'installation, la configuration et l'utilisation, veuillez consulter la [documentation](https://prrvchr.github.io/OAuth2OOo/README_fr).
-
-# Conditions d'utilisation
 
 ## Introduction:
 

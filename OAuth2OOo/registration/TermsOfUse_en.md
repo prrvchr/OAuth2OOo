@@ -1,8 +1,8 @@
+# ![OAuth2OOo logo](https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png) OAuth2OOo - Terms Of Use
+
 **Use of this software also subjects you to our [Data Protection Policy](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_en).**
 
 Regarding installation, configuration and use, please consult the [documentation](https://prrvchr.github.io/OAuth2OOo).
-
-# Terms Of Use
 
 ## Introduction:
 
