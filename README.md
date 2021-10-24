@@ -40,7 +40,7 @@ No more password is stored in LibreOffice / OpenOffice.
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the [OAuth2OOo.oxt](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt) extension version 0.0.5.
+- Install the ![OAuth2OOo logo](img/OAuth2OOo.png) **[OAuth2OOo.oxt](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt)** extension version 0.0.5.
 
 - Restart LibreOffice / OpenOffice after installation.
 
