@@ -11,6 +11,7 @@ ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/RestRequestEnumerator
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/RestRequestParameter
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/OAuth2Request
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/XRestKeyMap
+${Path}/merge_rdb.sh ${OOoPath} com/sun/star/rest/XRequestResponse
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/XRestDataParser
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/XRestRequest
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/XRestEnumeration

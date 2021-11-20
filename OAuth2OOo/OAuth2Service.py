@@ -61,6 +61,7 @@ from unolib import getInterfaceTypes
 from unolib import getParentWindow
 from unolib import getPropertyValueSet
 
+from oauth2 import Response
 from oauth2 import Request
 from oauth2 import Enumeration
 from oauth2 import Enumerator
@@ -206,6 +207,9 @@ class OAuth2Service(unohelper.Base,
         self._SessionMode = getSessionMode(self._ctx, host)
         return self._SessionMode != ONLINE
 
+    def unquoteUrl(self, url):
+        return requests.utils.unquote(url)
+
     def initializeUrl(self, url):
         self.Setting.Url.Id = url
         return self.Setting.Url.Initialized
@@ -310,6 +314,9 @@ class OAuth2Service(unohelper.Base,
 
     def getRequest(self, parameter, parser):
         return Request(self.Session, parameter, self.Timeout, parser)
+
+    def getResponse(self, parameter, parser):
+        return Response(self.Session, parameter, self.Timeout, parser)
 
     def getIterator(self, parameter, parser):
         return Iterator(self.Session, self.Timeout, parameter, parser)

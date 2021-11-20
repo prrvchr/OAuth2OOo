@@ -38,14 +38,15 @@ from .oauth2setting import OAuth2Setting
 from .wizard import Wizard
 from .wizardcontroller import WizardController
 
+from .request import Response
 from .request import Request
 from .request import Enumeration
 from .request import Enumerator
 from .request import Iterator
 from .request import InputStream
 from .request import Uploader
-from .request import getSessionMode
 from .request import getConnectionMode
+from .request import getSessionMode
 from .request import execute
 
 from .oauth2tools import getActivePath

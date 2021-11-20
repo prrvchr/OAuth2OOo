@@ -47,6 +47,7 @@ from com.sun.star.connection import NoConnectException
 from com.sun.star.auth import XRestUploader
 from com.sun.star.auth import XRestEnumeration
 from com.sun.star.auth import XRestRequest
+from com.sun.star.rest import XRequestResponse
 from com.sun.star.auth.RestRequestTokenType import TOKEN_NONE
 from com.sun.star.auth.RestRequestTokenType import TOKEN_URL
 from com.sun.star.auth.RestRequestTokenType import TOKEN_REDIRECT
@@ -80,6 +81,80 @@ def getSessionMode(ctx, host, port=80):
         connection.close()
         mode = ONLINE
     return mode
+
+
+class Response(unohelper.Base,
+               XRequestResponse):
+    def __init__(self, session, parameter, timeout, parser=None):
+        self._parser = parser
+        self._name = parameter.Name
+        kwargs = _getKeyWordArguments(parameter)
+        self._response = session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
+        print("Response.__init__() 1 \n%s\n%s" % (self._response.request.headers, self._response.request.body))
+        print("Response.__init__() 2 \n%s\n%s" % (self._response.headers, self._response.content))
+        self._closed = False
+
+    def __del__(self):
+        self.close()
+
+    @property
+    def Name(self):
+        return self._name
+    @property
+    def Method(self):
+        return self._response.request.method
+    @property
+    def StatusCode(self):
+        return self._response.status_code
+    @property
+    def ApparentEncoding(self):
+        return self._response.apparent_encoding
+    @property
+    def Encoding(self):
+        encoding = self._response.encoding
+        return '' if encoding is None else encoding
+    @Encoding.setter
+    def Encoding(self, encoding):
+        self._response.encoding = encoding
+    @property
+    def Text(self):
+        return self._response.text
+    @property
+    def Content(self):
+        return uno.ByteSequence(self._response.content)
+    @property
+    def Data(self):
+        result = None
+        if self._parser is not None and self._parser.DataType.lower() != 'json':
+            result = self._parser.parseResponse(self._response.content)
+        return result
+    @property
+    def Json(self):
+        if self._parser is not None and self._parser.DataType.lower() == 'json':
+            keymap = KeyMap(self._response.json(object_pairs_hook=self._parser.parseResponse))
+        else:
+            keymap = KeyMap(self._response.json())
+        return keymap
+    @property
+    def Ok(self):
+        return self._response.ok
+    @property
+    def IsPermanentRedirect(self):
+        return self._response.is_permanent_redirect
+    @property
+    def IsRedirect(self):
+        return self._response.is_redirect
+    @property
+    def Elapsed(self):
+        return self._response.elapsed
+
+    def getHeader(self, header):
+        return self._response.headers.get(header, '')
+
+    def close(self):
+        if not self._closed:
+            self._response.close()
+            self._closed = True
 
 
 class Iterator(unohelper.Base,
@@ -173,24 +248,27 @@ def execute(session, parameter, timeout, parser=None):
     with session as s:
         try:
             with s.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs) as r:
+                print("request.execute() 1 \n%s" % r.text)
                 r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             error = e.args[0]
-            print ("Http Error:", error)
+            print("Http Error:", error)
             #error = "Request: %s - ERROR: %s - %s" % (parameter.Name, r.status_code, r.text)
         except requests.exceptions.ConnectionError as e:
             cause = e.args[0]
             error = str(cause.args[0])
-            print ("Error Connecting:", error)
+            print("Error Connecting:", error)
         except requests.exceptions.Timeout as e:
             cause = e.args[0]
             error = str(cause.args[0])
-            print ("Timeout Error:", error)
+            print("Timeout Error:", error)
         except requests.exceptions.RequestException as e:
             cause = e.args[0]
             error = str(cause.args[0])
-            print ("OOps: Something Else", error)
+            print("OOps: Something Else", error)
         else:
+            print("request.execute() 2 \n%s\n%s" % (r.request.headers, r.request.body))
+            print("request.execute() 3 \n%s\n%s" % (r.headers, r.content))
             if parser is None:
                 response.Value = _parseResponse(r)
                 response.IsPresent = True
@@ -592,11 +670,13 @@ def _getKeyWordArguments(parameter):
     if parameter.Query:
         kwargs['params'] = json.loads(parameter.Query)
     if parameter.Data:
-        kwargs['data'] = json.loads(parameter.Data)
-    if parameter.Json:
+        kwargs['data'] = parameter.Data
+    elif parameter.Json:
         kwargs['json'] = json.loads(parameter.Json)
     if parameter.NoAuth:
         kwargs['auth'] = NoOAuth2()
+    elif parameter.Auth:
+        kwargs['auth'] = parameter.Auth
     if parameter.NoRedirect:
         kwargs['allow_redirects'] = False
     if parameter.NoVerify:

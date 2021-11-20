@@ -18,6 +18,7 @@ struct RestRequestParameter
     string Optional;
     ::com::sun::star::auth::RestRequestEnumerator Enumerator;
     boolean NoAuth;
+    sequence<string> Auth;
     boolean NoRedirect;
     boolean NoVerify;
 
