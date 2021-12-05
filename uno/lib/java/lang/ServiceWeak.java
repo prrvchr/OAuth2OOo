@@ -1,7 +1,4 @@
-#!
-# -*- coding: utf_8 -*-
-
-"""
+/*
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
 ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
@@ -25,18 +22,41 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
-"""
+*/
+package io.github.prrvchr.comp.lang;
 
-from .logmanager import LogManager
-from .logger import Pool
-from .logger import Logger
-from .handler import LogHandler
+import com.sun.star.lib.uno.helper.WeakBase;
 
-from .log import clearLogger
-from .log import getLoggerUrl
-from .log import getLoggerSetting
-from .log import getMessage
-from .log import isDebugMode
-from .log import logMessage
-from .log import setDebugMode
-from .log import setLoggerSetting
+
+public abstract class ServiceWeak
+extends WeakBase
+implements com.sun.star.lang.XServiceInfo
+{
+	public abstract String _getImplementationName();
+	public abstract String[] _getServiceNames();
+
+
+	// com.sun.star.lang.XServiceInfo:
+	@Override
+	public String getImplementationName()
+	{
+		String name = _getImplementationName();
+		return ServiceInfo.getImplementationName(name);
+	}
+
+	@Override
+	public String[] getSupportedServiceNames()
+	{
+		String[] services = _getServiceNames();
+		return ServiceInfo.getSupportedServiceNames(services);
+	}
+
+	@Override
+	public boolean supportsService(String service)
+	{
+		String[] services = _getServiceNames();
+		return ServiceInfo.supportsService(services, service);
+	}
+
+
+}
