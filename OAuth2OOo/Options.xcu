@@ -46,6 +46,11 @@
                 <value>Google Mail</value>
             </prop>
         </node>
+        <node oor:name="imap.gmail.com" oor:op="fuse">
+            <prop oor:name="Scope">
+                <value>Google Mail</value>
+            </prop>
+        </node>
         <node oor:name="smtp-mail.outlook.com" oor:op="fuse">
             <prop oor:name="Scope">
                 <value>Microsoft Mail Send</value>
