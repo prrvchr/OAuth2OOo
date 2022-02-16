@@ -63,7 +63,7 @@
                 <value>Google</value>
             </prop>
             <prop oor:name="Values">
-                <value>https://mail.google.com/</value>
+                <value>https://www.googleapis.com/auth/gmail.modify</value>
             </prop>
         </node>
         <node oor:name="Microsoft Mail Send" oor:op="fuse">
