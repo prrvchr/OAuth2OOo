@@ -2,6 +2,6 @@
 
 ### Welcome to OAuth2OOo configuration for: <span id="user"></span>.
 
-<button name="button" onclick="window.location.href='https://www.google.com';">Click me</button>
+<button id="button">Click me</button>
 
 <script type="text/javascript" src="google.js"></script>
