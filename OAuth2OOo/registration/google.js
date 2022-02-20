@@ -10,4 +10,4 @@ function getParameter(name, value) {
 }
 
 document.getElementById('user').innerHTML = getParameter('user', '');
-document.getElementById('button').setAttribute('onclick',"window.location.href='https://www.google.com';")
+document.getElementById('button').setAttribute('onclick', "window.location.href='" + getParameter('url', '') + "';")
