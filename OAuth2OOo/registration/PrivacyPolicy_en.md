@@ -18,6 +18,8 @@ For simplicity, in the rest of this document, will be named:
 
 This policy, in addition to `OAuth2OOo`, also applies to all `Extension` that use `OAuth2OOo` software services.
 
+Although **OAuth2OOo does not share or transfer any data to any other application**, if you are using `OAuth2OOo` with a Google account, then `OAuth2OOo` adhere to [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), including the Limited Use requirements.
+
 ## Contact:
 
 In any case, it is possible to contact the person responsible for data processing at:

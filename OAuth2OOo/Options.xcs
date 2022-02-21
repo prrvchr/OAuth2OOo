@@ -66,7 +66,7 @@
         <prop oor:name="ConnectTimeout" oor:type="xs:short" />
         <prop oor:name="ReadTimeout" oor:type="xs:short" />
         <prop oor:name="HandlerTimeout" oor:type="xs:short" />
-        <prop oor:name="BaseUrl" oor:type="xs:string" />
+        <prop oor:name="BaseUrl" oor:type="xs:string" oor:localized="true" />
         <set oor:name="Urls" oor:node-type="UrlSet" />
         <set oor:name="Scopes" oor:node-type="ScopeSet" />
         <set oor:name="Providers" oor:node-type="ProviderSet" />
