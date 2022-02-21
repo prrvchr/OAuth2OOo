@@ -63,7 +63,7 @@ def getAuthorizationStr(ctx, configuration, uuid):
     arguments = _getUrlArguments(parameters)
     url = '%s?%s' % (main, arguments)
     if configuration.Url.Scope.Provider.SignIn:
-        main = configuration.BaseUrl % configuration.Url.Scope.Provider.Id
+        main = _getSignInUrl(configuration)
         parameters = _getBaseUrlParameters(configuration, url)
         arguments = _getUrlArguments(parameters)
         url = '%s?%s' % (main, arguments)
@@ -89,10 +89,13 @@ def getAuthorizationUrl(ctx, configuration, uuid):
     return url
 
 def _getAuthorizationUrl(configuration, redirect):
-    page = '%sSignIn' % configuration.Url.Scope.Provider.Id
-    main = configuration.BaseUrl % page
+    main = _getSignInUrl(configuration)
     parameters = urlencode(_getBaseUrlParameters(configuration, redirect))
     return '%s?%s' % (main, parameters)
+
+def _getSignInUrl(configuration):
+    page = '%sSignIn' % configuration.Url.Scope.Provider.Id
+    return configuration.BaseUrl % page
 
 def updatePageTokenUI(window, configuration, strings):
     enabled = configuration.Url.Scope.Authorized
