@@ -84,6 +84,7 @@ class WizardSetting(unohelper.Base,
         self.HandlerTimeout = self.configuration.getByName('HandlerTimeout')
         self.ConnectTimeout = self.configuration.getByName('ConnectTimeout')
         self.ReadTimeout = self.configuration.getByName('ReadTimeout')
+        self.BaseUrl = self.configuration.getByName('BaseUrl')
 
     def _getPropertySetInfo(self):
         properties = {}
@@ -464,6 +465,12 @@ class ProviderSetting(unohelper.Base,
             uri = self.redirect
         return uri
     @property
+    def SignIn(self):
+        signin = False
+        if self.Id in self.Providers:
+            signin = self.Providers[self.Id]['SignIn']
+        return signin
+    @property
     def MetaData(self):
         metadata = KeyMap()
         metadata.insertValue('ClientSecret', self.ClientSecret)
@@ -527,6 +534,7 @@ class ProviderSetting(unohelper.Base,
                                   'HttpHandler': provider.getByName('HttpHandler'),
                                   'RedirectAddress': provider.getByName('RedirectAddress'),
                                   'RedirectPort': provider.getByName('RedirectPort'),
+                                  'SignIn': provider.getByName('SignIn'),
                                   'State': 1}
 
     def _getPropertySetInfo(self):

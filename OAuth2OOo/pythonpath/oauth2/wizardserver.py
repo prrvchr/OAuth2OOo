@@ -40,7 +40,6 @@ from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
 from unolib import createService
-from unolib import getStringResource
 
 from .requests.compat import unquote_plus
 from .requests.compat import urlencode
@@ -76,7 +75,8 @@ class WizardServer(unohelper.Base,
         user = configuration.Url.Scope.Provider.User.Id
         address = configuration.Url.Scope.Provider.RedirectAddress
         port = configuration.Url.Scope.Provider.RedirectPort
-        server = Server(self.ctx, code, uuid, user, address, port, lock)
+        url = configuration.BaseUrl
+        server = Server(self.ctx, code, uuid, user, address, port, url, lock)
         timeout = configuration.HandlerTimeout
         self.watchdog = WatchDog(server, controller, timeout, lock)
         server.start()
@@ -121,7 +121,7 @@ class WatchDog(Thread):
 
 
 class Server(Thread):
-    def __init__(self, ctx, code, uuid, user, address, port, lock):
+    def __init__(self, ctx, code, uuid, user, address, port, url, lock):
         Thread.__init__(self)
         self.ctx = ctx
         self.code = code
@@ -129,6 +129,7 @@ class Server(Thread):
         self.user = user
         self.argument = 'socket,host=%s,port=%s,tcpNoDelay=1' % (address, port)
         self.acceptor = createService(self.ctx, 'com.sun.star.connection.Acceptor')
+        self.url = url
         self.lock = lock
 
     def run(self):
@@ -237,7 +238,5 @@ Connection: Closed
         return False
 
     def _getResultLocation(self, result):
-        basename = 'Success' if result else 'Error'
-        stringresource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo')
-        location = stringresource.resolveString('PageWizard3.%s.Url' % basename)
-        return location
+        basename = 'OAuth2Success' if result else 'OAuth2Error'
+        return self.url % basename

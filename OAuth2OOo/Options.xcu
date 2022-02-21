@@ -40,6 +40,10 @@
     <prop oor:name="HandlerTimeout">
         <value>120</value>
     </prop>
+    <prop oor:name="BaseUrl">
+        <value xml:lang="en">https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/%s_en</value>
+        <value xml:lang="fr">https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/%s_fr</value>
+    </prop>
     <node oor:name="Urls">
         <node oor:name="smtp.gmail.com" oor:op="fuse">
             <prop oor:name="Scope">
@@ -110,6 +114,9 @@
             <prop oor:name="RedirectPort">
                 <value>8080</value>
             </prop>
+            <prop oor:name="SignIn">
+                <value>true</value>
+            </prop>
         </node>
         <node oor:name="Microsoft" oor:op="fuse">
             <prop oor:name="ClientId">
@@ -144,6 +151,9 @@
             </prop>
             <prop oor:name="RedirectPort">
                 <value>8080</value>
+            </prop>
+            <prop oor:name="SignIn">
+                <value>false</value>
             </prop>
         </node>
     </node>

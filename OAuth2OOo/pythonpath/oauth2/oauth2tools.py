@@ -59,8 +59,15 @@ def getActivePath(configuration):
 
 def getAuthorizationStr(ctx, configuration, uuid):
     main = configuration.Url.Scope.Provider.AuthorizationUrl
-    parameters = _getUrlArguments(ctx, configuration, uuid)
-    return '%s?%s' % (main, parameters)
+    parameters = _getUrlParameters(ctx, configuration, uuid)
+    arguments = _getUrlArguments(parameters)
+    url = '%s?%s' % (main, arguments)
+    if configuration.Url.Scope.Provider.SignIn:
+        main = configuration.BaseUrl % configuration.Url.Scope.Provider.Id
+        parameters = _getBaseUrlParameters(configuration, url)
+        arguments = _getUrlArguments(parameters)
+        url = '%s?%s' % (main, arguments)
+    return url
 
 def checkUrl(ctx, configuration, uuid):
     transformer = ctx.ServiceManager.createInstance('com.sun.star.util.URLTransformer')
@@ -76,6 +83,14 @@ def openUrl(ctx, url, option=''):
 def getAuthorizationUrl(ctx, configuration, uuid):
     main = configuration.Url.Scope.Provider.AuthorizationUrl
     parameters = urlencode(_getUrlParameters(ctx, configuration, uuid))
+    url = '%s?%s' % (main, parameters)
+    if configuration.Url.Scope.Provider.SignIn:
+        url = _getAuthorizationUrl(configuration, url)
+    return url
+
+def _getAuthorizationUrl(configuration, redirect):
+    main = configuration.BaseUrl % configuration.Url.Scope.Provider.Id
+    parameters = urlencode(_getBaseUrlParameters(configuration, redirect))
     return '%s?%s' % (main, parameters)
 
 def updatePageTokenUI(window, configuration, strings):
@@ -98,9 +113,8 @@ def updatePageTokenUI(window, configuration, strings):
     window.getControl('CommandButton2').Model.Enabled = enabled
     window.getControl('CommandButton3').Model.Enabled = enabled
 
-def _getUrlArguments(ctx, configuration, uuid):
+def _getUrlArguments(parameters):
     arguments = []
-    parameters = _getUrlParameters(ctx, configuration, uuid)
     for key, value in parameters.items():
         arguments.append('%s=%s' % (key, value))
     return '&'.join(arguments)
@@ -110,6 +124,12 @@ def _getUrlParameters(ctx, configuration, uuid):
     optional = _getUrlOptionalParameters(ctx, configuration)
     option = configuration.Url.Scope.Provider.AuthorizationParameters
     parameters = _parseParameters(parameters, optional, option)
+    return parameters
+
+def _getBaseUrlParameters(configuration, redirect):
+    parameters = {}
+    parameters['user'] = configuration.Url.Scope.Provider.User.Id
+    parameters['url'] = redirect
     return parameters
 
 def _getUrlBaseParameters(configuration, uuid):

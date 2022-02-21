@@ -58,6 +58,7 @@
             <prop oor:name="HttpHandler" oor:type="xs:boolean" />
             <prop oor:name="RedirectAddress" oor:type="xs:string" />
             <prop oor:name="RedirectPort" oor:type="xs:short" />
+            <prop oor:name="SignIn" oor:type="xs:boolean" />
             <set oor:name="Users" oor:node-type="UserSet" />
         </group>
     </templates>
@@ -65,6 +66,7 @@
         <prop oor:name="ConnectTimeout" oor:type="xs:short" />
         <prop oor:name="ReadTimeout" oor:type="xs:short" />
         <prop oor:name="HandlerTimeout" oor:type="xs:short" />
+        <prop oor:name="BaseUrl" oor:type="xs:string" />
         <set oor:name="Urls" oor:node-type="UrlSet" />
         <set oor:name="Scopes" oor:node-type="ScopeSet" />
         <set oor:name="Providers" oor:node-type="ProviderSet" />
