@@ -1,4 +1,4 @@
-function getParameter(name, value) {
+export function getParameter(name, value) {
     var parameter = value,
         tmp = [];
     var items = location.search.substr(1).split('&');
@@ -8,5 +8,3 @@ function getParameter(name, value) {
     }
     return parameter;
 }
-
-document.getElementById('user').innerHTML = getParameter('user', '');

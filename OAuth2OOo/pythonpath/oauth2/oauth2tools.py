@@ -89,7 +89,8 @@ def getAuthorizationUrl(ctx, configuration, uuid):
     return url
 
 def _getAuthorizationUrl(configuration, redirect):
-    main = configuration.BaseUrl % configuration.Url.Scope.Provider.Id
+    page = '%sSignIn' % configuration.Url.Scope.Provider.Id
+    main = configuration.BaseUrl % page
     parameters = urlencode(_getBaseUrlParameters(configuration, redirect))
     return '%s?%s' % (main, parameters)
 

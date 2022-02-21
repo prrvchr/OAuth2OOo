@@ -4,4 +4,4 @@
 
 ### You can close this page.
 
-<script type="text/javascript" src="script.js"></script>
+<script type="module" src="./oauth2.js"></script>
