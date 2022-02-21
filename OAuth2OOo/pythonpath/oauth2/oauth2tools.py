@@ -64,7 +64,7 @@ def getAuthorizationStr(ctx, configuration, uuid):
     url = '%s?%s' % (main, arguments)
     if configuration.Url.Scope.Provider.SignIn:
         main = _getSignInUrl(configuration)
-        parameters = _getBaseUrlParameters(configuration, url)
+        parameters = _getSignInParameters(configuration, url)
         arguments = _getUrlArguments(parameters)
         url = '%s?%s' % (main, arguments)
     return url
@@ -85,13 +85,10 @@ def getAuthorizationUrl(ctx, configuration, uuid):
     parameters = urlencode(_getUrlParameters(ctx, configuration, uuid))
     url = '%s?%s' % (main, parameters)
     if configuration.Url.Scope.Provider.SignIn:
-        url = _getAuthorizationUrl(configuration, url)
+        main = _getSignInUrl(configuration)
+        parameters = urlencode(_getSignInParameters(configuration, url))
+        url = '%s?%s' % (main, parameters)
     return url
-
-def _getAuthorizationUrl(configuration, redirect):
-    main = _getSignInUrl(configuration)
-    parameters = urlencode(_getBaseUrlParameters(configuration, redirect))
-    return '%s?%s' % (main, parameters)
 
 def _getSignInUrl(configuration):
     page = '%sSignIn' % configuration.Url.Scope.Provider.Id
@@ -130,10 +127,10 @@ def _getUrlParameters(ctx, configuration, uuid):
     parameters = _parseParameters(parameters, optional, option)
     return parameters
 
-def _getBaseUrlParameters(configuration, redirect):
+def _getSignInParameters(configuration, url):
     parameters = {}
     parameters['user'] = configuration.Url.Scope.Provider.User.Id
-    parameters['url'] = redirect
+    parameters['url'] = url
     return parameters
 
 def _getUrlBaseParameters(configuration, uuid):
