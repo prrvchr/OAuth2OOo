@@ -23,61 +23,90 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 */
-package io.github.prrvchr.uno.helper;
+package io.github.prrvchr.uno.sdbc;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.HashMap;
+import java.util.Arrays;
 
 import com.sun.star.container.XNameAccess;
-import com.sun.star.sdbcx.XUser;
-import com.sun.star.sdbcx.XUsersSupplier;
+import com.sun.star.lib.uno.helper.WeakBase;
+import com.sun.star.sdbc.DataType;
+import com.sun.star.sdbc.SQLException;
+import com.sun.star.sdbc.XArray;
+import com.sun.star.sdbc.XResultSet;
 
+import io.github.prrvchr.uno.helper.UnoHelper;
 
-public class UsersSupplierHelper
-implements XUsersSupplier
+public class Array
+extends WeakBase
+implements XArray
 {
-	private final java.sql.Connection m_Connection;
+	private Object[] m_Array = null;
+	private String m_Type = null;
 
 	// The constructor method:
-	public UsersSupplierHelper(Connection connection)
+	public Array(java.sql.Array array)
+	throws SQLException
 	{
-		m_Connection = connection;
+		try {
+			m_Array = (Object[]) array.getArray();
+			m_Type = UnoHelper.mapSQLDataType(array.getBaseType(), array.getBaseTypeName());
+		} catch (java.sql.SQLException e) {
+			throw UnoHelper.getSQLException(e, this);
+		}
+		
+	}
+	public Array(Object[] array,
+				 String type)
+	{
+		m_Array = array;
+		m_Type = type;
 	}
 
-
-	// com.sun.star.sdbcx.XUsersSupplier:
 	@Override
-	public XNameAccess getUsers()
+	public Object[] getArray(XNameAccess arg0)
+	throws SQLException
 	{
-		ResultSet result = null;
-		String query = "SELECT * FROM INFORMATION_SCHEMA.SYSTEM_USERS";
-		try
-		{
-			Statement statement = m_Connection.createStatement();
-			result = statement.executeQuery(query);
+		return m_Array;
+	}
+
+	@Override
+	public Object[] getArrayAtIndex(int index, int count, XNameAccess map)
+	throws SQLException
+	{
+		return Arrays.copyOfRange(m_Array, index, index + count);
+	}
+
+	@Override
+	public int getBaseType()
+	throws SQLException
+	{
+		try {
+			return UnoHelper.getConstantValue(DataType.class, m_Type);
+		} catch (java.sql.SQLException e) {
+			throw UnoHelper.getSQLException(e, this);
 		}
-		catch (java.sql.SQLException e) {e.getStackTrace();}
-		if (result == null) return null;
-		@SuppressWarnings("unused")
-		String type = "com.sun.star.sdbc.XUser";
-		@SuppressWarnings("unused")
-		HashMap<String, XUser> elements = new HashMap<>();
-		try
-		{
-			int i = 1;
-			int count = result.getMetaData().getColumnCount();
-			while (result.next())
-			{
-				for (int j = 1; j <= count; j++)
-				{
-					String value = UnoHelper.getResultSetValue(result, j);
-					System.out.println("UsersSupplier.getUsers() " + i + " - " + value);
-				}
-				i++;
-			}
-		} catch (java.sql.SQLException e) {e.printStackTrace();}
+	}
+
+	@Override
+	public String getBaseTypeName()
+	throws SQLException
+	{
+		return m_Type;
+	}
+
+	@Override
+	public XResultSet getResultSet(XNameAccess arg0)
+	throws SQLException
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public XResultSet getResultSetAtIndex(int arg0, int arg1, XNameAccess arg2)
+	throws SQLException
+	{
+		// TODO Auto-generated method stub
 		return null;
 	}
 

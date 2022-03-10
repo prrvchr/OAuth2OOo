@@ -41,6 +41,9 @@ from .dbtool import getDataSource
 from .dbtool import getDataSourceCall
 from .dbtool import getDataSourceClassPath
 from .dbtool import getDataSourceConnection
+from .dbtool import getDataSourceLocation
+from .dbtool import getDataSourceInfo
+from .dbtool import getDataSourceJavaInfo
 from .dbtool import getDictFromResult
 from .dbtool import getDriverPropertyInfo
 from .dbtool import getDriverPropertyInfos
@@ -49,7 +52,9 @@ from .dbtool import getKeyMapKeyMapFromResult
 from .dbtool import getKeyMapSequenceFromResult
 from .dbtool import getObjectFromResult
 from .dbtool import getObjectSequenceFromResult
+from .dbtool import getResultValue
 from .dbtool import getRowDict
+from .dbtool import getRowValue
 from .dbtool import getSequenceFromResult
 from .dbtool import getSqlException
 from .dbtool import getTableColumns
