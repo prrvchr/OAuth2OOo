@@ -1,4 +1,4 @@
-# ![logo][1] jdbcDriverOOo - Terms Of Use
+# ![logo][1] OAuth2OOo - Terms Of Use
 
 Regarding installation, configuration and use,
 please consult the **[documentation][2]**.
