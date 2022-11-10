@@ -82,7 +82,7 @@
     <node oor:name="Providers">
         <node oor:name="Google" oor:op="fuse">
             <prop oor:name="ClientId">
-                <value>398845255454-npksu301220b4f52g3ktevk4pd9lu8t9.apps.googleusercontent.com</value>
+                <value>398845255454-oudorbmilpc9obgtivm9ts1b2991upqk.apps.googleusercontent.com</value>
             </prop>
             <prop oor:name="ClientSecret">
                 <value></value>
