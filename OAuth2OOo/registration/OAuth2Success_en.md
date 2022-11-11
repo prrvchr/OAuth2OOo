@@ -1,7 +1,9 @@
-![OAuth2OOo logo](OAuth2OOo.png)
+# ![logo][1] OAuth2OOo
 
-### The OAuth2OOo configuration for: <span id="user"></span> was successful.
+## The configuration for account: <span id="user"></span> was successful.
 
 ### You can close this page.
+
+[1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
 
 <script type="module" src="./oauth2.js"></script>
