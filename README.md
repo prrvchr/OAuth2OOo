@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo](img/OAuth2OOo.png) OAuth2OOo
+# ![OAuth2OOo logo][1] OAuth2OOo
 
 **Ce [document](https://prrvchr.github.io/OAuth2OOo/README_fr) en français.**
 
@@ -21,13 +21,13 @@ Because it is together that we can make Free Software smarter.
 
 ## Uno OAuth2.0 API for LibreOffice / OpenOffice.
 
-![OAuth2OOo Wizard Page1 screenshot](img/OAuth2Wizard1.png)
+![OAuth2OOo Wizard Page1 screenshot][2]
 
-![OAuth2OOo Wizard Page2 screenshot](img/OAuth2Wizard2.png)
+![OAuth2OOo Wizard Page2 screenshot][3]
 
-![OAuth2OOo Wizard Page3 screenshot](img/OAuth2Wizard3.png)
+![OAuth2OOo Wizard Page3 screenshot][4]
 
-![OAuth2OOo Wizard Page4 screenshot](img/OAuth2Wizard4.png)
+![OAuth2OOo Wizard Page4 screenshot][5]
 
 The OAuth2.0 protocol allows the connection to resource servers, after acceptance of the connection authorization, by exchange of tokens.
 
@@ -40,7 +40,7 @@ No more password is stored in LibreOffice / OpenOffice.
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo](img/OAuth2OOo.png) **[OAuth2OOo.oxt](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt)** extension version 0.0.5.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt)** extension version 0.0.5.
 
 - Restart LibreOffice / OpenOffice after installation.
 
@@ -113,3 +113,9 @@ I will try to solve it ;-)
 - Add new language for internationalization...
 
 - Anything welcome...
+
+[1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
+[2]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
+[3]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
+[4]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
+[5]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>

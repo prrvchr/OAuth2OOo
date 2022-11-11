@@ -1,4 +1,4 @@
-# ![logo][1] OAuth2OOo
+# ![OAuth2OOo logo][1] OAuth2OOo
 
 ## Welcome to configuration for your Google account: <span id="user"></span>
 

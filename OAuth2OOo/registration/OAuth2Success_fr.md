@@ -1,4 +1,4 @@
-# ![logo][1] OAuth2OOo
+# ![OAuth2OOo logo][1] OAuth2OOo
 
 ## La configuration pour le compte: <span id="user"></span> a réussi.
 

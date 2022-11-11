@@ -1,4 +1,4 @@
-# ![logo][1] OAuth2OOo - Conditions d'utilisation
+# ![OAuth2OOo logo][1] OAuth2OOo - Conditions d'utilisation
 
 Concernant l'installation, la configuration et l'utilisation,
 veuillez consulter la **[documentation][2]**.

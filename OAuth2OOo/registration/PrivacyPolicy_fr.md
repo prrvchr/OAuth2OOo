@@ -1,4 +1,4 @@
-# ![logo][1] OAuth2OOo - Politique de protection des données
+# ![OAuth2OOo logo][1] OAuth2OOo - Politique de protection des données
 
 **L'utilisation de ce logiciel vous soumet également à nos [Conditions d'utilisation](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_fr).**
 

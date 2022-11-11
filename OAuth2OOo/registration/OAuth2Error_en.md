@@ -1,4 +1,4 @@
-# ![logo][1] OAuth2OOo
+# ![OAuth2OOo logo][1] OAuth2OOo
 
 ## The configuration for account: <span id="user"></span> failed.
 
