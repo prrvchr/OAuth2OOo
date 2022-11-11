@@ -1,6 +1,6 @@
 # ![OAuth2OOo logo][1] OAuth2OOo - Conditions d'utilisation
 
-**L'utilisation de ce logiciel vous soumet également à nos [Politique de protection des données][2].**
+**L'utilisation de ce logiciel vous soumet également à notre [Politique de protection des données][2].**
 
 Concernant l'installation, la configuration et l'utilisation, veuillez consulter la **[documentation][3]**.
 
