@@ -1,6 +1,6 @@
 # ![OAuth2OOo logo][1] OAuth2OOo
 
-## Welcome to configuration for your Google account: <span id="user"></span>
+**Welcome to configuration for your Google account: <span id="user"></span>**
 
 Although **OAuth2OOo does not share or transfer any data to any other application**, OAuth2OOo adhere to [Google API Services User Data Policy][2], including the Limited Use requirements.
 
