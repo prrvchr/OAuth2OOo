@@ -2,7 +2,7 @@
 
 **Use of this software also subjects you to our [Terms Of Use][2].**
 
-Regarding installation, configuration and use, please consult the [documentation][3].
+Regarding installation, configuration and use, please consult the **[documentation][3]**.
 
 ## Introduction:
 

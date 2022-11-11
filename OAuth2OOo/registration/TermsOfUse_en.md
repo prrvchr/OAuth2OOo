@@ -19,9 +19,9 @@ but **WITHOUT ANY WARRANTY**; without even the implied warranty of
 OAuth2OOo is free software; you can redistribute it and/or
 modify it under the terms of either (at your option):
 
-- The [Mozilla Public License version 2.0][4].
+- The **[Mozilla Public License version 2.0][4]**.
 
-- The GNU [Lesser General Public License][5] as published by the Free Software
+- The GNU **[Lesser General Public License][5]** as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later version.
 
 [1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>

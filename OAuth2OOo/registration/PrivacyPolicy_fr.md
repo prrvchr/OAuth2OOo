@@ -2,7 +2,7 @@
 
 **L'utilisation de ce logiciel vous soumet également à nos [Conditions d'utilisation][2].**
 
-Concernant l'installation, la configuration et l'utilisation, veuillez consulter la [documentation][3].
+Concernant l'installation, la configuration et l'utilisation, veuillez consulter la **[documentation][3]**.
 
 ## Introduction:
 
