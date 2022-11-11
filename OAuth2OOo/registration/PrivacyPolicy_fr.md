@@ -6,7 +6,7 @@ Concernant l'installation, la configuration et l'utilisation, veuillez consulter
 
 ## Introduction:
 
-La confidentialité des utilisateurs du logiciel OAuth2OOo est très importante pour nous et nous nous engageons à la protéger.
+La confidentialité des données des utilisateurs du logiciel OAuth2OOo est très importante pour nous et nous nous engageons à la protéger.
 
 Cette politique explique ce que nous faisons avec vos informations personnelles.
 

@@ -6,7 +6,7 @@ Regarding installation, configuration and use, please consult the **[documentati
 
 ## Introduction:
 
-the privacy of our OAuth2OOo software users is very important to us, and we are commited to safeguarding it.
+The privacy of OAuth2OOo software user data is very important to us and we are committed to protecting it.
 
 This policy explains what we do with your personal information.
 
