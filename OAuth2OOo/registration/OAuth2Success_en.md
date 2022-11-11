@@ -2,7 +2,7 @@
 
 **The configuration for account: <span id="user"></span> was successful.**
 
-### You can close this page.
+**You can close this page.**
 
 [1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
 

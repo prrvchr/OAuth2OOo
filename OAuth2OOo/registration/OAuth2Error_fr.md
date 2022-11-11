@@ -2,7 +2,7 @@
 
 **La configuration pour le compte: <span id="user"></span> a échoué.**
 
-### Vous pouvez fermer cette page.
+**Vous pouvez fermer cette page.**
 
 [1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
 
