@@ -11,14 +11,14 @@ La confidentialité des données des utilisateurs du logiciel OAuth2OOo est trè
 Cette politique explique ce que nous faisons avec vos informations personnelles.
 
 Pour plus de simplicité, dans la suite de ce document, on nommera:
-- `Utilisateur`: l'utilisateur du logiciel OAuth2OOo.
 - `OAuth2OOo`: le logiciel OAuth2OOo dans son intégralité.
-- `Extension`:  toutes les extensions installées sous Libre/OpenOffice et utilisant les services logiciels OAuth2OOo.
+- `Utilisateur`: l'utilisateur du logiciel `OAuth2OOo`.
+- `Extension`:  toutes les extensions installées sous LibreOffice et/ou OpenOffice et utilisant les services logiciels `OAuth2OOo`.
 - `Fournisseur`: fournisseur de services Internet fournissant des jetons OAuth2 à `OAuth2OOo` et/ou des services Internet à `Extension`.
 
 Cette politique, en plus de `OAuth2OOo`, s’applique également à toutes les `Extension` utilisant des services logiciels de `OAuth2OOo`.
 
-Bien que **OAuth2OOo ne partage ni ne transfert aucun données avec toutes autre application**, si vous utilisez `OAuth2OOo` avec un compte Google, alors `OAuth2OOo` respecte [la politique de données utilisateur des services API Google](https://developers.google.com/terms/api-services-user-data-policy), y compris les exigences d'utilisation limitée.
+Bien que **OAuth2OOo ne partage ni ne transfert aucun données avec toutes autre application**, si vous utilisez `OAuth2OOo` avec un compte Google, alors `OAuth2OOo` respecte [la politique de données utilisateur des services API Google][4], y compris les exigences d'utilisation limitée.
 
 ## Contact:
 
@@ -63,3 +63,4 @@ Le `Fournisseur` est seul responsable de l'expiration des données qu'il collect
 [1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
 [2]: <https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_fr>
 [3]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
+[4]: <https://developers.google.com/terms/api-services-user-data-policy?hl=fr>

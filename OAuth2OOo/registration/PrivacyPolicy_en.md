@@ -11,14 +11,14 @@ The privacy of OAuth2OOo software user data is very important to us and we are c
 This policy explains what we do with your personal information.
 
 For simplicity, in the rest of this document, will be named:
-- `User`: the user of the OAuth2OOo software.
 - `OAuth2OOo`: the OAuth2OOo software in its entirety.
-- `Extension`: all extensions installed under Libre/OpenOffice and using OAuth2OOo software services.
+- `User`: the user of the `OAuth2OOo` software.
+- `Extension`: all extensions installed under LibreOffice and/or OpenOffice and using `OAuth2OOo` software services.
 - `Supplier`: the internet service provider delivering the OAuth2 tokens to `OAuth2OOo` and/or internet services to `Extension`.
 
 This policy, in addition to `OAuth2OOo`, also applies to all `Extension` that use `OAuth2OOo` software services.
 
-Although **OAuth2OOo does not share or transfer any data to any other application**, if you are using `OAuth2OOo` with a Google account, then `OAuth2OOo` adhere to [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), including the Limited Use requirements.
+Although **OAuth2OOo does not share or transfer any data to any other application**, if you are using `OAuth2OOo` with a Google account, then `OAuth2OOo` adhere to [Google API Services User Data Policy][4], including the Limited Use requirements.
 
 ## Contact:
 
@@ -63,3 +63,4 @@ Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject yo
 [1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
 [2]: <https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_en>
 [3]: <https://prrvchr.github.io/OAuth2OOo>
+[4]: <https://developers.google.com/terms/api-services-user-data-policy?hl=en>
