@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo](https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png) OAuth2OOo - Data Protection Policy
+# ![logo][1] OAuth2OOo - Data Protection Policy
 
 **Use of this software also subjects you to our [Terms Of Use](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_en).**
 
@@ -59,3 +59,5 @@ It is the responsibility of the `User` to uninstall `OAuth2OOo` and/or `Extensio
 Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to review this Policy from the `Supplier` website.
 
 `Supplier` is solely responsible for the expiration of the data it collects as described in its Policy.
+
+[1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
