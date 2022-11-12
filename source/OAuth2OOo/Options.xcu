@@ -41,8 +41,8 @@
         <value>120</value>
     </prop>
     <prop oor:name="BaseUrl">
-        <value xml:lang="en">https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/%s_en</value>
-        <value xml:lang="fr">https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/%s_fr</value>
+        <value xml:lang="en">https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/%s_en</value>
+        <value xml:lang="fr">https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/%s_fr</value>
     </prop>
     <node oor:name="Urls">
         <node oor:name="smtp.gmail.com" oor:op="fuse">
