@@ -1,33 +1,33 @@
 # ![OAuth2OOo logo][1] OAuth2OOo
 
-**This [document](https://prrvchr.github.io/OAuth2OOo) in English.**
+**This [document][2] in English.**
 
-**L'utilisation de ce logiciel vous soumet à nos** [**Conditions d'utilisation**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/TermsOfUse_fr) **et à notre** [**Politique de protection des données**](https://prrvchr.github.io/OAuth2OOo/OAuth2OOo/registration/PrivacyPolicy_fr).
+**L'utilisation de ce logiciel vous soumet à nos** [**Conditions d'utilisation**][3] **et à notre** [**Politique de protection des données**][4].
 
-# version [0.0.5](https://prrvchr.github.io/OAuth2OOo/README_fr#historique)
+# version [0.0.5][5]
 
 ## Introduction:
 
-**OAuth2OOo** fait partie d'une [Suite](https://prrvchr.github.io/README_fr) d'extensions [LibreOffice](https://fr.libreoffice.org/download/telecharger-libreoffice/) et/ou [OpenOffice](https://www.openoffice.org/fr/Telecharger/) permettant de vous offrir des services inovants dans ces suites bureautique.  
+**OAuth2OOo** fait partie d'une [Suite][6] d'extensions [LibreOffice][7] et/ou [OpenOffice][8] permettant de vous offrir des services inovants dans ces suites bureautique.  
 Cette extension est l'implémentation du protocole OAuth 2.0. Protocole permettant d'obtenir votre consentement pour qu'une application puisse accéder à vos données présentes chez les GAFA.
 
 Etant un logiciel libre je vous encourage:
-- A dupliquer son [code source](https://github.com/prrvchr/OAuth2OOo).
+- A dupliquer son [code source][9].
 - A apporter des modifications, des corrections, des ameliorations.
-- D'ouvrir un [dysfonctionnement](https://github.com/prrvchr/OAuth2OOo/issues/new) si nécessaire.
+- D'ouvrir un [dysfonctionnement][10] si nécessaire.
 
 Bref, à participer au developpement de cette extension.
 Car c'est ensemble que nous pouvons rendre le Logiciel Libre plus intelligent.
 
 ## Uno OAuth2.0 API pour LibreOffice / OpenOffice.
 
-![OAuth2OOo Wizard Page1 screenshot][2]
+![OAuth2OOo Wizard Page1 screenshot][11]
 
-![OAuth2OOo Wizard Page2 screenshot][3]
+![OAuth2OOo Wizard Page2 screenshot][12]
 
-![OAuth2OOo Wizard Page3 screenshot][4]
+![OAuth2OOo Wizard Page3 screenshot][13]
 
-![OAuth2OOo Wizard Page4 screenshot][5]
+![OAuth2OOo Wizard Page4 screenshot][14]
 
 Le protocole OAuth2.0 permet la connexion aux ressources de serveurs, après acceptation de l'autorisation de connexion, par échange de jetons.
 
@@ -40,7 +40,7 @@ Plus aucun mot de passe n'est stocké dans LibreOffice / OpenOffice.
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt](https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt)** version 0.0.5.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][15]** version 0.0.5.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -86,16 +86,16 @@ La valeur renvoyée:: `initialized` est True si `registered_url` et/ou `user_acc
 * LibreOffice 6.4.4.2 (x64) - Windows 7 SP1
 
 Je vous encourage en cas de problème :-(  
-de créer un [dysfonctionnement](https://github.com/prrvchr/OAuth2OOo/issues/new)  
+de créer un [dysfonctionnement][10]  
 J'essaierai de la résoudre ;-)
 
 ## Historique:
 
 ### Ce qui a été fait pour la version 0.0.5:
 
-- Ecriture d'une nouvelle interface [XWizard](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py) afin de remplacer le service Wizard devenu défectueux avec les versions 6.4.x et 7.x de LibreOffice (voir [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
+- Ecriture d'une nouvelle interface [XWizard][16] afin de remplacer le service Wizard devenu défectueux avec les versions 6.4.x et 7.x de LibreOffice (voir [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
 
-    Cette nouvelle interface corrige également le [bug 132661](https://bugs.documentfoundation.org/show_bug.cgi?id=132661) et le [bug 132666](https://bugs.documentfoundation.org/show_bug.cgi?id=132666) et permet d'accéder aux versions 6.4.x et 7.x de LibreOffice...
+    Cette nouvelle interface corrige également le [bug 132661][17] et le [bug 132666][18] et permet d'accéder aux versions 6.4.x et 7.x de LibreOffice...
 
     De plus, ce nouveau XWizard ajoute de nouvelles fonctionnalités telles que:
 
@@ -108,14 +108,27 @@ J'essaierai de la résoudre ;-)
 
 ### Que reste-t-il à faire pour la version 0.0.5:
 
-- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard](https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py).
+- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][16].
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
 - Tout ce qui est bienvenu...
 
 [1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
-[2]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
-[3]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
-[4]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
-[5]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>
+[2]: <https://prrvchr.github.io/OAuth2OOo>
+[3]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
+[4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr>
+[5]: <https://prrvchr.github.io/OAuth2OOo/README_fr#historique>
+[6]: <https://prrvchr.github.io/README_fr>
+[7]: <https://fr.libreoffice.org/download/telecharger-libreoffice/>
+[8]: <https://www.openoffice.org/fr/Telecharger/>
+[9]: <https://github.com/prrvchr/OAuth2OOo>
+[10]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
+[11]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
+[12]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
+[13]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
+[14]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>
+[15]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
+[16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
+[17]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
+[18]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
