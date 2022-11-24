@@ -1,4 +1,7 @@
-/*
+#!
+# -*- coding: utf_8 -*-
+
+"""
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
 ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
@@ -22,53 +25,71 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
-*/
-package io.github.prrvchr.uno.lang;
+"""
 
-import java.util.Map;
+import uno
+import unohelper
 
-import com.sun.star.beans.Property;
-import com.sun.star.lang.XServiceInfo;
+from com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import SEVERE
 
-import io.github.prrvchr.uno.beans.PropertySet;
+from com.sun.star.ucb import XRestUser
 
+from .unolib import KeyMap
 
-public abstract class ServiceProperty
-extends PropertySet
-implements XServiceInfo
-{
-    private final String m_name;
-    private final String[] m_services;
+from .oauth2tool import getRequest
 
-    // The constructor method:
-    public ServiceProperty(String name,
-                           String[] services,
-                           Map<String, Property> properties)
-    {
-        super(properties);
-        m_name = name;
-        m_services = services;
-    }
+from .database import DataBase
+
+from .logger import logMessage
+from .logger import getMessage
+g_message = 'user'
+
+import traceback
 
 
-    // com.sun.star.lang.XServiceInfo:
-    @Override
-    public String getImplementationName()
-    {
-        return ServiceInfo.getImplementationName(m_name);
-    }
+class User(unohelper.Base,
+           XRestUser):
+    def __init__(self, ctx, source=None, name=None, database=None):
+        self.ctx = ctx
+        self.DataBase = database
+        # Uri with Scheme but without a Path generate invalid user but we need
+        # to return an Identifier, and raise an 'IllegalIdentifierException'
+        # when ContentProvider try to get the Content...
+        # (ie: ContentProvider.queryContent() -> Identifier.getContent())
+        if source is None:
+            self.Provider = None
+            self.Request = None
+            self.MetaData = KeyMap()
+        else:
+            self.Provider = source.Provider
+            self.Request = getRequest(self.ctx, self.Provider.Scheme, name)
+            self.MetaData = source.DataBase.selectUser(name)
+            self.CanAddChild = not self.Provider.GenerateIds
+        msg = getMessage(self.ctx, g_message, 101)
+        logMessage(self.ctx, INFO, msg, "User", "__init__()")
 
-    @Override
-    public String[] getSupportedServiceNames()
-    {
-        return ServiceInfo.getSupportedServiceNames(m_services);
-    }
+    @property
+    def Id(self):
+        return self.MetaData.getDefaultValue('UserId', None)
+    @property
+    def Name(self):
+        return self.MetaData.getDefaultValue('UserName', None)
+    @property
+    def RootId(self):
+        return self.MetaData.getDefaultValue('RootId', None)
+    @property
+    def RootName(self):
+        return self.MetaData.getDefaultValue('RootName', None)
+    @property
+    def Token(self):
+        return self.MetaData.getDefaultValue('Token', '')
 
-    @Override
-    public boolean supportsService(String service)
-    {
-        return ServiceInfo.supportsService(m_services, service);
-    }
-
-
-}
+    # XRestUser
+    def isValid(self):
+        return self.Id is not None
+    def setDataBase(self, datasource, password, sync):
+        name, password = self.getCredential(password)
+        self.DataBase = DataBase(self.ctx, datasource, name, password, sync)
+    def getCredential(self, password):
+        return self.Name, password

@@ -1,4 +1,7 @@
-/*
+#!
+# -*- coding: utf-8 -*-
+
+"""
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
 ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
@@ -22,50 +25,17 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
-*/
-package io.github.prrvchr.uno.lang;
+"""
 
-import com.sun.star.lib.uno.helper.ComponentBase;
-
-import com.sun.star.lang.XServiceInfo;
-
-
-public abstract class ServiceComponent
-extends ComponentBase
-implements XServiceInfo
-{
-    private final String m_name;
-    private final String[] m_services;
-
-
-    // The constructor method:
-    public ServiceComponent(String name,
-                            String[] services)
-    {
-        super();
-        m_name = name;
-        m_services = services;
-    }
-
-
-    // com.sun.star.lang.XServiceInfo:
-    @Override
-    public String getImplementationName()
-    {
-        return ServiceInfo.getImplementationName(m_name);
-    }
-
-    @Override
-    public String[] getSupportedServiceNames()
-    {
-        return ServiceInfo.getSupportedServiceNames(m_services);
-    }
-
-    @Override
-    public boolean supportsService(String service)
-    {
-        return ServiceInfo.supportsService(m_services, service);
-    }
-
-
-}
+# DataSource configuration
+g_protocol = 'xdbc:hsqldb:'
+g_folder = 'hsqldb'
+g_path = 'hsqldb'
+g_jar = 'hsqldb.jar'
+g_class = 'org.hsqldb.jdbcDriver'
+g_options = ';default_schema=true;hsqldb.default_table_type=cached;get_column_name=false;ifexists=false'
+g_shutdown = ';shutdown=true'
+g_csv = '%s.csv;fs=|;ignore_first=true;encoding=UTF-8;quoted=true'
+g_version = '2.5.0'
+g_role = 'FrontOffice'
+g_dba = 'AD'

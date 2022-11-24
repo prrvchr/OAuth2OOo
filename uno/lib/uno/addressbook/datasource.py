@@ -1,4 +1,7 @@
-/*
+#!
+# -*- coding: utf_8 -*-
+
+"""
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
 ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
@@ -22,64 +25,71 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
-*/
-package io.github.prrvchr.uno.helper;
+"""
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.HashMap;
+import uno
+import unohelper
 
-import com.sun.star.container.XNameAccess;
-import com.sun.star.sdbcx.XUser;
-import com.sun.star.sdbcx.XUsersSupplier;
+from com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import SEVERE
 
+from com.sun.star.sdb.CommandType import QUERY
 
-public class UsersSupplierHelper
-implements XUsersSupplier
-{
-    private final java.sql.Connection m_Connection;
+from com.sun.star.sdbc import XRestDataSource
 
-    // The constructor method:
-    public UsersSupplierHelper(Connection connection)
-    {
-        m_Connection = connection;
-    }
+from .configuration import g_identifier
+from .configuration import g_group
+from .configuration import g_compact
 
+from .database import DataBase
+from .provider import Provider
+from .user import User
+from .replicator import Replicator
 
-    // com.sun.star.sdbcx.XUsersSupplier:
-    @Override
-    public XNameAccess getUsers()
-    {
-        ResultSet result = null;
-        String query = "SELECT * FROM INFORMATION_SCHEMA.SYSTEM_USERS";
-        try
-        {
-            Statement statement = m_Connection.createStatement();
-            result = statement.executeQuery(query);
-        }
-        catch (java.sql.SQLException e) {e.getStackTrace();}
-        if (result == null) return null;
-        @SuppressWarnings("unused")
-        String type = "com.sun.star.sdbc.XUser";
-        @SuppressWarnings("unused")
-        HashMap<String, XUser> elements = new HashMap<>();
-        try
-        {
-            int i = 1;
-            int count = result.getMetaData().getColumnCount();
-            while (result.next())
-            {
-                for (int j = 1; j <= count; j++)
-                {
-                    String value = UnoHelper.getResultSetValue(result, j);
-                    System.out.println("UsersSupplier.getUsers() " + i + " - " + value);
-                }
-                i++;
-            }
-        } catch (java.sql.SQLException e) {e.printStackTrace();}
-        return null;
-    }
+from .listener import EventListener
+from .listener import TerminateListener
+
+from .unotool import getDesktop
+
+from .logger import logMessage
+from .logger import getMessage
+g_message = 'datasource'
+
+import traceback
 
 
-}
+class DataSource(unohelper.Base,
+                 XRestDataSource):
+    def __init__(self, ctx):
+        self._ctx = ctx
+        self._users = {}
+        self._connections = 0
+        self._listener = EventListener(self)
+        self._provider = Provider(ctx)
+        self._database = DataBase(ctx)
+        self._replicator = Replicator(ctx, self._database, self._provider, self._users)
+        listener = TerminateListener(self._replicator)
+        desktop = getDesktop(ctx)
+        desktop.addTerminateListener(listener)
+
+# XRestDataSource
+    def getConnection(self, user, password):
+        connection = self._database.getConnection(user, password)
+        connection.addEventListener(self._listener)
+        self._connections += 1
+        return connection
+
+    def stopReplicator(self):
+        if self._connections > 0:
+            self._connections -= 1
+        print("DataSource.disposeConnection() %s" % self._connections)
+        if self._connections == 0:
+            self._replicator.stop()
+
+    def setUser(self, name, password):
+        if name not in self._users:
+            user = User(self._ctx, self._database, self._provider, name, password)
+            self._users[name] = user
+        # User has been initialized and the connection to the database is done...
+        # We can start the database replication in a background task.
+        self._replicator.start()

@@ -1,4 +1,7 @@
-/*
+#!
+# -*- coding: utf_8 -*-
+
+"""
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
 ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
@@ -22,71 +25,33 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
-*/
-package io.github.prrvchr.uno.helper;
+"""
 
-import java.util.Map;
+import uno
+import unohelper
 
-import com.sun.star.container.NoSuchElementException;
-import com.sun.star.container.XNameAccess;
-import com.sun.star.lang.WrappedTargetException;
-import com.sun.star.uno.Type;
+from com.sun.star.auth import XRestDataParser
 
-
-public class NameAccessHelper<T>
-implements XNameAccess
-{
-    private final Map<String, T> m_elements;
-    private String m_type = "com.sun.star.uno.XInterface";
-
-    // The constructor method:
-    public NameAccessHelper(Map<String, T> elements)
-    {
-        m_elements = elements;
-    }
-    public NameAccessHelper(Map<String, T> elements,
-                            String type)
-    {
-        m_elements = elements;
-        m_type = type;
-    }
+from .unolib import KeyMap
+from .unotool import getNamedValue
 
 
-    // com.sun.star.container.XElementAccess <- XNameAccess:
-    @Override
-    public Type getElementType()
-    {
-        return new Type(m_type);
-    }
+class DataParser(unohelper.Base,
+                 XRestDataParser):
+    def __init__(self, database, provider, method):
+        self.provider = provider
+        self.map = database.getFieldsMap(method, True)
+        self.keys = self.map.getKeys()
+        self.DataType = 'Json'
 
-    @Override
-    public boolean hasElements()
-    {
-        return !m_elements.isEmpty();
-    }
-
-
-    // com.sun.star.container.XNameAccess:
-    @Override
-    public Object getByName(String name)
-    throws NoSuchElementException, WrappedTargetException
-    {
-        if (!hasByName(name)) throw new NoSuchElementException();
-        return m_elements.get(name);
-    }
-
-    @Override
-    public String[] getElementNames()
-    {
-        int len = m_elements.size();
-        return m_elements.keySet().toArray(new String[len]);
-    }
-
-    @Override
-    public boolean hasByName(String name)
-    {
-        return m_elements.containsKey(name);
-    }
-
-
-}
+    def parseResponse(self, pairs):
+        data = KeyMap()
+        for key, value in pairs:
+            if value is None:
+                continue
+            if key in self.keys:
+                map = self.map.getValue(key)
+                k = map.getValue('Map')
+                v = self.provider.transform(k, value)
+                data.setValue(k, v)
+        return data if data.Count else None
