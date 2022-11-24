@@ -1,5 +1,5 @@
 #!
-# -*- coding: utf_8 -*-
+# -*- coding: utf-8 -*-
 
 """
 ╔════════════════════════════════════════════════════════════════════════════════════╗
@@ -41,8 +41,8 @@ from com.sun.star.logging.LogLevel import SEVERE
 
 from unolib import createService
 
-from .requests.compat import unquote_plus
-from .requests.compat import urlencode
+from requests.compat import unquote_plus
+from requests.compat import urlencode
 
 from .logger import logMessage
 

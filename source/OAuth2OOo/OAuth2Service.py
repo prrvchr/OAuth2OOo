@@ -1,5 +1,5 @@
 #!
-# -*- coding: utf_8 -*-
+# -*- coding: utf-8 -*-
 
 """
 ╔════════════════════════════════════════════════════════════════════════════════════╗
@@ -48,44 +48,39 @@ from com.sun.star.frame.DispatchResultState import SUCCESS
 from com.sun.star.uno import Exception as UnoException
 from com.sun.star.auth import OAuth2Request
 
-from oauth2lib import OAuth2OOo
-from oauth2lib import NoOAuth2
+from oauth2 import KeyMap
 
-from unolib import KeyMap
-from unolib import getStringResource
-from unolib import createService
-from unolib import executeDispatch
-from unolib import getConfiguration
-from unolib import getDialog
-from unolib import getInterfaceTypes
-from unolib import getParentWindow
-from unolib import getPropertyValueSet
+from oauth2 import createService
+from oauth2 import execute
+from oauth2 import executeDispatch
+from oauth2 import getDialog
+from oauth2 import getParentWindow
+from oauth2 import getPropertyValueSet
+from oauth2 import getStringResource
+from oauth2 import getSessionMode
+from oauth2 import logMessage
+from oauth2 import showOAuth2Wizard
 
-from oauth2 import Response
 from oauth2 import Request
+from oauth2 import Response
 from oauth2 import Enumeration
 from oauth2 import Enumerator
 from oauth2 import Iterator
 from oauth2 import InputStream
 from oauth2 import Uploader
 from oauth2 import DialogHandler
-from oauth2 import getSessionMode
-from oauth2 import execute
-from oauth2 import OAuth2Setting
-from oauth2 import Wizard
-from oauth2 import WizardController
-from oauth2 import getRefreshToken
-from oauth2 import logMessage
-from oauth2 import g_identifier
+
 from oauth2 import g_extension
+from oauth2 import g_identifier
 from oauth2 import g_oauth2
-from oauth2 import g_wizard_paths
-from oauth2 import g_wizard_page
 from oauth2 import g_refresh_overlap
-from oauth2 import requests
 
+from oauth2 import OAuth2Model
+from oauth2 import OAuth2OOo
+from oauth2 import NoOAuth2
+
+import requests
 import time
-
 import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
@@ -101,35 +96,25 @@ class OAuth2Service(unohelper.Base,
     def __init__(self, ctx):
         self._ctx = ctx
         self._result = None
-        self.configuration = getConfiguration(self._ctx, g_identifier, True)
-        self.Setting = OAuth2Setting(self._ctx)
-        version = self._getSSLVersion()
-        self.Session = self._getSession(version)
-        self._Url = ''
-        self._Provider = KeyMap()
-        self._Users = None
-        self._UserName = ''
-        self._User = KeyMap()
+        self._model = OAuth2Model(ctx, True)
+        self._session = self._getSession()
         self._parent = None
-        self._Warnings = []
-        self._Error = None
-        self.Error = ''
-        self.stringResource = getStringResource(self._ctx, g_identifier, 'OAuth2OOo')
-        self._SessionMode = OFFLINE
-        #self._checkSSL()
+        self._warnings = []
+        self._resources = getStringResource(ctx, g_identifier, 'OAuth2OOo')
+        self._mode = OFFLINE
 
     @property
     def ResourceUrl(self):
-        return self.Setting.Url.Id
+        return self._model.Url
     @property
     def ProviderName(self):
-        return self.Setting.Url.Scope.Provider.Id
+        return self._model.Provider
     @property
     def UserName(self):
-        return self.Setting.Url.Scope.Provider.User.Id
+        return self._model.User
     @property
     def Timeout(self):
-        return self.Setting.Timeout
+        return self._model.Timeout
 
     # XInitialization
     def initialize(self, properties):
@@ -171,7 +156,7 @@ class OAuth2Service(unohelper.Base,
         return status == 1
 
     def _showUserDialog(self, interaction, url, message):
-        provider = self._getProviderNameFromUrl(url)
+        provider = self._model.getProviderName(url)
         dialog = getDialog(self._ctx, g_extension, 'UserDialog', DialogHandler(), self._parent)
         self._initUserDialog(dialog, provider, message)
         status = dialog.execute()
@@ -184,8 +169,8 @@ class OAuth2Service(unohelper.Base,
         return approved
 
     def _initUserDialog(self, dialog, provider, message):
-        title = self.stringResource.resolveString('UserDialog.Title')
-        label = self.stringResource.resolveString('UserDialog.Label1.Label')
+        title = self._resources.resolveString('UserDialog.Title')
+        label = self._resources.resolveString('UserDialog.Label1.Label')
         dialog.setTitle(title % provider)
         dialog.getControl('Label1').Text = label % message
 
@@ -195,35 +180,29 @@ class OAuth2Service(unohelper.Base,
 
     # XOAuth2Service
     def getWarnings(self):
-        if self._Warnings:
-            return self._Warnings.pop(0)
+        if self._warnings:
+            return self._warnings.pop(0)
         return None
     def clearWarnings(self):
-        self._Warnings = []
+        self._warnings = []
 
     def isOnLine(self):
-        return self._SessionMode != OFFLINE
+        return self._mode != OFFLINE
     def isOffLine(self, host):
-        self._SessionMode = getSessionMode(self._ctx, host)
-        return self._SessionMode != ONLINE
+        self._mode = getSessionMode(self._ctx, host)
+        return self._mode != ONLINE
 
     def unquoteUrl(self, url):
         return requests.utils.unquote(url)
 
     def initializeUrl(self, url):
-        self.Setting.Url.Id = url
-        return self.Setting.Url.Initialized
+        self._model.Url = url
+        return True
 
-    def _getProviderNameFromUrl(self, url):
-        self.Setting.Url.Id = url
-        if self.Setting.Url.Initialized:
-            return self.ProviderName
-        return ''
-
-    def initializeSession(self, url, name):
-        self.Setting.Url.Id = url
-        self.Setting.Url.Scope.Provider.User.Id = name
-        return self.Setting.Initialized
+    def initializeSession(self, url, user):
+        self._model.Url = url
+        self._model.User = user
+        return self._model.isInitialized()
 
     def getKeyMap(self):
         return KeyMap()
@@ -231,52 +210,19 @@ class OAuth2Service(unohelper.Base,
     def getSessionMode(self, host):
         return getSessionMode(self._ctx, host)
 
-    def getAuthorization(self, url, username, close=True, parent=None):
+    def getAuthorization(self, url, user, close=True, parent=None):
         print("OAuth2Service.getAuthorization() 1")
         authorized = False
-        self._result = None
-        listener = DispatchListener(self)
-        arguments = getPropertyValueSet({'Url': url,
-                                         'UserName': username,
-                                         'Close': close})
-        executeDispatch(self._ctx, 'oauth2:wizard', arguments, listener)
+        state, result = showOAuth2Wizard(self._ctx, url, user, close, parent)
         print("OAuth2Service.getAuthorization() 2")
-        if self._result is not None:
-            authorized = self.initializeSession(*self._result)
+        if state == SUCCESS:
+            authorized = self.initializeSession(*result)
         print("OAuth2Service.getAuthorization() 3")
         return authorized
 
     def dispatchFinished(self, result):
         print("OAuth2Service.dispatchFinished()  %s ***********************" % (result, ))
         self._result = result
-
-    def getAuthorization1(self, url, username, close=True, parent=None):
-        authorized = False
-        msg = "Wizard Loading ..."
-        print("OAuth2Service.getAuthorization() 1")
-        wizard = Wizard(self._ctx, g_wizard_page, True, parent)
-        print("OAuth2Service.getAuthorization() 2")
-        controller = WizardController(self._ctx, wizard, self.Session, url, username, close)
-        print("OAuth2Service.getAuthorization() 3")
-        arguments = (g_wizard_paths, controller)
-        print("OAuth2Service.getAuthorization() 4")
-        wizard.initialize(arguments)
-        msg += " Done ..."
-        #wizard.DialogWindow.toFront()
-        print("OAuth2Service.getAuthorization() 5")
-        if wizard.execute() == OK:
-            msg +=  " Retrieving Authorization Code ..."
-            if controller.Error:
-                msg += " ERROR: cant retrieve Authorization Code: %s" % controller.Error
-            else:
-                msg += " Done"
-                authorized = self.initializeSession(controller.ResourceUrl, controller.UserName)
-        else:
-            msg +=  " ERROR: Wizard as been aborted"
-            controller.Server.cancel()
-        wizard.DialogWindow.dispose()
-        logMessage(self._ctx, INFO, msg, 'OAuth2Service', 'getAuthorization()')
-        return authorized
 
     def getToken(self, format=''):
         level = INFO
@@ -285,20 +231,10 @@ class OAuth2Service(unohelper.Base,
             level = SEVERE
             msg += "ERROR: Cannot InitializeSession()..."
             token = ''
-        elif self.Setting.Url.Scope.Provider.User.HasExpired:
-            provider = self.Setting.Url.Scope.Provider.MetaData
-            user = self.Setting.Url.Scope.Provider.User
-            token, self._Error = getRefreshToken(self.Session, provider, user.MetaData, self.Timeout)
-            if token.IsPresent:
-                user.MetaData = token.Value
-                token = user.AccessToken
-                msg += "Refresh needed ... Done"
-            else:
-                level = SEVERE
-                msg += "ERROR: Cannot RefreshToken()..."
-                token = ''
+        elif self._model.isAccessTokenExpired():
+            token = self._model.getRefreshedToken()
         else:
-            token = self.Setting.Url.Scope.Provider.User.AccessToken
+            token = self._model.getToken()
             msg += "Get from configuration ... Done"
         logMessage(self._ctx, level, msg, 'OAuth2Service', 'getToken()')
         if format:
@@ -306,62 +242,42 @@ class OAuth2Service(unohelper.Base,
         return token
 
     def execute(self, parameter):
-        response, error = execute(self.Session, parameter, self.Timeout)
+        response, error = execute(self._session, parameter, self.Timeout)
         if error:
             logMessage(self._ctx, SEVERE, error, 'OAuth2Service', 'execute()')
-            self._Warnings.append(self._getException(error))
+            self._warnings.append(self._getException(error))
         return response
 
     def getRequest(self, parameter, parser):
-        return Request(self.Session, parameter, self.Timeout, parser)
+        return Request(self._session, parameter, self.Timeout, parser)
 
     def getResponse(self, parameter, parser):
-        return Response(self.Session, parameter, self.Timeout, parser)
+        return Response(self._session, parameter, self.Timeout, parser)
 
     def getIterator(self, parameter, parser):
-        return Iterator(self.Session, self.Timeout, parameter, parser)
+        return Iterator(self._session, self.Timeout, parameter, parser)
 
     def getEnumeration(self, parameter, parser):
-        return Enumeration(self.Session, parameter, self.Timeout, parser)
+        return Enumeration(self._session, parameter, self.Timeout, parser)
 
     def getEnumerator(self, parameter):
-        return Enumerator(self._ctx, self.Session, parameter, self.Timeout)
+        return Enumerator(self._ctx, self._session, parameter, self.Timeout)
 
     def getInputStream(self, parameter, chunk, buffer):
-        return InputStream(self._ctx, self.Session, parameter, chunk, buffer, self.Timeout)
+        return InputStream(self._ctx, self._session, parameter, chunk, buffer, self.Timeout)
 
     def getUploader(self, chunk, url, user):
-        return Uploader(self._ctx, self.Session, chunk, url, user.callBack, self.Timeout)
+        return Uploader(self._ctx, self._session, chunk, url, user.callBack, self.Timeout)
 
-    def _getSession(self, version):
-        print("OAuth2Service._getSession() 1 %s" % version)
-        session = None
-        #if sys.version_info[0] < 3:
-        #    requests.packages.urllib3.disable_warnings()
-        if version is not None:
-            #if version < 'OpenSSL 1.0.0':
-            #    print("OAuth2Service._getSession() 2 %s" % version)
-            #    monkey.patch()
-            #    print("OAuth2Service._getSession() 3 %s" % version)
-            session = requests.Session()
-            session.auth = OAuth2OOo(self)
-            session.codes = requests.codes
+    def _getSession(self):
+        session = requests.Session()
+        session.auth = OAuth2OOo(self)
+        session.codes = requests.codes
         return session
-
-    def _getSSLVersion(self):
-        try:
-            import ssl
-        except ImportError:
-            self.Error = "Can't load module: 'ssl.py'. Your Python SSL configuration is broken..."
-            version = None
-        else:
-            version = ssl.OPENSSL_VERSION
-            print("OAuth2Service._getSSLVersion() %s" % version)
-        return version
 
     def _isAuthorized(self):
         print("OAuth2Service._isAuthorized() 1")
-        if self.Setting.Initialized and self.Setting.Url.Scope.Authorized:
+        if self._model.isInitialized() and self._model.isUrlScopeAuthorized():
             return True
         print("OAuth2Service._isAuthorized() 2")
         msg = "OAuth2 initialization ... AuthorizationCode needed ..."

@@ -1,5 +1,5 @@
 #!
-# -*- coding: utf_8 -*-
+# -*- coding: utf-8 -*-
 
 """
 ╔════════════════════════════════════════════════════════════════════════════════════╗
@@ -31,22 +31,24 @@ import uno
 import unohelper
 
 from com.sun.star.lang import XServiceInfo
+
 from com.sun.star.awt import XContainerWindowEventHandler
 from com.sun.star.awt import XDialogEventHandler
+
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from oauth2lib import InteractionRequest
-from oauth2lib import getOAuth2UserName
+from oauth2 import OAuth2Model
 
-from unolib import createService
-from unolib import getFileSequence
-from unolib import getStringResource
-from unolib import getNamedValueSet
-from unolib import getConfiguration
-from unolib import getInteractionHandler
-from unolib import getDialog
-from unolib import getExceptionMessage
+from oauth2 import InteractionRequest
+from oauth2 import getOAuth2UserName
+
+from oauth2 import createService
+from oauth2 import getFileSequence
+from oauth2 import getConfiguration
+from oauth2 import getInteractionHandler
+from oauth2 import getDialog
+from oauth2 import getExceptionMessage
 
 from oauth2 import getLoggerUrl
 from oauth2 import getLoggerSetting
@@ -59,7 +61,7 @@ g_message = 'OptionsDialog'
 from oauth2 import g_identifier
 from oauth2 import g_oauth2
 
-from oauth2 import requests
+import requests
 import os
 import sys
 import traceback
@@ -75,13 +77,12 @@ class OptionsDialog(unohelper.Base,
                     XDialogEventHandler):
     def __init__(self, ctx):
         try:
-            self.ctx = ctx
-            self.stringResource = getStringResource(self.ctx, g_identifier, 'OAuth2OOo', 'OptionsDialog')
-            self.service = createService(self.ctx, g_oauth2)
-            logMessage(self.ctx, INFO, "Loading ... Done", 'OptionsDialog', '__init__()')
+            self._ctx = ctx
+            self._model = OAuth2Model(ctx)
+            logMessage(self._ctx, INFO, "Loading ... Done", 'OptionsDialog', '__init__()')
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self.ctx, SEVERE, msg, 'OptionsDialog', '__init__()')
+            logMessage(self._ctx, SEVERE, msg, 'OptionsDialog', '__init__()')
 
     # XContainerWindowEventHandler, XDialogEventHandler
     def callHandlerMethod(self, dialog, event, method):
@@ -152,39 +153,39 @@ class OptionsDialog(unohelper.Base,
             print("OptionDialog._doConnect() 1")
             url = dialog.getControl('ComboBox2').SelectedText
             if url != '':
-                message = "Authentication needed!!!"
-                if self.service.initializeUrl(url):
-                    print("OptionDialog._doConnect() 2 %s" % url)
-                    user = getOAuth2UserName(self.ctx, self, url, message)
+                message = self._model.getProviderName(url)
+                print("OptionDialog._doConnect() 2 %s" % url)
+                user = getOAuth2UserName(self._ctx, self, url, message)
             autoclose = bool(dialog.getControl('CheckBox2').State)
             print("OptionDialog._doConnect() 3 %s - %s - %s" % (user, url, autoclose))
-            enabled = self.service.getAuthorization(url, user, autoclose, dialog.getPeer())
+            service = createService(self._ctx, g_oauth2)
+            enabled = service.getAuthorization(url, user, autoclose, dialog.getPeer())
             print("OptionDialog._doConnect() 4")
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_doConnect()")
+            logMessage(self._ctx, SEVERE, msg, "OptionsDialog", "_doConnect()")
 
     def _loadSetting(self, dialog):
         try:
-            dialog.getControl('NumericField1').setValue(self.service.Setting.ConnectTimeout)
-            dialog.getControl('NumericField2').setValue(self.service.Setting.ReadTimeout)
-            dialog.getControl('NumericField3').setValue(self.service.Setting.HandlerTimeout)
-            dialog.getControl('ComboBox2').Model.StringItemList = self.service.Setting.Url.UrlList
+            dialog.getControl('NumericField1').setValue(self._model.ConnectTimeout)
+            dialog.getControl('NumericField2').setValue(self._model.ReadTimeout)
+            dialog.getControl('NumericField3').setValue(self._model.HandlerTimeout)
+            dialog.getControl('ComboBox2').Model.StringItemList = self._model.UrlList
             self._loadLoggerSetting(dialog)
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_loadSetting()")
+            logMessage(self._ctx, SEVERE, msg, "OptionsDialog", "_loadSetting()")
 
     def _saveSetting(self, dialog):
         try:
             self._saveLoggerSetting(dialog)
-            self.service.Setting.ConnectTimeout = int(dialog.getControl('NumericField1').getValue())
-            self.service.Setting.ReadTimeout = int(dialog.getControl('NumericField2').getValue())
-            self.service.Setting.HandlerTimeout = int(dialog.getControl('NumericField3').getValue())
-            self.service.Setting.commit()
+            self._model.ConnectTimeout = int(dialog.getControl('NumericField1').getValue())
+            self._model.ReadTimeout = int(dialog.getControl('NumericField2').getValue())
+            self._model.HandlerTimeout = int(dialog.getControl('NumericField3').getValue())
+            self._model.commit()
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_saveSetting()")
+            logMessage(self._ctx, SEVERE, msg, "OptionsDialog", "_saveSetting()")
 
     def _toggleLogger(self, dialog, enabled):
         dialog.getControl('Label1').Model.Enabled = enabled
@@ -198,8 +199,8 @@ class OptionsDialog(unohelper.Base,
         dialog.getControl('CommandButton1').Model.Enabled = enabled
 
     def _viewLog(self, window):
-        dialog = getDialog(self.ctx, 'OAuth2OOo', 'LogDialog', self, window.Peer)
-        url = getLoggerUrl(self.ctx)
+        dialog = getDialog(self._ctx, 'OAuth2OOo', 'LogDialog', self, window.Peer)
+        url = getLoggerUrl(self._ctx)
         dialog.Title = url
         self._setDialogText(dialog, url)
         dialog.execute()
@@ -208,48 +209,56 @@ class OptionsDialog(unohelper.Base,
     def _clearLog(self, dialog):
         try:
             clearLogger()
-            msg = getMessage(self.ctx, g_message, 101)
-            logMessage(self.ctx, INFO, msg, 'OptionsDialog', '_clearLog()')
-            url = getLoggerUrl(self.ctx)
+            msg = getMessage(self._ctx, g_message, 101)
+            logMessage(self._ctx, INFO, msg, 'OptionsDialog', '_clearLog()')
+            url = getLoggerUrl(self._ctx)
             self._setDialogText(dialog, url)
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self.ctx, SEVERE, msg, "OptionsDialog", "_clearLog()")
+            logMessage(self._ctx, SEVERE, msg, "OptionsDialog", "_clearLog()")
 
     def _logInfo(self, dialog):
         version  = ' '.join(sys.version.split())
-        msg = getMessage(self.ctx, g_message, 111, version)
-        logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
+        msg = getMessage(self._ctx, g_message, 111, version)
+        logMessage(self._ctx, INFO, msg, "OptionsDialog", "_logInfo()")
         path = os.pathsep.join(sys.path)
-        msg = getMessage(self.ctx, g_message, 112, path)
-        logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
-        msg = getMessage(self.ctx, g_message, 113, requests.__version__)
-        logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
-        msg = getMessage(self.ctx, g_message, 114, requests.urllib3.__version__)
-        logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
+        msg = getMessage(self._ctx, g_message, 112, path)
+        logMessage(self._ctx, INFO, msg, "OptionsDialog", "_logInfo()")
+        msg = getMessage(self._ctx, g_message, 113, requests.__version__)
+        logMessage(self._ctx, INFO, msg, "OptionsDialog", "_logInfo()")
+        try:
+            import urllib3
+        except ImportError as e:
+            msg = getMessage(self._ctx, g_message, 114, getExceptionMessage(e))
+        else:
+            msg = getMessage(self._ctx, g_message, 115, urllib3.__version__)
+        logMessage(self._ctx, INFO, msg, "OptionsDialog", "_logInfo()")
+        try:
+            import chardet
+        except ImportError as e:
+            msg = getMessage(self._ctx, g_message, 116, getExceptionMessage(e))
+        else:
+            msg = getMessage(self._ctx, g_message, 117, chardet.__version__)
+        logMessage(self._ctx, INFO, msg, "OptionsDialog", "_logInfo()")
         try:
             import ssl
         except ImportError as e:
-            print("OptionsDialog._logInfo() 1 %s" % (dir(e), ))
-            msg = getExceptionMessage(e)
-            print("OptionsDialog._logInfo() 2")
-            msg = getMessage(self.ctx, g_message, 116, msg)
+            msg = getMessage(self._ctx, g_message, 118, getExceptionMessage(e))
         else:
-            msg = getMessage(self.ctx, g_message, 115, ssl.OPENSSL_VERSION)
-            print("OptionsDialog._logInfo() 3")
-        logMessage(self.ctx, INFO, msg, "OptionsDialog", "_logInfo()")
-        url = getLoggerUrl(self.ctx)
+            msg = getMessage(self._ctx, g_message, 119, ssl.OPENSSL_VERSION)
+        logMessage(self._ctx, INFO, msg, "OptionsDialog", "_logInfo()")
+        url = getLoggerUrl(self._ctx)
         self._setDialogText(dialog, url)
 
     def _setDialogText(self, dialog, url):
         control = dialog.getControl('TextField1')
-        length, sequence = getFileSequence(self.ctx, url)
+        length, sequence = getFileSequence(self._ctx, url)
         control.Text = sequence.value.decode('utf-8')
         selection = uno.createUnoStruct('com.sun.star.awt.Selection', length, length)
         control.setSelection(selection)
 
     def _loadLoggerSetting(self, dialog):
-        enabled, index, handler = getLoggerSetting(self.ctx)
+        enabled, index, handler = getLoggerSetting(self._ctx)
         dialog.getControl('CheckBox1').State = int(enabled)
         dialog.getControl('ListBox1').selectItemPos(index, True)
         dialog.getControl('OptionButton%s' % handler).State = 1
@@ -259,7 +268,7 @@ class OptionsDialog(unohelper.Base,
         enabled = bool(dialog.getControl('CheckBox1').State)
         index = dialog.getControl('ListBox1').getSelectedItemPos()
         handler = dialog.getControl('OptionButton1').State
-        setLoggerSetting(self.ctx, enabled, index, handler)
+        setLoggerSetting(self._ctx, enabled, index, handler)
 
     # XServiceInfo
     def supportsService(self, service):

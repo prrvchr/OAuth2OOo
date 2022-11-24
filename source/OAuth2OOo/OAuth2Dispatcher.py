@@ -1,5 +1,5 @@
 #!
-# -*- coding: utf_8 -*-
+# -*- coding: utf-8 -*-
 
 """
 ╔════════════════════════════════════════════════════════════════════════════════════╗
@@ -26,6 +26,7 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
+from __future__ import absolute_import
 
 import uno
 import unohelper
@@ -43,9 +44,6 @@ from oauth2 import OAuth2Dispatch
 from oauth2 import getMessage
 from oauth2 import logMessage
 from oauth2 import g_identifier
-
-from unolib import createService
-from unolib import getDesktop
 
 import traceback
 
@@ -71,12 +69,8 @@ class OAuth2Dispatcher(unohelper.Base,
 # XDispatchProvider
     def queryDispatch(self, url, frame, flags):
         dispatch = None
-        if url.Path == 'wizard':
-            desktop = getDesktop(self._ctx)
-            #mri = createService(self._ctx, 'mytools.Mri')
-            #mri.inspect(desktop)
+        if url.Path in ('wizard',):
             parent = self._frame.getContainerWindow()
-            #mri.inspect(self._frame)
             dispatch = OAuth2Dispatch(self._ctx, parent)
         return dispatch
 
@@ -96,6 +90,6 @@ class OAuth2Dispatcher(unohelper.Base,
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
 
-g_ImplementationHelper.addImplementation(OAuth2Dispatcher,                            # UNO object class
+g_ImplementationHelper.addImplementation(OAuth2Dispatcher,                          # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                         (g_ImplementationName,))                    # List of implemented services

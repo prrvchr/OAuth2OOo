@@ -85,7 +85,7 @@
                 <value>398845255454-oudorbmilpc9obgtivm9ts1b2991upqk.apps.googleusercontent.com</value>
             </prop>
             <prop oor:name="ClientSecret">
-                <value></value>
+                <value>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</value>
             </prop>
             <prop oor:name="AuthorizationUrl">
                 <value>https://accounts.google.com/o/oauth2/v2/auth</value>
@@ -97,7 +97,7 @@
                 <value>https://www.googleapis.com/oauth2/v4/token</value>
             </prop>
             <prop oor:name="TokenParameters">
-                <value>{"scope": null}</value>
+                <value>{"client_secret": null}</value>
             </prop>
             <prop oor:name="CodeChallenge">
                 <value>true</value>

@@ -37,8 +37,8 @@ from oauth2lib import NoOAuth2
 from unolib import KeyMap
 from unolib import getCurrentLocale
 
-from .requests import Session
-from .requests.compat import urlencode
+from requests import Session
+from requests.compat import urlencode
 
 import json
 import base64
