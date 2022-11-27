@@ -189,11 +189,10 @@ class OAuth2Model(unohelper.Base):
         self.cancelServer()
 
 # OAuth2Model getter methods called by WizardPages 1
-    def getActivePath(self, user, url):
-        scope = self._getScope(url)
-        provider = self._getProvider(scope)
+    def getActivePath(self, user, url, provider, scope):
+        urls = self._configuration.getByName('Urls')
         providers = self._configuration.getByName('Providers')
-        if self.isAuthorized(user, scope, provider, providers):
+        if urls.hasByName(url) and self.isAuthorized(user, scope, provider, providers):
             path = 2
         elif providers.hasByName(provider) and not providers.getByName(provider).getByName('HttpHandler'):
             path = 1
@@ -298,10 +297,24 @@ class OAuth2Model(unohelper.Base):
         return (clientid, authorizationurl, tokenurl, codechallenge, codechallengemethod, clientsecret,
                 authorizationparameters, tokenparameters, redirectaddress, redirectport, httphandler)
 
-    def getUrlData(self, url):
+    def getUrl(self, url):
         scope = self._getScope(url)
         provider = self._getProvider(scope)
-        return scope, self._getScopeList(), provider, self._getProviderList()
+        return self._getProviderList(), provider, scope
+
+    def getScopeList(self, provider):
+        scopes = []
+        for name in self._configuration.getByName('Scopes').ElementNames:
+            scope = self._configuration.getByName('Scopes').getByName(name)
+            if scope.getByName('Provider') == provider:
+                scopes.append(name)
+        return scopes
+
+    def isConfigurationValid(self, email, url, provider, scope):
+        return self.isEmailValid(email) and url != '' and provider != '' and scope != ''
+
+    def isValueValid(self, value):
+        return value != ''
 
     def isEmailValid(self, email):
         if validators.email(email):
@@ -349,9 +362,6 @@ class OAuth2Model(unohelper.Base):
         if scopes.hasByName(scope):
             values = scopes.getByName(scope).getByName('Values')
         return values
-
-    def _getScopeList(self):
-        return self._configuration.getByName('Scopes').ElementNames
 
     def _getProviderList(self):
         return self._configuration.getByName('Providers').ElementNames
@@ -450,8 +460,8 @@ class OAuth2Model(unohelper.Base):
                 self._watchdog.cancel()
             self._watchdog = None
 
-    def registerUserToken(self, scopes, name, user, code):
-        self._registerUserToken(scopes, name, user, code)
+    def registerToken(self, scopes, name, user, code):
+        self._registerToken(scopes, name, user, code)
         self._watchdog = None
 
     def _getServerData(self):
@@ -471,7 +481,7 @@ class OAuth2Model(unohelper.Base):
         scope = self._configuration.getByName('Scopes').getByName(self._scope)
         provider = self._configuration.getByName('Providers').getByName(self._provider)
         scopes = self._getUrlScopes(scope, provider)
-        self._registerUserToken(scopes, self._provider, self._user, code)
+        self._registerToken(scopes, self._provider, self._user, code)
 
 # OAuth2Model getter methods called by WizardPages 5
     def closeWizard(self):
@@ -579,7 +589,7 @@ class OAuth2Model(unohelper.Base):
         return parameters
 
 # OAuth2Model private getter/setter methods called by WizardPages 3 and WizardPages 4
-    def _registerUserToken(self, scopes, name, user, code):
+    def _registerToken(self, scopes, name, user, code):
         provider = self._configuration.getByName('Providers').getByName(name)
         url = provider.getByName('TokenUrl')
         parameters = self._getTokenParameters(scopes, provider, code)
@@ -587,6 +597,8 @@ class OAuth2Model(unohelper.Base):
         logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
         response = self._getResponseFromRequest(url, parameters, self.Timeout)
         self._saveUserToken(scopes, provider, user, response)
+        msg = "Receive Response: %s" % (response, )
+        logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
 
     def _getTokenParameters(self, scopes, provider, code):
         parameters = self._getTokenBaseParameters(provider, code)
@@ -644,6 +656,8 @@ class OAuth2Model(unohelper.Base):
                     r.raise_for_status()
                     response = r.json()
             except Exception as e:
+                msg = "HTTP ERROR: %s" % (e, )
+                logMessage(self._ctx, SEVERE, msg, 'OAuth2Model', '_getResponseFromRequest()')
                 print("ERROR: OAuth2Model._getResponseFromRequest() %s - %s" % (response, traceback.print_exc()))
         return response
 

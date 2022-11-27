@@ -47,7 +47,9 @@ class WindowHandler(unohelper.Base,
                 self._manager.setUser(event.Source.Text.strip())
                 handled = True
             elif method == 'SetUrl':
-                self._manager.setUrl(event.Source.Text.strip(), event.Source.Model.StringItemList)
+                item = event.Source.Text.strip()
+                inlist = item in event.Source.getItems()
+                self._manager.setUrl(item, inlist)
                 handled = True
             elif method == 'AddUrl':
                 self._manager.addUrl()
@@ -56,7 +58,9 @@ class WindowHandler(unohelper.Base,
                 self._manager.removeUrl()
                 handled = True
             elif method == 'SetProvider':
-                self._manager.setProvider(event.Source.Text.strip(), event.Source.Model.StringItemList)
+                item = event.Source.Text.strip()
+                inlist = item in event.Source.getItems()
+                self._manager.setProvider(item, inlist)
                 handled = True
             elif method == 'AddProvider':
                 self._manager.addProvider()
@@ -68,7 +72,9 @@ class WindowHandler(unohelper.Base,
                 self._manager.removeProvider()
                 handled = True
             elif method == 'SetScope':
-                self._manager.setUrlScope(event.Source.Text.strip(), event.Source.Model.StringItemList)
+                item = event.Source.Text.strip()
+                inlist = item in event.Source.getItems()
+                self._manager.setUrlScope(item, inlist)
                 handled = True
             elif method == 'AddScope':
                 self._manager.addUrlScope()

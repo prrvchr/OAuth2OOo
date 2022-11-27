@@ -53,7 +53,7 @@ class ProviderView(unohelper.Base):
         clientid, authorizationurl, tokenurl, authorizationparameters, tokenparameters = self.getDialogValues()
         data = (self.getRedirectAddress(), self.getRedirectPort(), self.getClientSecret(),
                 self.getCodeChallenge(), self.getCodeChallengeMethod(), clientid,
-                authorizationurl, tokenurl, authorizationparameters, tokenparameter)
+                authorizationurl, tokenurl, authorizationparameters, tokenparameters)
         return self.getHttpHandler(), data
 
     def getClientId(self):

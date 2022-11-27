@@ -56,6 +56,12 @@ class OAuth2View(unohelper.Base):
     def getScope(self):
         return self._getScopes().Text.strip()
 
+    def canAddItem(self):
+        return any((self._canAddUrl(), self._getAddProvider().Model.Enabled, self._getAddScope().Model.Enabled))
+
+    def getConfiguration(self):
+        return self.getUser(), self.getUrl(), self.getProvider(), self.getScope()
+
 # OAuth2View setter methods
     def initView(self, user, url, urls):
         self._getUser().Text = user
@@ -67,7 +73,6 @@ class OAuth2View(unohelper.Base):
 
     def enableRemoveUrl(self, enabled):
         self._getRemoveUrl().Model.Enabled = enabled
-
 
     def enableAddProvider(self, enabled):
         self._getAddProvider().Model.Enabled = enabled
@@ -87,12 +92,16 @@ class OAuth2View(unohelper.Base):
     def enableRemoveScope(self, enabled):
         self._getRemoveScope().Model.Enabled = enabled
 
-    def setUrl(self, scope, scopes, provider, providers):
+    def setUrl(self, providers, provider, scope):
         control = self._getProviders()
         control.Model.StringItemList = providers
         control.Text = provider
+        self._getScopes().Text = scope
+
+    def setScopes(self, scopes):
         control = self._getScopes()
         control.Model.StringItemList = scopes
+        scope = control.getItem(0) if control.getItemCount() else ''
         control.Text = scope
 
     def setUrlLabel(self, label):
@@ -109,6 +118,36 @@ class OAuth2View(unohelper.Base):
 
     def setScopeFocus(self):
         self._getScopes().setFocus()
+
+    def addProvider(self, provider):
+        control = self._getProviders()
+        control.addItem(provider, control.getItemCount())
+
+    def addScope(self, scope):
+        control = self._getScopes()
+        control.addItem(scope, control.getItemCount())
+
+    def toggleAddUrl(self, inlist):
+        self._getAddUrl().Model.Enabled = inlist and self._canAddUrl()
+
+    def toggleProviderButtons(self):
+        self._getAddProvider().Model.Enabled = False
+        self._getEditProvider().Model.Enabled = True
+        self._getRemoveProvider().Model.Enabled = True
+
+    def toggleScopeButtons(self):
+        self._getAddScope().Model.Enabled = False
+        self._getEditScope().Model.Enabled = True
+        self._getRemoveScope().Model.Enabled = True
+
+# OAuth2View private getter methods
+    def _canAddUrl(self):
+        control = self._getUrls()
+        return control.Text not in self._getControlItems(control)
+
+    def _getControlItems(self, control):
+        # TODO: OpenOffice has strange behavior if StringItemList is empty
+        return control.getItems() if control.getItemCount() > 0 else ()
 
 # OAuth2View private getter control methods
     def _getUser(self):

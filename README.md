@@ -4,7 +4,7 @@
 
 **The use of this software subjects you to our** [**Terms Of Use**][3] **and** [**Data Protection Policy**][4].
 
-# version [0.0.5][5]
+# version [0.0.6][5]
 
 ## Introduction:
 
@@ -40,7 +40,7 @@ No more password is stored in LibreOffice / OpenOffice.
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][15]** extension version 0.0.5.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][15]** extension version 0.0.6.
 
 - Restart LibreOffice / OpenOffice after installation.
 

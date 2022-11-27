@@ -76,8 +76,8 @@ class OAuth2Manager(unohelper.Base):
     def notify(self, percent):
         self._view.notify(percent)
 
-    def register(self, scopes, provider, user, token):
-        self._model.registerUserToken(scopes, provider, user, token)
+    def register(self, scopes, provider, user, code):
+        self._model.registerToken(scopes, provider, user, code)
         self._wizard.updateTravelUI()
         if self._model.closeWizard():
             self._wizard.DialogWindow.endDialog(OK)
