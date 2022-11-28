@@ -52,10 +52,8 @@ from oauth2 import KeyMap
 
 from oauth2 import createService
 from oauth2 import execute
-from oauth2 import executeDispatch
 from oauth2 import getDialog
 from oauth2 import getParentWindow
-from oauth2 import getPropertyValueSet
 from oauth2 import getStringResource
 from oauth2 import getSessionMode
 from oauth2 import logMessage
@@ -73,7 +71,6 @@ from oauth2 import DialogHandler
 from oauth2 import g_extension
 from oauth2 import g_identifier
 from oauth2 import g_oauth2
-from oauth2 import g_refresh_overlap
 
 from oauth2 import OAuth2Model
 from oauth2 import OAuth2OOo

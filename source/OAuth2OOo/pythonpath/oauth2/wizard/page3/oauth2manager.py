@@ -33,7 +33,7 @@ from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 
 from .oauth2view import OAuth2View
 
-from oauth2 import executeShell
+from ...unotool import executeShell
 
 from six import PY3
 import traceback

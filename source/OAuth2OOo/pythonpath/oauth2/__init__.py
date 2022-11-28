@@ -27,28 +27,17 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
+from .optionscontroller import OptionsController
+
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_oauth2
-from .configuration import g_refresh_overlap
-from .configuration import g_resource
 
 from .unolib import KeyMap
 
-from .unotool import createMessageBox
 from .unotool import createService
-from .unotool import executeDispatch
-from .unotool import executeShell
-from .unotool import generateUuid
-from .unotool import getConfiguration
-from .unotool import getContainerWindow
-from .unotool import getCurrentLocale
 from .unotool import getDialog
-from .unotool import getExceptionMessage
-from .unotool import getFileSequence
-from .unotool import getInteractionHandler
 from .unotool import getParentWindow
-from .unotool import getPropertyValueSet
 from .unotool import getStringResource
 
 from .dialoghandler import DialogHandler
@@ -70,7 +59,6 @@ from .request import Enumerator
 from .request import Iterator
 from .request import InputStream
 from .request import Uploader
-from .request import getConnectionMode
 from .request import getSessionMode
 from .request import execute
 

@@ -52,7 +52,7 @@
                         <value>%origin%/OAuth2OOo/OptionsDialog.xdl</value>
                     </prop>
                     <prop oor:name="EventHandlerService">
-                        <value>com.gmail.prrvchr.extensions.OAuth2OOo.OptionsDialog</value>
+                        <value>com.gmail.prrvchr.extensions.OAuth2OOo.OptionsHandler</value>
                     </prop>
                 </node>
             </node>

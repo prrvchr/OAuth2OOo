@@ -42,7 +42,7 @@ from .dialog import ProviderView
 from .dialog import ScopeHandler
 from .dialog import ScopeView
 
-from oauth2 import createMessageBox
+from ...unotool import createMessageBox
 
 import traceback
 

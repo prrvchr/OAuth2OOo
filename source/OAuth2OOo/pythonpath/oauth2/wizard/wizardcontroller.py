@@ -35,7 +35,7 @@ from com.sun.star.ui.dialogs import XWizardController
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from oauth2 import logMessage
+from ..logger import logMessage
 
 from .page1 import OAuth2Manager as WizardPage1
 from .page2 import OAuth2Manager as WizardPage2

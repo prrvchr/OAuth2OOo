@@ -33,21 +33,22 @@ import unohelper
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from oauth2 import g_extension
-from oauth2 import g_identifier
-from oauth2 import g_refresh_overlap
-from oauth2 import generateUuid
-from oauth2 import getConfiguration
-from oauth2 import getCurrentLocale
-from oauth2 import getStringResource
-from oauth2 import logMessage
+from .configuration import g_extension
+from .configuration import g_identifier
+from .configuration import g_refresh_overlap
 
-from requests.compat import urlencode
-from requests import Session
+from .unotool import generateUuid
+from .unotool import getConfiguration
+from .unotool import getCurrentLocale
+from .unotool import getStringResource
+
+from .logger import logMessage
 
 from .wizard import WatchDog
 from .wizard import Server
 
+from requests.compat import urlencode
+from requests import Session
 import time
 import validators
 import base64
@@ -145,6 +146,10 @@ class OAuth2Model(unohelper.Base):
             if self._configuration.getByName('Scopes').hasByName(scope):
                 provider = self._configuration.getByName('Scopes').getByName(scope).getByName('Provider')
         return provider
+
+# OAuth2Model getter methods called by OptionsManager
+    def getOptionsDialogData(self):
+        return self.ConnectTimeout, self.ReadTimeout, self.HandlerTimeout, self.UrlList
 
 # OAuth2Model getter methods called by OAuth2Service
     def isInitialized(self):

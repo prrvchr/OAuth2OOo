@@ -33,8 +33,6 @@ from .oauth2handler import WindowHandler
 
 from .oauth2view import OAuth2View
 
-from oauth2 import executeShell
-
 import traceback
 
 

@@ -30,8 +30,8 @@
 import uno
 import unohelper
 
-from oauth2 import getContainerWindow
-from oauth2 import g_extension
+from ...unotool import getContainerWindow
+from ...configuration import g_extension
 
 import traceback
 

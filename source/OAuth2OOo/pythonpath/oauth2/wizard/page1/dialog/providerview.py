@@ -30,9 +30,9 @@
 import uno
 import unohelper
 
-from oauth2 import getDialog
-from oauth2 import logMessage
-from oauth2 import g_extension
+from ....unotool import getDialog
+from ....logger import logMessage
+from ....configuration import g_extension
 
 import traceback
 

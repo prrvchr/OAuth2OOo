@@ -41,8 +41,9 @@ from requests.compat import unquote_plus
 from requests.compat import urlencode
 
 
-from oauth2 import createService
-from oauth2 import logMessage
+from ..unotool import createService
+
+from ..logger import logMessage
 
 import time
 from threading import Thread
