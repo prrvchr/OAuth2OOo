@@ -122,10 +122,10 @@ J'essaierai de la résoudre ;-)
 [8]: <https://www.openoffice.org/fr/Telecharger/>
 [9]: <https://github.com/prrvchr/OAuth2OOo>
 [10]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[11]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
-[12]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
-[13]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
-[14]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>
+[11]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
+[12]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
+[13]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
+[14]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4_fr.png>
 [15]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
 [16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
 [17]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
