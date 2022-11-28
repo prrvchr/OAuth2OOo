@@ -73,17 +73,11 @@ La valeur renvoyée:: `initialized` est True si `registered_url` et/ou `user_acc
 
 ## A été testé avec:
 
-* LibreOffice 6.4.4.2 - Ubuntu 20.04 -  LxQt 0.14.1
+* LibreOffice 7.3.7.2 - Ubuntu 22.04 - LXQt 1.1.0
 
-* LibreOffice 7.0.0.0.alpha1 - Ubuntu 20.04 -  LxQt 0.14.1
+* LibreOffice 7.4.3.2.(x64) - Windows 10(x64)
 
-* OpenOffice 4.1.8 x86_64 - Ubuntu 20.04 - LxQt 0.14.1
-
-* OpenOffice 4.2.0.Build:9820 x86_64 - Ubuntu 20.04 - LxQt 0.14.1
-
-* LibreOffice 6.1.5.2 - Raspbian 10 buster - Raspberry Pi 4 Model B
-
-* LibreOffice 6.4.4.2 (x64) - Windows 7 SP1
+* OpenOffice 4.1.13 - Lubuntu 22.04 - LXQt 0.17.0
 
 Je vous encourage en cas de problème :-(  
 de créer un [dysfonctionnement][10]  
@@ -106,7 +100,11 @@ J'essaierai de la résoudre ;-)
 
 - Beaucoup d'autres correctifs...
 
-### Que reste-t-il à faire pour la version 0.0.5:
+### Ce qui a été fait pour la version 0.0.6:
+
+- L'erreur de flux de bouclage Google a été corrigée. Voir [Dysfonctionnement #10][19]
+
+### Que reste-t-il à faire pour la version 0.0.6:
 
 - Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][16].
 
@@ -132,3 +130,4 @@ J'essaierai de la résoudre ;-)
 [16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
 [17]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
 [18]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
+[19]: <https://github.com/prrvchr/OAuth2OOo/issues/10>

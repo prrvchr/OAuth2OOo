@@ -308,7 +308,7 @@ class OAuth2Model(unohelper.Base):
             scope = self._configuration.getByName('Scopes').getByName(name)
             if scope.getByName('Provider') == provider:
                 scopes.append(name)
-        return scopes
+        return tuple(scopes)
 
     def isConfigurationValid(self, email, url, provider, scope):
         return self.isEmailValid(email) and url != '' and provider != '' and scope != ''

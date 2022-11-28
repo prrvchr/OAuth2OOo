@@ -47,9 +47,11 @@ class WindowHandler(unohelper.Base,
                 self._manager.setUser(event.Source.Text.strip())
                 handled = True
             elif method == 'SetUrl':
-                item = event.Source.Text.strip()
-                inlist = item in event.Source.getItems()
-                self._manager.setUrl(item, inlist)
+                control = event.Source
+                item = control.Text.strip()
+                # TODO: OpenOffice has strange behavior if StringItemList is empty
+                items = control.getItems() if control.getItemCount() > 0 else ()
+                self._manager.setUrl(item, item in items)
                 handled = True
             elif method == 'AddUrl':
                 self._manager.addUrl()
@@ -58,9 +60,11 @@ class WindowHandler(unohelper.Base,
                 self._manager.removeUrl()
                 handled = True
             elif method == 'SetProvider':
-                item = event.Source.Text.strip()
-                inlist = item in event.Source.getItems()
-                self._manager.setProvider(item, inlist)
+                control = event.Source
+                item = control.Text.strip()
+                # TODO: OpenOffice has strange behavior if StringItemList is empty
+                items = control.getItems() if control.getItemCount() > 0 else ()
+                self._manager.setProvider(item, item in items)
                 handled = True
             elif method == 'AddProvider':
                 self._manager.addProvider()
@@ -72,9 +76,11 @@ class WindowHandler(unohelper.Base,
                 self._manager.removeProvider()
                 handled = True
             elif method == 'SetScope':
-                item = event.Source.Text.strip()
-                inlist = item in event.Source.getItems()
-                self._manager.setUrlScope(item, inlist)
+                control = event.Source
+                item = control.Text.strip()
+                # TODO: OpenOffice has strange behavior if StringItemList is empty
+                items = control.getItems() if control.getItemCount() > 0 else ()
+                self._manager.setUrlScope(item, item in items)
                 handled = True
             elif method == 'AddScope':
                 self._manager.addUrlScope()

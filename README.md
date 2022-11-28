@@ -73,17 +73,11 @@ The returned value: `initialized` is True if `registered_url` and/or `user_accou
 
 ## Has been tested with:
 
-* LibreOffice 6.4.4.2 - Ubuntu 20.04 -  LxQt 0.14.1
+* LibreOffice 7.3.7.2 - Lubuntu 22.04 - LXQt 1.1.0
 
-* LibreOffice 7.0.0.0.alpha1 - Ubuntu 20.04 -  LxQt 0.14.1
+* LibreOffice 7.4.3.2.(x64) - Windows 10(x64)
 
-* OpenOffice 4.1.8 x86_64 - Ubuntu 20.04 - LxQt 0.14.1
-
-* OpenOffice 4.2.0.Build:9820 x86_64 - Ubuntu 20.04 - LxQt 0.14.1
-
-* LibreOffice 6.1.5.2 - Raspbian 10 buster - Raspberry Pi 4 Model B
-
-* LibreOffice 6.4.4.2 (x64) - Windows 7 SP1
+* OpenOffice 4.1.13 - Lubuntu 22.04 - LXQt 0.17.0
 
 I encourage you in case of problem :-(  
 to create an [issue][10]  
@@ -106,7 +100,11 @@ I will try to solve it ;-)
 
 - Many other fix...
 
-### What remains to be done for version 0.0.5:
+### What has been done for version 0.0.6:
+
+- Google loopback flow error has been fixed. See [Issue #10][19]
+
+### What remains to be done for version 0.0.6:
 
 - Write the implementation of the Help button (CommandButton5) in the new [XWizard][16] interface.
 
@@ -132,3 +130,4 @@ I will try to solve it ;-)
 [16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
 [17]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
 [18]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
+[19]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
