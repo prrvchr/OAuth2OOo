@@ -40,8 +40,8 @@ from .unotool import getDialog
 from .unotool import getParentWindow
 from .unotool import getStringResource
 
-from .interaction import UserHandler
-from .interaction import UserView
+from .dialog import UserHandler
+from .dialog import UserView
 
 from .logger import getLoggerSetting
 from .logger import getLoggerUrl
