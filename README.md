@@ -35,7 +35,7 @@ Because it is together that we can make Free Software smarter.
 
 ![OAuth2OOo Wizard Page4 screenshot][17]
 
-The OAuth2.0 protocol allows the connection to resource servers, after acceptance of the connection authorization, by exchange of tokens.
+The OAuth2 protocol allows access to server resources, after accepting the connection authorization, by exchanging tokens.
 
 The revocation takes place in the management of the applications associated with your account.
 

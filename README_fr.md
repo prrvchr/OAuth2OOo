@@ -35,7 +35,7 @@ Car c'est ensemble que nous pouvons rendre le Logiciel Libre plus intelligent.
 
 ![OAuth2OOo Wizard Page4 screenshot][17]
 
-Le protocole OAuth2.0 permet la connexion aux ressources de serveurs, après acceptation de l'autorisation de connexion, par échange de jetons.
+Le protocole OAuth2 permet d'accéder aux ressources de serveurs, après acceptation de l'autorisation de connexion, en échangeant des jetons.
 
 La révocation a lieu dans la gestion des applications associées à votre compte.
 
