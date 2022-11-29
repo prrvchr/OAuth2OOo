@@ -27,7 +27,13 @@ Because it is together that we can make Free Software smarter.
 
 ![OAuth2OOo Wizard Page3 screenshot][13]
 
-![OAuth2OOo Wizard Page4 screenshot][14]
+![OAuth2OOo Browser Page1 screenshot][14]
+
+![OAuth2OOo Browser Page2 screenshot][15]
+
+![OAuth2OOo Browser Page3 screenshot][16]
+
+![OAuth2OOo Wizard Page4 screenshot][17]
 
 The OAuth2.0 protocol allows the connection to resource servers, after acceptance of the connection authorization, by exchange of tokens.
 
@@ -40,7 +46,7 @@ No more password is stored in LibreOffice / OpenOffice.
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][15]** extension version 0.0.6.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** extension version 0.0.6.
 
 - Restart LibreOffice / OpenOffice after installation.
 
@@ -87,9 +93,9 @@ I will try to solve it ;-)
 
 ### What has been done for version 0.0.5:
 
-- Writing of a new [XWizard][16] interface in order to replace the Wizard service which became defective with version 6.4.x and 7.x of LibreOffice (see [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
+- Writing of a new [XWizard][19] interface in order to replace the Wizard service which became defective with version 6.4.x and 7.x of LibreOffice (see [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
 
-    This new interface also fixes [bug 132661][17] and [bug 132666][18] and allows access to versions 6.4.x and 7.x of LibreOffice...
+    This new interface also fixes [bug 132661][20] and [bug 132666][21] and allows access to versions 6.4.x and 7.x of LibreOffice...
 
     In addition this new XWizard adds new functionality such as:
 
@@ -102,11 +108,11 @@ I will try to solve it ;-)
 
 ### What has been done for version 0.0.6:
 
-- Google loopback flow error has been fixed. See [Issue #10][19]
+- Google loopback flow error has been fixed. See [Issue #10][22]
 
 ### What remains to be done for version 0.0.6:
 
-- Write the implementation of the Help button (CommandButton5) in the new [XWizard][16] interface.
+- Write the implementation of the Help button (CommandButton5) in the new [XWizard][19] interface.
 
 - Add new language for internationalization...
 
@@ -126,8 +132,11 @@ I will try to solve it ;-)
 [12]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
 [13]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
 [14]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>
-[15]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
-[16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
-[17]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
-[18]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
-[19]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
+[15]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5.png>
+[16]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6.png>
+[17]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7.png>
+[18]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
+[19]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
+[20]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
+[21]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
+[22]: <https://github.com/prrvchr/OAuth2OOo/issues/10>

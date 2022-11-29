@@ -27,7 +27,13 @@ Car c'est ensemble que nous pouvons rendre le Logiciel Libre plus intelligent.
 
 ![OAuth2OOo Wizard Page3 screenshot][13]
 
-![OAuth2OOo Wizard Page4 screenshot][14]
+![OAuth2OOo Browser Page1 screenshot][14]
+
+![OAuth2OOo Browser Page2 screenshot][15]
+
+![OAuth2OOo Browser Page3 screenshot][16]
+
+![OAuth2OOo Wizard Page4 screenshot][17]
 
 Le protocole OAuth2.0 permet la connexion aux ressources de serveurs, après acceptation de l'autorisation de connexion, par échange de jetons.
 
@@ -40,7 +46,7 @@ Plus aucun mot de passe n'est stocké dans LibreOffice / OpenOffice.
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][15]** version 0.0.6.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 0.0.6.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -87,9 +93,9 @@ J'essaierai de la résoudre ;-)
 
 ### Ce qui a été fait pour la version 0.0.5:
 
-- Ecriture d'une nouvelle interface [XWizard][16] afin de remplacer le service Wizard devenu défectueux avec les versions 6.4.x et 7.x de LibreOffice (voir [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
+- Ecriture d'une nouvelle interface [XWizard][19] afin de remplacer le service Wizard devenu défectueux avec les versions 6.4.x et 7.x de LibreOffice (voir [bug 132110](https://bugs.documentfoundation.org/show_bug.cgi?id=132110)).
 
-    Cette nouvelle interface corrige également le [bug 132661][17] et le [bug 132666][18] et permet d'accéder aux versions 6.4.x et 7.x de LibreOffice...
+    Cette nouvelle interface corrige également le [bug 132661][20] et le [bug 132666][21] et permet d'accéder aux versions 6.4.x et 7.x de LibreOffice...
 
     De plus, ce nouveau XWizard ajoute de nouvelles fonctionnalités telles que:
 
@@ -102,11 +108,11 @@ J'essaierai de la résoudre ;-)
 
 ### Ce qui a été fait pour la version 0.0.6:
 
-- L'erreur de flux de bouclage Google a été corrigée. Voir [Dysfonctionnement #10][19]
+- L'erreur de flux de bouclage Google a été corrigée. Voir [Dysfonctionnement #10][22]
 
 ### Que reste-t-il à faire pour la version 0.0.6:
 
-- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][16].
+- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][19].
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -126,8 +132,11 @@ J'essaierai de la résoudre ;-)
 [12]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [13]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
 [14]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4_fr.png>
-[15]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
-[16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
-[17]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
-[18]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
-[19]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
+[15]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5_fr.png>
+[16]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6_fr.png>
+[17]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7_fr.png>
+[18]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
+[19]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
+[20]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
+[21]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
+[22]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
