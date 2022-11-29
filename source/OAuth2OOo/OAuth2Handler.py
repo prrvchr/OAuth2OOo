@@ -36,15 +36,11 @@ from com.sun.star.lang import XServiceInfo
 from com.sun.star.lang import XInitialization
 from com.sun.star.task import XInteractionHandler2
 
-from oauth2 import getDialog
-from oauth2 import getStringResource
-
 from oauth2 import UserView
 from oauth2 import UserHandler
 from oauth2 import OAuth2Model
 from oauth2 import showOAuth2Wizard
 
-from oauth2 import g_extension
 from oauth2 import g_identifier
 
 import traceback
@@ -63,16 +59,12 @@ class OAuth2Handler(unohelper.Base,
         self._model = OAuth2Model(ctx, True)
         self._parent = None
         self._dialog = None
-        self._resources = getStringResource(ctx, g_identifier, g_extension)
 
     # XInitialization
     def initialize(self, properties):
-        print("OAuth2Handler.initialize() 1")
         for property in properties:
-            print("OAuth2Handler.initialize() 2 %s" % property.Name)
             if property.Name == 'Parent':
                 self._parent = property.Value
-                print("OAuth2Handler.initialize() 3 %s" % self._parent)
 
     # XInteractionHandler2, XInteractionHandler
     def handle(self, interaction):
@@ -84,7 +76,6 @@ class OAuth2Handler(unohelper.Base,
         # TODO: at line 525 in "_uno_struct__setattr__"
         # TODO: as a workaround we must set an "args" attribute of type "sequence<any>" to
         # TODO: IDL file of com.sun.star.auth.OAuth2Request Exception who is normally returned...
-        print("OAuth2Handler.handleInteractionRequest() 1")
         request = interaction.getRequest()
         url = request.ResourceUrl
         user = request.UserName
@@ -119,21 +110,17 @@ class OAuth2Handler(unohelper.Base,
         return token
 
     def _showUserDialog(self, interaction, url, message):
-        try:
-            title, label = self._model.getUserData(url, message)
-            self._dialog = UserView(self._ctx, UserHandler(self), self._parent, title, label)
-            status = self._dialog.execute()
-            approved = status == OK
-            continuation = interaction.getContinuations()[status]
-            if approved:
-                continuation.setUserName(self._dialog.getUser())
-            continuation.select()
-            self._dialog.dispose()
-            self._dialog = None
-            return approved
-        except Exception as e:
-            msg = "Error: %s" % traceback.print_exc()
-            print(msg)
+        title, label = self._model.getUserData(url, message)
+        self._dialog = UserView(self._ctx, UserHandler(self), self._parent, title, label)
+        status = self._dialog.execute()
+        approved = status == OK
+        continuation = interaction.getContinuations()[status]
+        if approved:
+            continuation.setUserName(self._dialog.getUser())
+        continuation.select()
+        self._dialog.dispose()
+        self._dialog = None
+        return approved
 
     def setUserName(self, email):
         self._dialog.enableOkButton(self._model.isEmailValid(email))
