@@ -61,18 +61,12 @@ class OAuth2Manager(unohelper.Base):
         self._model.startServer(scopes, self.notify, self.register)
 
     def commitPage(self, reason):
-        print("OAuth2Manager.commitPage()")
         return True
 
     def canAdvance(self):
-        advance = self._model.canAdvance()
-        print("OAuth2Manager.canAdvance() %s" % advance)
-        return advance
+        return self._model.isAuthorized()
 
 # OAuth2Manager setter methods
-    def updateTravelUI(self):
-        self._wizard.updateTravelUI()
-
     def notify(self, percent):
         self._view.notify(percent)
 

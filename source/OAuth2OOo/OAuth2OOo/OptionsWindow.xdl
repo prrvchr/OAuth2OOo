@@ -15,9 +15,9 @@
     <dlg:fixedline dlg:style-id="0" dlg:id="FixedLine2" dlg:tab-index="7" dlg:left="6" dlg:top="140" dlg:width="244" dlg:height="14" dlg:help-text="&amp;OptionsWindow.FixedLine2.HelpText" dlg:value="&amp;OptionsWindow.FixedLine2.Label"/>
     <dlg:text dlg:id="Label4" dlg:tab-index="8" dlg:left="10" dlg:top="160" dlg:width="10" dlg:height="15" dlg:help-text="&amp;OptionsWindow.Label4.HelpText" dlg:value="&amp;OptionsWindow.Label4.Label" dlg:valign="center" dlg:tabstop="false"/>
     <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="9" dlg:left="25" dlg:top="160" dlg:width="60" dlg:height="15" dlg:help-text="&amp;OptionsWindow.ComboBox1.HelpText" dlg:value="&amp;OptionsWindow.ComboBox1.Text" dlg:spin="true"/>
-    <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="10" dlg:left="95" dlg:top="160" dlg:width="85" dlg:height="15" dlg:help-text="&amp;OptionsWindow.CheckBox1.HelpText" dlg:value="&amp;OptionsWindow.CheckBox1.Label" dlg:valign="center" dlg:checked="false"/>
-    <dlg:button dlg:id="CommandButton1" dlg:tab-index="11" dlg:disabled="false" dlg:left="190" dlg:top="160" dlg:width="60" dlg:height="15" dlg:help-text="&amp;OptionsWindow.CommandButton1.HelpText" dlg:value="&amp;OptionsWindow.CommandButton1.Label">
+    <dlg:button dlg:id="CommandButton1" dlg:tab-index="10" dlg:disabled="false" dlg:left="95" dlg:top="160" dlg:width="60" dlg:height="15" dlg:help-text="&amp;OptionsWindow.CommandButton1.HelpText" dlg:value="&amp;OptionsWindow.CommandButton1.Label">
       <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:Connect" script:language="UNO"/>
     </dlg:button>
+    <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="11" dlg:left="165" dlg:top="160" dlg:width="85" dlg:height="15" dlg:help-text="&amp;OptionsWindow.CheckBox1.HelpText" dlg:value="&amp;OptionsWindow.CheckBox1.Label" dlg:valign="center" dlg:checked="false"/>
   </dlg:bulletinboard>
 </dlg:window>

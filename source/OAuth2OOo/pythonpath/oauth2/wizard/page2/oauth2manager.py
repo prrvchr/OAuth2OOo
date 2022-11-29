@@ -64,7 +64,7 @@ class OAuth2Manager(unohelper.Base):
         return self._view.isAccepted()
 
 # OAuth2Manager setter methods
-    def updateTravelUI(self):
+    def acceptTerms(self):
         self._wizard.updateTravelUI()
 
     def loadTermsOfUse(self):

@@ -70,16 +70,14 @@ class OAuth2Manager(unohelper.Base):
         self._view.setUserFocus()
 
     def commitPage(self, reason):
-        print("OAuth2Manager.commitPage() 1")
         if reason == FORWARD:
             self._model.initialize(self._view.getUrl(), self._view.getUser())
-            print("OAuth2Manager.commitPage() %s - %s" % (self._view.getUser(), self._view.getUrl()))
         return True
 
     def canAdvance(self):
         return not self._view.canAddItem() and self._model.isConfigurationValid(*self._view.getConfiguration())
 
-# IspdbManager setter methods
+# OAuth2Manager setter methods
     def setUser(self, user):
         self._setActivePath()
         self._view.setUserFocus()
@@ -88,22 +86,37 @@ class OAuth2Manager(unohelper.Base):
         self._view.enableRemoveUrl(inlist)
         # TODO: The Add URL button must be activated after defining the Provider and/or Scope
         self._view.enableAddUrl(False)
-        self._view.setUrl(*self._model.getUrl(url))
+        self._view.setProviders(*self._model.getUrlData(url))
         self._view.setUrlLabel(self._model.getUrlLabel(url))
         self._setActivePath()
         self._view.setUrlFocus()
 
     def addUrl(self):
-        pass
+        url = self._view.getUrl()
+        scope = self._view.getScope()
+        self._model.addUrl(url, scope)
+        self._view.addUrl(url)
+
+    def saveUrl(self):
+        url = self._view.getUrl()
+        scope = self._view.getScope()
+        self._model.saveUrl(url, scope)
+        self._view.enableSaveUrl(False)
+        self._wizard.updateTravelUI()
 
     def removeUrl(self):
-        pass
+        dialog = self._getMessageBox()
+        if dialog.execute() == OK:
+            url = self._view.getUrl()
+            self._model.removeUrl(url)
+            self._view.removeUrl(url)
+        dialog.dispose()
 
     def setProvider(self, provider, inlist):
         url = self._view.getUrl()
         self._view.enableAddProvider(False if inlist else self._model.isValueValid(provider))
         self._view.enableEditProvider(inlist)
-        self._view.enableRemoveProvider(inlist)
+        self._view.enableRemoveProvider(inlist and self._model.canRemoveProvider(provider))
         self._view.setScopes(self._model.getScopeList(provider))
         self._view.toggleAddUrl(inlist)
         self._setActivePath()
@@ -135,23 +148,27 @@ class OAuth2Manager(unohelper.Base):
             if new:
                 self._view.addProvider(provider)
                 self._view.toggleProviderButtons()
+            self._setActivePath()
         self._dialog.dispose()
         self._dialog = None
 
     def removeProvider(self):
         dialog = self._getMessageBox()
         if dialog.execute() == OK:
-            pass
+            provider = self._view.getProvider()
+            self._model.removeProvider(provider)
+            self._view.removeProvider(provider)
         dialog.dispose()
 
     def _getMessageBox(self):
         return createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
 
     def setUrlScope(self, scope, inlist):
+        url = self._view.getUrl()
         self._view.enableAddScope(False if inlist else self._model.isValueValid(scope))
         self._view.enableEditScope(inlist)
-        self._view.enableRemoveScope(inlist)
-        self._view.toggleAddUrl(inlist)
+        self._view.enableRemoveScope(inlist and self._model.canRemoveScope(scope))
+        self._view.toggleUrlButtons(inlist, inlist and self._model.isScopeChanged(url, scope))
         self._setActivePath()
         self._view.setScopeFocus()
 
@@ -177,7 +194,9 @@ class OAuth2Manager(unohelper.Base):
     def removeUrlScope(self):
         dialog = self._getMessageBox()
         if dialog.execute() == OK:
-            pass
+            scope = self._view.getScope()
+            self._model.removeScope(scope)
+            self._view.removeScope(scope, self._model.canRemoveProvider(self._view.getProvider()))
         dialog.dispose()
 
     def selectScope(self, selected):

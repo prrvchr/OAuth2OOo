@@ -46,8 +46,8 @@ class WindowHandler(unohelper.Base,
             if method == 'Update':
                 self._manager.updateToken()
                 handled = True
-            elif method == 'Revoke':
-                self._manager.revokeToken()
+            elif method == 'Delete':
+                self._manager.deleteUser()
                 handled = True
             elif method == 'Refresh':
                 self._manager.refreshToken()
@@ -59,5 +59,5 @@ class WindowHandler(unohelper.Base,
 
     def getSupportedMethodNames(self):
         return ('Update',
-                'Revoke',
+                'Delete',
                 'Refresh')

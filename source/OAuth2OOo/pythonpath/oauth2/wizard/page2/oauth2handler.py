@@ -44,7 +44,7 @@ class WindowHandler(unohelper.Base,
         try:
             handled = False
             if method == 'Accept':
-                self._manager.updateTravelUI()
+                self._manager.acceptTerms()
                 handled = True
             elif method == 'TermsOfUse':
                 self._manager.loadTermsOfUse()

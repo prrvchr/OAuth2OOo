@@ -56,6 +56,9 @@ class WindowHandler(unohelper.Base,
             elif method == 'AddUrl':
                 self._manager.addUrl()
                 handled = True
+            elif method == 'SaveUrl':
+                self._manager.saveUrl()
+                handled = True
             elif method == 'RemoveUrl':
                 self._manager.removeUrl()
                 handled = True
@@ -100,6 +103,7 @@ class WindowHandler(unohelper.Base,
         return ('SetUser',
                 'SetUrl',
                 'AddUrl',
+                'SaveUrl',
                 'RemoveUrl',
                 'SetProvider',
                 'AddProvider',

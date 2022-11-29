@@ -57,7 +57,10 @@ class OAuth2View(unohelper.Base):
         return self._getScopes().Text.strip()
 
     def canAddItem(self):
-        return any((self._canAddUrl(), self._getAddProvider().Model.Enabled, self._getAddScope().Model.Enabled))
+        return any((self._canAddUrl(),
+                    self._getSaveUrl().Model.Enabled,
+                    self._getAddProvider().Model.Enabled,
+                    self._getAddScope().Model.Enabled))
 
     def getConfiguration(self):
         return self.getUser(), self.getUrl(), self.getProvider(), self.getScope()
@@ -70,6 +73,9 @@ class OAuth2View(unohelper.Base):
 
     def enableAddUrl(self, enabled):
         self._getAddUrl().Model.Enabled = enabled
+
+    def enableSaveUrl(self, enabled):
+        self._getSaveUrl().Model.Enabled = enabled
 
     def enableRemoveUrl(self, enabled):
         self._getRemoveUrl().Model.Enabled = enabled
@@ -92,11 +98,27 @@ class OAuth2View(unohelper.Base):
     def enableRemoveScope(self, enabled):
         self._getRemoveScope().Model.Enabled = enabled
 
-    def setUrl(self, providers, provider, scope):
+    def setProviders(self, providers, provider, scope):
         control = self._getProviders()
         control.Model.StringItemList = providers
         control.Text = provider
         self._getScopes().Text = scope
+
+    def addUrl(self, url):
+        control = self._getUrls()
+        control.addItem(url, control.getItemCount())
+        self.enableAddUrl(False)
+        self.enableRemoveUrl(True)
+
+    def removeUrl(self, url):
+        self._removeItem(self._getUrls(), url)
+
+    def removeProvider(self, provider):
+        self._removeItem(self._getProviders(), provider)
+
+    def removeScope(self, scope, enabled):
+        self._removeItem(self._getScopes(), scope)
+        self.enableRemoveProvider(enabled)
 
     def setScopes(self, scopes):
         control = self._getScopes()
@@ -128,7 +150,13 @@ class OAuth2View(unohelper.Base):
         control.addItem(scope, control.getItemCount())
 
     def toggleAddUrl(self, inlist):
-        self._getAddUrl().Model.Enabled = inlist and self._canAddUrl()
+        state = inlist and self._canAddUrl()
+        self._getAddUrl().Model.Enabled = state
+
+    def toggleUrlButtons(self, inlist, enabled):
+        state = inlist and self._canAddUrl()
+        self._getAddUrl().Model.Enabled = state
+        self._getSaveUrl().Model.Enabled = not state and enabled
 
     def toggleProviderButtons(self):
         self._getAddProvider().Model.Enabled = False
@@ -149,6 +177,12 @@ class OAuth2View(unohelper.Base):
         # TODO: OpenOffice has strange behavior if StringItemList is empty
         return control.getItems() if control.getItemCount() > 0 else ()
 
+    def _removeItem(self, control, item):
+        items = self._getControlItems(control)
+        if item in items:
+            control.Model.removeItem(items.index(item))
+            control.Text = ''
+
 # OAuth2View private getter control methods
     def _getUser(self):
         return self._window.getControl('TextField1')
@@ -165,26 +199,29 @@ class OAuth2View(unohelper.Base):
     def _getAddUrl(self):
         return self._window.getControl('CommandButton1')
 
-    def _getRemoveUrl(self):
+    def _getSaveUrl(self):
         return self._window.getControl('CommandButton2')
 
-    def _getAddProvider(self):
+    def _getRemoveUrl(self):
         return self._window.getControl('CommandButton3')
 
-    def _getEditProvider(self):
+    def _getAddProvider(self):
         return self._window.getControl('CommandButton4')
 
-    def _getRemoveProvider(self):
+    def _getEditProvider(self):
         return self._window.getControl('CommandButton5')
 
-    def _getAddScope(self):
+    def _getRemoveProvider(self):
         return self._window.getControl('CommandButton6')
 
-    def _getEditScope(self):
+    def _getAddScope(self):
         return self._window.getControl('CommandButton7')
 
-    def _getRemoveScope(self):
+    def _getEditScope(self):
         return self._window.getControl('CommandButton8')
+
+    def _getRemoveScope(self):
+        return self._window.getControl('CommandButton9')
 
     def _getUrlLabel(self):
         return self._window.getControl('Label4')

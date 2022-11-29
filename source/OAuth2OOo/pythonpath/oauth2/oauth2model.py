@@ -175,7 +175,7 @@ class OAuth2Model(unohelper.Base):
         return False
 
     def isUrlScopeAuthorized(self):
-        scopes = self._configuration.getByNames('Scopes')
+        scopes = self._configuration.getByName('Scopes')
         providers = self._configuration.getByName('Providers')
         if scopes.hasByName(self._scope):
             values = providers.getByName(self._provider).getByName('Users').getByName(self._user).getByName('Scopes')
@@ -325,10 +325,62 @@ class OAuth2Model(unohelper.Base):
         return (clientid, authorizationurl, tokenurl, codechallenge, codechallengemethod, clientsecret,
                 authorizationparameters, tokenparameters, redirectaddress, redirectport, httphandler)
 
-    def getUrl(self, url):
+    def getUrlData(self, url):
         scope = self._getScope(url)
         provider = self._getProvider(scope)
         return self._getProviderList(), provider, scope
+
+    def addUrl(self, name, scope):
+        urls = self._configuration.getByName('Urls')
+        if not urls.hasByName(name):
+            urls.insertByName(name, urls.createInstance())
+        url = urls.getByName(name)
+        url.replaceByName('Scope', scope)
+        self.commit()
+
+    def saveUrl(self, url, scope):
+        urls = self._configuration.getByName('Urls')
+        if urls.hasByName(url):
+             urls.getByName(url).replaceByName('Scope', scope)
+             self.commit()
+
+    def removeUrl(self, url):
+        urls = self._configuration.getByName('Urls')
+        if urls.hasByName(url):
+            urls.removeByName(url)
+            self.commit()
+
+    def canRemoveProvider(self, provider):
+        scopes = self._configuration.getByName('Scopes')
+        for scope in scopes.ElementNames:
+            if scopes.getByName(scope).getByName('Provider') == provider:
+                return False
+        return True
+
+    def canRemoveScope(self, scope):
+        urls = self._configuration.getByName('Urls')
+        for url in urls.ElementNames:
+            if urls.getByName(url).getByName('Scope') == scope:
+                return False
+        return True
+
+    def removeProvider(self, provider):
+        providers = self._configuration.getByName('Providers')
+        if providers.hasByName(provider):
+            providers.removeByName(provider)
+            self.commit()
+
+    def removeScope(self, scope):
+        scopes = self._configuration.getByName('Scopes')
+        if scopes.hasByName(scope):
+            scopes.removeByName(scope)
+            self.commit()
+
+    def isScopeChanged(self, url, scope):
+        urls = self._configuration.getByName('Urls')
+        if urls.hasByName(url):
+            return urls.getByName(url).getByName('Scope') != scope
+        return False
 
     def getScopeList(self, provider):
         scopes = []
@@ -479,9 +531,6 @@ class OAuth2Model(unohelper.Base):
         self._watchdog.start()
         logMessage(self._ctx, INFO, "WizardServer Started ... Done", 'OAuth2Manager', 'startServer()')
 
-    def canAdvance(self):
-        return self._watchdog is None
-
     def cancelServer(self):
         if self._watchdog is not None:
             if self._watchdog.is_alive():
@@ -545,14 +594,14 @@ class OAuth2Model(unohelper.Base):
         response = self._getResponseFromRequest(url, data, self.Timeout)
         self._saveToken(user, *self._getTokenFromResponse(response))
 
-    def revokeToken(self):
-        provider = self._configuration.getByName('Providers').getByName(self._provider)
-        user = provider.getByName('Users').getByName(self._user)
-        token = user.getByName('AccessToken')
-        url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % token
-        data = {'token': token}
-        response = self._getResponseFromRequest(url, data, self.Timeout)
-        print("OAuth2Model.revokeToken() %s" % (response, ))
+    def deleteUser(self):
+        providers = self._configuration.getByName('Providers')
+        if providers.hasByName(self._provider):
+            provider = providers.getByName(self._provider)
+            users = provider.getByName('Users')
+            if users.hasByName(self._user):
+                users.removeByName(self._user)
+                self.commit()
 
     def _getRefreshParameters(self, user, provider):
         parameters = self._getRefreshBaseParameters(user, provider)

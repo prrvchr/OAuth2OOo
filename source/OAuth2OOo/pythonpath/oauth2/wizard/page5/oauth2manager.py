@@ -29,9 +29,13 @@
 
 import unohelper
 
+from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
+
 from .oauth2handler import WindowHandler
 
 from .oauth2view import OAuth2View
+
+from ...unotool import createMessageBox
 
 import traceback
 
@@ -54,6 +58,7 @@ class OAuth2Manager(unohelper.Base):
 
     def activatePage(self):
         self._view.setToken(*self._model.getTokenData())
+        self._wizard.activatePath(2, True)
 
     def commitPage(self, reason):
         return True
@@ -65,8 +70,12 @@ class OAuth2Manager(unohelper.Base):
     def updateToken(self):
         self._view.setToken(*self._model.getTokenData())
 
-    def revokeToken(self):
-        self._model.revokeToken()
+    def deleteUser(self):
+        dialog = createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
+        if dialog.execute() == OK:
+            self._model.deleteUser()
+            self._wizard.travelPrevious()
+        dialog.dispose()
 
     def refreshToken(self):
         self._model.refreshToken()
