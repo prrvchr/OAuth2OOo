@@ -33,6 +33,8 @@ import unohelper
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
+from com.sun.star.frame.DispatchResultState import SUCCESS
+
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_refresh_overlap
@@ -59,14 +61,14 @@ import traceback
 
 
 class OAuth2Model(unohelper.Base):
-    def __init__(self, ctx, close=False):
+    def __init__(self, ctx, close=None, url='', user=''):
         self._ctx = ctx
         self._user = ''
         self._url = ''
         self._scope = ''
         self._provider = ''
         self._uuid = ''
-        self._close = close
+        self._close = False
         self._uri = 'http://%s:%s/'
         self._urn = 'urn:ietf:wg:oauth:2.0:oob'
         self._watchdog = None
@@ -82,23 +84,21 @@ class OAuth2Model(unohelper.Base):
                            'TokenRefresh': 'PageWizard5.Label5.Label',
                            'TokenExpires': 'PageWizard5.Label9.Label',
                            'DialogTitle': 'MessageBox.Title',
-                           'DialogMessage': 'MessageBox.Message'}
+                           'DialogMessage': 'MessageBox.Message',
+                           'UserTitle': 'UserDialog.Title',
+                           'UserLabel': 'UserDialog.Label1.Label'}
+        self.initialize(url, user, close)
 
-    @property
-    def User(self):
-        return self._user
-    @User.setter
-    def User(self, user):
+    def initialize(self, url, user, close=None):
         self._user = user
+        self.initializeUrl(url, close)
 
-    @property
-    def Url(self):
-        return self._url
-    @Url.setter
-    def Url(self, url):
+    def initializeUrl(self, url, close=None):
         self._url = url
         self._scope, self._provider = self._getUrlData(url)
         self._uuid = generateUuid()
+        if close is not None:
+            self._close = close
 
     def _getUrlData(self, url):
         scope = provider = ''
@@ -109,6 +109,14 @@ class OAuth2Model(unohelper.Base):
             if scopes.hasByName(scope):
                 provider = scopes.getByName(scope).getByName('Provider')
         return scope, provider
+
+    @property
+    def User(self):
+        return self._user
+
+    @property
+    def Url(self):
+        return self._url
 
     @property
     def Timeout(self):
@@ -151,6 +159,13 @@ class OAuth2Model(unohelper.Base):
     def getOptionsDialogData(self):
         return self.ConnectTimeout, self.ReadTimeout, self.HandlerTimeout, self.UrlList
 
+# OAuth2Model getter methods called by OAuth2Handler
+    def getUserData(self, url, msg):
+        provider = self.getProviderName(url)
+        title = self.getUserTitle(provider)
+        label = self.getUserLabel(msg)
+        return title, label
+
 # OAuth2Model getter methods called by OAuth2Service
     def isInitialized(self):
         providers = self._configuration.getByName('Providers')
@@ -189,15 +204,23 @@ class OAuth2Model(unohelper.Base):
         provider = self._configuration.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
         return user.getByName('AccessToken')
-
+ 
     def dispose(self):
         self.cancelServer()
+
+    def initializeSession(self, url, user):
+        self.Url = url
+        self.User = user
+        return self.isInitialized()
+
+    def isAuthorized(self):
+        return self.isInitialized() and self.isUrlScopeAuthorized()
 
 # OAuth2Model getter methods called by WizardPages 1
     def getActivePath(self, user, url, provider, scope):
         urls = self._configuration.getByName('Urls')
         providers = self._configuration.getByName('Providers')
-        if urls.hasByName(url) and self.isAuthorized(user, scope, provider, providers):
+        if urls.hasByName(url) and self._isAuthorized(user, scope, provider, providers):
             path = 2
         elif providers.hasByName(provider) and not providers.getByName(provider).getByName('HttpHandler'):
             path = 1
@@ -205,7 +228,7 @@ class OAuth2Model(unohelper.Base):
             path = 0
         return path
 
-    def isAuthorized(self, user, scope, provider, providers):
+    def _isAuthorized(self, user, scope, provider, providers):
         values = self._getScopeValues(scope)
         authorized = len(values) > 0
         scopes = ()
@@ -728,4 +751,12 @@ class OAuth2Model(unohelper.Base):
     def getDialogMessage(self):
         resource = self._resources.get('DialogMessage')
         return self._resolver.resolveString(resource)
+
+    def getUserTitle(self, provider):
+        resource = self._resources.get('UserTitle')
+        return self._resolver.resolveString(resource) % provider
+
+    def getUserLabel(self, msg):
+        resource = self._resources.get('UserLabel')
+        return self._resolver.resolveString(resource) % msg
 

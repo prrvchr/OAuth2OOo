@@ -72,8 +72,7 @@ class OAuth2Manager(unohelper.Base):
     def commitPage(self, reason):
         print("OAuth2Manager.commitPage() 1")
         if reason == FORWARD:
-            self._model.User = self._view.getUser()
-            self._model.Url = self._view.getUrl()
+            self._model.initialize(self._view.getUrl(), self._view.getUser())
             print("OAuth2Manager.commitPage() %s - %s" % (self._view.getUser(), self._view.getUrl()))
         return True
 

@@ -113,6 +113,7 @@ class OptionsManager(unohelper.Base):
             if url != '':
                 message = self._model.getProviderName(url)
                 user = getOAuth2UserName(self._ctx, self, url, message)
+                print("OptionsManager.connect() 1 %s" % user)
             autoclose = self._view.getAutoClose()
             service = createService(self._ctx, g_oauth2)
             enabled = service.getAuthorization(url, user, autoclose, self._view.getParent())

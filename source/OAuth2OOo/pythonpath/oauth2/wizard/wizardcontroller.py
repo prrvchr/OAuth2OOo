@@ -48,12 +48,10 @@ import traceback
 
 class WizardController(unohelper.Base,
                        XWizardController):
-    def __init__(self, ctx, wizard, model, user, url):
+    def __init__(self, ctx, wizard, model):
         self._ctx = ctx
         self._wizard = wizard
         self._model = model
-        self._model.User = user
-        self._model.Url = url
 
     @property
     def User(self):
@@ -61,6 +59,9 @@ class WizardController(unohelper.Base,
     @property
     def Url(self):
         return self._model.Url
+    @property
+    def Token(self):
+        return self._model.getToken()
 
     def dispose(self):
         self._model.dispose()

@@ -35,6 +35,7 @@ from com.sun.star.frame import XNotifyingDispatch
 from com.sun.star.frame.DispatchResultState import SUCCESS
 from com.sun.star.frame.DispatchResultState import FAILURE
 
+from .oauth2model import OAuth2Model
 from .oauth2helper import showOAuth2Wizard
 
 import traceback
@@ -67,7 +68,8 @@ class OAuth2Dispatch(unohelper.Base,
                     user = argument.Value
                 elif argument.Name == 'Close':
                     close = argument.Value
-            state, result = showOAuth2Wizard(self._ctx, url, user, close, self._parent)
+            model = OAuth2Model(self._ctx, close, url, user)
+            state, result = showOAuth2Wizard(self._ctx, model, self._parent)
         return state, result
 
     def addStatusListener(self, listener, url):

@@ -31,13 +31,14 @@ import uno
 import unohelper
 
 from com.sun.star.lang import XServiceInfo
-from com.sun.star.lang import XInitialization
-from com.sun.star.task import XInteractionHandler2
 from com.sun.star.auth import XOAuth2Service
+
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
+
 from com.sun.star.ucb.ConnectionMode import OFFLINE
 from com.sun.star.ucb.ConnectionMode import ONLINE
+
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
 
@@ -52,9 +53,7 @@ from oauth2 import KeyMap
 
 from oauth2 import createService
 from oauth2 import execute
-from oauth2 import getDialog
 from oauth2 import getParentWindow
-from oauth2 import getStringResource
 from oauth2 import getSessionMode
 from oauth2 import logMessage
 from oauth2 import showOAuth2Wizard
@@ -66,7 +65,6 @@ from oauth2 import Enumerator
 from oauth2 import Iterator
 from oauth2 import InputStream
 from oauth2 import Uploader
-from oauth2 import DialogHandler
 
 from oauth2 import g_extension
 from oauth2 import g_identifier
@@ -87,8 +85,6 @@ g_ImplementationName = g_oauth2
 
 class OAuth2Service(unohelper.Base,
                     XServiceInfo,
-                    XInitialization,
-                    XInteractionHandler2,
                     XOAuth2Service):
     def __init__(self, ctx):
         self._ctx = ctx
@@ -97,7 +93,6 @@ class OAuth2Service(unohelper.Base,
         self._session = self._getSession()
         self._parent = None
         self._warnings = []
-        self._resources = getStringResource(ctx, g_identifier, 'OAuth2OOo')
         self._mode = OFFLINE
 
     @property
@@ -112,68 +107,6 @@ class OAuth2Service(unohelper.Base,
     @property
     def Timeout(self):
         return self._model.Timeout
-
-    # XInitialization
-    def initialize(self, properties):
-        print("OAuth2Service.initialize() 1")
-        for property in properties:
-            print("OAuth2Service.initialize() 2")
-            if property.Name == 'Parent':
-                self._parent = property.Value
-                print("OAuth2Service.initialize() 3 %s" % self._parent)
-
-    # XInteractionHandler2, XInteractionHandler
-    def handle(self, interaction):
-        self.handleInteractionRequest(interaction)
-    def handleInteractionRequest(self, interaction):
-        # TODO: interaction.getRequest() does not seem to be functional under LibreOffice !!!
-        # TODO: throw error AttributeError: "args"
-        # TODO: on File "/usr/lib/python3/dist-packages/uno.py"
-        # TODO: at line 525 in "_uno_struct__setattr__"
-        # TODO: as a workaround we must set an "args" attribute of type "sequence<any>" to
-        # TODO: IDL file of com.sun.star.auth.OAuth2Request Exception who is normally returned...
-        print("OAuth2Service.handleInteractionRequest() 1")
-        request = interaction.getRequest()
-        url = request.ResourceUrl
-        user = request.UserName
-        if user != '':
-            approved = self._getToken(interaction, url, user, request.Format)
-        else:
-            approved = self._showUserDialog(interaction, url, request.Message)
-        return approved
-
-    def _getToken(self, interaction, url, user, format):
-        self.initializeSession(url, user)
-        token = self.getToken(format)
-        status = 1 if token != '' else 0
-        continuation = interaction.getContinuations()[status]
-        if status:
-            continuation.setToken(token)
-        continuation.select()
-        return status == 1
-
-    def _showUserDialog(self, interaction, url, message):
-        provider = self._model.getProviderName(url)
-        dialog = getDialog(self._ctx, g_extension, 'UserDialog', DialogHandler(), self._parent)
-        self._initUserDialog(dialog, provider, message)
-        status = dialog.execute()
-        approved = status == OK
-        continuation = interaction.getContinuations()[status]
-        if approved:
-            continuation.setUserName(self._getUserName(dialog))
-        continuation.select()
-        dialog.dispose()
-        return approved
-
-    def _initUserDialog(self, dialog, provider, message):
-        title = self._resources.resolveString('UserDialog.Title')
-        label = self._resources.resolveString('UserDialog.Label1.Label')
-        dialog.setTitle(title % provider)
-        dialog.getControl('Label1').Text = label % message
-
-    def _getUserName(self, dialog):
-        return dialog.getControl('TextField1').Model.Text
-
 
     # XOAuth2Service
     def getWarnings(self):
@@ -193,12 +126,11 @@ class OAuth2Service(unohelper.Base,
         return requests.utils.unquote(url)
 
     def initializeUrl(self, url):
-        self._model.Url = url
+        self._model.initializeUrl(url)
         return True
 
     def initializeSession(self, url, user):
-        self._model.Url = url
-        self._model.User = user
+        self._model.initialize(url, user)
         return self._model.isInitialized()
 
     def getKeyMap(self):
@@ -208,18 +140,16 @@ class OAuth2Service(unohelper.Base,
         return getSessionMode(self._ctx, host)
 
     def getAuthorization(self, url, user, close=True, parent=None):
-        print("OAuth2Service.getAuthorization() 1")
+        print("OAuth2Service.getAuthorization() 1 %s" % user)
         authorized = False
-        state, result = showOAuth2Wizard(self._ctx, url, user, close, parent)
+        self._model.initialize(url, user, close)
+        state, result = showOAuth2Wizard(self._ctx, self._model, parent)
         print("OAuth2Service.getAuthorization() 2")
         if state == SUCCESS:
-            authorized = self.initializeSession(*result)
+            url, user, token = result
+            authorized = self.initializeSession(url, user)
         print("OAuth2Service.getAuthorization() 3")
         return authorized
-
-    def dispatchFinished(self, result):
-        print("OAuth2Service.dispatchFinished()  %s ***********************" % (result, ))
-        self._result = result
 
     def getToken(self, format=''):
         level = INFO
@@ -316,20 +246,3 @@ g_ImplementationHelper.addImplementation(OAuth2Service,
                                          g_ImplementationName,
                                         (g_ImplementationName,))
 
-
-class DispatchListener(unohelper.Base,
-                       XDispatchResultListener):
-    def __init__(self, manager):
-        self._manager = manager
-
-    # XDispatchResultListener
-    def dispatchFinished(self, notification):
-        try:
-            if notification.State == SUCCESS:
-                self._manager.dispatchFinished(notification.Result)
-        except Exception as e:
-            msg = "Error: %s" % traceback.print_exc()
-            print(msg)
-
-    def disposing(self, source):
-        pass
