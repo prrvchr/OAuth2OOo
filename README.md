@@ -108,7 +108,28 @@ I will try to solve it ;-)
 
 ### What has been done for version 0.0.6:
 
-- Google loopback flow error has been fixed. See [Issue #10][22]
+- Rewrite of the OAuth2 wizard trying to follow the MCV model as best as possible. This wizard is made up of 5 pages inheriting from the UNO [XWizardPage][22] interface:
+
+    - Page 1: [Controller][23] and [View][24]
+    - Page 2: [Controller][25] and [View][26]
+    - Page 3: [Controller][27] and [View][28]
+    - Page 4: [Controller][29] and [View][30]
+    - Page 5: [Controller][31] and [View][32]
+
+- Rewrite of the three UNO services provided by the OAuth2OOo extension in three separate files:
+
+    - The [OAuth2Service][33] service implementing the interface described in the [XOAuth2Service][34] IDL file.
+    - The [OAuth2Dispacher][35] service implementing the UNO interface [XDispatchProvider][36].
+    - The [OAuth2Handler][37] service implementing the UNO interface [XInteractionHandler2][38].
+
+- Rewrite of the options dialog accessible by **Tools -> Options -> Internet -> Protocol OAuth2**. This dialog is composed of two windows:
+
+    - The logging window: [Controller][39] and [View][40].
+    - The OAuth2OOo extension configuration options window: [Controller][41] and [View][42].
+
+- Rewrite a single model: [OAuth2Model][43] managing wizard, services and options dialog.
+
+- Google loopback flow error has been fixed. See [Issue #10][44]
 
 ### What remains to be done for version 0.0.6:
 
@@ -139,4 +160,26 @@ I will try to solve it ;-)
 [19]: <https://github.com/prrvchr/OAuth2OOo/blob/master/python/wizard.py>
 [20]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
 [21]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
-[22]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
+[22]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/ui/dialogs/XWizardPage.html>
+[23]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page1/oauth2manager.py>
+[24]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page1/oauth2view.py>
+[25]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page2/oauth2manager.py>
+[26]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page2/oauth2view.py>
+[27]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page3/oauth2manager.py>
+[28]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page3/oauth2view.py>
+[29]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page4/oauth2manager.py>
+[30]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page4/oauth2view.py>
+[31]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page5/oauth2manager.py>
+[32]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/wizard/page5/oauth2view.py>
+[33]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2Service.py>
+[34]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
+[35]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2Dispatcher.py>
+[36]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/frame/XDispatchProvider.html>
+[37]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2Handler.py>
+[38]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/task/XInteractionHandler2.html>
+[39]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logger.py>
+[40]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logview.py>
+[41]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/options/optionsmanager.py>
+[42]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/options/optionsview.py>
+[43]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/oauth2model.py>
+[44]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
