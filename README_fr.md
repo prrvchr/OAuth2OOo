@@ -177,7 +177,7 @@ J'essaierai de la résoudre ;-)
 [36]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/frame/XDispatchProvider.html>
 [37]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2Handler.py>
 [38]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/task/XInteractionHandler2.html>
-[39]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logger.py>
+[39]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logmanager.py>
 [40]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logview.py>
 [41]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/options/optionsmanager.py>
 [42]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/pythonpath/oauth2/options/optionsview.py>
