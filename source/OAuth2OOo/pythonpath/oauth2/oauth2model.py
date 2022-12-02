@@ -45,6 +45,7 @@ from .unotool import getCurrentLocale
 from .unotool import getStringResource
 
 from .logger import logMessage
+from .logger import disposeLogger
 
 from .wizard import WatchDog
 from .wizard import Server
@@ -207,6 +208,7 @@ class OAuth2Model(unohelper.Base):
  
     def dispose(self):
         self.cancelServer()
+        disposeLogger()
 
     def initializeSession(self, url, user):
         self.Url = url

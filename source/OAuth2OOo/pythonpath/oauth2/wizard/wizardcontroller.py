@@ -36,6 +36,7 @@ from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
 from ..logger import logMessage
+from ..logger import disposeLogger
 
 from .page1 import OAuth2Manager as WizardPage1
 from .page2 import OAuth2Manager as WizardPage2
@@ -66,6 +67,7 @@ class WizardController(unohelper.Base,
     def dispose(self):
         self._model.dispose()
         self._wizard.DialogWindow.dispose()
+        disposeLogger()
 
 # XWizardController
     def createPage(self, parent, pageid):

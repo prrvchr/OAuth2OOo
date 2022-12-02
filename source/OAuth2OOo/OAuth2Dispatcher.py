@@ -30,7 +30,11 @@
 import uno
 import unohelper
 
+from com.sun.star.frame.DispatchResultState import SUCCESS
+from com.sun.star.frame.DispatchResultState import FAILURE
+
 from com.sun.star.frame import XDispatchProvider
+from com.sun.star.frame import XNotifyingDispatch
 
 from com.sun.star.lang import XInitialization
 from com.sun.star.lang import XServiceInfo
@@ -38,9 +42,9 @@ from com.sun.star.lang import XServiceInfo
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from oauth2 import OAuth2Dispatch
+from oauth2 import OAuth2Model
+from oauth2 import showOAuth2Wizard
 
-from oauth2 import getMessage
 from oauth2 import logMessage
 from oauth2 import g_identifier
 
@@ -69,7 +73,7 @@ class OAuth2Dispatcher(unohelper.Base,
     def queryDispatch(self, url, frame, flags):
         dispatch = None
         if url.Path in ('wizard',):
-            parent = self._frame.getContainerWindow()
+            parent = self._frame.getContainerWindow().getPeer()
             dispatch = OAuth2Dispatch(self._ctx, parent)
         return dispatch
 
@@ -92,3 +96,44 @@ class OAuth2Dispatcher(unohelper.Base,
 g_ImplementationHelper.addImplementation(OAuth2Dispatcher,                          # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                         (g_ImplementationName,))                    # List of implemented services
+
+
+class OAuth2Dispatch(unohelper.Base,
+                     XNotifyingDispatch):
+    def __init__(self, ctx, parent):
+        self._ctx = ctx
+        self._parent = parent
+        self._listeners = []
+
+# XNotifyingDispatch
+    def dispatchWithNotification(self, uri, arguments, listener):
+        state, result = self.dispatch(uri, arguments)
+        struct = 'com.sun.star.frame.DispatchResultEvent'
+        notification = uno.createUnoStruct(struct, self, state, result)
+        listener.dispatchFinished(notification)
+
+    def dispatch(self, uri, arguments):
+        state = FAILURE
+        result = ()
+        if uri.Path == 'wizard':
+            url = user = ''
+            close = True
+            for argument in arguments:
+                if argument.Name == 'Url':
+                    url = argument.Value
+                elif argument.Name == 'UserName':
+                    user = argument.Value
+                elif argument.Name == 'Close':
+                    close = argument.Value
+            model = OAuth2Model(self._ctx, close, url, user)
+            state, result = showOAuth2Wizard(self._ctx, model, self._parent)
+        return state, result
+
+    def addStatusListener(self, listener, url):
+        pass
+
+    def removeStatusListener(self, listener, url):
+        pass
+
+
+

@@ -1,7 +1,5 @@
-#!
-# -*- coding: utf-8 -*-
-
-"""
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
 ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
@@ -25,56 +23,49 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
-"""
-
-import uno
-import unohelper
-
-from com.sun.star.frame import XNotifyingDispatch
-
-from com.sun.star.frame.DispatchResultState import SUCCESS
-from com.sun.star.frame.DispatchResultState import FAILURE
-
-from .oauth2model import OAuth2Model
-from .oauth2helper import showOAuth2Wizard
-
-import traceback
-
-
-class OAuth2Dispatch(unohelper.Base,
-                     XNotifyingDispatch):
-    def __init__(self, ctx, parent):
-        self._ctx = ctx
-        self._parent = parent
-        self._listeners = []
-
-# XNotifyingDispatch
-    def dispatchWithNotification(self, uri, arguments, listener):
-        state, result = self.dispatch(uri, arguments)
-        struct = 'com.sun.star.frame.DispatchResultEvent'
-        notification = uno.createUnoStruct(struct, self, state, result)
-        listener.dispatchFinished(notification)
-
-    def dispatch(self, uri, arguments):
-        state = FAILURE
-        result = ()
-        if uri.Path == 'wizard':
-            url = user = ''
-            close = True
-            for argument in arguments:
-                if argument.Name == 'Url':
-                    url = argument.Value
-                elif argument.Name == 'UserName':
-                    user = argument.Value
-                elif argument.Name == 'Close':
-                    close = argument.Value
-            model = OAuth2Model(self._ctx, close, url, user)
-            state, result = showOAuth2Wizard(self._ctx, model, self._parent)
-        return state, result
-
-    def addStatusListener(self, listener, url):
-        pass
-
-    def removeStatusListener(self, listener, url):
-        pass
-
+-->
+<oor:component-data
+  xmlns:oor="http://openoffice.org/2001/registry"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  oor:package="org.openoffice.Office"
+  oor:name="Addons">
+  <node oor:name="AddonUI">
+    <node oor:name="AddonMenu">
+      <node oor:name="testdunnomunique" oor:op="replace">
+        <prop oor:name="Title" oor:type="xs:string">
+          <value xml:lang="en">OAuth2OOo</value>
+          <value xml:lang="fr">OAuth2OOo</value>
+        </prop>
+        <prop oor:name="Target" oor:type="xs:string">
+          <value>_self</value>
+        </prop>
+        <prop oor:name="ImageIdentifier" oor:type="xs:string">
+          <value>%origin%/OAuth2OOo/OAuth2OOo.png</value>
+        </prop>
+        <prop oor:name="Context" oor:type="xs:string">
+          <value></value>
+        </prop>
+        <node oor:name="Submenu">
+          <node oor:name="Menu115248" oor:op="replace">
+            <prop oor:name="Title" oor:type="xs:string">
+              <value xml:lang="en">OAuth2 Wizard</value>
+              <value xml:lang="fr">Assistant OAuth2</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+            <prop oor:name="ImageIdentifier" oor:type="xs:string">
+              <value></value>
+            </prop>
+            <prop oor:name="Context" oor:type="xs:string">
+              <value></value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>oauth2:wizard</value>
+            </prop>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</oor:component-data>

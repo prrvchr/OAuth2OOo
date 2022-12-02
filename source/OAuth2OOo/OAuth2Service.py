@@ -31,6 +31,7 @@ import uno
 import unohelper
 
 from com.sun.star.lang import XServiceInfo
+from com.sun.star.lang import EventObject
 from com.sun.star.auth import XOAuth2Service
 
 from com.sun.star.logging.LogLevel import INFO
@@ -52,6 +53,7 @@ from com.sun.star.auth import OAuth2Request
 from oauth2 import KeyMap
 
 from oauth2 import createService
+from oauth2 import disposeLogger
 from oauth2 import execute
 from oauth2 import getParentWindow
 from oauth2 import getSessionMode
@@ -91,7 +93,7 @@ class OAuth2Service(unohelper.Base,
         self._result = None
         self._model = OAuth2Model(ctx, True)
         self._session = self._getSession()
-        self._parent = None
+        self._listeners = []
         self._warnings = []
         self._mode = OFFLINE
 
@@ -140,15 +142,15 @@ class OAuth2Service(unohelper.Base,
         return getSessionMode(self._ctx, host)
 
     def getAuthorization(self, url, user, close=True, parent=None):
-        print("OAuth2Service.getAuthorization() 1 %s" % user)
         authorized = False
+        msg = "Request Authorization ... "
         self._model.initialize(url, user, close)
         state, result = showOAuth2Wizard(self._ctx, self._model, parent)
-        print("OAuth2Service.getAuthorization() 2")
         if state == SUCCESS:
             url, user, token = result
             authorized = self.initializeSession(url, user)
-        print("OAuth2Service.getAuthorization() 3")
+        msg += "Authorization has been granted..." if authorized else "Authorization was not granted..."
+        logMessage(self._ctx, INFO, msg, 'OAuth2Service', 'getAuthorization()')
         return authorized
 
     def getToken(self, format=''):
@@ -208,9 +210,8 @@ class OAuth2Service(unohelper.Base,
             return True
         print("OAuth2Service._isAuthorized() 2")
         msg = "OAuth2 initialization ... AuthorizationCode needed ..."
-        parent = getParentWindow(self._ctx) if self._parent is None else self._parent
         print("OAuth2Service._isAuthorized() 3")
-        if self.getAuthorization(self.ResourceUrl, self.UserName, True, parent):
+        if self.getAuthorization(self.ResourceUrl, self.UserName, True, getParentWindow(self._ctx)):
             print("OAuth2Service._isAuthorized() 4")
             msg += " Done"
             logMessage(self._ctx, INFO, msg, 'OAuth2Service', '_isAuthorized()')
@@ -232,6 +233,18 @@ class OAuth2Service(unohelper.Base,
         error.Message = message
         error.Context = self
         return error
+
+    # XComponent
+    def dispose(self):
+        source = EventObject(self)
+        for listener in self._listeners:
+            listener.disposing(source)
+        disposeLogger()
+    def addEventListener(self, listener):
+        self._listeners.append(listener)
+    def removeEventListener(self, listener):
+        if listener in self._listeners:
+            self._listeners.remove(listener)
 
     # XServiceInfo
     def supportsService(self, service):

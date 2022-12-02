@@ -27,7 +27,7 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .optionscontroller import OptionsController
+from .options import OptionsManager
 
 from .configuration import g_extension
 from .configuration import g_identifier
@@ -43,14 +43,10 @@ from .unotool import getStringResource
 from .dialog import UserHandler
 from .dialog import UserView
 
-from .logger import getLoggerSetting
-from .logger import getLoggerUrl
-from .logger import setLoggerSetting
-from .logger import clearLogger
 from .logger import logMessage
+from .logger import disposeLogger
 from .logger import getMessage
 
-from .oauth2dispatch import OAuth2Dispatch
 from .oauth2model import OAuth2Model
 
 from .request import Response

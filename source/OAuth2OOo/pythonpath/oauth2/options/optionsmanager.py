@@ -117,6 +117,7 @@ class OptionsManager(unohelper.Base):
             autoclose = self._view.getAutoClose()
             service = createService(self._ctx, g_oauth2)
             enabled = service.getAuthorization(url, user, autoclose, self._view.getParent())
+            service.dispose()
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
             logMessage(self._ctx, SEVERE, msg, "OptionsManager", "doConnect()")
