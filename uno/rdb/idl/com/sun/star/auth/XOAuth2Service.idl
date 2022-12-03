@@ -17,7 +17,7 @@
 
 module com { module sun { module star { module auth {
 
-interface XOAuth2Service: ::com::sun::star::lang::XComponent
+interface XOAuth2Service: com::sun::star::lang::XComponent
 {
 
     any getWarnings();

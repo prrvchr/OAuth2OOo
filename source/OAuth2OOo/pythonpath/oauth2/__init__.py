@@ -64,5 +64,6 @@ from .oauth2lib import NoOAuth2
 from .oauth2lib import InteractionRequest
 from .oauth2lib import getOAuth2UserName
 
+from .oauth2helper import getAccessToken
 from .oauth2helper import showOAuth2Wizard
 

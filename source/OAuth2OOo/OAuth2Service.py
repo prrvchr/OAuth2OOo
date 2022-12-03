@@ -55,6 +55,7 @@ from oauth2 import KeyMap
 from oauth2 import createService
 from oauth2 import disposeLogger
 from oauth2 import execute
+from oauth2 import getAccessToken
 from oauth2 import getParentWindow
 from oauth2 import getSessionMode
 from oauth2 import logMessage
@@ -154,18 +155,7 @@ class OAuth2Service(unohelper.Base,
         return authorized
 
     def getToken(self, format=''):
-        level = INFO
-        msg = "Request Token ... "
-        if not self._isAuthorized():
-            level = SEVERE
-            msg += "ERROR: Cannot InitializeSession()..."
-            token = ''
-        elif self._model.isAccessTokenExpired():
-            token = self._model.getRefreshedToken()
-        else:
-            token = self._model.getToken()
-            msg += "Get from configuration ... Done"
-        logMessage(self._ctx, level, msg, 'OAuth2Service', 'getToken()')
+        token = getAccessToken(self._ctx, self._model, getParentWindow(self._ctx))
         if format:
             token = format % token
         return token
@@ -203,23 +193,6 @@ class OAuth2Service(unohelper.Base,
         session.auth = OAuth2OOo(self)
         session.codes = requests.codes
         return session
-
-    def _isAuthorized(self):
-        print("OAuth2Service._isAuthorized() 1")
-        if self._model.isInitialized() and self._model.isUrlScopeAuthorized():
-            return True
-        print("OAuth2Service._isAuthorized() 2")
-        msg = "OAuth2 initialization ... AuthorizationCode needed ..."
-        print("OAuth2Service._isAuthorized() 3")
-        if self.getAuthorization(self.ResourceUrl, self.UserName, True, getParentWindow(self._ctx)):
-            print("OAuth2Service._isAuthorized() 4")
-            msg += " Done"
-            logMessage(self._ctx, INFO, msg, 'OAuth2Service', '_isAuthorized()')
-            return True
-        msg += " ERROR: Wizard Aborted!!!"
-        logMessage(self._ctx, SEVERE, msg, 'OAuth2Service', '_isAuthorized()')
-        print("OAuth2Service._isAuthorized() 5")
-        return False
 
     def _getToolkit(self):
         return createService(self._ctx, 'com.sun.star.awt.Toolkit')

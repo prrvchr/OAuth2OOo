@@ -77,14 +77,14 @@ class OAuth2Manager(unohelper.Base):
     def canAdvance(self):
         return not self._view.canAddItem() and self._model.isConfigurationValid(*self._view.getConfiguration())
 
-# OAuth2Manager setter methods
+# OAuth2Manager setter methods called by WindowHandler
     def setUser(self, user):
         self._setActivePath()
         self._view.setUserFocus()
 
     def setUrl(self, url, inlist):
         self._view.enableRemoveUrl(inlist)
-        # TODO: The Add URL button must be activated after defining the Provider and/or Scope
+        # TODO: Add URL button must be enabled after setting the Scope
         self._view.enableAddUrl(False)
         self._view.setProviders(*self._model.getUrlData(url))
         self._view.setUrlLabel(self._model.getUrlLabel(url))
@@ -128,6 +128,38 @@ class OAuth2Manager(unohelper.Base):
     def editProvider(self):
         self._showProvider(False)
 
+    def removeProvider(self):
+        dialog = self._getMessageBox()
+        if dialog.execute() == OK:
+            provider = self._view.getProvider()
+            self._model.removeProvider(provider)
+            self._view.removeProvider(provider)
+        dialog.dispose()
+
+    def setScope(self, scope, inlist):
+        url = self._view.getUrl()
+        self._view.enableAddScope(False if inlist else self._model.isValueValid(scope))
+        self._view.enableEditScope(inlist)
+        self._view.enableRemoveScope(inlist and self._model.canRemoveScope(scope))
+        self._view.toggleUrlButtons(inlist, inlist and self._model.isScopeChanged(url, scope))
+        self._setActivePath()
+        self._view.setScopeFocus()
+
+    def addScope(self):
+        self._showScope(True)
+
+    def editScope(self):
+        self._showScope(False)
+
+    def removeScope(self):
+        dialog = self._getMessageBox()
+        if dialog.execute() == OK:
+            scope = self._view.getScope()
+            self._model.removeScope(scope)
+            self._view.removeScope(scope, self._model.canRemoveProvider(self._view.getProvider()))
+        dialog.dispose()
+
+# OAuth2Manager setter methods called by ProviderHandler
     def setValue(self):
         enabled = self._model.isDialogValid(*self._dialog.getDialogValues())
         self._dialog.updateOk(enabled)
@@ -137,6 +169,32 @@ class OAuth2Manager(unohelper.Base):
 
     def setHttpHandler(self, enabled):
         self._dialog.enableHttpHandler(enabled)
+
+# OAuth2Manager setter methods called by ScopeHandler
+    def selectScopeValue(self, selected):
+        self._dialog.updateRemove(selected)
+
+    def setScopeValue(self, scope):
+        if scope in self._dialog.getScopeValues():
+            self._dialog.updateAdd(False)
+        else:
+            self._dialog.updateAdd(scope != '')
+
+    def addScopeValue(self):
+        self._dialog.addScope()
+
+    def removeScopeValue(self):
+        self._dialog.removeScope()
+
+# OAuth2Manager private getter methods
+    def _getMessageBox(self):
+        return createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
+
+# OAuth2Manager private setter methods
+    def _setActivePath(self):
+        path = self._model.getActivePath(*self._view.getConfiguration())
+        self._wizard.activatePath(path, True)
+        self._wizard.updateTravelUI()
 
     def _showProvider(self, new):
         provider = self._view.getProvider()
@@ -152,32 +210,6 @@ class OAuth2Manager(unohelper.Base):
         self._dialog.dispose()
         self._dialog = None
 
-    def removeProvider(self):
-        dialog = self._getMessageBox()
-        if dialog.execute() == OK:
-            provider = self._view.getProvider()
-            self._model.removeProvider(provider)
-            self._view.removeProvider(provider)
-        dialog.dispose()
-
-    def _getMessageBox(self):
-        return createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
-
-    def setUrlScope(self, scope, inlist):
-        url = self._view.getUrl()
-        self._view.enableAddScope(False if inlist else self._model.isValueValid(scope))
-        self._view.enableEditScope(inlist)
-        self._view.enableRemoveScope(inlist and self._model.canRemoveScope(scope))
-        self._view.toggleUrlButtons(inlist, inlist and self._model.isScopeChanged(url, scope))
-        self._setActivePath()
-        self._view.setScopeFocus()
-
-    def addUrlScope(self):
-        self._showScope(True)
-
-    def editUrlScope(self):
-        self._showScope(False)
-
     def _showScope(self, new):
         scope = self._view.getScope()
         provider = self._view.getProvider()
@@ -190,32 +222,4 @@ class OAuth2Manager(unohelper.Base):
             self._setActivePath()
         self._dialog.dispose()
         self._dialog = None
-
-    def removeUrlScope(self):
-        dialog = self._getMessageBox()
-        if dialog.execute() == OK:
-            scope = self._view.getScope()
-            self._model.removeScope(scope)
-            self._view.removeScope(scope, self._model.canRemoveProvider(self._view.getProvider()))
-        dialog.dispose()
-
-    def selectScope(self, selected):
-        self._dialog.updateRemove(selected)
-
-    def setScope(self, scope):
-        if scope in self._dialog.getScopeValues():
-            self._dialog.updateAdd(False)
-        else:
-            self._dialog.updateAdd(scope != '')
-
-    def addScope(self):
-        self._dialog.addScope()
-
-    def removeScope(self):
-        self._dialog.removeScope()
-
-    def _setActivePath(self):
-        path = self._model.getActivePath(*self._view.getConfiguration())
-        self._wizard.activatePath(path, True)
-        self._wizard.updateTravelUI()
 

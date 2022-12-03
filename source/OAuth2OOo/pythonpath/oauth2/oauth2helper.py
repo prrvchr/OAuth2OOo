@@ -41,30 +41,35 @@ from .configuration import g_wizard_paths
 import traceback
 
 
+# Get the OAuth2 Token, show Wizard or refresh Token if needed
+def getAccessToken(ctx, model, parent):
+    token = ''
+    if not model.isAuthorized():
+        token = _getTokenFromWizard(ctx, model, parent)
+    elif model.isAccessTokenExpired():
+        token = model.getRefreshedToken()
+    else:
+        token = model.getToken()
+    return token
+
 # Show the OAuth2OOo Wizard
 def showOAuth2Wizard(ctx, model, parent):
-    try:
-        state = FAILURE
-        result = ()
-        msg = "Retrieving Authorization Code ..."
-        print("OAuth2Helper.showOAuth2Wizard() 1")
-        wizard = Wizard(ctx, g_wizard_page, True, parent)
-        print("OAuth2Helper.showOAuth2Wizard() 2")
-        controller = WizardController(ctx, wizard, model)
-        print("OAuth2Helper.showOAuth2Wizard() 3")
-        arguments = (g_wizard_paths, controller)
-        print("OAuth2Helper.showOAuth2Wizard() 4")
-        wizard.initialize(arguments)
-        print("OAuth2Helper.showOAuth2Wizard() 5")
-        if wizard.execute() == OK:
-            msg +=  " Retrieving Authorization Code ... Done"
-            state = SUCCESS
-            result = (controller.Url, controller.User, controller.Token)
-        else:
-            msg +=  " ERROR: Wizard as been aborted"
-        controller.dispose()
-        print("OAuth2Helper.showOAuth2Wizard() 6 %s" % msg)
-        return state, result
-    except Exception as e:
-        msg = "Error: %s - %s" % (e, traceback.print_exc())
-        print(msg)
+    state = FAILURE
+    result = ()
+    wizard = Wizard(ctx, g_wizard_page, True, parent)
+    controller = WizardController(ctx, wizard, model)
+    arguments = (g_wizard_paths, controller)
+    wizard.initialize(arguments)
+    if wizard.execute() == OK:
+        state = SUCCESS
+        result = (controller.Url, controller.User, controller.Token)
+    controller.dispose()
+    return state, result
+
+def _getTokenFromWizard(ctx, model, parent):
+    token = ''
+    state, result = showOAuth2Wizard(ctx, model, parent)
+    if state == SUCCESS:
+        url, user, token = result
+    return token
+

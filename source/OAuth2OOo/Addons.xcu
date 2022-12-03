@@ -36,12 +36,6 @@
           <value xml:lang="en">OAuth2OOo</value>
           <value xml:lang="fr">OAuth2OOo</value>
         </prop>
-        <prop oor:name="Target" oor:type="xs:string">
-          <value>_self</value>
-        </prop>
-        <prop oor:name="ImageIdentifier" oor:type="xs:string">
-          <value>%origin%/OAuth2OOo/OAuth2OOo.png</value>
-        </prop>
         <prop oor:name="Context" oor:type="xs:string">
           <value></value>
         </prop>

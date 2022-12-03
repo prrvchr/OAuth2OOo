@@ -132,7 +132,7 @@ class Server(Thread):
         if connection:
             with self._lock:
                 result = self._getResult(connection)
-                location = self._getResultLocation(result)
+                location = self._getLocation(result)
                 location += '?%s' % urlencode({'user': self._user})
                 header = '''\
 HTTP/1.1 302 Found
@@ -151,6 +151,7 @@ Connection: Closed
                 self._lock.notifyAll()
                 logMessage(self._ctx, INFO, "Server Running ... Done", 'Server', 'run()')
 
+# Server private getter methods
     def _readString(self, connection, length):
         length, sequence = connection.read(None, length)
         return sequence.value.decode()
@@ -220,7 +221,7 @@ Connection: Closed
         logMessage(self._ctx, SEVERE, msg, 'Server', '_getResult()')
         return False
 
-    def _getResultLocation(self, result):
+    def _getLocation(self, result):
         basename = 'OAuth2Success' if result else 'OAuth2Error'
         return self._url % basename
 

@@ -83,16 +83,16 @@ class WindowHandler(unohelper.Base,
                 item = control.Text.strip()
                 # TODO: OpenOffice has strange behavior if StringItemList is empty
                 items = control.getItems() if control.getItemCount() > 0 else ()
-                self._manager.setUrlScope(item, item in items)
+                self._manager.setScope(item, item in items)
                 handled = True
             elif method == 'AddScope':
-                self._manager.addUrlScope()
+                self._manager.addScope()
                 handled = True
             elif method == 'EditScope':
-                self._manager.editUrlScope()
+                self._manager.editScope()
                 handled = True
             elif method == 'RemoveScope':
-                self._manager.removeUrlScope()
+                self._manager.removeScope()
                 handled = True
             return handled
         except Exception as e:

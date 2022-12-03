@@ -45,16 +45,16 @@ class ScopeHandler(unohelper.Base,
             handled = False
             if method == 'Select':
                 selected = event.Source.getSelectedItemPos() != -1
-                self._manager.selectScope(selected)
+                self._manager.selectScopeValue(selected)
                 handled = True
             elif method == 'Set':
-                self._manager.setScope(event.Source.Text.strip())
+                self._manager.setScopeValue(event.Source.Text.strip())
                 handled = True
             elif method == 'Add':
-                self._manager.addScope()
+                self._manager.addScopeValue()
                 handled = True
             elif method == 'Remove':
-                self._manager.removeScope()
+                self._manager.removeScopeValue()
                 handled = True
             return handled
         except Exception as e:

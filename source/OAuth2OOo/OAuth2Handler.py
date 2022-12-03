@@ -39,7 +39,8 @@ from com.sun.star.task import XInteractionHandler2
 from oauth2 import UserView
 from oauth2 import UserHandler
 from oauth2 import OAuth2Model
-from oauth2 import showOAuth2Wizard
+
+from oauth2 import getAccessToken
 
 from oauth2 import g_identifier
 
@@ -87,12 +88,7 @@ class OAuth2Handler(unohelper.Base,
 
     def _getToken(self, interaction, url, user, format):
         self._model.initialize(url, user)
-        if not self._model.isAuthorized():
-            token = self._getTokenFromWizard()
-        elif self._model.isAccessTokenExpired():
-            token = self._model.getRefreshedToken()
-        else:
-            token = self._model.getToken()
+        token = getAccessToken(self._ctx, self._model, self._parent)
         status = 1 if token != '' else 0
         continuation = interaction.getContinuations()[status]
         if status:
@@ -101,13 +97,6 @@ class OAuth2Handler(unohelper.Base,
             continuation.setToken(token)
         continuation.select()
         return status == 1
-
-    def _getTokenFromWizard(self):
-        token = ''
-        state, result = showOAuth2Wizard(self._ctx, self._model, self._parent)
-        if state == SUCCESS:
-            url, user, token = result
-        return token
 
     def _showUserDialog(self, interaction, url, message):
         title, label = self._model.getUserData(url, message)
