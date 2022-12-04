@@ -168,24 +168,6 @@ class OAuth2Model(unohelper.Base):
         return title, label
 
 # OAuth2Model getter methods called by OAuth2Service
-    def isInitialized(self):
-        providers = self._configuration.getByName('Providers')
-        if providers.hasByName(self._provider):
-            users = providers.getByName(self._provider).getByName('Users')
-            return users.hasByName(self._user)
-        return False
-
-    def isUrlScopeAuthorized(self):
-        scopes = self._configuration.getByName('Scopes')
-        providers = self._configuration.getByName('Providers')
-        if scopes.hasByName(self._scope):
-            values = providers.getByName(self._provider).getByName('Users').getByName(self._user).getByName('Scopes')
-            for scope in scopes.getByName(self._scope).getByName('Values'):
-                if scope not in values:
-                    return False
-            return True
-        return False
-
     def isAccessTokenExpired(self):
         providers = self._configuration.getByName('Providers')
         user = providers.getByName(self._provider).getByName('Users').getByName(self._user)
@@ -211,12 +193,28 @@ class OAuth2Model(unohelper.Base):
         disposeLogger()
 
     def initializeSession(self, url, user):
-        self.Url = url
-        self.User = user
-        return self.isInitialized()
+        self.initialize(url, user)
+        return self.isAuthorized()
 
     def isAuthorized(self):
-        return self.isInitialized() and self.isUrlScopeAuthorized()
+        providers = self._configuration.getByName('Providers')
+        return self._isInitialized(providers) and self._isUrlScopeAuthorized(providers)
+
+    def _isInitialized(self, providers):
+        if providers.hasByName(self._provider):
+            users = providers.getByName(self._provider).getByName('Users')
+            return users.hasByName(self._user)
+        return False
+
+    def _isUrlScopeAuthorized(self, providers):
+        scopes = self._configuration.getByName('Scopes')
+        if scopes.hasByName(self._scope):
+            values = providers.getByName(self._provider).getByName('Users').getByName(self._user).getByName('Scopes')
+            for scope in scopes.getByName(self._scope).getByName('Values'):
+                if scope not in values:
+                    return False
+            return True
+        return False
 
 # OAuth2Model getter methods called by WizardPages 1
     def getActivePath(self, user, url, provider, scope):
@@ -486,15 +484,6 @@ class OAuth2Model(unohelper.Base):
         parameters['url'] = url
         return parameters
 
-    def _getCodeChallenge(self, method):
-        code = self._getCodeVerifier()
-        if method == 'S256':
-            code = hashlib.sha256(code.encode('utf-8')).digest()
-            padding = {0:0, 1:2, 2:1}[len(code) % 3]
-            challenge = base64.urlsafe_b64encode(code).decode('utf-8')
-            code = challenge[:len(challenge)-padding]
-        return code
-
     def _getUrlScopes(self, scope, provider):
         scopes = self._getUserScopes(provider)
         for s in scope.getByName('Values'):
@@ -515,8 +504,10 @@ class OAuth2Model(unohelper.Base):
         provider = self._configuration.getByName('Providers').getByName(self._provider)
         scopes = self._getUrlScopes(scope, provider)
         main = provider.getByName('AuthorizationUrl')
-        parameters = urlencode(self._getUrlParameters(scopes, provider))
-        url = '%s?%s' % (main, parameters)
+        parameters = self._getUrlParameters(scopes, provider)
+        msg = "Make HTTP Request: %s?%s" % (main, self._getUrlArguments(parameters))
+        logMessage(self._ctx, INFO, msg, 'OAuth2Model', 'getAuthorizationData()')
+        url = '%s?%s' % (main, urlencode(parameters))
         if provider.getByName('SignIn'):
             main = self._getSignInUrl()
             parameters = urlencode(self._getSignInParameters(url))
@@ -573,7 +564,7 @@ class OAuth2Model(unohelper.Base):
         if exist:
             user = users.getByName(self._user)
             scopes = user.getByName('Scopes')
-            refresh = user.getByName('RefreshToken')
+            refresh = user.getByName('RefreshToken') if user.hasByName('RefreshToken') else ''
             access = user.getByName('AccessToken')
             timestamp = user.getByName('TimeStamp')
             never = user.getByName('NeverExpires')
@@ -667,12 +658,21 @@ class OAuth2Model(unohelper.Base):
         parameters['current_language'] = getCurrentLocale(self._ctx).Language
         return parameters
 
+    def _getCodeChallenge(self, method):
+        code = self._getCodeVerifier()
+        if method == 'S256':
+            code = hashlib.sha256(code.encode('utf-8')).digest()
+            padding = {0:0, 1:2, 2:1}[len(code) % 3]
+            challenge = base64.urlsafe_b64encode(code).decode('utf-8')
+            code = challenge[:len(challenge)-padding]
+        return code
+
 # OAuth2Model private getter/setter methods called by WizardPages 3 and WizardPages 4
     def _registerToken(self, scopes, name, user, code):
         provider = self._configuration.getByName('Providers').getByName(name)
         url = provider.getByName('TokenUrl')
         parameters = self._getTokenParameters(scopes, provider, code)
-        msg = "Make Http Request: %s?%s" % (url, parameters)
+        msg = "Make HTTP Request: %s?%s" % (url, self._getUrlArguments(parameters))
         logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
         response = self._getResponseFromRequest(url, parameters, self.Timeout)
         self._saveUserToken(scopes, provider, user, response)

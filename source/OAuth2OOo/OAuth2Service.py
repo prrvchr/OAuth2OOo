@@ -133,8 +133,7 @@ class OAuth2Service(unohelper.Base,
         return True
 
     def initializeSession(self, url, user):
-        self._model.initialize(url, user)
-        return self._model.isInitialized()
+        return self._model.initializeSession(url, user)
 
     def getKeyMap(self):
         return KeyMap()

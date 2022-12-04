@@ -99,6 +99,7 @@ class ProviderView(unohelper.Base):
         self._getCodeChallenge().State = 1 if codechallenge else 0
         option = 1 if codechallengemethod == 'S256' else 2
         self._getCodeChallengeMethod(option).State = 1
+        self.enableChallengeMethod(codechallenge)
         self._getClientSecret().Text = clientsecret
         self._getAuthorizationParameters().Text = authorizationparameters
         self._getTokenParameters().Text = tokenparameters
@@ -106,6 +107,7 @@ class ProviderView(unohelper.Base):
         self._getRedirectPort().Value = '%s' % redirectport
         option = 3 if httphandler else 4
         self._getHttpHandler(option).State = 1
+        self.enableHttpHandler(httphandler)
 
     def dispose(self):
         self._dialog.dispose()

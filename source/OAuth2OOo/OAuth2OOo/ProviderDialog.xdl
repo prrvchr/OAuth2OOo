@@ -19,12 +19,12 @@
     <dlg:textfield dlg:id="TextField3" dlg:tab-index="7" dlg:left="85" dlg:top="60" dlg:width="190" dlg:height="14" dlg:help-text="&amp;ProviderDialog.TextField3.HelpText" dlg:value="&amp;ProviderDialog.TextField3.Text">
       <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.UNO:SetValue" script:language="UNO"/>
     </dlg:textfield>
-    <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="8" dlg:left="10" dlg:top="80" dlg:width="65" dlg:height="14" dlg:help-text="&amp;ProviderDialog.CheckBox1.HelpText" dlg:value="&amp;ProviderDialog.CheckBox1.Label" dlg:valign="center" dlg:checked="true">
+    <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="8" dlg:left="10" dlg:top="80" dlg:width="65" dlg:height="14" dlg:help-text="&amp;ProviderDialog.CheckBox1.HelpText" dlg:value="&amp;ProviderDialog.CheckBox1.Label" dlg:valign="center" dlg:checked="false">
       <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:SetChallenge" script:language="UNO"/>
     </dlg:checkbox>
     <dlg:radiogroup>
-      <dlg:radio dlg:id="OptionButton1" dlg:tab-index="9" dlg:left="85" dlg:top="80" dlg:width="90" dlg:height="14" dlg:help-text="&amp;ProviderDialog.OptionButton1.HelpText" dlg:value="&amp;ProviderDialog.OptionButton1.Label" dlg:valign="center" dlg:checked="true"/>
-      <dlg:radio dlg:id="OptionButton2" dlg:tab-index="10" dlg:left="195" dlg:top="80" dlg:width="90" dlg:height="14" dlg:help-text="&amp;ProviderDialog.OptionButton2.HelpText" dlg:value="&amp;ProviderDialog.OptionButton2.Label" dlg:valign="center"/>
+      <dlg:radio dlg:id="OptionButton1" dlg:tab-index="9" dlg:disabled="true" dlg:left="85" dlg:top="80" dlg:width="90" dlg:height="14" dlg:help-text="&amp;ProviderDialog.OptionButton1.HelpText" dlg:value="&amp;ProviderDialog.OptionButton1.Label" dlg:valign="center" dlg:checked="true"/>
+      <dlg:radio dlg:id="OptionButton2" dlg:tab-index="10" dlg:disabled="true" dlg:left="195" dlg:top="80" dlg:width="90" dlg:height="14" dlg:help-text="&amp;ProviderDialog.OptionButton2.HelpText" dlg:value="&amp;ProviderDialog.OptionButton2.Label" dlg:valign="center"/>
     </dlg:radiogroup>
     <dlg:text dlg:id="Label5" dlg:tab-index="11" dlg:left="10" dlg:top="100" dlg:width="65" dlg:height="14" dlg:help-text="&amp;ProviderDialog.Label5.HelpText" dlg:value="&amp;ProviderDialog.Label5.Label" dlg:valign="center" dlg:tabstop="false"/>
     <dlg:textfield dlg:id="TextField4" dlg:tab-index="12" dlg:left="85" dlg:top="100" dlg:width="190" dlg:height="14" dlg:help-text="&amp;ProviderDialog.TextField4.HelpText" dlg:value="&amp;ProviderDialog.TextField4.Text" dlg:echochar="*"/>
@@ -45,15 +45,15 @@
         <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:DisableHttpHandler" script:language="UNO"/>
       </dlg:radio>
     </dlg:radiogroup>
-    <dlg:text dlg:id="Label9" dlg:tab-index="20" dlg:left="135" dlg:top="180" dlg:width="35" dlg:height="15" dlg:help-text="&amp;ProviderDialog.Label9.HelpText" dlg:value="&amp;ProviderDialog.Label9.Label" dlg:valign="center" dlg:tabstop="false"/>
-    <dlg:menulist dlg:id="ListBox1" dlg:tab-index="21" dlg:left="175" dlg:top="180" dlg:width="50" dlg:height="15" dlg:help-text="&amp;ProviderDialog.ListBox1.HelpText" dlg:value="&amp;ProviderDialog.ListBox1.Text" dlg:spin="true">
+    <dlg:text dlg:id="Label9" dlg:tab-index="20" dlg:disabled="true" dlg:left="135" dlg:top="180" dlg:width="35" dlg:height="15" dlg:help-text="&amp;ProviderDialog.Label9.HelpText" dlg:value="&amp;ProviderDialog.Label9.Label" dlg:valign="center" dlg:tabstop="false"/>
+    <dlg:menulist dlg:id="ListBox1" dlg:tab-index="21" dlg:disabled="true" dlg:left="175" dlg:top="180" dlg:width="50" dlg:height="15" dlg:help-text="&amp;ProviderDialog.ListBox1.HelpText" dlg:value="&amp;ProviderDialog.ListBox1.Text" dlg:spin="true">
       <dlg:menupopup>
         <dlg:menuitem dlg:value="&amp;ProviderDialog.ListBox1.StringItemList.0"/>
         <dlg:menuitem dlg:value="&amp;ProviderDialog.ListBox1.StringItemList.1"/>
       </dlg:menupopup>
     </dlg:menulist>
-    <dlg:text dlg:id="Label10" dlg:tab-index="22" dlg:left="230" dlg:top="180" dlg:width="15" dlg:height="15" dlg:help-text="&amp;ProviderDialog.Label10.HelpText" dlg:value="&amp;ProviderDialog.Label10.Label" dlg:valign="center" dlg:tabstop="false"/>
-    <dlg:numericfield dlg:id="NumericField1" dlg:tab-index="23" dlg:left="250" dlg:top="180" dlg:width="25" dlg:height="15" dlg:help-text="&amp;ProviderDialog.NumericField1.HelpText" dlg:decimal-accuracy="0" dlg:value-min="1000" dlg:value-max="9999"/>
+    <dlg:text dlg:id="Label10" dlg:tab-index="22" dlg:disabled="true" dlg:left="230" dlg:top="180" dlg:width="15" dlg:height="15" dlg:help-text="&amp;ProviderDialog.Label10.HelpText" dlg:value="&amp;ProviderDialog.Label10.Label" dlg:valign="center" dlg:tabstop="false"/>
+    <dlg:numericfield dlg:id="NumericField1" dlg:disabled="true" dlg:tab-index="23" dlg:left="250" dlg:top="180" dlg:width="25" dlg:height="15" dlg:help-text="&amp;ProviderDialog.NumericField1.HelpText" dlg:decimal-accuracy="0" dlg:value-min="1000" dlg:value-max="9999"/>
     <dlg:button dlg:id="CommandButton1" dlg:tab-index="24" dlg:left="180" dlg:top="220" dlg:width="45" dlg:height="14" dlg:help-text="&amp;ProviderDialog.CommandButton1.HelpText" dlg:value="&amp;ProviderDialog.CommandButton1.Label" dlg:button-type="cancel"/>
     <dlg:button dlg:id="CommandButton2" dlg:tab-index="25" dlg:disabled="true" dlg:left="230" dlg:top="220" dlg:width="45" dlg:height="14" dlg:help-text="&amp;ProviderDialog.CommandButton2.HelpText" dlg:default="true" dlg:value="&amp;ProviderDialog.CommandButton2.Label" dlg:button-type="ok"/>
   </dlg:bulletinboard>
