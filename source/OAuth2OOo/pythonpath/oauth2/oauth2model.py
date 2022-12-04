@@ -518,7 +518,7 @@ class OAuth2Model(unohelper.Base):
         self.cancelServer()
         provider, user, url, address, port, uuid, timeout = self._getServerData()
         lock = Condition()
-        server = Server(self._ctx, user, url, address, port, uuid, lock)
+        server = Server(self._ctx, user, url, provider, address, port, uuid, lock)
         self._watchdog = WatchDog(self._ctx, server, notify, register, scopes, provider, user, timeout, lock)
         server.start()
         self._watchdog.start()

@@ -1,6 +1,6 @@
 # ![OAuth2OOo logo][1] OAuth2OOo
 
-**La configuration pour le compte: <span id="user"></span> a échoué.**
+**La configuration pour le compte <span id="provider"></span>: <span id="user"></span> a échoué.**
 
 **Vous pouvez fermer cette page.**
 

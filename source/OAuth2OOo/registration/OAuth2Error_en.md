@@ -1,6 +1,6 @@
 # ![OAuth2OOo logo][1] OAuth2OOo
 
-**The configuration for account: <span id="user"></span> failed.**
+**Setup for <span id="provider"></span> account: <span id="user"></span> failed.**
 
 **You can close this page.**
 

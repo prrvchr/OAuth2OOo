@@ -94,11 +94,12 @@ class WatchDog(Thread):
 
 
 class Server(Thread):
-    def __init__(self, ctx, user, url, address, port, uuid, lock):
+    def __init__(self, ctx, user, url, provider, address, port, uuid, lock):
         Thread.__init__(self)
         self._ctx = ctx
         self._user = user
         self._url = url
+        self._provider = provider
         self._address = address
         self._port = port
         self._uuid = uuid
@@ -133,7 +134,7 @@ class Server(Thread):
             with self._lock:
                 result = self._getResult(connection)
                 location = self._getLocation(result)
-                location += '?%s' % urlencode({'user': self._user})
+                location += '?%s' % urlencode({'provider': self._provider, 'user': self._user})
                 header = '''\
 HTTP/1.1 302 Found
 Location: %s
