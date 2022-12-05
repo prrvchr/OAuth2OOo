@@ -129,7 +129,7 @@ I will try to solve it ;-)
     - The logging window: [Controller][41] and [View][42].
     - The OAuth2OOo extension configuration options window: [Controller][43] and [View][44].
 
-- Rewrite a single model: [OAuth2Model][45] managing wizard, services and options dialog.
+- Rewrite a single data model: [OAuth2Model][45] managing wizard, services and options dialog.
 
 - Google loopback flow error has been fixed. See [Issue #10][46]
 

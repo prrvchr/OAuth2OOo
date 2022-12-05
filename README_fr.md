@@ -129,7 +129,7 @@ J'essaierai de la résoudre ;-)
     - La fenêtre de journalisation: [Controlleur][41] et [Vue][42].
     - La fenêtre des options de configuration de l'extension OAuth2OOo: [Controlleur][43] et [Vue][44].
 
-- Réécriture d'un modèle unique [OAuth2Model][45] gérant l'assistant, les services, et la fenêtre des options.
+- Réécriture d'un modèle de données unique [OAuth2Model][45] gérant l'assistant, les services, et la fenêtre des options.
 
 - L'erreur de flux de bouclage Google a été corrigée. Voir [Dysfonctionnement #10][46]
 
