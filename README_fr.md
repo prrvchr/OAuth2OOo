@@ -135,6 +135,8 @@ J'essaierai de la résoudre ;-)
 
 - Utilisation pour Dropbox de leur nouvelle API avec des jetons expirables.
 
+- Beaucoup d'autres correctifs...
+
 ### Que reste-t-il à faire pour la version 0.0.6:
 
 - Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][20].

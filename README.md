@@ -135,6 +135,8 @@ I will try to solve it ;-)
 
 - Use for Dropbox their new OAuth2 API with expirable tokens.
 
+- Many other fix...
+
 ### What remains to be done for version 0.0.6:
 
 - Write the implementation of the Help button (CommandButton5) in the new [XWizard][20] interface.
