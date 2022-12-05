@@ -75,7 +75,7 @@ class OAuth2Manager(unohelper.Base):
         self._wizard.updateTravelUI()
         if self._model.closeWizard():
             self._wizard.DialogWindow.endDialog(OK)
-        elif PY3:
+        else:
             # FIXME: Cannot Wizard.travelNext() on OpenOffice
             self._wizard.travelNext()
 

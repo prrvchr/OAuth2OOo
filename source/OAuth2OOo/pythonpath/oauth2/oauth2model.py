@@ -532,7 +532,6 @@ class OAuth2Model(unohelper.Base):
 
     def registerToken(self, scopes, name, user, code):
         self._registerToken(scopes, name, user, code)
-        self._watchdog = None
 
     def _getServerData(self):
         provider = self._configuration.getByName('Providers').getByName(self._provider)
@@ -584,8 +583,9 @@ class OAuth2Model(unohelper.Base):
     def _refreshToken(self, provider, user):
         url = provider.getByName('TokenUrl')
         data = self._getRefreshParameters(user, provider)
+        timestamp = int(time.time())
         response = self._getResponseFromRequest(url, data, self.Timeout)
-        self._saveToken(user, *self._getTokenFromResponse(response))
+        self._saveToken(user, *self._getTokenFromResponse(response, timestamp))
 
     def deleteUser(self):
         providers = self._configuration.getByName('Providers')
@@ -674,8 +674,9 @@ class OAuth2Model(unohelper.Base):
         parameters = self._getTokenParameters(scopes, provider, code)
         msg = "Make HTTP Request: %s?%s" % (url, self._getUrlArguments(parameters))
         logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
+        timestamp = int(time.time())
         response = self._getResponseFromRequest(url, parameters, self.Timeout)
-        self._saveUserToken(scopes, provider, user, response)
+        self._saveUserToken(scopes, provider, user, response, timestamp)
         msg = "Receive Response: %s" % (response, )
         logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
 
@@ -702,7 +703,7 @@ class OAuth2Model(unohelper.Base):
         parameters['client_secret'] = provider.getByName('ClientSecret')
         return parameters
 
-    def _saveUserToken(self, scopes, provider, name, response):
+    def _saveUserToken(self, scopes, provider, name, response, timestamp):
         users = provider.getByName('Users')
         if not users.hasByName(name):
             users.insertByName(name, users.createInstance())
@@ -710,7 +711,7 @@ class OAuth2Model(unohelper.Base):
         # user.replaceByName('Scopes', scopes)
         arguments = ('Scopes', uno.Any('[]string', tuple(scopes)))
         uno.invoke(user, 'replaceByName', arguments)
-        self._saveToken(user, *self._getTokenFromResponse(response))
+        self._saveToken(user, *self._getTokenFromResponse(response, timestamp))
 
 # OAuth2Model private getter/setter methods
     def _parseParameters(self, base, optional, required):
@@ -740,14 +741,13 @@ class OAuth2Model(unohelper.Base):
                 print("ERROR: OAuth2Model._getResponseFromRequest() %s - %s" % (response, traceback.print_exc()))
         return response
 
-    def _getTokenFromResponse(self, response):
+    def _getTokenFromResponse(self, response, timestamp):
         print("OAuth2Model._getTokenFromResponse() %s" % (response, ))
         refresh = response.get('refresh_token', None)
         access = response.get('access_token', None)
         expires = response.get('expires_in', None)
         never = expires is None
-        timestamp = 0 if never else int(time.time()) + expires
-        return refresh, access, never, timestamp
+        return refresh, access, never, 0 if never else timestamp + expires
 
     def _saveToken(self, user, refresh, access, never, timestamp):
         if refresh is not None:

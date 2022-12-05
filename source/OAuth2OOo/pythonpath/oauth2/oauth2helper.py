@@ -56,14 +56,19 @@ def getAccessToken(ctx, model, parent):
 def showOAuth2Wizard(ctx, model, parent):
     state = FAILURE
     result = ()
+    print("oauth2helper.showOAuth2Wizard() 1")
     wizard = Wizard(ctx, g_wizard_page, True, parent)
+    print("oauth2helper.showOAuth2Wizard() 2")
     controller = WizardController(ctx, wizard, model)
+    print("oauth2helper.showOAuth2Wizard() 3")
     arguments = (g_wizard_paths, controller)
     wizard.initialize(arguments)
+    print("oauth2helper.showOAuth2Wizard() 4")
     if wizard.execute() == OK:
         state = SUCCESS
         result = (controller.Url, controller.User, controller.Token)
     controller.dispose()
+    print("oauth2helper.showOAuth2Wizard() 5")
     return state, result
 
 def _getTokenFromWizard(ctx, model, parent):
