@@ -81,9 +81,9 @@ class OAuth2Model(unohelper.Base):
                            'ProviderTitle': 'ProviderDialog.Title',
                            'ScopeTitle': 'ScopeDialog.Title',
                            'TokenLabel': 'PageWizard5.Label1.Label',
-                           'TokenAccess': 'PageWizard5.Label7.Label',
-                           'TokenRefresh': 'PageWizard5.Label5.Label',
-                           'TokenExpires': 'PageWizard5.Label9.Label',
+                           'TokenAccess': 'PageWizard5.Label6.Label',
+                           'TokenRefresh': 'PageWizard5.Label4.Label',
+                           'TokenExpires': 'PageWizard5.Label8.Label',
                            'DialogTitle': 'MessageBox.Title',
                            'DialogMessage': 'MessageBox.Message',
                            'UserTitle': 'UserDialog.Title',
@@ -122,24 +122,28 @@ class OAuth2Model(unohelper.Base):
     @property
     def Timeout(self):
         return self._configuration.getByName('ConnectTimeout'), self._configuration.getByName('ReadTimeout')
+
     @property
     def ConnectTimeout(self):
         return self._configuration.getByName('ConnectTimeout')
     @ConnectTimeout.setter
     def ConnectTimeout(self, timeout):
         self._configuration.replaceByName('ConnectTimeout', timeout)
+
     @property
     def ReadTimeout(self):
         return self._configuration.getByName('ReadTimeout')
     @ReadTimeout.setter
     def ReadTimeout(self, timeout):
         self._configuration.replaceByName('ReadTimeout', timeout)
+
     @property
     def HandlerTimeout(self):
         return self._configuration.getByName('HandlerTimeout')
     @HandlerTimeout.setter
     def HandlerTimeout(self, timeout):
         self._configuration.replaceByName('HandlerTimeout', timeout)
+
     @property
     def UrlList(self):
         return self._configuration.getByName('Urls').ElementNames
@@ -251,25 +255,28 @@ class OAuth2Model(unohelper.Base):
             data = self._getProviderData(providers.getByName(name))
         else:
             data = self._getDefaultProviderData()
-        return data
+        return self.getProviderTitle(name), data
 
-    def saveProviderData(self, name, handler, address, port, clientsecret, challenge, challengemethod,
-                         clientid, authorizationurl, tokenurl, authorizationparameters, tokenparameters):
+    def saveProviderData(self, name, clientid, clientsecret, authorizationurl, tokenurl,
+                         authorizationparameters, tokenparameters, challenge, challengemethod,
+                         signin, page, handler, address, port):
         providers = self._configuration.getByName('Providers')
         if not providers.hasByName(name):
             providers.insertByName(name, providers.createInstance())
         provider = providers.getByName(name)
-        provider.replaceByName('HttpHandler', handler)
-        provider.replaceByName('RedirectAddress', address)
-        provider.replaceByName('RedirectPort', port)
-        provider.replaceByName('ClientSecret', clientsecret)
-        provider.replaceByName('CodeChallenge', challenge)
-        provider.replaceByName('CodeChallengeMethod', challengemethod)
         provider.replaceByName('ClientId', clientid)
+        provider.replaceByName('ClientSecret', clientsecret)
         provider.replaceByName('AuthorizationUrl', authorizationurl)
         provider.replaceByName('TokenUrl', tokenurl)
         provider.replaceByName('AuthorizationParameters', authorizationparameters)
         provider.replaceByName('TokenParameters', tokenparameters)
+        provider.replaceByName('CodeChallenge', challenge)
+        provider.replaceByName('CodeChallengeMethod', challengemethod)
+        provider.replaceByName('SignIn', signin)
+        provider.replaceByName('SignInPage', page)
+        provider.replaceByName('HttpHandler', handler)
+        provider.replaceByName('RedirectAddress', address)
+        provider.replaceByName('RedirectPort', port)
         self.commit()
 
     def getScopeData(self, name):
@@ -297,33 +304,37 @@ class OAuth2Model(unohelper.Base):
 
     def _getProviderData(self, provider):
         clientid = provider.getByName('ClientId')
+        clientsecret = provider.getByName('ClientSecret')
         authorizationurl = provider.getByName('AuthorizationUrl')
         tokenurl = provider.getByName('TokenUrl')
-        codechallenge = provider.getByName('CodeChallenge')
-        codechallengemethod = provider.getByName('CodeChallengeMethod')
-        clientsecret = provider.getByName('ClientSecret')
         authorizationparameters = provider.getByName('AuthorizationParameters')
         tokenparameters = provider.getByName('TokenParameters')
+        codechallenge = provider.getByName('CodeChallenge')
+        codechallengemethod = provider.getByName('CodeChallengeMethod')
+        signin = provider.getByName('SignIn')
+        page = provider.getByName('SignInPage')
+        httphandler = provider.getByName('HttpHandler')
         redirectaddress = provider.getByName('RedirectAddress')
         redirectport = provider.getByName('RedirectPort')
-        httphandler = provider.getByName('HttpHandler')
-        return (clientid, authorizationurl, tokenurl, codechallenge, codechallengemethod, clientsecret,
-                authorizationparameters, tokenparameters, redirectaddress, redirectport, httphandler)
+        return (clientid, clientsecret, authorizationurl, tokenurl, authorizationparameters, tokenparameters,
+                codechallenge, codechallengemethod, signin, page, httphandler, redirectaddress, redirectport)
 
     def _getDefaultProviderData(self):
         clientid = ''
+        clientsecret = ''
         authorizationurl = ''
         tokenurl = ''
-        codechallenge = True
-        codechallengemethod = 'S256'
-        clientsecret = ''
         authorizationparameters = '{"prompt": "consent", "response_mode": "query", "scope": null, "login_hint": "current_user", "hl": "current_language"}'
         tokenparameters = '{"scope": null}'
+        codechallenge = True
+        codechallengemethod = 'S256'
+        signin = False
+        page = ''
+        httphandler = True
         redirectaddress = 'localhost'
         redirectport = 8080
-        httphandler = True
-        return (clientid, authorizationurl, tokenurl, codechallenge, codechallengemethod, clientsecret,
-                authorizationparameters, tokenparameters, redirectaddress, redirectport, httphandler)
+        return (clientid, clientsecret, authorizationurl, tokenurl, authorizationparameters, tokenparameters,
+                codechallenge, codechallengemethod, signin, page, httphandler, redirectaddress, redirectport)
 
     def getUrlData(self, url):
         scope = self._getScope(url)
@@ -418,9 +429,9 @@ class OAuth2Model(unohelper.Base):
             return False
         return True
 
-    def isDialogValid(self, clientid, authorizationurl, tokenurl, authorizationparameters, tokenparameters):
+    def isDialogValid(self, clientid, authorizationurl, tokenurl, authorizationparameters, tokenparameters, signin, page):
         return (self.isTextValid(clientid) and self.isUrlValid(authorizationurl) and self.isUrlValid(tokenurl)
-                and self.isJsonValid(authorizationparameters) and self.isJsonValid(tokenparameters))
+                and self.isJsonValid(authorizationparameters) and self.isJsonValid(tokenparameters) and (not signin or self.isTextValid(page)))
 
     def _getScope(self, url):
         scope = ''
@@ -462,7 +473,7 @@ class OAuth2Model(unohelper.Base):
         arguments = self._getUrlArguments(parameters)
         url = '%s?%s' % (main, arguments)
         if provider.getByName('SignIn'):
-            main = self._getSignInUrl()
+            main = self._getSignInUrl(provider)
             parameters = self._getSignInParameters(url)
             arguments = self._getUrlArguments(parameters)
             url = '%s?%s' % (main, arguments)
@@ -474,8 +485,8 @@ class OAuth2Model(unohelper.Base):
             arguments.append('%s=%s' % (key, value))
         return '&'.join(arguments)
 
-    def _getSignInUrl(self):
-        page = '%sSignIn' % self._provider
+    def _getSignInUrl(self, provider):
+        page = provider.getByName('SignInPage')
         return self._getBaseUrl() % page
 
     def _getSignInParameters(self, url):
@@ -505,13 +516,13 @@ class OAuth2Model(unohelper.Base):
         scopes = self._getUrlScopes(scope, provider)
         main = provider.getByName('AuthorizationUrl')
         parameters = self._getUrlParameters(scopes, provider)
-        msg = "Make HTTP Request: %s?%s" % (main, self._getUrlArguments(parameters))
-        logMessage(self._ctx, INFO, msg, 'OAuth2Model', 'getAuthorizationData()')
         url = '%s?%s' % (main, urlencode(parameters))
         if provider.getByName('SignIn'):
-            main = self._getSignInUrl()
-            parameters = urlencode(self._getSignInParameters(url))
-            url = '%s?%s' % (main, parameters)
+            main = self._getSignInUrl(provider)
+            parameters = self._getSignInParameters(url)
+            url = '%s?%s' % (main, urlencode(parameters))
+        msg = "Make HTTP Request: %s?%s" % (main, self._getUrlArguments(parameters))
+        logMessage(self._ctx, INFO, msg, 'OAuth2Model', 'getAuthorizationData()')
         return scopes, url
 
     def startServer(self, scopes, notify, register):
@@ -567,7 +578,7 @@ class OAuth2Model(unohelper.Base):
             access = user.getByName('AccessToken')
             timestamp = user.getByName('TimeStamp')
             never = user.getByName('NeverExpires')
-            expires = 0 if never else timestamp - int(time.time())
+            expires = self.getTokenExpires() if never else timestamp - int(time.time())
         else:
             scopes = ()
             access = self.getTokenAccess()
@@ -584,8 +595,8 @@ class OAuth2Model(unohelper.Base):
         url = provider.getByName('TokenUrl')
         data = self._getRefreshParameters(user, provider)
         timestamp = int(time.time())
-        response = self._getResponseFromRequest(url, data, self.Timeout)
-        self._saveToken(user, *self._getTokenFromResponse(response, timestamp))
+        response = self._getResponseFromRequest(url, data)
+        self._saveAccessToken(user, *self._getTokenFromResponse(response, timestamp))
 
     def deleteUser(self):
         providers = self._configuration.getByName('Providers')
@@ -675,7 +686,7 @@ class OAuth2Model(unohelper.Base):
         msg = "Make HTTP Request: %s?%s" % (url, self._getUrlArguments(parameters))
         logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
         timestamp = int(time.time())
-        response = self._getResponseFromRequest(url, parameters, self.Timeout)
+        response = self._getResponseFromRequest(url, parameters)
         self._saveUserToken(scopes, provider, user, response, timestamp)
         msg = "Receive Response: %s" % (response, )
         logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
@@ -727,12 +738,12 @@ class OAuth2Model(unohelper.Base):
                 base[key] = value
         return base
 
-    def _getResponseFromRequest(self, url, data, timeout):
+    def _getResponseFromRequest(self, url, data):
         session = Session()
         response = {}
         with session as s:
             try:
-                with s.post(url, data=data, timeout=timeout) as r:
+                with s.post(url, data=data, timeout=self.Timeout) as r:
                     r.raise_for_status()
                     response = r.json()
             except Exception as e:
@@ -750,9 +761,16 @@ class OAuth2Model(unohelper.Base):
         return refresh, access, never, 0 if never else timestamp + expires
 
     def _saveToken(self, user, refresh, access, never, timestamp):
-        if refresh is not None:
+        if refresh is None:
+            user.replaceByName('RefreshToken', self.getTokenRefresh())
+        else:
             user.replaceByName('RefreshToken', refresh)
-        if access is not None:
+        self._saveAccessToken(user, refresh, access, never, timestamp)
+
+    def _saveAccessToken(self, user, refresh, access, never, timestamp):
+        if access is None:
+            user.replaceByName('AccessToken', self.getTokenAccess())
+        else:
             user.replaceByName('AccessToken', access)
         user.replaceByName('NeverExpires', never)
         user.replaceByName('TimeStamp', timestamp)

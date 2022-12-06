@@ -47,17 +47,19 @@ class ProviderView(unohelper.Base):
 
     def getDialogValues(self):
         return (self.getClientId(), self.getAuthorizationUrl(), self.getTokenUrl(),
-                self.getAuthorizationParameters(), self.getTokenParameters())
+                self.getAuthorizationParameters(), self.getTokenParameters(), self.getSignIn(), self.getSignInPage())
 
     def getDialogData(self):
-        clientid, authorizationurl, tokenurl, authorizationparameters, tokenparameters = self.getDialogValues()
-        data = (self.getRedirectAddress(), self.getRedirectPort(), self.getClientSecret(),
-                self.getCodeChallenge(), self.getCodeChallengeMethod(), clientid,
-                authorizationurl, tokenurl, authorizationparameters, tokenparameters)
-        return self.getHttpHandler(), data
+        clientid, authorizationurl, tokenurl, authorizationparameters, tokenparameters, signin, page = self.getDialogValues()
+        return (clientid, self.getClientSecret(), authorizationurl, tokenurl, authorizationparameters, tokenparameters,
+                self.getCodeChallenge(), self.getCodeChallengeMethod(), signin, page, self.getHttpHandler(),
+                self.getRedirectAddress(), self.getRedirectPort())
 
     def getClientId(self):
         return self._getClientId().Text.strip()
+
+    def getClientSecret(self):
+        return self._getClientSecret().Text.strip()
 
     def getAuthorizationUrl(self):
         return self._getAuthorizationUrl().Text.strip()
@@ -65,20 +67,23 @@ class ProviderView(unohelper.Base):
     def getTokenUrl(self):
         return self._getTokenUrl().Text.strip()
 
+    def getAuthorizationParameters(self):
+        return self._getAuthorizationParameters().Text.strip()
+
+    def getTokenParameters(self):
+        return self._getTokenParameters().Text.strip()
+
     def getCodeChallenge(self):
         return bool(self._getCodeChallenge().State)
 
     def getCodeChallengeMethod(self):
         return 'S256' if self._getCodeChallengeMethod(1).State else 'plain'
 
-    def getClientSecret(self):
-        return self._getClientSecret().Text.strip()
+    def getSignIn(self):
+        return bool(self._getSignIn().State)
 
-    def getAuthorizationParameters(self):
-        return self._getAuthorizationParameters().Text.strip()
-
-    def getTokenParameters(self):
-        return self._getTokenParameters().Text.strip()
+    def getSignInPage(self):
+        return self._getSignInPage().Text.strip()
 
     def getRedirectAddress(self):
         return self._getRedirectAddress().getSelectedItem()
@@ -90,24 +95,27 @@ class ProviderView(unohelper.Base):
         return bool(self._getHttpHandler(3).State)
 
 # ProviderView setter methods
-    def initDialog(self, clientid, authorizationurl, tokenurl, codechallenge, codechallengemethod,
-                   clientsecret, authorizationparameters, tokenparameters,
-                   redirectaddress, redirectport, httphandler):
+    def initDialog(self, clientid, clientsecret, authorizationurl, tokenurl,
+                   authorizationparameters, tokenparameters, codechallenge, codechallengemethod,
+                   signin, page, httphandler, redirectaddress, redirectport):
         self._getClientId().Text = clientid
+        self._getClientSecret().Text = clientsecret
         self._getAuthorizationUrl().Text = authorizationurl
         self._getTokenUrl().Text = tokenurl
+        self._getAuthorizationParameters().Text = authorizationparameters
+        self._getTokenParameters().Text = tokenparameters
         self._getCodeChallenge().State = 1 if codechallenge else 0
         option = 1 if codechallengemethod == 'S256' else 2
         self._getCodeChallengeMethod(option).State = 1
         self.enableChallengeMethod(codechallenge)
-        self._getClientSecret().Text = clientsecret
-        self._getAuthorizationParameters().Text = authorizationparameters
-        self._getTokenParameters().Text = tokenparameters
-        self._getRedirectAddress().selectItem(redirectaddress, True)
-        self._getRedirectPort().Value = '%s' % redirectport
+        self._getSignIn().State = 1 if signin else 0
+        self._getSignInPage().Text = page
+        self.enableSignIn(signin)
         option = 3 if httphandler else 4
         self._getHttpHandler(option).State = 1
         self.enableHttpHandler(httphandler)
+        self._getRedirectAddress().selectItem(redirectaddress, True)
+        self._getRedirectPort().Value = '%s' % redirectport
 
     def dispose(self):
         self._dialog.dispose()
@@ -121,6 +129,9 @@ class ProviderView(unohelper.Base):
         self._getRedirectAddress().Model.Enabled = enabled
         self._getRedirectPortLabel().Model.Enabled = enabled
         self._getRedirectPort().Model.Enabled = enabled
+
+    def enableSignIn(self, enabled):
+        self._getSignInPage().Model.Enabled = enabled
 
     def updateOk(self, enabled):
         self._getOkButton().Model.Enabled = enabled
@@ -164,13 +175,13 @@ class ProviderView(unohelper.Base):
     def _getClientId(self):
         return self._dialog.getControl('TextField1')
 
-    def _getAuthorizationUrl(self):
+    def _getClientSecret(self):
         return self._dialog.getControl('TextField2')
 
-    def _getTokenUrl(self):
+    def _getAuthorizationUrl(self):
         return self._dialog.getControl('TextField3')
 
-    def _getClientSecret(self):
+    def _getTokenUrl(self):
         return self._dialog.getControl('TextField4')
 
     def _getAuthorizationParameters(self):
@@ -185,6 +196,12 @@ class ProviderView(unohelper.Base):
     def _getCodeChallenge(self):
         return self._dialog.getControl('CheckBox1')
 
+    def _getSignIn(self):
+        return self._dialog.getControl('CheckBox2')
+
+    def _getSignInPage(self):
+        return self._dialog.getControl('TextField7')
+
     def _getRedirectAddress(self):
         return self._dialog.getControl('ListBox1')
 
@@ -195,10 +212,10 @@ class ProviderView(unohelper.Base):
         return self._dialog.getControl('OptionButton%s' % option)
 
     def _getRedirectAddressLabel(self):
-        return self._dialog.getControl('Label9')
+        return self._dialog.getControl('Label7')
 
     def _getRedirectPortLabel(self):
-        return self._dialog.getControl('Label10')
+        return self._dialog.getControl('Label8')
 
     def _getOkButton(self):
         return self._dialog.getControl('CommandButton2')

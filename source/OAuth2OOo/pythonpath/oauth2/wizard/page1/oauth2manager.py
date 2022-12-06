@@ -170,6 +170,10 @@ class OAuth2Manager(unohelper.Base):
     def setHttpHandler(self, enabled):
         self._dialog.enableHttpHandler(enabled)
 
+    def setSignIn(self, enabled):
+        self._dialog.enableSignIn(enabled)
+        self.setValue()
+
 # OAuth2Manager setter methods called by ScopeHandler
     def selectScopeValue(self, selected):
         self._dialog.updateRemove(selected)
@@ -198,11 +202,11 @@ class OAuth2Manager(unohelper.Base):
 
     def _showProvider(self, new):
         provider = self._view.getProvider()
-        self._dialog = ProviderView(self._ctx, ProviderHandler(self), self._view.getWindow().Peer, self._model.getProviderTitle(provider))
-        self._dialog.initDialog(*self._model.getProviderData(provider))
+        title, data = self._model.getProviderData(provider)
+        self._dialog = ProviderView(self._ctx, ProviderHandler(self), self._view.getWindow().Peer, title)
+        self._dialog.initDialog(*data)
         if self._dialog.execute() == OK:
-            httphandler, data = self._dialog.getDialogData()
-            self._model.saveProviderData(provider, httphandler, *data)
+            self._model.saveProviderData(provider, *self._dialog.getDialogData())
             if new:
                 self._view.addProvider(provider)
                 self._view.toggleProviderButtons()
@@ -213,7 +217,8 @@ class OAuth2Manager(unohelper.Base):
     def _showScope(self, new):
         scope = self._view.getScope()
         provider = self._view.getProvider()
-        self._dialog = ScopeView(self._ctx, ScopeHandler(self), self._view.getWindow().Peer, *self._model.getScopeData(scope))
+        data = self._model.getScopeData(scope)
+        self._dialog = ScopeView(self._ctx, ScopeHandler(self), self._view.getWindow().Peer, *data)
         if self._dialog.execute() == OK:
             self._model.saveScopeData(scope, provider, self._dialog.getScopeValues())
             if new:

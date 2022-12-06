@@ -49,6 +49,9 @@ class ProviderHandler(unohelper.Base,
             elif method == 'SetChallenge':
                 self._manager.setChallenge(bool(event.Source.State))
                 handled = True
+            elif method == 'SetSignIn':
+                self._manager.setSignIn(bool(event.Source.State))
+                handled = True
             elif method == 'EnableHttpHandler':
                 self._manager.setHttpHandler(True)
                 handled = True
@@ -63,6 +66,7 @@ class ProviderHandler(unohelper.Base,
     def getSupportedMethodNames(self):
         return ('SetValue',
                 'SetChallenge',
+                'SetSignIn',
                 'EnableHttpHandler',
                 'DisableHttpHandler')
 

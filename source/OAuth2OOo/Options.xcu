@@ -94,7 +94,7 @@
                 <value>{"prompt": "consent", "response_mode": "query", "scope": null, "login_hint": "current_user", "hl": "current_language"}</value>
             </prop>
             <prop oor:name="TokenUrl">
-                <value>https://www.googleapis.com/oauth2/v4/token</value>
+                <value>https://oauth2.googleapis.com/token</value>
             </prop>
             <prop oor:name="TokenParameters">
                 <value>{"client_secret": null}</value>
@@ -117,6 +117,9 @@
             <prop oor:name="SignIn">
                 <value>true</value>
             </prop>
+            <prop oor:name="SignInPage">
+                <value>GoogleSignIn</value>
+            </prop>
         </node>
         <node oor:name="Microsoft" oor:op="fuse">
             <prop oor:name="ClientId">
@@ -138,7 +141,7 @@
                 <value>{"scope": null}</value>
             </prop>
             <prop oor:name="CodeChallenge">
-                <value>false</value>
+                <value>true</value>
             </prop>
             <prop oor:name="CodeChallengeMethod">
                 <value>S256</value>
@@ -154,6 +157,9 @@
             </prop>
             <prop oor:name="SignIn">
                 <value>false</value>
+            </prop>
+            <prop oor:name="SignInPage">
+                <value></value>
             </prop>
         </node>
     </node>
