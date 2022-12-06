@@ -73,7 +73,7 @@ class OAuth2Model(unohelper.Base):
         self._uri = 'http://%s:%s/'
         self._urn = 'urn:ietf:wg:oauth:2.0:oob'
         self._watchdog = None
-        self._configuration = getConfiguration(ctx, g_identifier, True)
+        self._config = getConfiguration(ctx, g_identifier, True)
         self._resolver = getStringResource(ctx, g_identifier, g_extension)
         self._resources = {'Title': 'PageWizard%s.Title',
                            'Step': 'PageWizard%s.Step',
@@ -103,10 +103,10 @@ class OAuth2Model(unohelper.Base):
 
     def _getUrlData(self, url):
         scope = provider = ''
-        urls = self._configuration.getByName('Urls')
+        urls = self._config.getByName('Urls')
         if urls.hasByName(url):
             scope = urls.getByName(url).getByName('Scope')
-            scopes = self._configuration.getByName('Scopes')
+            scopes = self._config.getByName('Scopes')
             if scopes.hasByName(scope):
                 provider = scopes.getByName(scope).getByName('Provider')
         return scope, provider
@@ -120,44 +120,44 @@ class OAuth2Model(unohelper.Base):
         return self._url
 
     @property
-    def Timeout(self):
-        return self._configuration.getByName('ConnectTimeout'), self._configuration.getByName('ReadTimeout')
-
-    @property
     def ConnectTimeout(self):
-        return self._configuration.getByName('ConnectTimeout')
+        return self._config.getByName('ConnectTimeout')
     @ConnectTimeout.setter
     def ConnectTimeout(self, timeout):
-        self._configuration.replaceByName('ConnectTimeout', timeout)
+        self._config.replaceByName('ConnectTimeout', timeout)
 
     @property
     def ReadTimeout(self):
-        return self._configuration.getByName('ReadTimeout')
+        return self._config.getByName('ReadTimeout')
     @ReadTimeout.setter
     def ReadTimeout(self, timeout):
-        self._configuration.replaceByName('ReadTimeout', timeout)
+        self._config.replaceByName('ReadTimeout', timeout)
 
     @property
     def HandlerTimeout(self):
-        return self._configuration.getByName('HandlerTimeout')
+        return self._config.getByName('HandlerTimeout')
     @HandlerTimeout.setter
     def HandlerTimeout(self, timeout):
-        self._configuration.replaceByName('HandlerTimeout', timeout)
+        self._config.replaceByName('HandlerTimeout', timeout)
+
+    @property
+    def Timeout(self):
+        return self.ConnectTimeout, self.ReadTimeout
 
     @property
     def UrlList(self):
-        return self._configuration.getByName('Urls').ElementNames
+        return self._config.getByName('Urls').ElementNames
 
     def commit(self):
-        if self._configuration.hasPendingChanges():
-            self._configuration.commitChanges()
+        if self._config.hasPendingChanges():
+            self._config.commitChanges()
 
     def getProviderName(self, url):
         provider = ''
-        if self._configuration.getByName('Urls').hasByName(url):
-            scope = self._configuration.getByName('Urls').getByName(url).getByName('Scope')
-            if self._configuration.getByName('Scopes').hasByName(scope):
-                provider = self._configuration.getByName('Scopes').getByName(scope).getByName('Provider')
+        if self._config.getByName('Urls').hasByName(url):
+            scope = self._config.getByName('Urls').getByName(url).getByName('Scope')
+            if self._config.getByName('Scopes').hasByName(scope):
+                provider = self._config.getByName('Scopes').getByName(scope).getByName('Provider')
         return provider
 
 # OAuth2Model getter methods called by OptionsManager
@@ -173,7 +173,7 @@ class OAuth2Model(unohelper.Base):
 
 # OAuth2Model getter methods called by OAuth2Service
     def isAccessTokenExpired(self):
-        providers = self._configuration.getByName('Providers')
+        providers = self._config.getByName('Providers')
         user = providers.getByName(self._provider).getByName('Users').getByName(self._user)
         if user.getByName('NeverExpires'):
             return False
@@ -182,13 +182,13 @@ class OAuth2Model(unohelper.Base):
         return expire < g_refresh_overlap
 
     def getRefreshedToken(self):
-        provider = self._configuration.getByName('Providers').getByName(self._provider)
+        provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
         self._refreshToken(provider, user)
         return user.getByName('AccessToken')
 
     def getToken(self):
-        provider = self._configuration.getByName('Providers').getByName(self._provider)
+        provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
         return user.getByName('AccessToken')
  
@@ -201,7 +201,7 @@ class OAuth2Model(unohelper.Base):
         return self.isAuthorized()
 
     def isAuthorized(self):
-        providers = self._configuration.getByName('Providers')
+        providers = self._config.getByName('Providers')
         return self._isInitialized(providers) and self._isUrlScopeAuthorized(providers)
 
     def _isInitialized(self, providers):
@@ -211,7 +211,7 @@ class OAuth2Model(unohelper.Base):
         return False
 
     def _isUrlScopeAuthorized(self, providers):
-        scopes = self._configuration.getByName('Scopes')
+        scopes = self._config.getByName('Scopes')
         if scopes.hasByName(self._scope):
             values = providers.getByName(self._provider).getByName('Users').getByName(self._user).getByName('Scopes')
             for scope in scopes.getByName(self._scope).getByName('Values'):
@@ -222,8 +222,8 @@ class OAuth2Model(unohelper.Base):
 
 # OAuth2Model getter methods called by WizardPages 1
     def getActivePath(self, user, url, provider, scope):
-        urls = self._configuration.getByName('Urls')
-        providers = self._configuration.getByName('Providers')
+        urls = self._config.getByName('Urls')
+        providers = self._config.getByName('Providers')
         if urls.hasByName(url) and self._isAuthorized(user, scope, provider, providers):
             path = 2
         elif providers.hasByName(provider) and not providers.getByName(provider).getByName('HttpHandler'):
@@ -250,7 +250,7 @@ class OAuth2Model(unohelper.Base):
         return self._user, self._url, self.UrlList
 
     def getProviderData(self, name):
-        providers = self._configuration.getByName('Providers')
+        providers = self._config.getByName('Providers')
         if providers.hasByName(name):
             data = self._getProviderData(providers.getByName(name))
         else:
@@ -260,7 +260,7 @@ class OAuth2Model(unohelper.Base):
     def saveProviderData(self, name, clientid, clientsecret, authorizationurl, tokenurl,
                          authorizationparameters, tokenparameters, challenge, challengemethod,
                          signin, page, handler, address, port):
-        providers = self._configuration.getByName('Providers')
+        providers = self._config.getByName('Providers')
         if not providers.hasByName(name):
             providers.insertByName(name, providers.createInstance())
         provider = providers.getByName(name)
@@ -281,7 +281,7 @@ class OAuth2Model(unohelper.Base):
 
     def getScopeData(self, name):
         title = self.getScopeTitle(name)
-        scopes = self._configuration.getByName('Scopes')
+        scopes = self._config.getByName('Scopes')
         if scopes.hasByName(name):
             values = scopes.getByName(name).getByName('Values')
         else:
@@ -289,7 +289,7 @@ class OAuth2Model(unohelper.Base):
         return title, values
 
     def saveScopeData(self, name, provider, values):
-        scopes = self._configuration.getByName('Scopes')
+        scopes = self._config.getByName('Scopes')
         if not scopes.hasByName(name):
             scopes.insertByName(name, scopes.createInstance())
         scope = scopes.getByName(name)
@@ -342,7 +342,7 @@ class OAuth2Model(unohelper.Base):
         return self._getProviderList(), provider, scope
 
     def addUrl(self, name, scope):
-        urls = self._configuration.getByName('Urls')
+        urls = self._config.getByName('Urls')
         if not urls.hasByName(name):
             urls.insertByName(name, urls.createInstance())
         url = urls.getByName(name)
@@ -350,56 +350,56 @@ class OAuth2Model(unohelper.Base):
         self.commit()
 
     def saveUrl(self, url, scope):
-        urls = self._configuration.getByName('Urls')
+        urls = self._config.getByName('Urls')
         if urls.hasByName(url):
              urls.getByName(url).replaceByName('Scope', scope)
              self.commit()
 
     def removeUrl(self, url):
-        urls = self._configuration.getByName('Urls')
+        urls = self._config.getByName('Urls')
         if urls.hasByName(url):
             urls.removeByName(url)
             self.commit()
 
     def canRemoveProvider(self, provider):
-        scopes = self._configuration.getByName('Scopes')
+        scopes = self._config.getByName('Scopes')
         for scope in scopes.ElementNames:
             if scopes.getByName(scope).getByName('Provider') == provider:
                 return False
         return True
 
     def canRemoveScope(self, scope):
-        urls = self._configuration.getByName('Urls')
+        urls = self._config.getByName('Urls')
         for url in urls.ElementNames:
             if urls.getByName(url).getByName('Scope') == scope:
                 return False
         return True
 
     def removeProvider(self, provider):
-        providers = self._configuration.getByName('Providers')
+        providers = self._config.getByName('Providers')
         if providers.hasByName(provider):
             providers.removeByName(provider)
             self.commit()
 
     def removeScope(self, scope):
-        scopes = self._configuration.getByName('Scopes')
+        scopes = self._config.getByName('Scopes')
         if scopes.hasByName(scope):
             scopes.removeByName(scope)
             self.commit()
 
     def isScopeChanged(self, url, scope):
-        urls = self._configuration.getByName('Urls')
+        urls = self._config.getByName('Urls')
         if urls.hasByName(url):
             return urls.getByName(url).getByName('Scope') != scope
         return False
 
     def getScopeList(self, provider):
-        scopes = []
-        for name in self._configuration.getByName('Scopes').ElementNames:
-            scope = self._configuration.getByName('Scopes').getByName(name)
-            if scope.getByName('Provider') == provider:
-                scopes.append(name)
-        return tuple(scopes)
+        items = []
+        scopes = self._config.getByName('Scopes')
+        for name in scopes.ElementNames:
+            if scopes.getByName(name).getByName('Provider') == provider:
+                items.append(name)
+        return tuple(items)
 
     def isConfigurationValid(self, email, url, provider, scope):
         return self.isEmailValid(email) and url != '' and provider != '' and scope != ''
@@ -435,27 +435,27 @@ class OAuth2Model(unohelper.Base):
 
     def _getScope(self, url):
         scope = ''
-        urls = self._configuration.getByName('Urls')
+        urls = self._config.getByName('Urls')
         if urls.hasByName(url):
             scope = urls.getByName(url).getByName('Scope')
         return scope
 
     def _getProvider(self, scope):
         provider = ''
-        scopes = self._configuration.getByName('Scopes')
+        scopes = self._config.getByName('Scopes')
         if scopes.hasByName(scope):
             provider = scopes.getByName(scope).getByName('Provider')
         return provider
 
     def _getScopeValues(self, scope):
         values = ()
-        scopes = self._configuration.getByName('Scopes')
+        scopes = self._config.getByName('Scopes')
         if scopes.hasByName(scope):
             values = scopes.getByName(scope).getByName('Values')
         return values
 
     def _getProviderList(self):
-        return self._configuration.getByName('Providers').ElementNames
+        return self._config.getByName('Providers').ElementNames
 
 # OAuth2Model getter methods called by WizardPages 2
     def getTermsOfUse(self):
@@ -465,8 +465,8 @@ class OAuth2Model(unohelper.Base):
         return self._getBaseUrl() % 'PrivacyPolicy'
 
     def getAuthorizationStr(self):
-        scope = self._configuration.getByName('Scopes').getByName(self._scope)
-        provider = self._configuration.getByName('Providers').getByName(self._provider)
+        scope = self._config.getByName('Scopes').getByName(self._scope)
+        provider = self._config.getByName('Providers').getByName(self._provider)
         scopes = self._getUrlScopes(scope, provider)
         main = provider.getByName('AuthorizationUrl')
         parameters = self._getUrlParameters(scopes, provider)
@@ -511,8 +511,8 @@ class OAuth2Model(unohelper.Base):
 
 # OAuth2Model getter methods called by WizardPages 3
     def getAuthorizationData(self):
-        scope = self._configuration.getByName('Scopes').getByName(self._scope)
-        provider = self._configuration.getByName('Providers').getByName(self._provider)
+        scope = self._config.getByName('Scopes').getByName(self._scope)
+        provider = self._config.getByName('Providers').getByName(self._provider)
         scopes = self._getUrlScopes(scope, provider)
         main = provider.getByName('AuthorizationUrl')
         parameters = self._getUrlParameters(scopes, provider)
@@ -545,21 +545,18 @@ class OAuth2Model(unohelper.Base):
         self._registerToken(scopes, name, user, code)
 
     def _getServerData(self):
-        provider = self._configuration.getByName('Providers').getByName(self._provider)
+        provider = self._config.getByName('Providers').getByName(self._provider)
         address = provider.getByName('RedirectAddress')
         port = provider.getByName('RedirectPort')
-        return self._provider, self._user, self._getBaseUrl(), address, port, self._uuid, self._getHandlerTimeout()
-
-    def _getHandlerTimeout(self):
-        return self._configuration.getByName('HandlerTimeout')
+        return self._provider, self._user, self._getBaseUrl(), address, port, self._uuid, self.HandlerTimeout
 
 # OAuth2Model getter methods called by WizardPages 4
     def isCodeValid(self, code):
         return code != ''
 
     def setAuthorization(self, code):
-        scope = self._configuration.getByName('Scopes').getByName(self._scope)
-        provider = self._configuration.getByName('Providers').getByName(self._provider)
+        scope = self._config.getByName('Scopes').getByName(self._scope)
+        provider = self._config.getByName('Providers').getByName(self._provider)
         scopes = self._getUrlScopes(scope, provider)
         self._registerToken(scopes, self._provider, self._user, code)
 
@@ -569,7 +566,7 @@ class OAuth2Model(unohelper.Base):
 
     def getTokenData(self):
         label = self.getTokenLabel()
-        users = self._configuration.getByName('Providers').getByName(self._provider).getByName('Users')
+        users = self._config.getByName('Providers').getByName(self._provider).getByName('Users')
         exist = users.hasByName(self._user)
         if exist:
             user = users.getByName(self._user)
@@ -587,7 +584,7 @@ class OAuth2Model(unohelper.Base):
         return label, exist, scopes, access, refresh, expires
 
     def refreshToken(self):
-        provider = self._configuration.getByName('Providers').getByName(self._provider)
+        provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
         self._refreshToken(provider, user)
 
@@ -596,10 +593,10 @@ class OAuth2Model(unohelper.Base):
         data = self._getRefreshParameters(user, provider)
         timestamp = int(time.time())
         response = self._getResponseFromRequest(url, data)
-        self._saveAccessToken(user, *self._getTokenFromResponse(response, timestamp))
+        self._saveRefreshToken(user, *self._getTokenFromResponse(response, timestamp))
 
     def deleteUser(self):
-        providers = self._configuration.getByName('Providers')
+        providers = self._config.getByName('Providers')
         if providers.hasByName(self._provider):
             provider = providers.getByName(self._provider)
             users = provider.getByName('Users')
@@ -629,7 +626,7 @@ class OAuth2Model(unohelper.Base):
 
  # OAuth2Model private getter methods called by WizardPages 1 and WizardPages 3
     def _getBaseUrl(self):
-        return self._configuration.getByName('BaseUrl')
+        return self._config.getByName('BaseUrl')
 
 # OAuth2Model private getter methods called by WizardPages 2 and WizardPages 3
     def _getCodeVerifier(self):
@@ -680,7 +677,7 @@ class OAuth2Model(unohelper.Base):
 
 # OAuth2Model private getter/setter methods called by WizardPages 3 and WizardPages 4
     def _registerToken(self, scopes, name, user, code):
-        provider = self._configuration.getByName('Providers').getByName(name)
+        provider = self._config.getByName('Providers').getByName(name)
         url = provider.getByName('TokenUrl')
         parameters = self._getTokenParameters(scopes, provider, code)
         msg = "Make HTTP Request: %s?%s" % (url, self._getUrlArguments(parameters))
@@ -765,9 +762,9 @@ class OAuth2Model(unohelper.Base):
             user.replaceByName('RefreshToken', self.getTokenRefresh())
         else:
             user.replaceByName('RefreshToken', refresh)
-        self._saveAccessToken(user, refresh, access, never, timestamp)
+        self._saveRefreshToken(user, refresh, access, never, timestamp)
 
-    def _saveAccessToken(self, user, refresh, access, never, timestamp):
+    def _saveRefreshToken(self, user, refresh, access, never, timestamp):
         if access is None:
             user.replaceByName('AccessToken', self.getTokenAccess())
         else:
