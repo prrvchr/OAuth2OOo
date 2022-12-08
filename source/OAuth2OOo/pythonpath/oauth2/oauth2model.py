@@ -54,6 +54,7 @@ from .oauth2helper import getOAuth2ErrorCode
 
 from requests.compat import urlencode
 from requests import Session
+from requests import ConnectionError
 from requests import HTTPError
 import time
 import validators
@@ -752,24 +753,29 @@ class OAuth2Model(unohelper.Base):
         error = None
         session = Session()
         with session as s:
-            with s.post(url, data=data, timeout=self.Timeout) as r:
-                try:
+            try:
+                with s.post(url, data=data, timeout=self.Timeout) as r:
                     response = r.json()
                     r.raise_for_status()
-                except json.decoder.JSONDecodeError as e:
-                    # TODO: Normally the content of the page must be in json format,
-                    # TODO: except if we are not on the right page for example.
-                    error = self.getAuthorizationErrorMessage(300) % (r.status_code, r.url)
-                    logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
-                    error += self.getAuthorizationErrorMessage(301) % r.text
-                except HTTPError as e:
-                    # TODO: Capture OAuth2 errors in order to display them to facilitate debugging
-                    code = getOAuth2ErrorCode(response.get('error'))
-                    error = self.getAuthorizationErrorMessage(code)
-                    logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
-                    description = response.get('error_description')
-                    if description is not None:
-                        error += self.getAuthorizationErrorMessage(400) % description
+            except ConnectionError:
+                # TODO: The provided url may be unreachable
+                error = self.getAuthorizationErrorMessage(300) % url
+            except json.decoder.JSONDecodeError:
+                # TODO: Normally the content of the page must be in json format,
+                # TODO: except if we are not on the right page for example.
+                ctype = r.headers.get('Content-Type', 'undefined')
+                error = self.getAuthorizationErrorMessage(301) % (ctype, r.status_code, url)
+                logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
+                if r.text != '':
+                    error += self.getAuthorizationErrorMessage(302) % r.text
+            except HTTPError:
+                # TODO: Capture OAuth2 errors in order to display them to facilitate debugging
+                code = getOAuth2ErrorCode(response.get('error'))
+                error = self.getAuthorizationErrorMessage(code)
+                logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
+                description = response.get('error_description')
+                if description is not None:
+                    error += self.getAuthorizationErrorMessage(303) % description
         return response, error
 
     def _getTokenFromResponse(self, response, timestamp):
