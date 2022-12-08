@@ -44,11 +44,24 @@ class OAuth2View(unohelper.Base):
     def getWindow(self):
         return self._window
 
+    def setStep(self, step):
+        self._window.Model.Step = step
+
 # OAuth2View setter methods
     def notify(self, percent):
         self._getProgessBar().Value = percent
+
+    def showError(self, title, message):
+        self._window.Model.Step = 2
+        self._getErrorTitle().Text = title
+        self._getErrorText().Text = message
 
 # OAuth2View private getter control methods
     def _getProgessBar(self):
         return self._window.getControl('ProgressBar1')
 
+    def _getErrorTitle(self):
+        return self._window.getControl('Label2')
+
+    def _getErrorText(self):
+        return self._window.getControl('TextField1')

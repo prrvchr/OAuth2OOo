@@ -71,6 +71,17 @@ def showOAuth2Wizard(ctx, model, parent):
     print("oauth2helper.showOAuth2Wizard() 5")
     return state, result
 
+def getOAuth2ErrorCode(error):
+    errors = {'access_denied': 201,
+              'invalid_request': 202,
+              'unauthorized_client': 203,
+              'unsupported_response_type': 204,
+              'invalid_scope': 205,
+              'server_error': 206,
+              'temporarily_unavailable': 207}
+    return errors.get(error, 200)
+
+
 def _getTokenFromWizard(ctx, model, parent):
     token = ''
     state, result = showOAuth2Wizard(ctx, model, parent)

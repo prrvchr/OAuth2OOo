@@ -35,7 +35,6 @@ from .oauth2view import OAuth2View
 
 from ...unotool import executeShell
 
-from six import PY3
 import traceback
 
 
@@ -56,6 +55,7 @@ class OAuth2Manager(unohelper.Base):
         return self._view.getWindow()
 
     def activatePage(self):
+        self._view.setStep(1)
         scopes, url = self._model.getAuthorizationData()
         executeShell(self._ctx, url)
         self._model.startServer(scopes, self.notify, self.register)
@@ -70,13 +70,18 @@ class OAuth2Manager(unohelper.Base):
     def notify(self, percent):
         self._view.notify(percent)
 
-    def register(self, scopes, provider, user, code):
-        self._model.registerToken(scopes, provider, user, code)
-        self._wizard.updateTravelUI()
-        if self._model.closeWizard():
-            self._wizard.DialogWindow.endDialog(OK)
+    def register(self, scopes, provider, user, code, error):
+        if error is None:
+            error = self._model.registerToken(scopes, provider, user, code)
+            if error is None:
+                self._wizard.updateTravelUI()
+                if self._model.closeWizard():
+                    self._wizard.DialogWindow.endDialog(OK)
+                else:
+                    # FIXME: Cannot Wizard.travelNext() on OpenOffice
+                    self._wizard.travelNext()
+            else:
+                self._view.showError(self._model.getTokenTitle(), error)
         else:
-            # FIXME: Cannot Wizard.travelNext() on OpenOffice
-            self._wizard.travelNext()
-
+            self._view.showError(*self._model.getAuthorizationMessage(error))
 

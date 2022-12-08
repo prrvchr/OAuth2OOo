@@ -44,10 +44,21 @@ class OAuth2View(unohelper.Base):
     def getWindow(self):
         return self._window
 
+    def setStep(self, step):
+        self._window.Model.Step = step
+
     def getCode(self):
         return self._getCode().Text.strip()
+
+# OAuth2View setter methods
+    def showError(self, message):
+        self._window.Model.Step = 2
+        self._getErrorText().Text = message
 
 # OAuth2View private getter control methods
     def _getCode(self):
         return self._window.getControl('TextField1')
+
+    def _getErrorText(self):
+        return self._window.getControl('TextField2')
 

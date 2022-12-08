@@ -43,7 +43,11 @@ from requests.compat import urlencode
 
 from ..unotool import createService
 
+from ..oauth2helper import getOAuth2ErrorCode
+
 from ..logger import logMessage
+from ..logger import getMessage
+g_message = 'httpserver'
 
 import time
 from threading import Thread
@@ -81,16 +85,18 @@ class WatchDog(Thread):
                 now = timer()
             if self._server.is_alive():
                 self._server.stopAccepting()
-            elif self._server.hasAuthorizationCode():
-                self._notify(100)
-                self._register(self._scopes, self._provider, self._user, self._server.getAuthorizationCode())
+                self._server.join()
+            self._notify(100)
+            self._register(self._scopes, self._provider, self._user, *self._server.getResults())
             self._lock.notifyAll()
             logMessage(self._ctx, INFO, "WatchDog Running ... Done", 'WatchDog', 'run()')
 
     def cancel(self):
         if self._server.is_alive():
             self._end = 0
-            self._server.join()
+
+    def isRunning(self):
+        return self._server.is_alive()
 
 
 class Server(Thread):
@@ -104,14 +110,12 @@ class Server(Thread):
         self._port = port
         self._uuid = uuid
         self._code = None
+        self._error = 100
         self._lock = lock
         self._acceptor = createService(ctx, 'com.sun.star.connection.Acceptor')
 
-    def hasAuthorizationCode(self):
-        return self._code is not None
-
-    def getAuthorizationCode(self):
-        return self._code
+    def getResults(self):
+        return self._code, self._error
 
     def stopAccepting(self):
         self._acceptor.stopAccepting()
@@ -153,15 +157,52 @@ Connection: Closed
                 logMessage(self._ctx, INFO, "Server Running ... Done", 'Server', 'run()')
 
 # Server private getter methods
-    def _readString(self, connection, length):
-        length, sequence = connection.read(None, length)
-        return sequence.value.decode()
+    def _getResult(self, connection):
+        parameters = self._getParameters(connection)
+        response = self._getResponse(parameters)
+        if 'error' in response:
+            self._error = getOAuth2ErrorCode(response['error'])
+        elif 'code' in response:
+            if 'state' not in response:
+                self._error = 101
+            elif response['state'] != self._uuid:
+                self._error = 102
+            else:
+                self._code = response['code']
+                self._error = None
+                return True
+        else:
+            self._error = 103
+        msg = 'Request response Error: %s - %s' % (parameters, response)
+        logMessage(self._ctx, SEVERE, msg, 'Server', '_getResult()')
+        return False
 
-    def _readLine(self, connection, eol='\r\n'):
-        line = ''
-        while not line.endswith(eol):
-            line += self._readString(connection, 1)
-        return line.strip()
+    def _getLocation(self, result):
+        basename = 'OAuth2Success' if result else 'OAuth2Error'
+        return self._url % basename
+
+    def _getParameters(self, connection):
+        parameters = ''
+        method, url, version = self._getRequest(connection)
+        headers = self._getHeaders(connection)
+        if method == 'GET':
+            parts = url.split('?')
+            if len(parts) > 1:
+                parameters = '?'.join(parts[1:]).strip()
+        elif method == 'POST':
+            length = self._getContentLength(headers)
+            parameters = self._readString(connection, length).strip()
+        return unquote_plus(parameters)
+
+    def _getResponse(self, parameters):
+        response = {}
+        for parameter in parameters.split('&'):
+            parts = parameter.split('=')
+            if len(parts) > 1:
+                name = parts[0].strip()
+                value = '='.join(parts[1:]).strip()
+                response[name] = value
+        return response
 
     def _getRequest(self, connection):
         method, url, version = None, '/', 'HTTP/0.9'
@@ -188,41 +229,13 @@ Connection: Closed
     def _getContentLength(self, headers):
         return int(headers['Content-Length'])
 
-    def _getParameters(self, connection):
-        parameters = ''
-        method, url, version = self._getRequest(connection)
-        headers = self._getHeaders(connection)
-        if method == 'GET':
-            parts = url.split('?')
-            if len(parts) > 1:
-                parameters = '?'.join(parts[1:]).strip()
-        elif method == 'POST':
-            length = self._getContentLength(headers)
-            parameters = self._readString(connection, length).strip()
-        return unquote_plus(parameters)
+    def _readString(self, connection, length):
+        length, sequence = connection.read(None, length)
+        return sequence.value.decode()
 
-    def _getResponse(self, parameters):
-        response = {}
-        for parameter in parameters.split('&'):
-            parts = parameter.split('=')
-            if len(parts) > 1:
-                name = parts[0].strip()
-                value = '='.join(parts[1:]).strip()
-                response[name] = value
-        return response
-
-    def _getResult(self, connection):
-        parameters = self._getParameters(connection)
-        response = self._getResponse(parameters)
-        if 'code' in response and 'state' in response:
-            if response['state'] == self._uuid:
-                self._code = response['code']
-                return True
-        msg = 'Request response Error: %s - %s' % (parameters, response)
-        logMessage(self._ctx, SEVERE, msg, 'Server', '_getResult()')
-        return False
-
-    def _getLocation(self, result):
-        basename = 'OAuth2Success' if result else 'OAuth2Error'
-        return self._url % basename
+    def _readLine(self, connection, eol='\r\n'):
+        line = ''
+        while not line.endswith(eol):
+            line += self._readString(connection, 1)
+        return line.strip()
 

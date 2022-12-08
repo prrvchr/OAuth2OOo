@@ -50,8 +50,11 @@ from .logger import disposeLogger
 from .wizard import WatchDog
 from .wizard import Server
 
+from .oauth2helper import getOAuth2ErrorCode
+
 from requests.compat import urlencode
 from requests import Session
+from requests import HTTPError
 import time
 import validators
 import base64
@@ -80,6 +83,9 @@ class OAuth2Model(unohelper.Base):
                            'UrlLabel': 'PageWizard1.Label4.Label',
                            'ProviderTitle': 'ProviderDialog.Title',
                            'ScopeTitle': 'ScopeDialog.Title',
+                           'AuthorizationError': 'PageWizard3.Label2.Label',
+                           'AuthorizationMessage': 'PageWizard3.TextField1.Text.%s',
+                           'TokenError': 'PageWizard4.Label2.Label',
                            'TokenLabel': 'PageWizard5.Label1.Label',
                            'TokenAccess': 'PageWizard5.Label6.Label',
                            'TokenRefresh': 'PageWizard5.Label4.Label',
@@ -527,28 +533,31 @@ class OAuth2Model(unohelper.Base):
 
     def startServer(self, scopes, notify, register):
         self.cancelServer()
-        provider, user, url, address, port, uuid, timeout = self._getServerData()
+        provider = self._config.getByName('Providers').getByName(self._provider)
+        address = provider.getByName('RedirectAddress')
+        port = provider.getByName('RedirectPort')
         lock = Condition()
-        server = Server(self._ctx, user, url, provider, address, port, uuid, lock)
-        self._watchdog = WatchDog(self._ctx, server, notify, register, scopes, provider, user, timeout, lock)
+        server = Server(self._ctx, self._user, self._getBaseUrl(), self._provider, address, port, self._uuid, lock)
+        self._watchdog = WatchDog(self._ctx, server, notify, register, scopes, self._provider, self._user, self.HandlerTimeout, lock)
         server.start()
         self._watchdog.start()
         logMessage(self._ctx, INFO, "WizardServer Started ... Done", 'OAuth2Manager', 'startServer()')
+
+    def isServerRunning(self):
+        return self._watchdog is not None and self._watchdog.isRunning()
 
     def cancelServer(self):
         if self._watchdog is not None:
             if self._watchdog.is_alive():
                 self._watchdog.cancel()
+                self._watchdog.join()
             self._watchdog = None
 
     def registerToken(self, scopes, name, user, code):
-        self._registerToken(scopes, name, user, code)
+        return self._registerToken(scopes, name, user, code)
 
-    def _getServerData(self):
-        provider = self._config.getByName('Providers').getByName(self._provider)
-        address = provider.getByName('RedirectAddress')
-        port = provider.getByName('RedirectPort')
-        return self._provider, self._user, self._getBaseUrl(), address, port, self._uuid, self.HandlerTimeout
+    def getAuthorizationMessage(self, error):
+        return self.getAuthorizationErrorTitle(), self.getAuthorizationErrorMessage(error)
 
 # OAuth2Model getter methods called by WizardPages 4
     def isCodeValid(self, code):
@@ -558,7 +567,7 @@ class OAuth2Model(unohelper.Base):
         scope = self._config.getByName('Scopes').getByName(self._scope)
         provider = self._config.getByName('Providers').getByName(self._provider)
         scopes = self._getUrlScopes(scope, provider)
-        self._registerToken(scopes, self._provider, self._user, code)
+        return self._registerToken(scopes, self._provider, self._user, code)
 
 # OAuth2Model getter methods called by WizardPages 5
     def closeWizard(self):
@@ -592,8 +601,9 @@ class OAuth2Model(unohelper.Base):
         url = provider.getByName('TokenUrl')
         data = self._getRefreshParameters(user, provider)
         timestamp = int(time.time())
-        response = self._getResponseFromRequest(url, data)
-        self._saveRefreshToken(user, *self._getTokenFromResponse(response, timestamp))
+        response, error = self._getResponseFromRequest(url, data)
+        if error is None:
+            self._saveRefreshToken(user, *self._getTokenFromResponse(response, timestamp))
 
     def deleteUser(self):
         providers = self._config.getByName('Providers')
@@ -683,10 +693,12 @@ class OAuth2Model(unohelper.Base):
         msg = "Make HTTP Request: %s?%s" % (url, self._getUrlArguments(parameters))
         logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
         timestamp = int(time.time())
-        response = self._getResponseFromRequest(url, parameters)
-        self._saveUserToken(scopes, provider, user, response, timestamp)
+        response, error = self._getResponseFromRequest(url, parameters)
+        if error is None:
+            self._saveUserToken(scopes, provider, user, response, timestamp)
         msg = "Receive Response: %s" % (response, )
         logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
+        return error
 
     def _getTokenParameters(self, scopes, provider, code):
         parameters = self._getTokenBaseParameters(provider, code)
@@ -736,18 +748,22 @@ class OAuth2Model(unohelper.Base):
         return base
 
     def _getResponseFromRequest(self, url, data):
-        session = Session()
         response = {}
+        error = None
+        session = Session()
         with session as s:
-            try:
-                with s.post(url, data=data, timeout=self.Timeout) as r:
+            with s.post(url, data=data, timeout=self.Timeout) as r:
+                response = r.json()
+                try:
                     r.raise_for_status()
-                    response = r.json()
-            except Exception as e:
-                msg = "HTTP ERROR: %s" % (e, )
-                logMessage(self._ctx, SEVERE, msg, 'OAuth2Model', '_getResponseFromRequest()')
-                print("ERROR: OAuth2Model._getResponseFromRequest() %s - %s" % (response, traceback.print_exc()))
-        return response
+                except HTTPError as e:
+                    code = getOAuth2ErrorCode(response.get('error'))
+                    error = self.getAuthorizationErrorMessage(code)
+                    logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
+                    description = response.get('error_description')
+                    if description is not None:
+                        error += self.getAuthorizationErrorMessage(300) % description
+        return response, error
 
     def _getTokenFromResponse(self, response, timestamp):
         print("OAuth2Model._getTokenFromResponse() %s" % (response, ))
@@ -825,4 +841,16 @@ class OAuth2Model(unohelper.Base):
     def getUserLabel(self, msg):
         resource = self._resources.get('UserLabel')
         return self._resolver.resolveString(resource) % msg
+
+    def getAuthorizationErrorTitle(self):
+        resource = self._resources.get('AuthorizationError')
+        return self._resolver.resolveString(resource)
+
+    def getAuthorizationErrorMessage(self, error):
+        resource = self._resources.get('AuthorizationMessage')
+        return self._resolver.resolveString(resource % error)
+
+    def getTokenTitle(self):
+        resource = self._resources.get('TokenError')
+        return self._resolver.resolveString(resource)
 

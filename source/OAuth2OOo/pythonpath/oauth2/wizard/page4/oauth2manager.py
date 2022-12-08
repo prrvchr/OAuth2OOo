@@ -57,16 +57,20 @@ class OAuth2Manager(unohelper.Base):
         return self._view.getWindow()
 
     def activatePage(self):
+        self._view.setStep(1)
         scopes, url = self._model.getAuthorizationData()
         executeShell(self._ctx, url)
 
     def commitPage(self, reason):
         if reason == FORWARD:
-            self._model.setAuthorization(self._view.getCode())
+            error = self._model.setAuthorization(self._view.getCode())
+            if error is not None:
+                self._view.showError(error)
+                return False
+            self._wizard.updateTravelUI()
             if self._model.closeWizard():
                 self._wizard.DialogWindow.endDialog(OK)
             else:
-                self._wizard.updateTravelUI()
                 self._wizard.travelNext()
         return True
 
