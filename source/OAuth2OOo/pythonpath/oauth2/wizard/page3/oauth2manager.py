@@ -81,7 +81,7 @@ class OAuth2Manager(unohelper.Base):
                     # FIXME: Cannot Wizard.travelNext() on OpenOffice
                     self._wizard.travelNext()
             else:
-                self._view.showError(self._model.getTokenTitle(), error)
+                self._view.showError(self._model.getTokenErrorTitle(), error)
         else:
             self._view.showError(*self._model.getAuthorizationMessage(error))
 

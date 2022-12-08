@@ -85,7 +85,7 @@ class OAuth2Model(unohelper.Base):
                            'ProviderTitle': 'ProviderDialog.Title',
                            'ScopeTitle': 'ScopeDialog.Title',
                            'AuthorizationError': 'PageWizard3.Label2.Label',
-                           'AuthorizationMessage': 'PageWizard3.TextField1.Text.%s',
+                           'RequestMessage': 'PageWizard3.TextField1.Text.%s',
                            'TokenError': 'PageWizard4.Label2.Label',
                            'TokenLabel': 'PageWizard5.Label1.Label',
                            'TokenAccess': 'PageWizard5.Label6.Label',
@@ -558,7 +558,7 @@ class OAuth2Model(unohelper.Base):
         return self._registerToken(scopes, name, user, code)
 
     def getAuthorizationMessage(self, error):
-        return self.getAuthorizationErrorTitle(), self.getAuthorizationErrorMessage(error)
+        return self.getAuthorizationErrorTitle(), self.getRequestErrorMessage(error)
 
 # OAuth2Model getter methods called by WizardPages 4
     def isCodeValid(self, code):
@@ -759,23 +759,23 @@ class OAuth2Model(unohelper.Base):
                     r.raise_for_status()
             except ConnectionError:
                 # TODO: The provided url may be unreachable
-                error = self.getAuthorizationErrorMessage(300) % url
+                error = self.getRequestErrorMessage(300) % url
             except json.decoder.JSONDecodeError:
                 # TODO: Normally the content of the page must be in json format,
                 # TODO: except if we are not on the right page for example.
                 ctype = r.headers.get('Content-Type', 'undefined')
-                error = self.getAuthorizationErrorMessage(301) % (ctype, r.status_code, url)
+                error = self.getRequestErrorMessage(301) % (ctype, r.status_code, url)
                 logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
                 if r.text != '':
-                    error += self.getAuthorizationErrorMessage(302) % r.text
+                    error += self.getRequestErrorMessage(302) % r.text
             except HTTPError:
                 # TODO: Capture OAuth2 errors in order to display them to facilitate debugging
                 code = getOAuth2ErrorCode(response.get('error'))
-                error = self.getAuthorizationErrorMessage(code)
+                error = self.getRequestErrorMessage(code)
                 logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
                 description = response.get('error_description')
                 if description is not None:
-                    error += self.getAuthorizationErrorMessage(303) % description
+                    error += self.getRequestErrorMessage(303) % description
         return response, error
 
     def _getTokenFromResponse(self, response, timestamp):
@@ -859,11 +859,11 @@ class OAuth2Model(unohelper.Base):
         resource = self._resources.get('AuthorizationError')
         return self._resolver.resolveString(resource)
 
-    def getAuthorizationErrorMessage(self, error):
-        resource = self._resources.get('AuthorizationMessage')
-        return self._resolver.resolveString(resource % error)
-
-    def getTokenTitle(self):
+    def getTokenErrorTitle(self):
         resource = self._resources.get('TokenError')
         return self._resolver.resolveString(resource)
+
+    def getRequestErrorMessage(self, error):
+        resource = self._resources.get('RequestMessage')
+        return self._resolver.resolveString(resource % error)
 
