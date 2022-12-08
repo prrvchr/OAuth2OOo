@@ -753,16 +753,23 @@ class OAuth2Model(unohelper.Base):
         session = Session()
         with session as s:
             with s.post(url, data=data, timeout=self.Timeout) as r:
-                response = r.json()
                 try:
+                    response = r.json()
                     r.raise_for_status()
+                except json.decoder.JSONDecodeError as e:
+                    # TODO: Normally the content of the page must be in json format,
+                    # TODO: except if we are not on the right page for example.
+                    error = self.getAuthorizationErrorMessage(300) % (r.status_code, r.url)
+                    logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
+                    error += self.getAuthorizationErrorMessage(301) % r.text
                 except HTTPError as e:
+                    # TODO: Capture OAuth2 errors in order to display them to facilitate debugging
                     code = getOAuth2ErrorCode(response.get('error'))
                     error = self.getAuthorizationErrorMessage(code)
                     logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
                     description = response.get('error_description')
                     if description is not None:
-                        error += self.getAuthorizationErrorMessage(300) % description
+                        error += self.getAuthorizationErrorMessage(400) % description
         return response, error
 
     def _getTokenFromResponse(self, response, timestamp):
