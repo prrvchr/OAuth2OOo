@@ -30,6 +30,7 @@
 import uno
 import unohelper
 
+from com.sun.star.lang import XComponent
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.lang import EventObject
 from com.sun.star.auth import XOAuth2Service
@@ -87,6 +88,7 @@ g_ImplementationName = g_oauth2
 
 
 class OAuth2Service(unohelper.Base,
+                    XComponent,
                     XServiceInfo,
                     XOAuth2Service):
     def __init__(self, ctx):
