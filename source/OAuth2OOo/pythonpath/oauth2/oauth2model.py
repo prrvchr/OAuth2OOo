@@ -204,11 +204,10 @@ class OAuth2Model(unohelper.Base):
     def getRefreshedToken(self):
         provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
-        error = self._refreshToken(provider, user)
-        if error is None:
-            return user.getByName('AccessToken')
-        else:
+        error = self._refreshToken(provider, user, False)
+        if error is not None:
             raise self._getRefreshTokenException(error)
+        return user.getByName('AccessToken')
 
     def _getRefreshTokenException(self, message):
         error = RefreshTokenException()
@@ -592,39 +591,24 @@ class OAuth2Model(unohelper.Base):
     def getUserTokenData(self):
         users = self._config.getByName('Providers').getByName(self._provider).getByName('Users')
         user = users.getByName(self._user)
-        return self._getUserTokenData(user)
-
-    def _getUserTokenData(self, user):
         scopes = user.getByName('Scopes')
         refresh = user.getByName('RefreshToken') if user.hasByName('RefreshToken') else self.getTokenRefresh()
         access = user.getByName('AccessToken') if user.hasByName('AccessToken') else self.getTokenAccess()
         timestamp = user.getByName('TimeStamp')
         never = user.getByName('NeverExpires')
         expires = self.getTokenExpires() if never else timestamp - int(time.time())
-        return scopes, access, refresh, expires
-
-    def _getRefreshTokenData(self, user):
-        scopes = user.getByName('Scopes')
-        access = self.getTokenAccess()
-        refresh = user.getByName('RefreshToken') if user.hasByName('RefreshToken') else self.getTokenRefresh()
-        expires = self.getTokenExpires()
-        return scopes, access, refresh, expires
+        return never, scopes, access, refresh, expires
 
     def refreshToken(self):
         provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
-        error = self._refreshToken(provider, user)
-        if error is None:
-            scopes, access, refresh, expires = self._getUserTokenData(user)
-        else:
-            scopes, access, refresh, expires = self._getRefreshTokenData(user)
-        return scopes, access, refresh, expires
+        return self._refreshToken(provider, user, True)
 
-    def _refreshToken(self, provider, user):
+    def _refreshToken(self, provider, user, multiline):
         url = provider.getByName('TokenUrl')
         data = self._getRefreshParameters(user, provider)
         timestamp = int(time.time())
-        response, error = self._getResponseFromRequest(url, data, False)
+        response, error = self._getResponseFromRequest(url, data, multiline)
         if error is None:
             self._saveRefreshToken(user, *self._getTokenFromResponse(response, timestamp))
         return error

@@ -64,7 +64,7 @@ class OAuth2Manager(unohelper.Base):
         return True
 
     def canAdvance(self):
-        return True
+        return not self._view.hasError()
 
 # OAuth2Manager setter methods
     def updateToken(self):
@@ -78,5 +78,10 @@ class OAuth2Manager(unohelper.Base):
         dialog.dispose()
 
     def refreshToken(self):
-        self._view.setToken(*self._model.refreshToken())
+        error = self._model.refreshToken()
+        if error is None:
+            self._view.setToken(*self._model.getUserTokenData())
+        else:
+            self._view.showError(error)
+            self._wizard.updateTravelUI()
 

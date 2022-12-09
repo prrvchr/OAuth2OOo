@@ -45,7 +45,9 @@ import traceback
 def getAccessToken(ctx, model, parent):
     token = ''
     if not model.isAuthorized():
-        token = _getTokenFromWizard(ctx, model, parent)
+        state, result = showOAuth2Wizard(ctx, model, parent)
+        if state == SUCCESS:
+            url, user, token = result
     elif model.isAccessTokenExpired():
         token = model.getRefreshedToken()
     else:
@@ -60,16 +62,13 @@ def showOAuth2Wizard(ctx, model, parent):
     controller = WizardController(ctx, wizard, model)
     arguments = (g_wizard_paths, controller)
     wizard.initialize(arguments)
-    print("oauth2helper.showOAuth2Wizard() 1")
     if wizard.execute() == OK:
-        print("oauth2helper.showOAuth2Wizard() 2")
         state = SUCCESS
         result = (controller.Url, controller.User, controller.Token)
-    print("oauth2helper.showOAuth2Wizard() 3")
     controller.dispose()
-    print("oauth2helper.showOAuth2Wizard() 4")
     return state, result
 
+# Get OAuth2 error status as an error number with default to 200
 def getOAuth2ErrorCode(error):
     errors = {'access_denied': 201,
               'invalid_request': 202,
@@ -79,12 +78,4 @@ def getOAuth2ErrorCode(error):
               'server_error': 206,
               'temporarily_unavailable': 207}
     return errors.get(error, 200)
-
-
-def _getTokenFromWizard(ctx, model, parent):
-    token = ''
-    state, result = showOAuth2Wizard(ctx, model, parent)
-    if state == SUCCESS:
-        url, user, token = result
-    return token
 
