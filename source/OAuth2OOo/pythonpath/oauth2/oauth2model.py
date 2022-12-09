@@ -35,6 +35,8 @@ from com.sun.star.logging.LogLevel import SEVERE
 
 from com.sun.star.frame.DispatchResultState import SUCCESS
 
+from com.sun.star.auth import RefreshTokenException
+
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_refresh_overlap
@@ -166,6 +168,17 @@ class OAuth2Model(unohelper.Base):
             if self._config.getByName('Scopes').hasByName(scope):
                 provider = self._config.getByName('Scopes').getByName(scope).getByName('Provider')
         return provider
+ 
+    def dispose(self):
+        self._cancelServer()
+        disposeLogger()
+
+    def _cancelServer(self):
+        if self._watchdog is not None:
+            if self._watchdog.is_alive():
+                self._watchdog.cancel()
+                self._watchdog.join()
+            self._watchdog = None
 
 # OAuth2Model getter methods called by OptionsManager
     def getOptionsDialogData(self):
@@ -191,17 +204,23 @@ class OAuth2Model(unohelper.Base):
     def getRefreshedToken(self):
         provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
-        self._refreshToken(provider, user)
-        return user.getByName('AccessToken')
+        error = self._refreshToken(provider, user)
+        if error is None:
+            return user.getByName('AccessToken')
+        else:
+            raise self._getRefreshTokenException(error)
+
+    def _getRefreshTokenException(self, message):
+        error = RefreshTokenException()
+        error.Message = message
+        error.ResourceUrl = self._url
+        error.UserName = self._user
+        return error
 
     def getToken(self):
         provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
         return user.getByName('AccessToken')
- 
-    def dispose(self):
-        self.cancelServer()
-        disposeLogger()
 
     def initializeSession(self, url, user):
         self.initialize(url, user)
@@ -533,7 +552,7 @@ class OAuth2Model(unohelper.Base):
         return scopes, url
 
     def startServer(self, scopes, notify, register):
-        self.cancelServer()
+        self._cancelServer()
         provider = self._config.getByName('Providers').getByName(self._provider)
         address = provider.getByName('RedirectAddress')
         port = provider.getByName('RedirectPort')
@@ -546,13 +565,6 @@ class OAuth2Model(unohelper.Base):
 
     def isServerRunning(self):
         return self._watchdog is not None and self._watchdog.isRunning()
-
-    def cancelServer(self):
-        if self._watchdog is not None:
-            if self._watchdog.is_alive():
-                self._watchdog.cancel()
-                self._watchdog.join()
-            self._watchdog = None
 
     def registerToken(self, scopes, name, user, code):
         return self._registerToken(scopes, name, user, code)
@@ -575,36 +587,47 @@ class OAuth2Model(unohelper.Base):
         return self._close
 
     def getTokenData(self):
-        label = self.getTokenLabel()
+        return self.getTokenLabel(), *self.getUserTokenData()
+
+    def getUserTokenData(self):
         users = self._config.getByName('Providers').getByName(self._provider).getByName('Users')
-        exist = users.hasByName(self._user)
-        if exist:
-            user = users.getByName(self._user)
-            scopes = user.getByName('Scopes')
-            refresh = user.getByName('RefreshToken') if user.hasByName('RefreshToken') else ''
-            access = user.getByName('AccessToken')
-            timestamp = user.getByName('TimeStamp')
-            never = user.getByName('NeverExpires')
-            expires = self.getTokenExpires() if never else timestamp - int(time.time())
-        else:
-            scopes = ()
-            access = self.getTokenAccess()
-            refresh = self.getTokenRefresh()
-            expires = self.getTokenExpires()
-        return label, exist, scopes, access, refresh, expires
+        user = users.getByName(self._user)
+        return self._getUserTokenData(user)
+
+    def _getUserTokenData(self, user):
+        scopes = user.getByName('Scopes')
+        refresh = user.getByName('RefreshToken') if user.hasByName('RefreshToken') else self.getTokenRefresh()
+        access = user.getByName('AccessToken') if user.hasByName('AccessToken') else self.getTokenAccess()
+        timestamp = user.getByName('TimeStamp')
+        never = user.getByName('NeverExpires')
+        expires = self.getTokenExpires() if never else timestamp - int(time.time())
+        return scopes, access, refresh, expires
+
+    def _getRefreshTokenData(self, user):
+        scopes = user.getByName('Scopes')
+        access = self.getTokenAccess()
+        refresh = user.getByName('RefreshToken') if user.hasByName('RefreshToken') else self.getTokenRefresh()
+        expires = self.getTokenExpires()
+        return scopes, access, refresh, expires
 
     def refreshToken(self):
         provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
-        self._refreshToken(provider, user)
+        error = self._refreshToken(provider, user)
+        if error is None:
+            scopes, access, refresh, expires = self._getUserTokenData(user)
+        else:
+            scopes, access, refresh, expires = self._getRefreshTokenData(user)
+        return scopes, access, refresh, expires
 
     def _refreshToken(self, provider, user):
         url = provider.getByName('TokenUrl')
         data = self._getRefreshParameters(user, provider)
         timestamp = int(time.time())
-        response, error = self._getResponseFromRequest(url, data)
+        response, error = self._getResponseFromRequest(url, data, False)
         if error is None:
             self._saveRefreshToken(user, *self._getTokenFromResponse(response, timestamp))
+        return error
 
     def deleteUser(self):
         providers = self._config.getByName('Providers')
@@ -748,7 +771,7 @@ class OAuth2Model(unohelper.Base):
                 base[key] = value
         return base
 
-    def _getResponseFromRequest(self, url, data):
+    def _getResponseFromRequest(self, url, data, multiline=True):
         response = {}
         error = None
         session = Session()
@@ -760,13 +783,14 @@ class OAuth2Model(unohelper.Base):
             except ConnectionError:
                 # TODO: The provided url may be unreachable
                 error = self.getRequestErrorMessage(300) % url
+                logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
             except json.decoder.JSONDecodeError:
                 # TODO: Normally the content of the page must be in json format,
                 # TODO: except if we are not on the right page for example.
                 ctype = r.headers.get('Content-Type', 'undefined')
                 error = self.getRequestErrorMessage(301) % (ctype, r.status_code, url)
                 logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
-                if r.text != '':
+                if multiline and r.text != '':
                     error += self.getRequestErrorMessage(302) % r.text
             except HTTPError:
                 # TODO: Capture OAuth2 errors in order to display them to facilitate debugging
@@ -774,7 +798,7 @@ class OAuth2Model(unohelper.Base):
                 error = self.getRequestErrorMessage(code)
                 logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
                 description = response.get('error_description')
-                if description is not None:
+                if multiline and description is not None:
                     error += self.getRequestErrorMessage(303) % description
         return response, error
 
@@ -787,16 +811,12 @@ class OAuth2Model(unohelper.Base):
         return refresh, access, never, 0 if never else timestamp + expires
 
     def _saveToken(self, user, refresh, access, never, timestamp):
-        if refresh is None:
-            user.replaceByName('RefreshToken', self.getTokenRefresh())
-        else:
+        if refresh is not None:
             user.replaceByName('RefreshToken', refresh)
         self._saveRefreshToken(user, refresh, access, never, timestamp)
 
     def _saveRefreshToken(self, user, refresh, access, never, timestamp):
-        if access is None:
-            user.replaceByName('AccessToken', self.getTokenAccess())
-        else:
+        if access is not None:
             user.replaceByName('AccessToken', access)
         user.replaceByName('NeverExpires', never)
         user.replaceByName('TimeStamp', timestamp)
@@ -867,3 +887,16 @@ class OAuth2Model(unohelper.Base):
         resource = self._resources.get('RequestMessage')
         return self._resolver.resolveString(resource % error)
 
+
+class OAuth2Token():
+    def __init__(self, user=None):
+        self.Scopes = ()
+        self.Refresh = ''
+        self.Access = ''
+        self.Expires = 0
+
+    def _init(self, user):
+        self.Scopes = ()
+        self.Refresh = ''
+        self.Access = ''
+        self.Expires = 0

@@ -44,7 +44,7 @@ class OAuth2Manager(unohelper.Base):
         self._wizard = wizard
         self._model = model
         self._pageid = pageid
-        self._view = OAuth2View(ctx, parent)
+        self._view = OAuth2View(ctx, parent, model.HandlerTimeout)
 
 # XWizardPage
     @property

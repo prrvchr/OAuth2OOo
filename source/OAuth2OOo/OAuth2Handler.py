@@ -32,6 +32,8 @@ import unohelper
 
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 
+from com.sun.star.auth import RefreshTokenException
+
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.lang import XInitialization
 from com.sun.star.task import XInteractionHandler2
@@ -87,9 +89,13 @@ class OAuth2Handler(unohelper.Base,
         return approved
 
     def _getToken(self, interaction, url, user, format):
+        token = ''
+        status = 1
         self._model.initialize(url, user)
-        token = getAccessToken(self._ctx, self._model, self._parent)
-        status = 1 if token != '' else 0
+        try:
+            token = getAccessToken(self._ctx, self._model, self._parent)
+        except RefreshTokenException:
+            status = 0
         continuation = interaction.getContinuations()[status]
         if status:
             if format:

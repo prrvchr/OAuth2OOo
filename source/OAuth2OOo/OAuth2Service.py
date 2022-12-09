@@ -34,6 +34,7 @@ from com.sun.star.lang import XComponent
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.lang import EventObject
 from com.sun.star.auth import XOAuth2Service
+from com.sun.star.auth import RefreshTokenException
 
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
@@ -156,7 +157,11 @@ class OAuth2Service(unohelper.Base,
         return authorized
 
     def getToken(self, format=''):
-        token = getAccessToken(self._ctx, self._model, getParentWindow(self._ctx))
+        try:
+            token = getAccessToken(self._ctx, self._model, getParentWindow(self._ctx))
+        except RefreshTokenException as e:
+            e.Context = self
+            raise e
         if format:
             token = format % token
         return token

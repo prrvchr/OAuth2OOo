@@ -57,7 +57,7 @@ class OAuth2Manager(unohelper.Base):
         return self._view.getWindow()
 
     def activatePage(self):
-        self._view.setToken(*self._model.getTokenData())
+        self._view.initView(*self._model.getTokenData())
         self._wizard.activatePath(2, True)
 
     def commitPage(self, reason):
@@ -68,7 +68,7 @@ class OAuth2Manager(unohelper.Base):
 
 # OAuth2Manager setter methods
     def updateToken(self):
-        self._view.setToken(*self._model.getTokenData())
+        self._view.setToken(*self._model.getUserTokenData())
 
     def deleteUser(self):
         dialog = createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
@@ -78,6 +78,5 @@ class OAuth2Manager(unohelper.Base):
         dialog.dispose()
 
     def refreshToken(self):
-        self._model.refreshToken()
-        self._view.setToken(*self._model.getTokenData())
+        self._view.setToken(*self._model.refreshToken())
 

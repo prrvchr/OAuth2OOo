@@ -37,8 +37,9 @@ import traceback
 
 
 class OAuth2View(unohelper.Base):
-    def __init__(self, ctx, parent):
+    def __init__(self, ctx, parent, timeout):
         self._window = getContainerWindow(ctx, parent, None, g_extension, 'PageWizard3')
+        self._getProgessBar().setRange(0, timeout)
 
 # OAuth2View getter methods
     def getWindow(self):
@@ -48,8 +49,8 @@ class OAuth2View(unohelper.Base):
         self._window.Model.Step = step
 
 # OAuth2View setter methods
-    def notify(self, percent):
-        self._getProgessBar().Value = percent
+    def notify(self, value):
+        self._getProgessBar().Value = value
 
     def showError(self, title, message):
         self._window.Model.Step = 2

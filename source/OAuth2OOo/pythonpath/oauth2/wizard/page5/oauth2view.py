@@ -47,9 +47,11 @@ class OAuth2View(unohelper.Base):
         return self._window
 
 # OAuth2View setter methods
-    def setToken(self, label, exist, scopes, access, refresh, expires):
-        print("OAuth2View.setToken() %s - %s - %s - %s - %s" % (label, scopes, access, refresh, expires))
+    def initView(self, label, scopes, access, refresh, expires):
         self._getLabel().Text = label
+        self.setToken(scopes, access, refresh, expires)
+
+    def setToken(self, scopes, access, refresh, expires):
         control = self._getScopes()
         control.Model.StringItemList = scopes
         if control.ItemCount > 0:
@@ -57,9 +59,6 @@ class OAuth2View(unohelper.Base):
         self._getAccess().Text = access
         self._getRefresh().Text = refresh
         self._getExpires().Text = expires
-        self._getUpdateButton().Model.Enabled = exist
-        self._getRevokeButton().Model.Enabled = exist
-        self._getRefreshButton().Model.Enabled = exist
 
 # OAuth2View private getter control methods
     def _getLabel(self):
@@ -76,13 +75,4 @@ class OAuth2View(unohelper.Base):
 
     def _getExpires(self):
         return self._window.getControl('Label8')
-
-    def _getUpdateButton(self):
-        return self._window.getControl('CommandButton1')
-
-    def _getRevokeButton(self):
-        return self._window.getControl('CommandButton2')
-
-    def _getRefreshButton(self):
-        return self._window.getControl('CommandButton3')
 

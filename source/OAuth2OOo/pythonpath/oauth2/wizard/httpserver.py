@@ -67,27 +67,26 @@ class WatchDog(Thread):
         self._user = user
         self._timeout = timeout
         self._lock = lock
-        self._step = 50
         self._end = 0
+        # TODO Time in seconds between two refreshes
+        self._wait = 1
 
     def run(self):
-        wait = self._timeout/self._step
         start = now = timer()
         self._end = start + self._timeout
-        self._notify(0)
         with self._lock:
             while now < self._end and self._server.is_alive():
-                elapsed = now - start
-                percent =  min(99, int(elapsed * 100 / self._timeout))
-                if self._server.is_alive():
-                    self._notify(percent)
-                self._lock.wait(wait)
+                value =  min(self._timeout, int(now - start))
+                if self._end != 0:
+                    self._notify(value)
+                self._lock.wait(self._wait)
                 now = timer()
             if self._server.is_alive():
                 self._server.stopAccepting()
                 self._server.join()
-            self._notify(100)
-            self._register(self._scopes, self._provider, self._user, *self._server.getResults())
+            if self._end != 0:
+                self._notify(self._timeout)
+                self._register(self._scopes, self._provider, self._user, *self._server.getResults())
             self._lock.notifyAll()
             logMessage(self._ctx, INFO, "WatchDog Running ... Done", 'WatchDog', 'run()')
 
