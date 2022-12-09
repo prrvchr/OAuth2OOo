@@ -610,7 +610,7 @@ class OAuth2Model(unohelper.Base):
         timestamp = int(time.time())
         response, error = self._getResponseFromRequest(url, data, multiline)
         if error is None:
-            self._saveRefreshToken(user, *self._getTokenFromResponse(response, timestamp))
+            self._saveRefreshedToken(user, *self._getTokenFromResponse(response, timestamp))
         return error
 
     def deleteUser(self):
@@ -739,7 +739,7 @@ class OAuth2Model(unohelper.Base):
         # user.replaceByName('Scopes', scopes)
         arguments = ('Scopes', uno.Any('[]string', tuple(scopes)))
         uno.invoke(user, 'replaceByName', arguments)
-        self._saveToken(user, *self._getTokenFromResponse(response, timestamp))
+        self._saveTokens(user, *self._getTokenFromResponse(response, timestamp))
 
 # OAuth2Model private getter/setter methods
     def _parseParameters(self, base, optional, required):
@@ -777,29 +777,30 @@ class OAuth2Model(unohelper.Base):
                 if multiline and r.text != '':
                     error += self.getRequestErrorMessage(302) % r.text
             except HTTPError:
-                # TODO: Capture OAuth2 errors in order to display them to facilitate debugging
-                code = getOAuth2ErrorCode(response.get('error'))
-                error = self.getRequestErrorMessage(code)
+                # TODO: Catch OAuth2 'error' and 'error_description' to display them to facilitate debugging.
+                error = self.getRequestErrorMessage(getOAuth2ErrorCode(response.get('error')))
                 logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
                 description = response.get('error_description')
-                if multiline and description is not None:
-                    error += self.getRequestErrorMessage(303) % description
+                if multiline:
+                    if description is not None:
+                        error += self.getRequestErrorMessage(303) % description
+                    elif r.text != '':
+                        error += self.getRequestErrorMessage(302) % r.text
         return response, error
 
     def _getTokenFromResponse(self, response, timestamp):
-        print("OAuth2Model._getTokenFromResponse() %s" % (response, ))
         refresh = response.get('refresh_token', None)
         access = response.get('access_token', None)
         expires = response.get('expires_in', None)
         never = expires is None
         return refresh, access, never, 0 if never else timestamp + expires
 
-    def _saveToken(self, user, refresh, access, never, timestamp):
+    def _saveTokens(self, user, refresh, access, never, timestamp):
         if refresh is not None:
             user.replaceByName('RefreshToken', refresh)
-        self._saveRefreshToken(user, refresh, access, never, timestamp)
+        self._saveRefreshedToken(user, refresh, access, never, timestamp)
 
-    def _saveRefreshToken(self, user, refresh, access, never, timestamp):
+    def _saveRefreshedToken(self, user, refresh, access, never, timestamp):
         if access is not None:
             user.replaceByName('AccessToken', access)
         user.replaceByName('NeverExpires', never)
@@ -871,16 +872,3 @@ class OAuth2Model(unohelper.Base):
         resource = self._resources.get('RequestMessage')
         return self._resolver.resolveString(resource % error)
 
-
-class OAuth2Token():
-    def __init__(self, user=None):
-        self.Scopes = ()
-        self.Refresh = ''
-        self.Access = ''
-        self.Expires = 0
-
-    def _init(self, user):
-        self.Scopes = ()
-        self.Refresh = ''
-        self.Access = ''
-        self.Expires = 0
