@@ -124,7 +124,7 @@ J'essaierai de la résoudre ;-)
     - Le service [OAuth2Dispacher][38] implémentant l'interface UNO [XDispatchProvider][39].
     - Le service [OAuth2Handler][40] implémentant l'interface UNO [XInteractionHandler2][41].
 
-- Réécriture de la fenêtre des options accessible par **Outils -> Options -> Internet -> Protocole OAuth2**. Cette fenêtre est composée de deux fenêtre:
+- Réécriture de la fenêtre des options accessible par **Outils -> Options -> Internet -> Protocole OAuth2**. Cette fenêtre est composée de deux fenêtres:
 
     - La fenêtre de journalisation: [Controlleur][42] et [Vue][43].
     - La fenêtre des options de configuration de l'extension OAuth2OOo: [Controlleur][44] et [Vue][45].
