@@ -23,68 +23,58 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 */
-package io.github.prrvchr.uno.sdbc;
+package io.github.prrvchr.uno.helper;
+
+import java.util.Arrays;
 
 import com.sun.star.container.XNameAccess;
-import com.sun.star.lib.uno.helper.ComponentBase;
-import com.sun.star.logging.LogLevel;
+import com.sun.star.lib.uno.helper.WeakBase;
+import com.sun.star.sdbc.DataType;
 import com.sun.star.sdbc.SQLException;
 import com.sun.star.sdbc.XArray;
 import com.sun.star.sdbc.XResultSet;
 
-import io.github.prrvchr.uno.helper.UnoHelper;
 
 public class Array
-    extends ComponentBase
+    extends WeakBase
     implements XArray
 {
 
-    private final ConnectionBase m_Connection;
-    private final java.sql.Array m_Array;
+    private Object[] m_Array = null;
+    private String m_Type = null;
 
     // The constructor method:
-    public Array(ConnectionBase connection,
-                 java.sql.Array array)
+    public Array(java.sql.Array array)
+        throws SQLException
     {
-            m_Connection = connection;
-            m_Array = array;
-    }
-
-    // com.sun.star.lang.XComponent
-    @Override
-    protected void postDisposing() {
         try {
-            m_Array.free();
+            m_Array = (Object[]) array.getArray();
+            m_Type = array.getBaseTypeName();
         }
         catch (java.sql.SQLException e) {
-            m_Connection.getLogger().log(LogLevel.WARNING, e);
+            throw UnoHelper.getSQLException(e, this);
         }
+        
     }
-    
+    public Array(Object[] array,
+                 String type)
+    {
+        m_Array = array;
+        m_Type = type;
+    }
 
-    // com.sun.star.sdbc.XArray
     @Override
     public Object[] getArray(XNameAccess map)
         throws SQLException
     {
-        try {
-            return (Object[]) m_Array.getArray();
-        }
-        catch (java.sql.SQLException e) {
-            throw UnoHelper.getSQLException(e, this);
-        }
+        return m_Array;
     }
 
     @Override
     public Object[] getArrayAtIndex(int index, int count, XNameAccess map)
-    throws SQLException
+        throws SQLException
     {
-        try {
-            return (Object[]) m_Array.getArray(index, count);
-        }
-        catch (java.sql.SQLException e) {
-            throw UnoHelper.getSQLException(e, this);
-        }
+        return Arrays.copyOfRange(m_Array, index, index + count);
     }
 
     @Override
@@ -92,7 +82,7 @@ public class Array
         throws SQLException
     {
         try {
-            return m_Connection.getProvider().getDataType(m_Array.getBaseType());
+            return UnoHelper.getConstantValue(DataType.class, m_Type);
         }
         catch (java.sql.SQLException e) {
             throw UnoHelper.getSQLException(e, this);
@@ -101,40 +91,23 @@ public class Array
 
     @Override
     public String getBaseTypeName()
-    throws SQLException
+        throws SQLException
     {
-        try {
-            return m_Array.getBaseTypeName();
-        }
-        catch (java.sql.SQLException e) {
-            throw UnoHelper.getSQLException(e, this);
-        }
+        return m_Type;
     }
 
     @Override
     public XResultSet getResultSet(XNameAccess map)
-    throws SQLException
+        throws SQLException
     {
-        try {
-            java.sql.ResultSet result = m_Array.getResultSet();
-            return result != null ? m_Connection.getProvider().getResultSet(m_Connection, result) : null;
-        }
-        catch (java.sql.SQLException e) {
-            throw UnoHelper.getSQLException(e, this);
-        }
+        return null;
     }
 
     @Override
     public XResultSet getResultSetAtIndex(int index, int count, XNameAccess map)
-    throws SQLException
+        throws SQLException
     {
-        try {
-            java.sql.ResultSet result = m_Array.getResultSet(index, count);
-            return result != null ? m_Connection.getProvider().getResultSet(m_Connection, result) : null;
-        }
-        catch (java.sql.SQLException e) {
-            throw UnoHelper.getSQLException(e, this);
-        }
+        return null;
     }
 
 
