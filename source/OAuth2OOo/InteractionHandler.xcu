@@ -41,7 +41,7 @@
                 </node>
             </node>
             <prop oor:name="ServiceName">
-                <value>com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Handler</value>
+                <value>io.github.prrvchr.OAuth2OOo.OAuth2Handler</value>
             </prop>
         </node>
     </node>

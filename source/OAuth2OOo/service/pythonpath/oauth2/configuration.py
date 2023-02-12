@@ -29,7 +29,7 @@
 
 # OAuth2 configuration
 g_extension = 'OAuth2OOo'
-g_identifier = 'com.gmail.prrvchr.extensions.%s' % g_extension
+g_identifier = 'io.github.prrvchr.%s' % g_extension
 g_oauth2 = '%s.OAuth2Service' % g_identifier
 g_resource = 'resource'
 
