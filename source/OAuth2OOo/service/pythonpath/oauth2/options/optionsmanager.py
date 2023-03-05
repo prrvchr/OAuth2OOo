@@ -34,6 +34,7 @@ from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
 from .optionsview import OptionsView
+from .optionshandler import OptionsListener
 from .optionshandler import OptionsHandler
 
 from ..oauth2model import OAuth2Model
@@ -45,6 +46,8 @@ from ..unotool import getExceptionMessage
 from ..oauth2lib import getOAuth2UserName
 from ..oauth2lib import g_oauth2
 
+from ..configuration import g_identifier
+
 from ..logger import logMessage
 from ..logger import getMessage
 g_message = 'OptionsDialog'
@@ -55,13 +58,16 @@ import traceback
 
 
 class OptionsManager(unohelper.Base):
-    def __init__(self, ctx, parent):
+    def __init__(self, ctx, window):
         self._ctx = ctx
         self._model = OAuth2Model(ctx)
-        self._view = OptionsView(ctx, OptionsHandler(self), parent)
-        loggers = {'Logger': 'Logger'}
-        self._logger = LogManager(ctx, self._view.getParent(), loggers, self.getInfos)
+        self._view = OptionsView(ctx, OptionsHandler(self), window.getPeer())
+        self._logger = LogManager(ctx, self._view.getParent(), self._getInfos(), g_identifier, 'Logger')
         self._view.initView(*self._model.getOptionsDialogData())
+        window.addEventListener(OptionsListener(self))
+
+    def dispose(self):
+        self._logger.dispose()
 
     def saveSetting(self):
         self._model.ConnectTimeout = self._view.getConnectTimeout()
@@ -74,36 +80,36 @@ class OptionsManager(unohelper.Base):
         self._view.initView(*self._model.getOptionsDialogData())
         self._logger.reloadSetting()
 
-    def getInfos(self):
-        infos = []
+    def _getInfos(self):
+        infos = {}
         version  = ' '.join(sys.version.split())
-        infos.append(getMessage(self._ctx, g_message, 111, version))
+        infos[111] = version
         path = os.pathsep.join(sys.path)
-        infos.append(getMessage(self._ctx, g_message, 112, path))
+        infos[112] = path
         try:
             import requests
         except ImportError as e:
-            infos.append(getMessage(self._ctx, g_message, 114, getExceptionMessage(e)))
+            infos[113] = getExceptionMessage(e)
         else:
-            infos.append(getMessage(self._ctx, g_message, 113, requests.__version__))
+            infos[114] = requests.__version__
         try:
             import urllib3
         except ImportError as e:
-            infos.append(getMessage(self._ctx, g_message, 114, getExceptionMessage(e)))
+            infos[115] = getExceptionMessage(e)
         else:
-            infos.append(getMessage(self._ctx, g_message, 115, urllib3.__version__))
+            infos[116] = urllib3.__version__
         try:
             import chardet
         except ImportError as e:
-            infos.append(getMessage(self._ctx, g_message, 116, getExceptionMessage(e)))
+            infos[117] = getExceptionMessage(e)
         else:
-            infos.append(getMessage(self._ctx, g_message, 117, chardet.__version__))
+            infos[118] = chardet.__version__
         try:
             import ssl
         except ImportError as e:
-            infos.append(getMessage(self._ctx, g_message, 118, e.args[0]))
+            infos[119] = getExceptionMessage(e)
         else:
-            infos.append(getMessage(self._ctx, g_message, 119, ssl.OPENSSL_VERSION))
+            infos[120] = ssl.OPENSSL_VERSION
         return infos
 
     def connect(self):

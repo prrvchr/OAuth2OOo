@@ -49,7 +49,8 @@ class OptionsHandler(unohelper.Base,
                      XContainerWindowEventHandler):
     def __init__(self, ctx):
         print("OptionsHandler.__init__() 1")
-        self._controller = OptionsController(ctx)
+        self._ctx = ctx
+        self._manager = None
         print("OptionsHandler.__init__() 2")
 
     # XContainerWindowEventHandler
@@ -58,13 +59,13 @@ class OptionsHandler(unohelper.Base,
             handled = False
             if method == 'external_event':
                 if event == 'initialize':
-                    self._controller.initialize(window.getPeer())
+                    self._manager = OptionsManager(self._ctx, window)
                     handled = True
                 elif event == 'ok':
-                    self._controller.saveSetting()
+                    self._manager.saveSetting()
                     handled = True
                 elif event == 'back':
-                    self._controller.reloadSetting()
+                    self._manager.reloadSetting()
                     handled = True
             return handled
         except Exception as e:
@@ -86,20 +87,5 @@ class OptionsHandler(unohelper.Base,
 g_ImplementationHelper.addImplementation(OptionsHandler,                            # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                         (g_ImplementationName,))                    # List of implemented services
-
-
-class OptionsController(unohelper.Base):
-    def __init__(self, ctx):
-        self._ctx = ctx
-        self._manager = None
-
-    def initialize(self, parent):
-        self._manager = OptionsManager(self._ctx, parent)
-
-    def saveSetting(self):
-        self._manager.saveSetting()
-
-    def reloadSetting(self):
-        self._manager.reloadSetting()
 
 
