@@ -32,6 +32,7 @@ from .options import OptionsManager
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_oauth2
+from .configuration import g_basename
 
 from .unolib import KeyMap
 
@@ -43,6 +44,7 @@ from .unotool import getStringResource
 from .dialog import UserHandler
 from .dialog import UserView
 
+from .logger import getLogger
 from .logger import logMessage
 from .logger import disposeLogger
 from .logger import getMessage

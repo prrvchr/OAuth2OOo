@@ -6,7 +6,6 @@
   <library:element library:name="LogWindow"/>
   <library:element library:name="UserDialog"/>
   <library:element library:name="OptionsDialog"/>
-  <library:element library:name="OptionsWindow"/>
   <library:element library:name="ScopeDialog"/>
   <library:element library:name="ProviderDialog"/>
   <library:element library:name="PageWizard1"/>

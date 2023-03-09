@@ -62,7 +62,6 @@ from oauth2 import execute
 from oauth2 import getAccessToken
 from oauth2 import getParentWindow
 from oauth2 import getSessionMode
-from oauth2 import logMessage
 from oauth2 import showOAuth2Wizard
 
 from oauth2 import Request
@@ -73,9 +72,12 @@ from oauth2 import Iterator
 from oauth2 import InputStream
 from oauth2 import Uploader
 
+from oauth2 import getLogger
+
 from oauth2 import g_extension
 from oauth2 import g_identifier
 from oauth2 import g_oauth2
+from oauth2 import g_basename
 
 from oauth2 import OAuth2Model
 from oauth2 import OAuth2OOo
@@ -102,6 +104,7 @@ class OAuth2Service(unohelper.Base,
         self._listeners = []
         self._warnings = []
         self._mode = OFFLINE
+        self._logger = getLogger(ctx, g_extension)
 
     @property
     def ResourceUrl(self):
@@ -155,7 +158,7 @@ class OAuth2Service(unohelper.Base,
             url, user, token = result
             authorized = self.initializeSession(url, user)
         msg += "Authorization has been granted..." if authorized else "Authorization was not granted..."
-        logMessage(self._ctx, INFO, msg, 'OAuth2Service', 'getAuthorization()')
+        self._logger.logp(INFO, 'OAuth2Service', 'getAuthorization()', msg)
         return authorized
 
     def getToken(self, format=''):
@@ -169,13 +172,9 @@ class OAuth2Service(unohelper.Base,
         return token
 
     def execute(self, parameter):
-        try:
-            with self._session as s:
-                response = execute(self._ctx, s, parameter, self.Timeout)
-            return response
-        except RequestException as e:
-            logMessage(self._ctx, SEVERE, e.Message, 'OAuth2Service', 'execute()')
-            raise e
+        with self._session as s:
+            response = execute(self._ctx, s, parameter, self.Timeout)
+        return response
 
     def getRequest(self, parameter, parser):
         return Request(self._ctx, self._session, parameter, self.Timeout, parser)

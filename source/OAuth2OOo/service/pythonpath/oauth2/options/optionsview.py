@@ -38,18 +38,17 @@ import traceback
 
 
 class OptionsView(unohelper.Base):
-    def __init__(self, ctx, handler, parent):
-        self._window = getContainerWindow(ctx, parent, handler, g_extension, 'OptionsWindow')
-        self._window.setVisible(True)
-
-    def getParent(self):
-        return self._window.getPeer()
+    def __init__(self, dialog):
+        self._dialog = dialog
 
     def initView(self, connect, read, handler, urls):
         self._getConnectTimeout().setValue(connect)
         self._getReadTimeout().setValue(read)
         self._getHandlerTimeout().setValue(handler)
         self._getUrls().Model.StringItemList = urls
+
+    def getParent(self):
+        return self._dialog.getPeer()
 
     def getConnectTimeout(self):
         return int(self._getConnectTimeout().getValue())
@@ -68,18 +67,18 @@ class OptionsView(unohelper.Base):
 
 # OptionsView private getter control methods
     def _getUrls(self):
-        return self._window.getControl('ComboBox1')
+        return self._dialog.getControl('ComboBox1')
 
     def _getAutoClose(self):
-        return self._window.getControl('CheckBox1')
+        return self._dialog.getControl('CheckBox1')
 
     def _getConnectTimeout(self):
-        return self._window.getControl('NumericField1')
+        return self._dialog.getControl('NumericField1')
 
     def _getReadTimeout(self):
-        return self._window.getControl('NumericField2')
+        return self._dialog.getControl('NumericField2')
 
     def _getHandlerTimeout(self):
-        return self._window.getControl('NumericField3')
+        return self._dialog.getControl('NumericField3')
 
 

@@ -70,9 +70,9 @@ from .unolib import KeyMap
 
 from .oauth2lib import NoOAuth2
 
-from .logger import getMessage
-from .logger import logMessage
-g_message = 'request'
+from .logger import getLogger
+
+from .configuration import g_errorlog
 
 import requests
 import sys
@@ -657,49 +657,49 @@ def execute(ctx, session, parameter, timeout, parser=None):
     except requests.exceptions.URLRequired as e:
         error = URLRequiredException()
         error.Url = parameter.Url
-        error.Message = getMessage(ctx, g_message, 101, error.Url)
+        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 101, error.Url)
         raise error
     except requests.exceptions.ConnectTimeout as e:
         error = ConnectTimeoutException()
         error.Url = e.response.url
         connect, read = timeout
         error.ConnectTimeout = connect
-        error.Message = getMessage(ctx, g_message, 102, error.ConnectTimeout, error.Url)
+        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 102, error.ConnectTimeout, error.Url)
         raise error
     except requests.exceptions.ReadTimeout as e:
         error = ReadTimeoutException()
         error.Url = e.response.url
         connect, read = timeout
         error.ReadTimeout = read
-        error.Message = getMessage(ctx, g_message, 103, error.ReadTimeout, error.Url)
+        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 103, error.ReadTimeout, error.Url)
         raise error
     except requests.exceptions.ConnectionError as e:
         error = ConnectionException()
         error.Url = e.response.url
-        error.Message = getMessage(ctx, g_message, 104, error.Url)
+        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 104, error.Url)
         raise error
     except requests.exceptions.HTTPError as e:
         error = HTTPException()
         error.Url = e.response.url
         error.StatusCode = e.response.status_code
         error.Content = e.response.text
-        error.Message = getMessage(ctx, g_message, 105, error.Url, error.StatusCode)
+        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 105, error.Url, error.StatusCode)
         raise error
     except requests.exceptions.TooManyRedirects as e:
         error = TooManyRedirectsException()
         error.Url = e.response.url
-        error.Message = getMessage(ctx, g_message, 106, error.Url)
+        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 106, error.Url)
         raise error
     except requests.exceptions.JSONDecodeError as e:
         error = JSONDecodeException()
         error.Url = e.response.url
         error.Content = e.response.text
-        error.Message = getMessage(ctx, g_message, 107, error.Url)
+        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 107, error.Url)
         raise error
     except requests.exceptions.RequestException as e:
         error = RequestException()
         error.Url = e.response.url
-        error.Message = getMessage(ctx, g_message, 108, error.Url)
+        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 108, error.Url)
         raise error
     return response
 
@@ -739,3 +739,11 @@ def _jsonParser(data):
             value = tuple(value)
         keymap.setValue(key, value)
     return keymap
+
+def _getExceptionMessage(ctx, level, clazz, method, resource, *args):
+    logger = getLogger(ctx, g_errorlog)
+    message = logger.resolveString(resource, *args)
+    logger.logp(SEVERE, clazz, method, message)
+    return message
+
+

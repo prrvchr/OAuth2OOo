@@ -35,7 +35,6 @@ from com.sun.star.logging.LogLevel import SEVERE
 
 from .optionsview import OptionsView
 from .optionshandler import OptionsListener
-from .optionshandler import OptionsHandler
 
 from ..oauth2model import OAuth2Model
 from ..logger import LogManager
@@ -46,11 +45,11 @@ from ..unotool import getExceptionMessage
 from ..oauth2lib import getOAuth2UserName
 from ..oauth2lib import g_oauth2
 
+from ..configuration import g_extension
 from ..configuration import g_identifier
+from ..configuration import g_errorlog
 
-from ..logger import logMessage
-from ..logger import getMessage
-g_message = 'OptionsDialog'
+from ..logger import getLogger
 
 import os
 import sys
@@ -61,8 +60,8 @@ class OptionsManager(unohelper.Base):
     def __init__(self, ctx, window):
         self._ctx = ctx
         self._model = OAuth2Model(ctx)
-        self._view = OptionsView(ctx, OptionsHandler(self), window.getPeer())
-        self._logger = LogManager(ctx, self._view.getParent(), self._getInfos(), g_identifier, 'Logger')
+        self._view = OptionsView(window)
+        self._logger = LogManager(ctx, window.getPeer(), self._getInfos(), g_identifier, g_extension)
         self._view.initView(*self._model.getOptionsDialogData())
         window.addEventListener(OptionsListener(self))
 
@@ -126,5 +125,5 @@ class OptionsManager(unohelper.Base):
             service.dispose()
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self._ctx, SEVERE, msg, "OptionsManager", "doConnect()")
+            getLogger(self._ctx, g_errorlog).logp(SEVERE, 'OptionsManager', 'connect()', msg)
 

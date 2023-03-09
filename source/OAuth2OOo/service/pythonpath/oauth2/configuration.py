@@ -33,6 +33,7 @@ g_identifier = 'io.github.prrvchr.%s' % g_extension
 g_oauth2 = '%s.OAuth2Service' % g_identifier
 g_resource = 'resource'
 g_basename = 'OAuth2'
+g_errorlog = 'OAuth2Error'
 
 g_wizard_page = 2 # -1 to disable
 g_wizard_paths = ((1, 2, 3, 5), (1, 2, 4, 5), (1, 5))

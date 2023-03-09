@@ -49,24 +49,3 @@ class OptionsListener(unohelper.Base,
             msg = "OptionsHandler.disposing() Error: %s" % traceback.print_exc()
             print(msg)
 
-
-class OptionsHandler(unohelper.Base,
-                     XContainerWindowEventHandler):
-    def __init__(self, manager):
-        self._manager = manager
-
-    # XContainerWindowEventHandler
-    def callHandlerMethod(self, window, event, method):
-        try:
-            handled = False
-            if method == 'Connect':
-                self._manager.connect()
-                handled = True
-            return handled
-        except Exception as e:
-            msg = "OptionsHandler.callHandlerMethod() Error: %s" % traceback.print_exc()
-            print(msg)
-
-    def getSupportedMethodNames(self):
-        return ('Connect', )
-
