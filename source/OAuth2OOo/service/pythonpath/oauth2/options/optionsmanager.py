@@ -75,9 +75,9 @@ class OptionsManager(unohelper.Base):
         self._model.commit()
         self._logger.saveSetting()
 
-    def reloadSetting(self):
+    def loadSetting(self):
         self._view.initView(*self._model.getOptionsDialogData())
-        self._logger.reloadSetting()
+        self._logger.loadSetting()
 
     def _getInfos(self):
         infos = {}
