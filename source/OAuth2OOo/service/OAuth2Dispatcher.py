@@ -45,7 +45,6 @@ from com.sun.star.logging.LogLevel import SEVERE
 from oauth2 import OAuth2Model
 from oauth2 import showOAuth2Wizard
 
-from oauth2 import logMessage
 from oauth2 import g_identifier
 
 import traceback
@@ -62,7 +61,6 @@ class OAuth2Dispatcher(unohelper.Base,
     def __init__(self, ctx):
         self._ctx = ctx
         self._frame = None
-        logMessage(self._ctx, INFO, "Loading ... Done", 'OAuth2Dispatcher', '__init__()')
 
 # XInitialization
     def initialize(self, args):

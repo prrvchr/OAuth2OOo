@@ -45,9 +45,11 @@ from ..unotool import createService
 
 from ..oauth2helper import getOAuth2ErrorCode
 
-from ..logger import logMessage
-from ..logger import getMessage
-g_message = 'httpserver'
+from ..logger import getLogger
+
+from ..configuration import g_oauth2log
+from ..configuration import g_errorlog
+from ..configuration import g_basename
 
 import time
 from threading import Thread
@@ -67,6 +69,7 @@ class WatchDog(Thread):
         self._user = user
         self._timeout = timeout
         self._lock = lock
+        self._logger = getLogger(ctx, g_oauth2log, g_basename)
         self._end = 0
         # TODO Time in seconds between two refreshes
         self._wait = 1
@@ -88,7 +91,7 @@ class WatchDog(Thread):
                 self._notify(self._timeout)
                 self._register(self._scopes, self._provider, self._user, *self._server.getResults())
             self._lock.notifyAll()
-            logMessage(self._ctx, INFO, "WatchDog Running ... Done", 'WatchDog', 'run()')
+            self._logger.logp(INFO, 'WatchDog', 'run()', "WatchDog Running ... Done")
 
     def cancel(self):
         if self._server.is_alive():
@@ -110,6 +113,7 @@ class Server(Thread):
         self._uuid = uuid
         self._code = None
         self._error = 100
+        self._logger = getLogger(ctx, g_oauth2log, g_basename)
         self._lock = lock
         self._acceptor = createService(ctx, 'com.sun.star.connection.Acceptor')
 
@@ -126,13 +130,13 @@ class Server(Thread):
             connection = self._acceptor.accept(argument)
         except AlreadyAcceptingException as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self._ctx, SEVERE, msg, 'Server', 'run()')
+            getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, 'Server', 'run()', msg)
         except ConnectionSetupException as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self._ctx, SEVERE, msg, 'Server', 'run()')
+            getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, 'Server', 'run()', msg)
         except IllegalArgumentException as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self._ctx, SEVERE, msg, 'Server', 'run()')
+            getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, 'Server', 'run()', msg)
         if connection:
             with self._lock:
                 result = self._getResult(connection)
@@ -148,12 +152,12 @@ Connection: Closed
                     connection.write(uno.ByteSequence(header.encode('utf8')))
                 except IOException as e:
                     msg = "Error: %s - %s" % (e, traceback.print_exc())
-                    logMessage(self._ctx, SEVERE, msg, 'Server', 'run()')
+                    getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, 'Server', 'run()', msg)
                 connection.flush()
                 connection.close()
                 self._acceptor.stopAccepting()
                 self._lock.notifyAll()
-                logMessage(self._ctx, INFO, "Server Running ... Done", 'Server', 'run()')
+                self._logger.logp(INFO, 'Server', 'run()', "Server Running ... Done")
 
 # Server private getter methods
     def _getResult(self, connection):
@@ -173,7 +177,7 @@ Connection: Closed
         else:
             self._error = 103
         msg = 'Request response Error: %s - %s' % (parameters, response)
-        logMessage(self._ctx, SEVERE, msg, 'Server', '_getResult()')
+        getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, 'Server', '_getResult()', msg)
         return False
 
     def _getLocation(self, result):

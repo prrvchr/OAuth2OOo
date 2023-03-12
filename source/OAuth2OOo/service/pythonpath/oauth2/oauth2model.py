@@ -40,14 +40,15 @@ from com.sun.star.auth import RefreshTokenException
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_refresh_overlap
+from .configuration import g_oauth2log
+from .configuration import g_basename
 
 from .unotool import generateUuid
 from .unotool import getConfiguration
 from .unotool import getCurrentLocale
 from .unotool import getStringResource
 
-from .logger import logMessage
-from .logger import disposeLogger
+from .logger import getLogger
 
 from .wizard import WatchDog
 from .wizard import Server
@@ -79,6 +80,7 @@ class OAuth2Model(unohelper.Base):
         self._uri = 'http://%s:%s/'
         self._urn = 'urn:ietf:wg:oauth:2.0:oob'
         self._watchdog = None
+        self._logger = getLogger(ctx, g_oauth2log, g_basename)
         self._config = getConfiguration(ctx, g_identifier, True)
         self._resolver = getStringResource(ctx, g_identifier, g_extension)
         self._resources = {'Title': 'PageWizard%s.Title',
@@ -171,7 +173,6 @@ class OAuth2Model(unohelper.Base):
  
     def dispose(self):
         self._cancelServer()
-        disposeLogger()
 
     def _cancelServer(self):
         if self._watchdog is not None:
@@ -547,7 +548,7 @@ class OAuth2Model(unohelper.Base):
             parameters = self._getSignInParameters(url)
             url = '%s?%s' % (main, urlencode(parameters))
         msg = "Make HTTP Request: %s?%s" % (main, self._getUrlArguments(parameters))
-        logMessage(self._ctx, INFO, msg, 'OAuth2Model', 'getAuthorizationData()')
+        self._logger.logp(INFO, 'OAuth2Model', 'getAuthorizationData()', msg)
         return scopes, url
 
     def startServer(self, scopes, notify, register):
@@ -560,7 +561,7 @@ class OAuth2Model(unohelper.Base):
         self._watchdog = WatchDog(self._ctx, server, notify, register, scopes, self._provider, self._user, self.HandlerTimeout, lock)
         server.start()
         self._watchdog.start()
-        logMessage(self._ctx, INFO, "WizardServer Started ... Done", 'OAuth2Manager', 'startServer()')
+        self._logger.logp(INFO, 'OAuth2Manager', 'startServer()', "WizardServer Started ... Done")
 
     def isServerRunning(self):
         return self._watchdog is not None and self._watchdog.isRunning()
@@ -699,13 +700,13 @@ class OAuth2Model(unohelper.Base):
         url = provider.getByName('TokenUrl')
         parameters = self._getTokenParameters(scopes, provider, code)
         msg = "Make HTTP Request: %s?%s" % (url, self._getUrlArguments(parameters))
-        logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
+        self._logger.logp(INFO, 'OAuth2Model', '_registerToken()', msg)
         timestamp = int(time.time())
         response, error = self._getResponseFromRequest(url, parameters)
         if error is None:
             self._saveUserToken(scopes, provider, user, response, timestamp)
         msg = "Receive Response: %s" % (response, )
-        logMessage(self._ctx, INFO, msg, 'OAuth2Model', '_registerToken()')
+        self._logger.logp(INFO, 'OAuth2Model', '_registerToken()', msg)
         return error
 
     def _getTokenParameters(self, scopes, provider, code):
@@ -767,19 +768,19 @@ class OAuth2Model(unohelper.Base):
             except ConnectionError:
                 # TODO: The provided url may be unreachable
                 error = self.getRequestErrorMessage(300) % url
-                logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
+                self._logger.logp(SEVERE, 'OAuth2Model', '_getResponseFromRequest()', error)
             except json.decoder.JSONDecodeError:
                 # TODO: Normally the content of the page must be in json format,
                 # TODO: except if we are not on the right page for example.
                 ctype = r.headers.get('Content-Type', 'undefined')
                 error = self.getRequestErrorMessage(301) % (ctype, r.status_code, url)
-                logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
+                self._logger.logp(SEVERE, 'OAuth2Model', '_getResponseFromRequest()', error)
                 if multiline and r.text != '':
                     error += self.getRequestErrorMessage(302) % r.text
             except HTTPError:
                 # TODO: Catch OAuth2 'error' and 'error_description' to display them to facilitate debugging.
                 error = self.getRequestErrorMessage(getOAuth2ErrorCode(response.get('error')))
-                logMessage(self._ctx, SEVERE, error, 'OAuth2Model', '_getResponseFromRequest()')
+                self._logger.logp(SEVERE, 'OAuth2Model', '_getResponseFromRequest()', error)
                 description = response.get('error_description')
                 if multiline:
                     if description is not None:

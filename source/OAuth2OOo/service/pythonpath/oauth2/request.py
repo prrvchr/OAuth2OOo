@@ -343,7 +343,7 @@ class Enumerator(unohelper.Base,
         self._rows, self._token, self._sync, error = self._getRows()
         self._PageCount = 0
         if error:
-            logMessage(self._ctx, SEVERE, error, "OAuth2Service","Enumerator()")
+            getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, "OAuth2Service","Enumerator()", error)
 
     @property
     def SyncToken(self):
@@ -359,7 +359,7 @@ class Enumerator(unohelper.Base,
             self._rows, self._token, self._sync, error = self._getRows(self._token)
             if not error:
                 return self.nextElement()
-            logMessage(self._ctx, SEVERE, error, "OAuth2Service","Enumerator()")
+            getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, "OAuth2Service","Enumerator()", error)
         raise NoSuchElementException()
 
     def _getRows(self, token=None):
@@ -394,7 +394,7 @@ class Enumerator(unohelper.Base,
             return rows, token, sync, ''
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
-            logMessage(self._ctx, SEVERE, msg, 'OAuth2Service', 'Enumerator()')
+            getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, "OAuth2Service","Enumerator()", msg)
 
 
 class InputStream(unohelper.Base,
@@ -476,7 +476,7 @@ class Downloader():
                     else:
                         self.closed = True
                         msg = "getChunks() ERROR: %s - %s" % (r.status_code, r.text)
-                        logMessage(self.ctx, SEVERE, msg, "OAuth2Service", "Downloader()")
+                        getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, "OAuth2Service","Downloader()", msg)
                         break
                     for c in r.iter_content(self.buffer):
                         self.start += len(c)
@@ -566,7 +566,7 @@ class OutputStream(unohelper.Base,
                     self.buffers = b''
             else:
                 msg = 'ERROR: %s - %s' % (r.status_code, r.text)
-                logMessage(self.ctx, SEVERE, msg, "OAuth2Service","OutputStream()")
+                getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, "OAuth2Service","OutputStream()", msg)
         return
 
 
@@ -587,12 +587,12 @@ class StreamListener(unohelper.Base,
             self.callback(self.username, self.itemid, self.response)
         else:
             msg = "ERROR ..."
-            logMessage(self.ctx, SEVERE, msg, "OAuth2Service","StreamListener()")
+            getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, "OAuth2Service","StreamListener()", msg)
     def terminated(self):
         pass
     def error(self, error):
         msg = "ERROR ..."
-        logMessage(self.ctx, SEVERE, msg, "OAuth2Service","StreamListener()")
+        getLogger(self._ctx, g_errorlog, g_basename).logp(SEVERE, "OAuth2Service","StreamListener()", msg)
     def disposing(self, event):
         pass
 

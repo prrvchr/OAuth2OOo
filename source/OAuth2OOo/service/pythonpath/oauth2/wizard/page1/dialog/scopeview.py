@@ -31,7 +31,7 @@ import uno
 import unohelper
 
 from ....unotool import getDialog
-from ....logger import logMessage
+
 from ....configuration import g_extension
 
 import traceback

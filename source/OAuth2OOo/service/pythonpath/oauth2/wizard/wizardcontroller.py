@@ -35,8 +35,10 @@ from com.sun.star.ui.dialogs import XWizardController
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from ..logger import logMessage
-from ..logger import disposeLogger
+from ..logger import getLogger
+
+from ..configuration import g_oauth2log
+from ..configuration import g_basename
 
 from .page1 import OAuth2Manager as WizardPage1
 from .page2 import OAuth2Manager as WizardPage2
@@ -53,6 +55,8 @@ class WizardController(unohelper.Base,
         self._ctx = ctx
         self._wizard = wizard
         self._model = model
+        self._logger = getLogger(ctx, g_oauth2log, g_basename)
+        
 
     @property
     def User(self):
@@ -67,7 +71,6 @@ class WizardController(unohelper.Base,
     def dispose(self):
         self._model.dispose()
         self._wizard.DialogWindow.dispose()
-        disposeLogger()
 
 # XWizardController
     def createPage(self, parent, pageid):
@@ -86,7 +89,7 @@ class WizardController(unohelper.Base,
                 page = WizardPage5(self._ctx, self._wizard, self._model, pageid, parent)
                 print("WizardController.createPage() 2")
             msg += " Done"
-            logMessage(self._ctx, INFO, msg, 'WizardController', 'createPage()')
+            self._logger.logp(INFO, 'WizardController', 'createPage()', msg)
             return page
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.print_exc())
@@ -106,7 +109,7 @@ class WizardController(unohelper.Base,
         forward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.NEXT')
         finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
         msg += " Done"
-        logMessage(self._ctx, INFO, msg, 'WizardController', 'onActivatePage()')
+        self._logger.logp(INFO, 'WizardController', 'onActivatePage()', msg)
 
     def onDeactivatePage(self, pageid):
         pass

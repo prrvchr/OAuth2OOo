@@ -45,8 +45,8 @@ from ..unotool import getExceptionMessage
 from ..oauth2lib import getOAuth2UserName
 from ..oauth2lib import g_oauth2
 
-from ..configuration import g_extension
 from ..configuration import g_identifier
+from ..configuration import g_oauth2log
 from ..configuration import g_errorlog
 
 from ..logger import getLogger
@@ -61,7 +61,7 @@ class OptionsManager(unohelper.Base):
         self._ctx = ctx
         self._model = OAuth2Model(ctx)
         self._view = OptionsView(window)
-        self._logger = LogManager(ctx, window.getPeer(), self._getInfos(), g_identifier, g_extension)
+        self._logger = LogManager(ctx, window.getPeer(), self._getInfos(), g_identifier, g_oauth2log)
         self._view.initView(*self._model.getOptionsDialogData())
         window.addEventListener(OptionsListener(self))
 
