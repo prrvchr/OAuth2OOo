@@ -47,7 +47,7 @@ from ..oauth2helper import getOAuth2ErrorCode
 
 from ..logger import getLogger
 
-from ..configuration import g_oauth2log
+from ..configuration import g_defaultlog
 from ..configuration import g_errorlog
 from ..configuration import g_basename
 
@@ -69,7 +69,7 @@ class WatchDog(Thread):
         self._user = user
         self._timeout = timeout
         self._lock = lock
-        self._logger = getLogger(ctx, g_oauth2log, g_basename)
+        self._logger = getLogger(ctx, g_defaultlog, g_basename)
         self._end = 0
         # TODO Time in seconds between two refreshes
         self._wait = 1
@@ -113,7 +113,7 @@ class Server(Thread):
         self._uuid = uuid
         self._code = None
         self._error = 100
-        self._logger = getLogger(ctx, g_oauth2log, g_basename)
+        self._logger = getLogger(ctx, g_defaultlog, g_basename)
         self._lock = lock
         self._acceptor = createService(ctx, 'com.sun.star.connection.Acceptor')
 

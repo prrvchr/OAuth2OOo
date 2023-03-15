@@ -32,7 +32,7 @@ from .options import OptionsManager
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_oauth2
-from .configuration import g_oauth2log
+from .configuration import g_defaultlog
 from .configuration import g_basename
 
 from .unolib import KeyMap

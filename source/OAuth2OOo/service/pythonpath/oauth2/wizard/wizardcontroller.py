@@ -37,7 +37,7 @@ from com.sun.star.logging.LogLevel import SEVERE
 
 from ..logger import getLogger
 
-from ..configuration import g_oauth2log
+from ..configuration import g_defaultlog
 from ..configuration import g_basename
 
 from .page1 import OAuth2Manager as WizardPage1
@@ -55,7 +55,7 @@ class WizardController(unohelper.Base,
         self._ctx = ctx
         self._wizard = wizard
         self._model = model
-        self._logger = getLogger(ctx, g_oauth2log, g_basename)
+        self._logger = getLogger(ctx, g_defaultlog, g_basename)
         
 
     @property

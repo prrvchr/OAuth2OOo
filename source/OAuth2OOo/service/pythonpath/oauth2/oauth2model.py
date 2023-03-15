@@ -40,7 +40,7 @@ from com.sun.star.auth import RefreshTokenException
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_refresh_overlap
-from .configuration import g_oauth2log
+from .configuration import g_defaultlog
 from .configuration import g_basename
 
 from .unotool import generateUuid
@@ -80,7 +80,7 @@ class OAuth2Model(unohelper.Base):
         self._uri = 'http://%s:%s/'
         self._urn = 'urn:ietf:wg:oauth:2.0:oob'
         self._watchdog = None
-        self._logger = getLogger(ctx, g_oauth2log, g_basename)
+        self._logger = getLogger(ctx, g_defaultlog, g_basename)
         self._config = getConfiguration(ctx, g_identifier, True)
         self._resolver = getStringResource(ctx, g_identifier, g_extension)
         self._resources = {'Title': 'PageWizard%s.Title',

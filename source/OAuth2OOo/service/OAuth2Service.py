@@ -75,7 +75,7 @@ from oauth2 import getLogger
 
 from oauth2 import g_identifier
 from oauth2 import g_oauth2
-from oauth2 import g_oauth2log
+from oauth2 import g_defaultlog
 from oauth2 import g_basename
 
 from oauth2 import OAuth2Model
@@ -103,7 +103,7 @@ class OAuth2Service(unohelper.Base,
         self._listeners = []
         self._warnings = []
         self._mode = OFFLINE
-        self._logger = getLogger(ctx, g_oauth2log)
+        self._logger = getLogger(ctx, g_defaultlog)
 
     @property
     def ResourceUrl(self):

@@ -73,6 +73,7 @@ from .oauth2lib import NoOAuth2
 from .logger import getLogger
 
 from .configuration import g_errorlog
+g_basename = 'request'
 
 import requests
 import sys
@@ -741,7 +742,7 @@ def _jsonParser(data):
     return keymap
 
 def _getExceptionMessage(ctx, level, clazz, method, resource, *args):
-    logger = getLogger(ctx, g_errorlog)
+    logger = getLogger(ctx, g_errorlog, g_basename)
     message = logger.resolveString(resource, *args)
     logger.logp(SEVERE, clazz, method, message)
     return message
