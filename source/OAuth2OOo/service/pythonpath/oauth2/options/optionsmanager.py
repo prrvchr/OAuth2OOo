@@ -62,7 +62,8 @@ class OptionsManager(unohelper.Base):
         self._model = OAuth2Model(ctx)
         self._view = OptionsView(window)
         self._logger = LogManager(ctx, window.getPeer(), self._getInfos(), g_identifier, g_defaultlog)
-        self._view.initView(*self._model.getOptionsDialogData())
+        connect, read, handler, urls = self._model.getOptionsDialogData()
+        self._view.initView(connect, read, handler, urls)
         window.addEventListener(OptionsListener(self))
 
     def dispose(self):
@@ -76,7 +77,8 @@ class OptionsManager(unohelper.Base):
         self._logger.saveSetting()
 
     def loadSetting(self):
-        self._view.initView(*self._model.getOptionsDialogData())
+        connect, read, handler, urls = self._model.getOptionsDialogData()
+        self._view.initView(connect, read, handler, urls)
         self._logger.loadSetting()
 
     def _getInfos(self):

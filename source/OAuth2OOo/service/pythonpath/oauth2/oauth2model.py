@@ -587,7 +587,9 @@ class OAuth2Model(unohelper.Base):
         return self._close
 
     def getTokenData(self):
-        return self.getTokenLabel(), *self.getUserTokenData()
+        label = self.getTokenLabel()
+        never, scopes, access, refresh, expires = self.getUserTokenData()
+        return label, never, scopes, access, refresh, expires
 
     def getUserTokenData(self):
         users = self._config.getByName('Providers').getByName(self._provider).getByName('Users')
@@ -611,7 +613,8 @@ class OAuth2Model(unohelper.Base):
         timestamp = int(time.time())
         response, error = self._getResponseFromRequest(url, data, multiline)
         if error is None:
-            self._saveRefreshedToken(user, *self._getTokenFromResponse(response, timestamp))
+            refresh, access, never, expires = self._getTokenFromResponse(response, timestamp)
+            self._saveRefreshedToken(user, refresh, access, never, expires)
         return error
 
     def deleteUser(self):
@@ -740,7 +743,8 @@ class OAuth2Model(unohelper.Base):
         # user.replaceByName('Scopes', scopes)
         arguments = ('Scopes', uno.Any('[]string', tuple(scopes)))
         uno.invoke(user, 'replaceByName', arguments)
-        self._saveTokens(user, *self._getTokenFromResponse(response, timestamp))
+        refresh, access, never, expires = self._getTokenFromResponse(response, timestamp)
+        self._saveTokens(user, refresh, access, never, expires)
 
 # OAuth2Model private getter/setter methods
     def _parseParameters(self, base, optional, required):
