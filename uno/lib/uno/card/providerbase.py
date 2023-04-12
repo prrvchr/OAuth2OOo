@@ -30,93 +30,62 @@
 import uno
 import unohelper
 
-from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
 from com.sun.star.ucb.ConnectionMode import OFFLINE
 from com.sun.star.ucb.ConnectionMode import ONLINE
 
-from com.sun.star.sdbc import XRestUser
-
-from .oauth2lib import getRequest
-from .oauth2lib import g_oauth2
-
-from .unotool import executeDispatch
+from .unotool import getConnectionMode
 
 from .dbtool import getSqlException
 
-from .configuration import g_errorlog
-
 from .logger import getLogger
-g_basename = 'User'
+
+from .configuration import g_path
+from .configuration import g_errorlog
+from .configuration import g_basename
 
 import traceback
 
 
-class User(unohelper.Base,
-           XRestUser):
-    def __init__(self, ctx, database, provider, name, password=''):
-        self._ctx = ctx
-        self.Fields = database.getUserFields()
-        self.Request = getRequest(ctx, provider.Host, name)
-        self.MetaData = database.selectUser(name)
-        if self._isNew():
-            self.MetaData = self._getMetaData(database, provider, name)
-            self._initUser(database, password)
+class ProviderBase(unohelper.Base):
 
     @property
-    def People(self):
-        return self.MetaData.getDefaultValue('People', None)
+    def Host(self):
+        return self._server
     @property
-    def Resource(self):
-        return self.MetaData.getDefaultValue('Resource', None)
-    @property
-    def Group(self):
-        return self.MetaData.getDefaultValue('Group', None)
-    @property
-    def Account(self):
-        return self.MetaData.getDefaultValue('Account', '')
-    @property
-    def Name(self):
-        return self.Account.split('@').pop(0)
-    @property
-    def PeopleSync(self):
-        return self.MetaData.getDefaultValue('PeopleSync', None)
-    @property
-    def GroupSync(self):
-        return self.MetaData.getDefaultValue('GroupSync', None)
+    def BaseUrl(self):
+        return self._scheme + self._server + g_path
 
-    def _isNew(self):
-        return self.MetaData is None
+    def isOnLine(self):
+        return getConnectionMode(self._ctx, self.Host) != OFFLINE
+    def isOffLine(self):
+        return getConnectionMode(self._ctx, self.Host) != ONLINE
 
-    def _getMetaData(self, database, provider, name):
-        if self.Request is None:
-            raise self._getSqlException(1003, 1105, '_getMetaData', g_oauth2)
-        if provider.isOffLine():
-            raise self._getSqlException(1004, 1108, '_getMetaData', name)
-        # TODO: Remove Fields parameter
-        data = provider.getUser(self.Request, self.Fields)
-        if not data.IsPresent:
-            raise self._getSqlException(1006, 1107, '_getMetaData', name)
-        userid = provider.getUserId(data.Value)
-        return database.insertUser(userid, name)
-
-    def _initUser(self, database, password):
-        credential = self._getCredential(password)
-        if not database.createUser(*credential):
-            raise self._getSqlException(1005, 1106, '_initUser', name)
-        format = {'Schema': self.Resource,
-                    'User': self.Account,
-                    'GroupId': self.Group}
-        database.initUser(format)
-
-    def _getCredential(self, password):
-        return self.Account, password
-
-    def _getSqlException(self, state, code, method, *args):
+    def getSqlException(self, state, code, method, *args):
         logger = getLogger(self._ctx, g_errorlog, g_basename)
         state = logger.resolveString(state)
         msg = logger.resolveString(code, *args)
         logger.logp(SEVERE, g_basename, method, msg)
         error = getSqlException(state, code, msg, self)
         return error
+
+    # Need to be implemented method
+    def insertUser(self, database, request, scheme, server, name, pwd):
+        raise NotImplementedError
+
+    def initAddressbooks(self, database, user, request):
+        raise NotImplementedError
+
+    def getAddressbookUrl(self, request, addressbook, user, password, url):
+        raise NotImplementedError
+
+    def firstCardPull(self, database, user, addressbook):
+        raise NotImplementedError
+
+    def getModifiedCardByToken(self, request, user, password, url, token):
+        raise NotImplementedError
+
+    def getModifiedCard(self, request, user, password, url, urls):
+        raise NotImplementedError
+
