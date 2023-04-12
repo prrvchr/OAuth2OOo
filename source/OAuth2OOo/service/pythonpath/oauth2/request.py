@@ -68,7 +68,10 @@ from com.sun.star.rest import XRequestResponse
 
 from .unolib import KeyMap
 
-from .oauth2lib import NoOAuth2
+from .oauth2 import NoOAuth2
+
+from .requestresponse import RequestResponse
+from .requestresponse import getExceptionMessage
 
 from .logger import getLogger
 
@@ -100,7 +103,7 @@ class Response(unohelper.Base,
     def __init__(self, session, parameter, timeout, parser=None):
         self._parser = parser
         self._name = parameter.Name
-        kwargs = _getKeyWordArguments(parameter)
+        kwargs = _getKeyWordArguments1(parameter)
         self._response = session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
         print("Response.__init__() 1 \n%s\n%s" % (self._response.request.headers, self._response.request.body))
         print("Response.__init__() 2 \n%s\n%s" % (self._response.headers, self._response.content))
@@ -443,7 +446,7 @@ class Downloader():
         self.session = session
         self.method = parameter.Method
         self.url = parameter.Url
-        kwargs = _getKeyWordArguments(parameter)
+        kwargs = _getKeyWordArguments1(parameter)
         kwargs.update({'stream': True})
         # We need to use a "Range" Header... but it's not shure that parameter has Headers...
         if 'headers' not in kwargs:
@@ -504,7 +507,7 @@ class OutputStream(unohelper.Base,
         self.buffers = b''
         self.response = response
         self.timeout = timeout
-        kwargs = _getKeyWordArguments(parameter)
+        kwargs = _getKeyWordArguments1(parameter)
         # If Chunked we need to use a "Content-Range" Header...
         # but it's not shure that parameter has Headers...
         if self.chunked and 'headers' not in kwargs:
@@ -636,11 +639,55 @@ class Uploader(unohelper.Base,
     def _getStreamListener(self, username, itemid, response):
         return StreamListener(self.ctx, self.callback, username, itemid, response)
 
+def executeRequest(ctx, session, parameter, timeout):
+    try:
+        print("Request.executeRequest() 1")
+        kwargs = _getKeyWordArguments(parameter)
+        print("Request.executeRequest() 2")
+        with session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs) as r:
+            print("Request.executeRequest() 3")
+            response = RequestResponse(ctx, parameter, r)
+        print("Request.executeRequest() 4")
+    except requests.exceptions.URLRequired as e:
+        error = URLRequiredException()
+        error.Url = parameter.Url
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 101, error.Url)
+        raise error
+    except requests.exceptions.ConnectTimeout as e:
+        error = ConnectTimeoutException()
+        error.Url = e.response.url
+        connect, read = timeout
+        error.ConnectTimeout = connect
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 102, error.ConnectTimeout, error.Url)
+        raise error
+    except requests.exceptions.ReadTimeout as e:
+        error = ReadTimeoutException()
+        error.Url = e.response.url
+        connect, read = timeout
+        error.ReadTimeout = read
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 103, error.ReadTimeout, error.Url)
+        raise error
+    except requests.exceptions.ConnectionError as e:
+        error = ConnectionException()
+        error.Url = e.response.url
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 104, error.Url)
+        raise error
+    except requests.exceptions.TooManyRedirects as e:
+        error = TooManyRedirectsException()
+        error.Url = e.response.url
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 106, error.Url)
+        raise error
+    except requests.exceptions.RequestException as e:
+        error = RequestException()
+        error.Url = e.response.url
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 108, error.Url)
+        raise error
+    return response
 
 def execute(ctx, session, parameter, timeout, parser=None):
     try:
         response = uno.createUnoStruct('com.sun.star.beans.Optional<com.sun.star.auth.XRestKeyMap>')
-        kwargs = _getKeyWordArguments(parameter)
+        kwargs = _getKeyWordArguments1(parameter)
         with session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs) as r:
             print("request.execute() 1 \n%s" % r.text)
             r.raise_for_status()
@@ -658,54 +705,76 @@ def execute(ctx, session, parameter, timeout, parser=None):
     except requests.exceptions.URLRequired as e:
         error = URLRequiredException()
         error.Url = parameter.Url
-        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 101, error.Url)
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 101, error.Url)
         raise error
     except requests.exceptions.ConnectTimeout as e:
         error = ConnectTimeoutException()
         error.Url = e.response.url
         connect, read = timeout
         error.ConnectTimeout = connect
-        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 102, error.ConnectTimeout, error.Url)
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 102, error.ConnectTimeout, error.Url)
         raise error
     except requests.exceptions.ReadTimeout as e:
         error = ReadTimeoutException()
         error.Url = e.response.url
         connect, read = timeout
         error.ReadTimeout = read
-        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 103, error.ReadTimeout, error.Url)
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 103, error.ReadTimeout, error.Url)
         raise error
     except requests.exceptions.ConnectionError as e:
         error = ConnectionException()
         error.Url = e.response.url
-        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 104, error.Url)
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 104, error.Url)
         raise error
     except requests.exceptions.HTTPError as e:
         error = HTTPException()
         error.Url = e.response.url
         error.StatusCode = e.response.status_code
         error.Content = e.response.text
-        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 105, error.Url, error.StatusCode)
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 105, error.Url, error.StatusCode)
         raise error
     except requests.exceptions.TooManyRedirects as e:
         error = TooManyRedirectsException()
         error.Url = e.response.url
-        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 106, error.Url)
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 106, error.Url)
         raise error
     except requests.exceptions.JSONDecodeError as e:
         error = JSONDecodeException()
         error.Url = e.response.url
         error.Content = e.response.text
-        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 107, error.Url)
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 107, error.Url)
         raise error
     except requests.exceptions.RequestException as e:
         error = RequestException()
         error.Url = e.response.url
-        error.Message = _getExceptionMessage(ctx, SEVERE, 'OAuth2Service', 'execute()', 108, error.Url)
+        error.Message = getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 108, error.Url)
         raise error
     return response
 
 # Private method
 def _getKeyWordArguments(parameter):
+    kwargs = {}
+    if parameter.Header:
+        kwargs['headers'] = json.loads(parameter.Header)
+    if parameter.Query:
+        kwargs['params'] = json.loads(parameter.Query)
+    if parameter.Data:
+        kwargs['data'] = parameter.Data
+    elif parameter.Json:
+        kwargs['json'] = json.loads(parameter.Json)
+    elif parameter.DataSink:
+        kwargs['data'] = parameter.DataSink
+    if parameter.NoAuth:
+        kwargs['auth'] = NoOAuth2()
+    elif parameter.Auth:
+        kwargs['auth'] = parameter.Auth
+    if parameter.NoRedirect:
+        kwargs['allow_redirects'] = False
+    if parameter.NoVerify:
+        kwargs['verify'] = False
+    return kwargs
+
+def _getKeyWordArguments1(parameter):
     kwargs = {}
     if parameter.Header:
         kwargs['headers'] = json.loads(parameter.Header)
@@ -730,7 +799,7 @@ def _parseResponse(response):
     if content.startswith('application/json'):
         result = response.json(object_pairs_hook=_jsonParser)
     else:
-        result = KeyMap(**response.headers)
+        result = KeyMap(response.headers)
     return result
 
 def _jsonParser(data):
@@ -740,11 +809,4 @@ def _jsonParser(data):
             value = tuple(value)
         keymap.setValue(key, value)
     return keymap
-
-def _getExceptionMessage(ctx, level, clazz, method, resource, *args):
-    logger = getLogger(ctx, g_errorlog, g_basename)
-    message = logger.resolveString(resource, *args)
-    logger.logp(SEVERE, clazz, method, message)
-    return message
-
 

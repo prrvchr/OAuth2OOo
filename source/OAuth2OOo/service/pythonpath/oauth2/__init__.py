@@ -58,11 +58,12 @@ from .request import InputStream
 from .request import Uploader
 from .request import getSessionMode
 from .request import execute
+from .request import executeRequest
 
-from .oauth2lib import OAuth2OOo
-from .oauth2lib import NoOAuth2
-from .oauth2lib import InteractionRequest
-from .oauth2lib import getOAuth2UserName
+from .oauth2 import OAuth2OOo
+from .oauth2 import NoOAuth2
+from .oauth2 import InteractionRequest
+from .oauth2 import getOAuth2UserName
 
 from .oauth2helper import getAccessToken
 from .oauth2helper import showOAuth2Wizard

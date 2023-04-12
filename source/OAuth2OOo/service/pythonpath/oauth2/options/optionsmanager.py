@@ -42,8 +42,8 @@ from ..logger import LogManager
 from ..unotool import createService
 from ..unotool import getExceptionMessage
 
-from ..oauth2lib import getOAuth2UserName
-from ..oauth2lib import g_oauth2
+from ..oauth2 import getOAuth2UserName
+from ..oauth2 import g_oauth2
 
 from ..configuration import g_identifier
 from ..configuration import g_defaultlog

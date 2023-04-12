@@ -58,6 +58,7 @@ from oauth2 import KeyMap
 
 from oauth2 import createService
 from oauth2 import execute
+from oauth2 import executeRequest
 from oauth2 import getAccessToken
 from oauth2 import getParentWindow
 from oauth2 import getSessionMode
@@ -173,6 +174,14 @@ class OAuth2Service(unohelper.Base,
     def execute(self, parameter):
         with self._session as s:
             response = execute(self._ctx, s, parameter, self.Timeout)
+        return response
+
+    def executeRequest(self, parameter):
+        print("OAuth2Service.executeRequest() 1")
+        with self._session as s:
+            print("OAuth2Service.executeRequest() 2")
+            response = executeRequest(self._ctx, s, parameter, self.Timeout)
+        print("OAuth2Service.executeRequest() 3")
         return response
 
     def getRequest(self, parameter, parser):
