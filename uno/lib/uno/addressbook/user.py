@@ -58,6 +58,8 @@ class User(unohelper.Base,
     def __init__(self, ctx, database, provider, name, password=''):
         self._ctx = ctx
         self.Fields = database.getUserFields()
+        #url = 'gcontact:request'
+        #executeDispatch(ctx, url)
         self.Request = getRequest(ctx, provider.Host, name)
         self.MetaData = database.selectUser(name)
         if self._isNew():
@@ -94,7 +96,6 @@ class User(unohelper.Base,
             raise self._getSqlException(1003, 1105, '_getMetaData', g_oauth2)
         if provider.isOffLine():
             raise self._getSqlException(1004, 1108, '_getMetaData', name)
-        # TODO: Remove Fields parameter
         data = provider.getUser(self.Request, self.Fields)
         if not data.IsPresent:
             raise self._getSqlException(1006, 1107, '_getMetaData', name)

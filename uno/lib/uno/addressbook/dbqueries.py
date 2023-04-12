@@ -318,13 +318,14 @@ GRANT SELECT ON "%(Schema)s"."%(Name)s" TO "%(User)s";
         query = 'SELECT %s FROM %s WHERE %s ORDER BY "TableId","LabelId","TypeId"' % p
 
     elif name == 'getFieldNames':
-        query = '''\
-SELECT "Fields"."Name" FROM "Fields" 
-  INNER JOIN "Tables" ON "Fields"."Table"='Tables' AND "Fields"."Column"="Tables"."Table" 
-  WHERE "Tables"."View"=TRUE 
-UNION 
-SELECT "Fields"."Name" FROM "Fields" 
-  WHERE "Fields"."Table"='Loop' AND "Fields"."Column"=1;'''
+        s = '"Fields"."Name"'
+        f1 = '"Fields"'
+        f2 = 'JOIN "Tables" ON "Fields"."Table"=%s AND "Fields"."Column"="Tables"."Table"'
+        f = (f1, f2 % "'Tables'")
+        w1 = '"Tables"."View"=TRUE'
+        w2 = '"Fields"."Table"=%s AND "Fields"."Column"=1' % "'Loop'"
+        p = (s, ' '.join(f), w1, s, f1, w2)
+        query = 'SELECT %s FROM %s WHERE %s UNION SELECT %s FROM %s WHERE %s' % p
 
     elif name == 'getDefaultType':
         s1 = '"Tables"."Name" AS "Table"'
