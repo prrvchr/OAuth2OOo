@@ -119,6 +119,9 @@ class RequestResponse(unohelper.Base,
     def close(self):
         self._response.close()
 
+    def hasHeader(self, key):
+        return key in self._response.headers
+
     def getHeader(self, key):
         return self._response.headers.get(key, '')
 
