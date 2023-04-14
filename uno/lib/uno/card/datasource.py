@@ -46,7 +46,7 @@ from .user import User
 from .user import getUserUri
 
 from .addressbook import AddressBook
-
+from .provider import Provider
 from .replicator import Replicator
 
 from .listener import EventListener
@@ -69,7 +69,8 @@ class DataSource(unohelper.Base):
         self._users = {}
         self._listener = EventListener(self)
         self._database = DataBase(ctx)
-        self._replicator = Replicator(ctx, self._database, self._users)
+        self._provider = Provider(ctx)
+        self._replicator = Replicator(ctx, self._database, self._provider, self._users)
         listener = TerminateListener(self._replicator)
         getDesktop(ctx).addTerminateListener(listener)
 
@@ -92,12 +93,13 @@ class DataSource(unohelper.Base):
             name = self._maps.get(uri)
             user = self._users.get(name)
         else:
-            user = User(self._ctx, self._database, scheme, server, account, password)
+            user = User(self._ctx, self._database, self._provider, scheme, server, account, password)
             name = user.getName()
             self._users[name] = user
             self._maps[uri] = name
         print("DataSource.getConnection () 2")
-        user.initAddressbooks(self._database)
+        if user.isOnLine():
+            self._provider.initAddressbooks(self._database, user)
         print("DataSource.getConnection () 3")
         connection = self._database.getConnection(name, user.getPassword())
         print("DataSource.getConnection () 4")

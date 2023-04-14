@@ -33,14 +33,15 @@ from .configuration import g_defaultlog
 from .configuration import g_scheme
 from .configuration import g_host
 
-from .options import OptionsManager
+from .datasource import DataSource
 
 from .logger import getLogger
 
-from .datasource import DataSource
+from .options import OptionsManager
 
 from .dbtool import getDriverPropertyInfos
-from .dbtool import getSqlException
+
+from .providerbase import getSqlException
 
 from .unotool import createMessageBox
 from .unotool import createService

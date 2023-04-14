@@ -30,22 +30,12 @@
 import uno
 import unohelper
 
-from com.sun.star.util import XCancellable
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from .unolib import KeyMap
-
-from .unotool import executeDispatch
 from .unotool import getConfiguration
-from .unotool import getDateTime
-from .unotool import getPropertyValueSet
-
-from .database import DataBase
-from .addressbook import AddressBook
 
 from .configuration import g_identifier
-from .configuration import g_filter
 from .configuration import g_synclog
 
 from .logger import getLogger
@@ -53,15 +43,14 @@ g_basename = 'Replicator'
 
 from threading import Thread
 from threading import Event
-from threading import Condition
 import traceback
 
 
 class Replicator(unohelper.Base):
-    def __init__(self, ctx, database, users):
+    def __init__(self, ctx, database, provider, users):
         self._ctx = ctx
-        self._cardsync = '%s.CardSync' % g_identifier
         self._database = database
+        self._provider = provider
         self._users = users
         self._started = Event()
         self._paused = Event()
@@ -113,10 +102,9 @@ class Replicator(unohelper.Base):
                     total = dltd + mdfd
                     if total > 0:
                         print("replicator.run()4 synchronize started CardSync.jar")
-                        url = 'vnd.sun.star.job:service=%s' % self._cardsync
-                        arguments = getPropertyValueSet({'Connection': self._database.Connection})
-                        executeDispatch(self._ctx, url, arguments)
+                        self._provider.parseCard(self._database.Connection)
                         print("replicator.run()5 synchronize ended CardSync.jar")
+                        self._database.syncGroups()
                     self._database.dispose()
                     logger.logprb(INFO, 'Replicator', '_replicate()', 101, total, mdfd, dltd)
                     print("replicator.run()6 synchronize ended query=%s modified=%s deleted=%s *******************************************" % (total, mdfd, dltd))
@@ -148,33 +136,14 @@ class Replicator(unohelper.Base):
 
     def _syncUser(self, logger, user, dltd, mdfd):
         for addressbook in user.getAddressbooks():
-            print("Replicator._syncUser() AddressBook Name: %s - Path: %s" % (addressbook.Name, addressbook.Path))
+            print("Replicator._syncUser() AddressBook Name: %s - Path: %s" % (addressbook.Name, addressbook.Uri))
         for addressbook in user.getAddressbooks():
             if self._canceled():
                 break
             if addressbook.isNew():
-                print("Replicator._syncUser() New AddressBook Path: %s" % addressbook.Path)
-                mdfd += user.firstCardPull(self._database, addressbook)
+                print("Replicator._syncUser() New AddressBook Path: %s" % addressbook.Uri)
+                mdfd += self._provider.firstPullCard(self._database, user, addressbook)
             elif not self._canceled():
-                dltd, mdfd = self._pullModifiedCard(user, addressbook, dltd, mdfd)
-        self._database.syncGroups(user)
-        return dltd, mdfd
-
-    def _pullModifiedCard(self, user, addressbook, dltd, mdfd):
-        if addressbook.Token is not None:
-            dltd, mdfd = self._pullCardByToken(user, addressbook, dltd, mdfd)
-        elif addressbook.Tag is not None:
-            dltd, mdfd = self._pullCardByTag(user, addressbook, dltd, mdfd)
-        else:
-            print("Replicator._pullModifiedCard() Error %s" % (addressbook.Name, ))
-        return dltd, mdfd
-
-    def _pullCardByToken(self, user, addressbook, dltd, mdfd):
-        dltd, mdfd = user.pullCardByToken(self._database, addressbook, dltd, mdfd)
-        print("Replicator._pullCardByToken() AddresBook: %s - Deleted: %s - Modified: %s" % (addressbook.Name, dltd, mdfd))
-        return dltd, mdfd
-
-    def _pullCardByTag(self, user, addressbook, dltd, mdfd):
-        print("Replicator._pullModifiedCardByTag() %s" % (addressbook.Name, ))
+                dltd, mdfd = self._provider.pullCard(self._database, user, addressbook, dltd, mdfd)
         return dltd, mdfd
 

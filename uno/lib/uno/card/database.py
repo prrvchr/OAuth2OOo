@@ -240,11 +240,22 @@ class DataBase(unohelper.Base):
             self._initUserAddressbookView(user, data)
         self._updateAddressbook(stop)
 
-    def syncGroups(self, user):
+    def insertGroups(self, user, iterator):
+        call = self._getCall('insertGroup')
+        call.setInt(1, user.Id)
+        for uri, name in iterator:
+            call.setString(2, uri)
+            call.setString(3, name)
+            call.execute()
+            gid = call.getInt(4)
+            yield {'Query': 'Inserted', 'Group': gid, 'Schema': user.getSchema(), 'Name': name}
+        call.close()
+
+    def syncGroups(self):
         start = self._getLastGroupSync()
         stop = currentDateTimeInTZ()
-        for data in self._selectChangedGroups(user.Id, start, stop):
-            self._initUserGroupView(user, data)
+        for data in self._selectChangedGroups(start, stop):
+            self.initUserGroupView(data)
         self._updateGroup(stop)
 
     def _selectChangedAddressbooks(self, userid, start, stop):
@@ -279,13 +290,12 @@ class DataBase(unohelper.Base):
         call.close()
         return start
 
-    def _selectChangedGroups(self, userid, start, stop):
+    def _selectChangedGroups(self, start, stop):
         print("DataBase._selectChangedGroups() 1")
         groups = []
         call = self._getCall('selectChangedGroups')
-        call.setInt(1, userid)
-        call.setObject(2, start)
-        call.setObject(3, stop)
+        call.setObject(1, start)
+        call.setObject(2, stop)
         result = call.executeQuery()
         while result.next():
             groups.append(getDataFromResult(result))
@@ -315,10 +325,9 @@ class DataBase(unohelper.Base):
             self._createUserView(statement, 'createAddressbookView', format)
         statement.close()
 
-    def _initUserGroupView(self, user, format):
+    def initUserGroupView(self, format):
         statement = self.Connection.createStatement()
         query = format.get('Query')
-        format['Schema'] = user.getSchema()
         format['Public'] = 'PUBLIC'
         format['View'] = g_cardview
         format['Bookmark'] = g_bookmark
@@ -357,14 +366,15 @@ class DataBase(unohelper.Base):
         call.close()
         return addressbook
 
-    def insertUser(self, scheme, server, path, name, addressbook=None):
+    def insertUser(self, uri, scheme, server, path, name, addressbook=None):
         user = None
         call = self._getCall('insertUser')
-        call.setString(1, scheme)
-        call.setString(2, server)
-        call.setString(3, path)
-        call.setString(4, name)
-        call.setString(5, addressbook) if addressbook is not None else call.setNull(5, VARCHAR)
+        call.setString(1, uri)
+        call.setString(2, scheme)
+        call.setString(3, server)
+        call.setString(4, path)
+        call.setString(5, name)
+        call.setString(6, addressbook) if addressbook is not None else call.setNull(6, VARCHAR)
         result = call.executeQuery()
         if result.next():
             user = getKeyMapFromResult(result)
@@ -402,7 +412,7 @@ class DataBase(unohelper.Base):
     def mergeCard(self, aid, iterator):
         count = 0
         self._setBatchModeOn()
-        call = self._getBatchedCall('mergeCard')
+        call = self._getCall('mergeCard')
         call.setInt(1, aid)
         for url, etag, data in iterator:
             call.setString(2, url)
@@ -410,7 +420,9 @@ class DataBase(unohelper.Base):
             call.setString(4, data)
             call.addBatch()
             count += 1
-        self._executeBatchCall()
+        if count:
+            call.executeBatch()
+        call.close()
         self.Connection.commit()
         self._setBatchModeOff()
         return count
