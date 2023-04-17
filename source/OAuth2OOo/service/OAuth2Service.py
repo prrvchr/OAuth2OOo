@@ -56,35 +56,28 @@ from com.sun.star.auth import OAuth2Request
 
 from oauth2 import KeyMap
 
-from oauth2 import createService
 from oauth2 import execute
-from oauth2 import executeRequest
 from oauth2 import getAccessToken
 from oauth2 import getParentWindow
 from oauth2 import getSessionMode
 from oauth2 import showOAuth2Wizard
 
-from oauth2 import Request
-from oauth2 import Response
-from oauth2 import Enumeration
-from oauth2 import Enumerator
-from oauth2 import Iterator
+from oauth2 import RequestParameter
 from oauth2 import InputStream
-from oauth2 import Uploader
+
+from oauth2 import getSimpleFile
+from oauth2 import upload
 
 from oauth2 import getLogger
 
-from oauth2 import g_identifier
 from oauth2 import g_oauth2
 from oauth2 import g_defaultlog
 from oauth2 import g_basename
 
 from oauth2 import OAuth2Model
 from oauth2 import OAuth2OOo
-from oauth2 import NoOAuth2
 
 import requests
-import time
 import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
@@ -102,9 +95,8 @@ class OAuth2Service(unohelper.Base,
         self._model = OAuth2Model(ctx, True)
         self._session = self._getSession()
         self._listeners = []
-        self._warnings = []
         self._mode = OFFLINE
-        self._logger = getLogger(ctx, g_defaultlog)
+        self._logger = getLogger(ctx, g_defaultlog, g_basename)
 
     @property
     def ResourceUrl(self):
@@ -120,13 +112,6 @@ class OAuth2Service(unohelper.Base,
         return self._model.Timeout
 
     # XOAuth2Service
-    def getWarnings(self):
-        if self._warnings:
-            return self._warnings.pop(0)
-        return None
-    def clearWarnings(self):
-        self._warnings = []
-
     def isOnLine(self):
         return self._mode != OFFLINE
     def isOffLine(self, host):
@@ -171,58 +156,32 @@ class OAuth2Service(unohelper.Base,
             token = format % token
         return token
 
-    def execute(self, parameter):
-        with self._session as s:
-            response = execute(self._ctx, s, parameter, self.Timeout)
-        return response
+    def getRequestParameter(self, name):
+        return RequestParameter(self._ctx, name)
 
-    def executeRequest(self, parameter):
+    def execute(self, parameter):
         print("OAuth2Service.executeRequest() 1")
         with self._session as s:
             print("OAuth2Service.executeRequest() 2")
-            response = executeRequest(self._ctx, s, parameter, self.Timeout)
+            response = execute(self._ctx, s, parameter, self.Timeout)
         print("OAuth2Service.executeRequest() 3")
         return response
 
-    def getRequest(self, parameter, parser):
-        return Request(self._ctx, self._session, parameter, self.Timeout, parser)
+    def getInputStream(self, parameter, chunk, decode):
+        return InputStream(self._session, parameter, self.Timeout, chunk, decode)
 
-    def getResponse(self, parameter, parser):
-        return Response(self._session, parameter, self.Timeout, parser)
-
-    def getIterator(self, parameter, parser):
-        return Iterator(self._ctx, self._session, self.Timeout, parameter, parser)
-
-    def getEnumeration(self, parameter, parser):
-        return Enumeration(self._ctx, self._session, parameter, self.Timeout, parser)
-
-    def getEnumerator(self, parameter):
-        return Enumerator(self._ctx, self._session, parameter, self.Timeout)
-
-    def getInputStream(self, parameter, chunk, buffer):
-        return InputStream(self._ctx, self._session, parameter, chunk, buffer, self.Timeout)
-
-    def getUploader(self, chunk, url, user):
-        return Uploader(self._ctx, self._session, chunk, url, user.callBack, self.Timeout)
+    def upload(self, parameter, url):
+        sf = getSimpleFile(self._ctx)
+        if not sf.exists(url):
+            return
+        stream = sf.openFileRead(url)
+        upload(self._session, parameter, stream, self.Timeout)
 
     def _getSession(self):
         session = requests.Session()
         session.auth = OAuth2OOo(self)
         session.codes = requests.codes
         return session
-
-    def _getToolkit(self):
-        return createService(self._ctx, 'com.sun.star.awt.Toolkit')
-
-    def _isDocument(self, frame):
-        controller = frame.getController()
-        return controller.getModel() is not None
-
-    def _getException(self, message):
-        error = UnoException()
-        error.Message = message
-        error.Context = self
-        return error
 
     # XComponent
     def dispose(self):

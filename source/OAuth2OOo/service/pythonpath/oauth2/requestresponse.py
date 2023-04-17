@@ -203,7 +203,7 @@ class RequestIterator(unohelper.Base,
         self._end = object()
         # FIXME: In order to be able to respond to the hasMoreElements()
         # FIXME: method, I need to be one element ahead...
-        self._next = self._getNextElement()
+        self._next = self._nextElement()
 
     #XEnumeration
     def hasMoreElements(self):
@@ -212,11 +212,11 @@ class RequestIterator(unohelper.Base,
         if not self.hasMoreElements():
             raise NoSuchElementException('Error: no more elements exist', self)
         element = self._next if self._decode else uno.ByteSequence(self._next)
-        self._next = self._getNextElement()
+        self._next = self._nextElement()
         return element
 
     # Private methods
-    def _getNextElement(self):
+    def _nextElement(self):
         try:
             return next(self._iterator)
         except StopIteration:

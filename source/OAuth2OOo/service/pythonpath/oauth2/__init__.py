@@ -41,6 +41,7 @@ from .unotool import createService
 from .unotool import getDialog
 from .unotool import getParentWindow
 from .unotool import getStringResource
+from .unotool import getSimpleFile
 
 from .dialog import UserHandler
 from .dialog import UserView
@@ -49,16 +50,13 @@ from .logger import getLogger
 
 from .oauth2model import OAuth2Model
 
-from .request import Response
-from .request import Request
-from .request import Enumeration
-from .request import Enumerator
-from .request import Iterator
 from .request import InputStream
-from .request import Uploader
+
 from .request import getSessionMode
 from .request import execute
-from .request import executeRequest
+from .request import upload
+
+from .requestparameter import RequestParameter
 
 from .oauth2 import OAuth2OOo
 from .oauth2 import NoOAuth2
