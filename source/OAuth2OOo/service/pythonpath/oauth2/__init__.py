@@ -50,11 +50,12 @@ from .logger import getLogger
 
 from .oauth2model import OAuth2Model
 
-from .request import InputStream
-
+from .request import download
+from .request import getInputStream
 from .request import getSessionMode
-from .request import execute
 from .request import upload
+
+from .requestresponse import getRequestResponse
 
 from .requestparameter import RequestParameter
 

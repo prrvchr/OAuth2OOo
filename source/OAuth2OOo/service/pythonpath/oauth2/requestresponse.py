@@ -39,10 +39,22 @@ from com.sun.star.io import XSeekableInputStream
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
+from com.sun.star.rest.ParameterType import QUERY
+from com.sun.star.rest.ParameterType import JSON
+from com.sun.star.rest.ParameterType import HEADER
+
+from com.sun.star.rest import ConnectionException
+from com.sun.star.rest import ConnectTimeoutException
 from com.sun.star.rest import HTTPException
 from com.sun.star.rest import JSONDecodeException
+from com.sun.star.rest import ReadTimeoutException
+from com.sun.star.rest import RequestException
+from com.sun.star.rest import TooManyRedirectsException
+from com.sun.star.rest import URLRequiredException
 
 from com.sun.star.rest import XRequestResponse
+
+from .oauth2 import NoOAuth2
 
 from .unolib import KeyMap
 
@@ -53,8 +65,60 @@ g_basename = 'request'
 
 from requests.exceptions import HTTPError
 from requests.exceptions import JSONDecodeError
+from requests.exceptions import URLRequired
+from requests.exceptions import ConnectTimeout
+from requests.exceptions import ReadTimeout
+from requests.exceptions import ConnectionError
+from requests.exceptions import TooManyRedirects
+from requests.exceptions import RequestException as RequestError
+import json
 import traceback
 
+
+def execute(ctx, session, parameter, timeout, stream=False):
+    try:
+        print("Request.executeRequest() 1")
+        kwargs = _getKeyWordArguments(parameter, stream)
+        print("Request.executeRequest() 2")
+        return session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
+    except URLRequired as e:
+        error = URLRequiredException()
+        error.Url = parameter.Url
+        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 101, error.Url)
+        raise error
+    except ConnectTimeout as e:
+        error = ConnectTimeoutException()
+        error.Url = parameter.Url
+        connect, read = timeout
+        error.ConnectTimeout = connect
+        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 102, error.ConnectTimeout, error.Url)
+        raise error
+    except ReadTimeout as e:
+        error = ReadTimeoutException()
+        error.Url = parameter.Url
+        connect, read = timeout
+        error.ReadTimeout = read
+        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 103, error.ReadTimeout, error.Url)
+        raise error
+    except ConnectionError as e:
+        error = ConnectionException()
+        error.Url = parameter.Url
+        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 104, error.Url)
+        raise error
+    except TooManyRedirects as e:
+        error = TooManyRedirectsException()
+        error.Url = parameter.Url
+        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 106, error.Url)
+        raise error
+    except RequestError as e:
+        error = RequestException()
+        error.Url = parameter.Url
+        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 108, error.Url)
+        raise error
+
+def getRequestResponse(ctx, session, parameter, timeout):
+    response = execute(ctx, session, parameter, timeout)
+    return RequestResponse(ctx, parameter, response)
 
 class RequestResponse(unohelper.Base,
                       XRequestResponse):
@@ -113,8 +177,8 @@ class RequestResponse(unohelper.Base,
     def Elapsed(self):
         return self._response.elapsed
     @property
-    def Raw(self):
-        return RequestInputStream(self._response)
+    def DataSink(self):
+        return InputStream(self._response)
 
     def close(self):
         self._response.close()
@@ -132,7 +196,7 @@ class RequestResponse(unohelper.Base,
             error = JSONDecodeException()
             error.Url = e.response.url
             error.Content = e.response.text
-            error.Message = getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 107, error.Url)
+            error.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 107, error.Url)
             raise error
 
     def jsonWithParser(self, parser):
@@ -142,7 +206,7 @@ class RequestResponse(unohelper.Base,
             error = JSONDecodeException()
             error.Url = e.response.url
             error.Content = e.response.text
-            error.Message = getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 107, error.Url)
+            error.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 107, error.Url)
             raise error
 
     def raiseForStatus(self):
@@ -153,24 +217,26 @@ class RequestResponse(unohelper.Base,
             error.Url = e.response.url
             error.StatusCode = e.response.status_code
             error.Content = e.response.text
-            error.Message = getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 105, error.Url, error.StatusCode)
+            error.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 105, error.Url, error.StatusCode)
             raise error
 
     def iterContent(self, length, decode):
         chunk = length if length > 0 else None
-        return RequestIterator(self._response.iter_content(chunk, decode), decode)
+        return Enumerator(self._response.iter_content(chunk, decode), decode)
 
     def iterLines(self, length, decode, separator):
         chunk = length if length > 0 else None
         delimiter = separator if separator != '' else None
-        return RequestIterator(self._response.iter_lines(chunk, decode, delimiter), decode)
+        return Enumerator(self._response.iter_lines(chunk, decode, delimiter), decode)
 
-
-class RequestInputStream(unohelper.Base,
-                         XInputStream):
+class InputStream(unohelper.Base,
+                  XInputStream):
     def __init__(self, response):
+        self._response = response
         self._input = response.raw
-        self._length = int(response.header.get('ContentLength', 0))
+        self._input.seek(0, 2)
+        self._length = self._input.tell()
+        self._input.seek(0)
 
     #XInputStream
     def readBytes(self, sequence, length):
@@ -185,6 +251,7 @@ class RequestInputStream(unohelper.Base,
         return max(available, 0)
     def closeInput(self):
         self._input.close()
+        self._response.close
 
     #XSeekable
     def seek(self, location):
@@ -194,36 +261,91 @@ class RequestInputStream(unohelper.Base,
     def getLength(self):
         return self._length
 
-
-class RequestIterator(unohelper.Base,
-                      XEnumeration):
+class Enumerator(unohelper.Base,
+                 XEnumeration):
     def __init__(self, iterator, decode):
         self._iterator = iterator
         self._decode = decode
-        self._end = object()
+        self._stopped = False
         # FIXME: In order to be able to respond to the hasMoreElements()
         # FIXME: method, I need to be one element ahead...
-        self._next = self._nextElement()
+        self._buffer = self._nextElement()
 
     #XEnumeration
     def hasMoreElements(self):
-        return self._next != self._end
+        return not self._stopped
     def nextElement(self):
-        if not self.hasMoreElements():
+        if self._stopped:
             raise NoSuchElementException('Error: no more elements exist', self)
-        element = self._next if self._decode else uno.ByteSequence(self._next)
-        self._next = self._nextElement()
-        return element
+        buffer = self._buffer if self._decode else uno.ByteSequence(self._buffer)
+        self._buffer = self._nextElement()
+        return buffer
 
     # Private methods
     def _nextElement(self):
         try:
             return next(self._iterator)
         except StopIteration:
-            return self._end
+            self._stopped = True
+            return None
 
+class FileLike():
+    def __init__(self, input):
+        self._input = input
 
-def getExceptionMessage(ctx, clazz, method, resource, *args):
+    # Python FileLike Object
+    def read(self, length):
+        length, sequence = self._input.readBytes(None, length)
+        return sequence.value
+
+    def close(self):
+        self._input.closeInput()
+
+    def seek(self, offset, whence=0):
+        if whence == 1:
+            offset = self._input.getPosition() + offset
+        elif whence == 2:
+            offset = self._input.getLength() - offset
+        self._input.seek(offset)
+
+    def tell(self):
+        return self._input.getPosition()
+
+# Private method
+def _getKeyWordArguments(parameter, stream):
+    kwargs = {}
+    if parameter.Headers:
+        data = json.loads(parameter.Headers)
+        if parameter.PageType == HEADER:
+            data.update({parameter.PageKey: parameter.PageValue})
+        kwargs['headers'] = data
+    if parameter.Query:
+        data = json.loads(parameter.Query)
+        if parameter.PageType == QUERY:
+            data.update({parameter.PageKey: parameter.PageValue})
+        kwargs['params'] = data
+    if parameter.Data:
+        kwargs['data'] = parameter.Data
+    elif parameter.Json:
+        data = json.loads(parameter.Json)
+        if parameter.PageType == JSON:
+            data.update({parameter.PageKey: parameter.PageValue})
+        kwargs['json'] = data
+    elif parameter.DataSink:
+        kwargs['data'] = FileLike(parameter.DataSink)
+    if parameter.NoAuth:
+        kwargs['auth'] = NoOAuth2()
+    elif parameter.Auth:
+        kwargs['auth'] = parameter.Auth
+    if parameter.NoRedirect:
+        kwargs['allow_redirects'] = False
+    if parameter.NoVerify:
+        kwargs['verify'] = False
+    if parameter.Stream or stream:
+        kwargs['stream'] = True
+    return kwargs
+
+def _getExceptionMessage(ctx, clazz, method, resource, *args):
     logger = getLogger(ctx, g_errorlog, g_basename)
     message = logger.resolveString(resource, *args)
     logger.logp(SEVERE, clazz, method, message)

@@ -56,16 +56,17 @@ from com.sun.star.auth import OAuth2Request
 
 from oauth2 import KeyMap
 
-from oauth2 import execute
 from oauth2 import getAccessToken
 from oauth2 import getParentWindow
 from oauth2 import getSessionMode
 from oauth2 import showOAuth2Wizard
 
 from oauth2 import RequestParameter
-from oauth2 import InputStream
 
+from oauth2 import getRequestResponse
+from oauth2 import getInputStream
 from oauth2 import getSimpleFile
+from oauth2 import download
 from oauth2 import upload
 
 from oauth2 import getLogger
@@ -161,22 +162,18 @@ class OAuth2Service(unohelper.Base,
 
     def execute(self, parameter):
         print("OAuth2Service.executeRequest() 1")
-        with self._session as s:
-            print("OAuth2Service.executeRequest() 2")
-            response = execute(self._ctx, s, parameter, self.Timeout)
-        print("OAuth2Service.executeRequest() 3")
-        return response
+        return getRequestResponse(self._ctx, self._session, parameter, self.Timeout)
 
     def getInputStream(self, parameter, chunk, decode):
-        return InputStream(self._session, parameter, self.Timeout, chunk, decode)
+        return getInputStream(self._session, parameter, self.Timeout, chunk, decode)
+
+    def download(self, parameter, url, chunk, retry, delay):
+        return download(self._ctx, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
     def upload(self, parameter, url):
-        sf = getSimpleFile(self._ctx)
-        if not sf.exists(url):
-            return
-        stream = sf.openFileRead(url)
-        upload(self._session, parameter, stream, self.Timeout)
+        return upload(self._ctx, self._session, parameter, url, self.Timeout)
 
+    # Private method
     def _getSession(self):
         session = requests.Session()
         session.auth = OAuth2OOo(self)

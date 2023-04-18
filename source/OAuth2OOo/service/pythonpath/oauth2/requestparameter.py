@@ -39,6 +39,7 @@ from com.sun.star.rest.ParameterType import HEADER
 
 from com.sun.star.rest import XRequestParameter
 
+import json
 import traceback
 
 
@@ -178,18 +179,14 @@ class RequestParameter(unohelper.Base,
         self._value = value
         self._type = parameter
 
-    def updateHeaders(self, key, value):
-        pass
+    def setHeader(self, key, value):
+        headers = json.loads(self._headers or '{}')
+        headers[key] = value
+        self._headers = json.dump(headers)
 
     def _hasNextPage(self):
         if self._type != NONE:
             return self._value is not None and self._key is not None
         else:
             return self._count == 0
-
-def getExceptionMessage(ctx, clazz, method, resource, *args):
-    logger = getLogger(ctx, g_errorlog, g_basename)
-    message = logger.resolveString(resource, *args)
-    logger.logp(SEVERE, clazz, method, message)
-    return message
 
