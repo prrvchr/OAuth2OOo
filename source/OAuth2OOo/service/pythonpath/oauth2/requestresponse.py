@@ -315,23 +315,26 @@ class FileLike():
 # Private method
 def _getRequestArguments(parameter, stream):
     kwargs = {}
+    # FIXME: It is necessary to be able to manage nextPage
+    # FIXME: tokens and sync token present in various XML/JSON APIs
     nextpage = parameter.PageType
+    nextdata = {parameter.PageKey: parameter.PageValue}
     if parameter.Headers:
         data = json.loads(parameter.Headers)
         if nextpage == HEADER:
-            data.update({parameter.PageKey: parameter.PageValue})
+            data.update(nextdata)
         kwargs['headers'] = data
     if parameter.Query and nextpage != REDIRECT:
         data = json.loads(parameter.Query)
         if nextpage == QUERY:
-            data.update({parameter.PageKey: parameter.PageValue})
+            data.update(nextdata)
         kwargs['params'] = data
     if parameter.Data:
         kwargs['data'] = parameter.Data
     elif parameter.Json:
         data = json.loads(parameter.Json)
         if nextpage == JSON:
-            data.update({parameter.PageKey: parameter.PageValue})
+            data.update(nextdata)
         kwargs['json'] = data
     elif parameter.DataSink:
         kwargs['data'] = FileLike(parameter.DataSink)
