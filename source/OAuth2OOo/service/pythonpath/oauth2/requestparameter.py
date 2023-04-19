@@ -39,6 +39,8 @@ from com.sun.star.rest.ParameterType import HEADER
 
 from com.sun.star.rest import XRequestParameter
 
+from .oauth2 import NoOAuth2
+
 import json
 import traceback
 
@@ -50,15 +52,15 @@ class RequestParameter(unohelper.Base,
         self._name = name
         self._method = 'GET'
         self._url = ''
-        self._headers = ''
-        self._query = ''
+        self._headers = {}
+        self._query = {}
+        self._json = {}
         self._data = ''
-        self._json = ''
         self._datasink = None
         self._noauth = False
         self._auth = ()
-        self._redirect = False
-        self._verify = False
+        self._noredirect = False
+        self._noverify = False
         self._stream = False
         self._token = ''
         self._count = 0
@@ -77,34 +79,36 @@ class RequestParameter(unohelper.Base,
         self._method = method
     @property
     def Url(self):
-        return self._value if self._type == URL else self._url
+        if self._type == URL or self._type == REDIRECT:
+            return self._value
+        return self._url
     @Url.setter
     def Url(self, url):
         self._url = url
     @property
     def Headers(self):
-        return self._headers
+        return json.dump(self._headers)
     @Headers.setter
     def Headers(self, headers):
-        self._headers = headers
+        self._headers = json.loads(headers)
     @property
     def Query(self):
-        return self._query
+        return json.dump(self._query)
     @Query.setter
     def Query(self, query):
-        self._query = query
+        self._query = json.loads(query)
+    @property
+    def Json(self):
+        return json.dump(self._json)
+    @Json.setter
+    def Json(self, data):
+        self._json = json.loads(data)
     @property
     def Data(self):
         return self._data
     @Data.setter
     def Data(self, data):
         self._data = data
-    @property
-    def Json(self):
-        return self._json
-    @Json.setter
-    def Json(self, data):
-        self._json = data
     @property
     def DataSink(self):
         return self._datasink
@@ -125,16 +129,16 @@ class RequestParameter(unohelper.Base,
         self._auth = auth
     @property
     def NoRedirect(self):
-        return self._redirect
+        return self._noredirect
     @NoRedirect.setter
     def NoRedirect(self, state):
-        self._redirect = state
+        self._noredirect = state
     @property
     def NoVerify(self):
-        return self._verify
+        return self._noverify
     @NoVerify.setter
     def NoVerify(self, state):
-        self._verify = state
+        self._noverify = state
     @property
     def Stream(self):
         return self._stream
@@ -180,13 +184,70 @@ class RequestParameter(unohelper.Base,
         self._type = parameter
 
     def setHeader(self, key, value):
-        headers = json.loads(self._headers or '{}')
-        headers[key] = value
-        self._headers = json.dump(headers)
+        self._headers[key] = value
+
+    def toJson(self, stream):
+        # FIXME: It is necessary to be able to manage nextPage
+        # FIXME: tokens and sync token present in various XML/JSON APIs
+        kwargs = {}
+        nextdata = {self._key: self._value}
+        if self._headers:
+            data = self._headers
+            if self._type == HEADER:
+                data.update(nextdata)
+            kwargs['headers'] = data
+        if self._query and self._type != REDIRECT:
+            data = self._query
+            if self._type == QUERY:
+                data.update(nextdata)
+            kwargs['params'] = data
+        if self._data:
+            kwargs['data'] = self._data
+        elif self._json:
+            data = self._json
+            if self._type == JSON:
+                data.update(nextdata)
+            kwargs['json'] = data
+        elif self._datasink:
+            kwargs['data'] = FileLike(self._datasink)
+        if self._noauth:
+            kwargs['auth'] = NoOAuth2()
+        elif self._auth:
+            kwargs['auth'] = self._auth
+        if self._noredirect:
+            kwargs['allow_redirects'] = False
+        if self._noverify:
+            kwargs['verify'] = False
+        if self._stream or stream:
+            kwargs['stream'] = True
+        return json.dump(kwargs)
 
     def _hasNextPage(self):
         if self._type != NONE:
             return self._value is not None and self._key is not None
         else:
             return self._count == 0
+
+
+class FileLike():
+    def __init__(self, input):
+        self._input = input
+
+    # Python FileLike Object
+    def read(self, length):
+        length, sequence = self._input.readBytes(None, length)
+        return sequence.value
+
+    def close(self):
+        self._input.closeInput()
+
+    def seek(self, offset, whence=0):
+        if whence == 1:
+            offset = self._input.getPosition() + offset
+        elif whence == 2:
+            offset = self._input.getLength() - offset
+        self._input.seek(offset)
+
+    def tell(self):
+        return self._input.getPosition()
 

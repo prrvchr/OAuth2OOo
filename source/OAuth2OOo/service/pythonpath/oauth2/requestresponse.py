@@ -48,15 +48,12 @@ from com.sun.star.rest.ParameterType import REDIRECT
 from com.sun.star.rest import ConnectionException
 from com.sun.star.rest import ConnectTimeoutException
 from com.sun.star.rest import HTTPException
-from com.sun.star.rest import JSONDecodeException
 from com.sun.star.rest import ReadTimeoutException
 from com.sun.star.rest import RequestException
 from com.sun.star.rest import TooManyRedirectsException
 from com.sun.star.rest import URLRequiredException
 
 from com.sun.star.rest import XRequestResponse
-
-from .oauth2 import NoOAuth2
 
 from .unolib import KeyMap
 
@@ -66,7 +63,6 @@ from .configuration import g_errorlog
 g_basename = 'request'
 
 from requests.exceptions import HTTPError
-from requests.exceptions import JSONDecodeError
 from requests.exceptions import URLRequired
 from requests.exceptions import ConnectTimeout
 from requests.exceptions import ReadTimeout
@@ -79,44 +75,48 @@ import traceback
 
 def execute(ctx, session, parameter, timeout, stream=False):
     try:
+        response = None
+        clazz, method = 'OAuth2Service', 'execute()'
         print("Request.executeRequest() 1")
-        url, kwargs = _getRequestArguments(parameter, stream)
+        kwargs = json.loads(parameter.toJson(stream))
         print("Request.executeRequest() 2")
-        return session.request(parameter.Method, url, timeout=timeout, **kwargs)
+        response = session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
     except URLRequired as e:
         error = URLRequiredException()
         error.Url = parameter.Url
-        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 101, error.Url)
+        error.Message = _getExceptionMessage(ctx, clazz, method, 101, parameter.Name, error.Url)
         raise error
     except ConnectTimeout as e:
         error = ConnectTimeoutException()
         error.Url = parameter.Url
         connect, read = timeout
         error.ConnectTimeout = connect
-        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 102, error.ConnectTimeout, error.Url)
+        error.Message = _getExceptionMessage(ctx, clazz, method, 102, error.ConnectTimeout, parameter.Name, error.Url)
         raise error
     except ReadTimeout as e:
         error = ReadTimeoutException()
         error.Url = parameter.Url
         connect, read = timeout
         error.ReadTimeout = read
-        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 103, error.ReadTimeout, error.Url)
+        error.Message = _getExceptionMessage(ctx, clazz, method, 103, error.ReadTimeout, parameter.Name, error.Url)
         raise error
     except ConnectionError as e:
         error = ConnectionException()
         error.Url = parameter.Url
-        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 104, error.Url)
+        error.Message = _getExceptionMessage(ctx, clazz, method, 104, parameter.Name, error.Url)
         raise error
     except TooManyRedirects as e:
         error = TooManyRedirectsException()
         error.Url = parameter.Url
-        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 106, error.Url)
+        error.Message = _getExceptionMessage(ctx, clazz, method, 106, parameter.Name, error.Url)
         raise error
     except RequestError as e:
         error = RequestException()
         error.Url = parameter.Url
-        error.Message = _getExceptionMessage(ctx, 'OAuth2Service', 'execute()', 108, error.Url)
+        text = '' if response is None else response.Text
+        error.Message = _getExceptionMessage(ctx, clazz, method, 107, parameter.Name, error.Url, text)
         raise error
+    return response
 
 def getRequestResponse(ctx, session, parameter, timeout):
     response = execute(ctx, session, parameter, timeout)
@@ -162,7 +162,7 @@ class RequestResponse(unohelper.Base,
         return uno.ByteSequence(self._response.content)
     @property
     def Headers(self):
-        return KeyMap(**self._response.headers)
+        return json.dump(self._response.headers)
     @property
     def History(self):
         return tuple(ResquestResponse(self._ctx, self._parameter, r) for r in self._response.history)
@@ -191,26 +191,6 @@ class RequestResponse(unohelper.Base,
     def getHeader(self, key):
         return self._response.headers.get(key, '')
 
-    def json(self):
-        try:
-            return KeyMap(**self._response.json())
-        except JSONDecodeError as e:
-            error = JSONDecodeException()
-            error.Url = e.response.url
-            error.Content = e.response.text
-            error.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 107, error.Url)
-            raise error
-
-    def jsonWithParser(self, parser):
-        try:
-            return self._response.json(object_pairs_hook=parser.parse)
-        except JSONDecodeError as e:
-            error = JSONDecodeException()
-            error.Url = e.response.url
-            error.Content = e.response.text
-            error.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 107, error.Url)
-            raise error
-
     def raiseForStatus(self):
         try:
             self._response.raise_for_status()
@@ -219,7 +199,7 @@ class RequestResponse(unohelper.Base,
             error.Url = e.response.url
             error.StatusCode = e.response.status_code
             error.Content = e.response.text
-            error.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 105, error.Url, error.StatusCode)
+            error.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 105, self._parameter.Name, error.Url, error.StatusCode)
             raise error
 
     def iterContent(self, length, decode):
@@ -291,70 +271,7 @@ class Enumerator(unohelper.Base,
             self._stopped = True
             return None
 
-class FileLike():
-    def __init__(self, input):
-        self._input = input
-
-    # Python FileLike Object
-    def read(self, length):
-        length, sequence = self._input.readBytes(None, length)
-        return sequence.value
-
-    def close(self):
-        self._input.closeInput()
-
-    def seek(self, offset, whence=0):
-        if whence == 1:
-            offset = self._input.getPosition() + offset
-        elif whence == 2:
-            offset = self._input.getLength() - offset
-        self._input.seek(offset)
-
-    def tell(self):
-        return self._input.getPosition()
-
 # Private method
-def _getRequestArguments(parameter, stream):
-    kwargs = {}
-    # FIXME: It is necessary to be able to manage nextPage
-    # FIXME: tokens and sync token present in various XML/JSON APIs
-    nextpage = parameter.PageType
-    nextdata = {parameter.PageKey: parameter.PageValue}
-    if parameter.Headers:
-        data = json.loads(parameter.Headers)
-        if nextpage == HEADER:
-            data.update(nextdata)
-        kwargs['headers'] = data
-    if parameter.Query and nextpage != REDIRECT:
-        data = json.loads(parameter.Query)
-        if nextpage == QUERY:
-            data.update(nextdata)
-        kwargs['params'] = data
-    if parameter.Data:
-        kwargs['data'] = parameter.Data
-    elif parameter.Json:
-        data = json.loads(parameter.Json)
-        if nextpage == JSON:
-            data.update(nextdata)
-        kwargs['json'] = data
-    elif parameter.DataSink:
-        kwargs['data'] = FileLike(parameter.DataSink)
-    if parameter.NoAuth:
-        kwargs['auth'] = NoOAuth2()
-    elif parameter.Auth:
-        kwargs['auth'] = parameter.Auth
-    if parameter.NoRedirect:
-        kwargs['allow_redirects'] = False
-    if parameter.NoVerify:
-        kwargs['verify'] = False
-    if parameter.Stream or stream:
-        kwargs['stream'] = True
-    if nextpage == URL or nextpage == REDIRECT:
-        url = parameter.PageValue
-    else:
-        url = parameter.Url
-    return url, kwargs
-
 def _getExceptionMessage(ctx, clazz, method, resource, *args):
     logger = getLogger(ctx, g_errorlog, g_basename)
     message = logger.resolveString(resource, *args)
