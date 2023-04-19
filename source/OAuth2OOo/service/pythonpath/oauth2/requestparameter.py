@@ -33,9 +33,10 @@ import unohelper
 
 from com.sun.star.rest.ParameterType import NONE
 from com.sun.star.rest.ParameterType import URL
-from com.sun.star.rest.ParameterType import QUERY
 from com.sun.star.rest.ParameterType import JSON
+from com.sun.star.rest.ParameterType import QUERY
 from com.sun.star.rest.ParameterType import HEADER
+from com.sun.star.rest.ParameterType import REDIRECT
 
 from com.sun.star.rest import XRequestParameter
 

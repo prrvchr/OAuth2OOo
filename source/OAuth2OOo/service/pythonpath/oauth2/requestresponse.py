@@ -55,8 +55,6 @@ from com.sun.star.rest import URLRequiredException
 
 from com.sun.star.rest import XRequestResponse
 
-from .unolib import KeyMap
-
 from .logger import getLogger
 
 from .configuration import g_errorlog
