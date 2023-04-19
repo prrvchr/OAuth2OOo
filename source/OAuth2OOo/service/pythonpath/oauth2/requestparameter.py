@@ -40,8 +40,6 @@ from com.sun.star.rest.ParameterType import REDIRECT
 
 from com.sun.star.rest import XRequestParameter
 
-from .oauth2 import NoOAuth2
-
 import json
 import traceback
 
@@ -51,6 +49,7 @@ class RequestParameter(unohelper.Base,
     def __init__(self, ctx, name):
         self._ctx = ctx
         self._name = name
+        # FIXME: Requests parameters
         self._method = 'GET'
         self._url = ''
         self._headers = {}
@@ -63,11 +62,13 @@ class RequestParameter(unohelper.Base,
         self._noredirect = False
         self._noverify = False
         self._stream = False
+        # FIXME: Custom parameters
         self._token = ''
         self._count = 0
         self._key = None
         self._value = None
         self._type = NONE
+        self._next = False
 
     @property
     def Name(self):
@@ -88,19 +89,19 @@ class RequestParameter(unohelper.Base,
         self._url = url
     @property
     def Headers(self):
-        return json.dump(self._headers)
+        return json.dumps(self._headers)
     @Headers.setter
     def Headers(self, headers):
         self._headers = json.loads(headers)
     @property
     def Query(self):
-        return json.dump(self._query)
+        return json.dumps(self._query)
     @Query.setter
     def Query(self, query):
         self._query = json.loads(query)
     @property
     def Json(self):
-        return json.dump(self._json)
+        return json.dumps(self._json)
     @Json.setter
     def Json(self, data):
         self._json = json.loads(data)
@@ -155,34 +156,19 @@ class RequestParameter(unohelper.Base,
     @property
     def PageCount(self):
         return self._count
-    @property
-    def PageKey(self):
-        if self._key is None:
-            return ''
-        key = self._key
-        self._key = None
-        return key
-    @property
-    def PageValue(self):
-        if self._value is None:
-            return ''
-        value = self._value
-        self._value = None
-        return value
-    @property
-    def PageType(self):
-        return self._type
 
     def hasNextPage(self):
-        hasnext = self._hasNextPage()
-        if hasnext:
+        page = self._next if self._type != NONE else self._count == 0
+        if page:
             self._count += 1
-        return hasnext
+            self._next = False
+        return page
 
     def setNextPage(self, key, value, parameter):
         self._key = key
         self._value = value
         self._type = parameter
+        self._next = True
 
     def setHeader(self, key, value):
         self._headers[key] = value
@@ -211,9 +197,7 @@ class RequestParameter(unohelper.Base,
             kwargs['json'] = data
         elif self._datasink:
             kwargs['data'] = FileLike(self._datasink)
-        if self._noauth:
-            kwargs['auth'] = NoOAuth2()
-        elif self._auth:
+        if self._auth:
             kwargs['auth'] = self._auth
         if self._noredirect:
             kwargs['allow_redirects'] = False
@@ -221,13 +205,7 @@ class RequestParameter(unohelper.Base,
             kwargs['verify'] = False
         if self._stream or stream:
             kwargs['stream'] = True
-        return json.dump(kwargs)
-
-    def _hasNextPage(self):
-        if self._type != NONE:
-            return self._value is not None and self._key is not None
-        else:
-            return self._count == 0
+        return json.dumps(kwargs)
 
 
 class FileLike():

@@ -55,6 +55,8 @@ from com.sun.star.rest import URLRequiredException
 
 from com.sun.star.rest import XRequestResponse
 
+from .oauth2 import NoOAuth2
+
 from .logger import getLogger
 
 from .configuration import g_errorlog
@@ -77,6 +79,8 @@ def execute(ctx, session, parameter, timeout, stream=False):
         clazz, method = 'OAuth2Service', 'execute()'
         print("Request.executeRequest() 1")
         kwargs = json.loads(parameter.toJson(stream))
+        if parameter.NoAuth:
+            kwargs['auth'] = NoOAuth2()
         print("Request.executeRequest() 2")
         response = session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
     except URLRequired as e:
