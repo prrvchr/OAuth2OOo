@@ -39,6 +39,7 @@ from com.sun.star.io import XSeekableInputStream
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
+from com.sun.star.rest.ParameterType import URL
 from com.sun.star.rest.ParameterType import QUERY
 from com.sun.star.rest.ParameterType import JSON
 from com.sun.star.rest.ParameterType import HEADER
@@ -78,9 +79,9 @@ import traceback
 def execute(ctx, session, parameter, timeout, stream=False):
     try:
         print("Request.executeRequest() 1")
-        kwargs = _getKeyWordArguments(parameter, stream)
+        url, kwargs = _getRequestArguments(parameter, stream)
         print("Request.executeRequest() 2")
-        return session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
+        return session.request(parameter.Method, url, timeout=timeout, **kwargs)
     except URLRequired as e:
         error = URLRequiredException()
         error.Url = parameter.Url
@@ -160,10 +161,10 @@ class RequestResponse(unohelper.Base,
         return uno.ByteSequence(self._response.content)
     @property
     def Headers(self):
-        return KeyMap(self._response.headers)
+        return KeyMap(**self._response.headers)
     @property
     def History(self):
-        return tuple(ResquestResponse(self._parameter, r) for r in self._response.history)
+        return tuple(ResquestResponse(self._ctx, self._parameter, r) for r in self._response.history)
     @property
     def Ok(self):
         return self._response.ok
@@ -312,23 +313,24 @@ class FileLike():
         return self._input.getPosition()
 
 # Private method
-def _getKeyWordArguments(parameter, stream):
+def _getRequestArguments(parameter, stream):
     kwargs = {}
+    nextpage = parameter.PageType
     if parameter.Headers:
         data = json.loads(parameter.Headers)
-        if parameter.PageType == HEADER:
+        if nextpage == HEADER:
             data.update({parameter.PageKey: parameter.PageValue})
         kwargs['headers'] = data
-    if parameter.Query:
+    if parameter.Query and nextpage != REDIRECT:
         data = json.loads(parameter.Query)
-        if parameter.PageType == QUERY:
+        if nextpage == QUERY:
             data.update({parameter.PageKey: parameter.PageValue})
         kwargs['params'] = data
     if parameter.Data:
         kwargs['data'] = parameter.Data
     elif parameter.Json:
         data = json.loads(parameter.Json)
-        if parameter.PageType == JSON:
+        if nextpage == JSON:
             data.update({parameter.PageKey: parameter.PageValue})
         kwargs['json'] = data
     elif parameter.DataSink:
@@ -343,7 +345,11 @@ def _getKeyWordArguments(parameter, stream):
         kwargs['verify'] = False
     if parameter.Stream or stream:
         kwargs['stream'] = True
-    return kwargs
+    if nextpage == URL or nextpage == REDIRECT:
+        url = parameter.PageValue
+    else:
+        url = parameter.Url
+    return url, kwargs
 
 def _getExceptionMessage(ctx, clazz, method, resource, *args):
     logger = getLogger(ctx, g_errorlog, g_basename)
