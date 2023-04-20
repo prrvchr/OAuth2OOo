@@ -55,7 +55,7 @@ class RequestParameter(unohelper.Base,
         self._headers = {}
         self._query = {}
         self._json = {}
-        self._data = ''
+        self._data = uno.ByteSequence(b'')
         self._datasink = None
         self._noauth = False
         self._auth = ()
@@ -194,15 +194,11 @@ class RequestParameter(unohelper.Base,
             if self._type == QUERY:
                 data.update(nextdata)
             kwargs['params'] = data
-        if self._data:
-            kwargs['data'] = self._data
-        elif self._json:
+        if self._json:
             data = self._json
             if self._type == JSON:
                 data.update(nextdata)
             kwargs['json'] = data
-        elif self._datasink:
-            kwargs['data'] = FileLike(self._datasink)
         if self._auth:
             kwargs['auth'] = self._auth
         if self._noredirect:
@@ -212,27 +208,4 @@ class RequestParameter(unohelper.Base,
         if self._stream or stream:
             kwargs['stream'] = True
         return json.dumps(kwargs)
-
-
-class FileLike():
-    def __init__(self, input):
-        self._input = input
-
-    # Python FileLike Object
-    def read(self, length):
-        length, sequence = self._input.readBytes(None, length)
-        return sequence.value
-
-    def close(self):
-        self._input.closeInput()
-
-    def seek(self, offset, whence=0):
-        if whence == 1:
-            offset = self._input.getPosition() + offset
-        elif whence == 2:
-            offset = self._input.getLength() - offset
-        self._input.seek(offset)
-
-    def tell(self):
-        return self._input.getPosition()
 

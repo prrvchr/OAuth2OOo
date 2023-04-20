@@ -85,14 +85,18 @@ def getDuration(delta):
     return duration
 
 def execute(ctx, session, parameter, timeout, stream=False):
+    response = None
+    clazz, method = 'OAuth2Service', 'execute()'
+    print("Request.executeRequest() 1")
+    kwargs = json.loads(parameter.toJson(stream))
+    if parameter.NoAuth:
+        kwargs['auth'] = NoOAuth2()
+    if parameter.DataSink:
+        kwargs['data'] = FileLike(parameter.DataSink)
+    elif parameter.Data.value:
+        kwargs['data'] = parameter.Data.value
+    print("Request.executeRequest() 2")
     try:
-        response = None
-        clazz, method = 'OAuth2Service', 'execute()'
-        print("Request.executeRequest() 1")
-        kwargs = json.loads(parameter.toJson(stream))
-        if parameter.NoAuth:
-            kwargs['auth'] = NoOAuth2()
-        print("Request.executeRequest() 2")
         response = session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
     except URLRequired as e:
         error = URLRequiredException()
@@ -283,6 +287,28 @@ class Enumerator(unohelper.Base,
         except StopIteration:
             self._stopped = True
             return None
+
+class FileLike():
+    def __init__(self, input):
+        self._input = input
+
+    # Python FileLike Object
+    def read(self, length):
+        length, sequence = self._input.readBytes(None, length)
+        return sequence.value
+
+    def close(self):
+        self._input.closeInput()
+
+    def seek(self, offset, whence=0):
+        if whence == 1:
+            offset = self._input.getPosition() + offset
+        elif whence == 2:
+            offset = self._input.getLength() - offset
+        self._input.seek(offset)
+
+    def tell(self):
+        return self._input.getPosition()
 
 # Private method
 def _getExceptionMessage(ctx, clazz, method, resource, *args):
