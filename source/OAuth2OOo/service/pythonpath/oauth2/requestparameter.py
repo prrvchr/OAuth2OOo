@@ -170,6 +170,12 @@ class RequestParameter(unohelper.Base,
         self._type = parameter
         self._next = True
 
+    def hasHeader(self, key):
+        return key in self._headers
+
+    def getHeader(self, key):
+        return self._headers[key]
+
     def setHeader(self, key, value):
         self._headers[key] = value
 

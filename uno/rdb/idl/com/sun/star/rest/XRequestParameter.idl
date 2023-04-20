@@ -41,6 +41,10 @@ interface XRequestParameter: com::sun::star::uno::XInterface
                      [in] string Value,
                      [in] short ParameterType);
 
+    boolean hasHeader([in] string Key);
+
+    string getHeader([in] string Key);
+
     void setHeader([in] string Key,
                    [in] string Value);
 

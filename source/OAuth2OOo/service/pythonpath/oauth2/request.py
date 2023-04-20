@@ -54,34 +54,55 @@ def download(ctx, session, parameter, url, timeout, chunk, retry, delay):
     sf = getSimpleFile(ctx)
     retry = max(1, retry)
     size = 0
+    response = None
     while retry > 0:
         retry -= 1
         stream = sf.openFileWrite(url)
         stream.seek(size)
         try:
             response = execute(ctx, session, parameter, timeout, True)
-            for buffer in response.iter_content(chunk, False):
-                stream.writeBytes(uno.ByteSequence(buffer))
-        except (ConnectTimeoutException, ReadTimeoutException, ConnectionException) as e:
-            print('request.download() Download ERROR')
-            stream.closeOutput()
-            size = sf.getSize(url)
-            parameter.setHeader('Range', f'bytes={size}-')
-            time.sleep(delay)
+        except:
+            continue
         else:
-            stream.closeOutput()
-            retry = 0
-    return RequestResponse(ctx, parameter, response)
+            if response.ok:
+                try:
+                    for buffer in response.iter_content(chunk, False):
+                        stream.writeBytes(uno.ByteSequence(buffer))
+                except:
+                    print('request.download() Download ERROR')
+                    stream.closeOutput()
+                    size = sf.getSize(url)
+                    parameter.setHeader('Range', f'bytes={size}-')
+                    time.sleep(delay)
+                else:
+                    stream.closeOutput()
+                    retry = 0
+    if response is not None:
+        return RequestResponse(ctx, parameter, response)
+    return None
 
 def upload(ctx, session, parameter, url, timeout):
     sf = getSimpleFile(ctx)
-    if not sf.exists(url):
-        return
-    stream = sf.openFileRead(url)
-    parameter.DataSink = stream
-    response = execute(ctx, session, parameter, timeout, True)
-    stream.closeInput()
-    return RequestResponse(ctx, parameter, response)
+    if sf.exists(url):
+        stream = sf.openFileRead(url)
+        parameter.DataSink = stream
+        if parameter.hasHeader('Content-Range'):
+            range = parameter.getHeader('Content-Range')
+            try:
+                start = int(range[6:range.find('-')])
+            except:
+                pass
+            else:
+                stream.seek(start)
+        try:
+            response = execute(ctx, session, parameter, timeout, True)
+        except:
+            print('request.upload() Upload ERROR')
+            stream.closeInput()
+        else:
+            stream.closeInput()
+            return RequestResponse(ctx, parameter, response)
+    return None
 
 def getSessionMode(ctx, host, port=80):
     connector = ctx.ServiceManager.createInstance('com.sun.star.connection.Connector')
