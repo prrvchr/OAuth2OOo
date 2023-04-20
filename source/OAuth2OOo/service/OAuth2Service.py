@@ -168,10 +168,10 @@ class OAuth2Service(unohelper.Base,
         return getInputStream(self._session, parameter, self.Timeout, chunk, decode)
 
     def download(self, parameter, url, chunk, retry, delay):
-        return download(self._ctx, self._session, parameter, url, self.Timeout, chunk, retry, delay)
+        return download(self._ctx, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
     def upload(self, parameter, url):
-        return upload(self._ctx, self._session, parameter, url, self.Timeout)
+        return upload(self._ctx, self._logger, self._session, parameter, url, self.Timeout)
 
     # Private method
     def _getSession(self):

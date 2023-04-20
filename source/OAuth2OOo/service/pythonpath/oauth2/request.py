@@ -30,6 +30,9 @@
 import uno
 import unohelper
 
+from com.sun.star.logging.LogLevel import INFO
+from com.sun.star.logging.LogLevel import SEVERE
+
 from com.sun.star.io import XInputStream
 
 from com.sun.star.ucb.ConnectionMode import ONLINE
@@ -43,6 +46,7 @@ from com.sun.star.rest import ReadTimeoutException
 
 from .requestresponse import RequestResponse
 from .requestresponse import execute
+from .requestresponse import getDuration
 
 from .unotool import getSimpleFile
 
@@ -50,7 +54,7 @@ import time
 import traceback
 
 
-def download(ctx, session, parameter, url, timeout, chunk, retry, delay):
+def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
     sf = getSimpleFile(ctx)
     retry = max(1, retry)
     size = 0
@@ -62,6 +66,7 @@ def download(ctx, session, parameter, url, timeout, chunk, retry, delay):
         try:
             response = execute(ctx, session, parameter, timeout, True)
         except:
+            logger.logprb(SEVERE, 'OAuth2Service', 'download()', 121, parameter.Name, traceback.format_exc())
             continue
         else:
             if response.ok:
@@ -69,6 +74,7 @@ def download(ctx, session, parameter, url, timeout, chunk, retry, delay):
                     for buffer in response.iter_content(chunk, False):
                         stream.writeBytes(uno.ByteSequence(buffer))
                 except:
+                    logger.logprb(SEVERE, 'OAuth2Service', 'download()', 121, parameter.Name, traceback.format_exc())
                     print('request.download() Download ERROR')
                     stream.closeOutput()
                     size = sf.getSize(url)
@@ -76,31 +82,36 @@ def download(ctx, session, parameter, url, timeout, chunk, retry, delay):
                     time.sleep(delay)
                 else:
                     stream.closeOutput()
+                    d = getDuration(response.elapsed)
+                    logger.logprb(INFO, 'OAuth2Service', 'download()', 122, url, d.Hours, d.Minutes, d.Seconds, d.NanoSeconds)
                     retry = 0
     if response is not None:
         return RequestResponse(ctx, parameter, response)
     return None
 
-def upload(ctx, session, parameter, url, timeout):
+def upload(ctx, logger, session, parameter, url, timeout):
     sf = getSimpleFile(ctx)
     if sf.exists(url):
         stream = sf.openFileRead(url)
-        parameter.DataSink = stream
         if parameter.hasHeader('Content-Range'):
             range = parameter.getHeader('Content-Range')
             try:
                 start = int(range[6:range.find('-')])
             except:
+                logger.logprb(SEVERE, 'OAuth2Service', 'upload()', 131, parameter.Name, traceback.format_exc())
                 pass
             else:
                 stream.seek(start)
+        parameter.DataSink = stream
         try:
             response = execute(ctx, session, parameter, timeout, True)
-        except:
-            print('request.upload() Upload ERROR')
+        except Exception as e:
+            logger.logprb(SEVERE, 'OAuth2Service', 'upload()', 131, parameter.Name, traceback.format_exc())
             stream.closeInput()
         else:
             stream.closeInput()
+            d = getDuration(response.elapsed)
+            logger.logprb(INFO, 'OAuth2Service', 'upload()', 132, url, d.Hours, d.Minutes, d.Seconds, d.NanoSeconds)
             return RequestResponse(ctx, parameter, response)
     return None
 

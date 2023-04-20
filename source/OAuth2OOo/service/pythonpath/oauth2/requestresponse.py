@@ -60,7 +60,7 @@ from .oauth2 import NoOAuth2
 from .logger import getLogger
 
 from .configuration import g_errorlog
-g_basename = 'request'
+from .configuration import g_basename
 
 from requests.exceptions import HTTPError
 from requests.exceptions import URLRequired
@@ -72,6 +72,17 @@ from requests.exceptions import RequestException as RequestError
 import json
 import traceback
 
+
+def getDuration(delta):
+    days, hours, minutes = delta.days, delta.seconds // 3600, delta.seconds % 3600 // 60
+    seconds = delta.seconds - hours * 3600 - minutes * 60
+    duration = uno.createUnoStruct('io.github.prrvchr.css.util.Duration')
+    duration.Days = days
+    duration.Hours = hours
+    duration.Minutes = minutes
+    duration.Seconds = seconds
+    duration.NanoSeconds = delta.microseconds * 1000
+    return duration
 
 def execute(ctx, session, parameter, timeout, stream=False):
     try:
@@ -179,7 +190,7 @@ class RequestResponse(unohelper.Base,
         return self._response.is_redirect
     @property
     def Elapsed(self):
-        return self._response.elapsed
+        return getDuration(self._response.elapsed)
     @property
     def DataSink(self):
         return InputStream(self._response)
