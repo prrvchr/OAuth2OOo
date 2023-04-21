@@ -92,6 +92,8 @@ def execute(ctx, session, parameter, timeout, stream=False):
     kwargs = json.loads(parameter.toJson(stream))
     if parameter.NoAuth:
         kwargs['auth'] = NoOAuth2()
+    elif parameter.Auth:
+        kwargs['auth'] = parameter.Auth
     if parameter.DataSink:
         kwargs['data'] = FileLike(parameter.DataSink)
     elif parameter.Data.value:

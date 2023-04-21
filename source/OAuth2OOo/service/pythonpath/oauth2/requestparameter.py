@@ -65,13 +65,14 @@ class RequestParameter(unohelper.Base,
         self._noverify = False
         self._stream = False
         # FIXME: Custom parameters
+        self._sep = '/'
         self._nexturl = ''
         self._token = ''
         self._count = 0
         self._key = None
         self._value = None
         self._type = NONE
-        self._next = False
+        self._next = True
 
     @property
     def Name(self):
@@ -160,6 +161,12 @@ class RequestParameter(unohelper.Base,
     def Stream(self, state):
         self._stream = state
     @property
+    def Separator(self):
+        return uno.Char(self._sep)
+    @Separator.setter
+    def Separator(self, sep):
+        self._sep = sep.value
+    @property
     def NextUrl(self):
         return self._nexturl
     @NextUrl.setter
@@ -177,11 +184,11 @@ class RequestParameter(unohelper.Base,
         return self._count
 
     def hasNextPage(self):
-        page = self._next if self._type != NONE else self._count == 0
-        if page:
+        hasnext = self._next
+        if hasnext:
             self._count += 1
             self._next = False
-        return page
+        return hasnext
 
     def setNextPage(self, key, value, parameter):
         self._key = key
@@ -201,8 +208,8 @@ class RequestParameter(unohelper.Base,
     def setJson(self, key, value):
             self._json[key] = value
 
-    def setNestedJson(self, path, separator, value):
-        item = self._getJsonItem(path, separator, value)
+    def setNesting(self, path, value):
+        item = self._getJsonItem(path, value)
         self._json = self._updateJson(dict(self._json), item)
 
     def setQuery(self, key, value):
@@ -228,8 +235,6 @@ class RequestParameter(unohelper.Base,
             if self._type & JSON == JSON:
                 data.update(nextdata)
             kwargs['json'] = data
-        if self._auth:
-            kwargs['auth'] = self._auth
         if self._noredirect:
             kwargs['allow_redirects'] = False
         if self._noverify:
@@ -238,8 +243,8 @@ class RequestParameter(unohelper.Base,
             kwargs['stream'] = True
         return json.dumps(kwargs)
 
-    def _getJsonItem(self, path, separator, value):
-        for index, name in enumerate(reversed(path.split(separator))):
+    def _getJsonItem(self, path, value):
+        for index, name in enumerate(reversed(path.split(self._sep))):
             if index:
                 item = {name: dict(item)}
             else:
