@@ -63,6 +63,7 @@ class RequestParameter(unohelper.Base,
         self._noverify = False
         self._stream = False
         # FIXME: Custom parameters
+        self._nexturl = ''
         self._token = ''
         self._count = 0
         self._key = None
@@ -81,8 +82,10 @@ class RequestParameter(unohelper.Base,
         self._method = method
     @property
     def Url(self):
-        if self._type == URL or self._type == REDIRECT:
+        if self._type & REDIRECT == REDIRECT:
             return self._value
+        elif self._count and self._type & URL == URL:
+            return self._nexturl
         return self._url
     @Url.setter
     def Url(self, url):
@@ -148,6 +151,13 @@ class RequestParameter(unohelper.Base,
     def Stream(self, state):
         self._stream = state
     @property
+    def NextUrl(self):
+        return self._nexturl
+    @NextUrl.setter
+    def NextUrl(self, url):
+        self._nexturl = url
+        self._type |= URL
+    @property
     def SyncToken(self):
         return self._token
     @SyncToken.setter
@@ -167,7 +177,7 @@ class RequestParameter(unohelper.Base,
     def setNextPage(self, key, value, parameter):
         self._key = key
         self._value = value
-        self._type = parameter
+        self._type |= parameter
         self._next = True
 
     def hasHeader(self, key):
