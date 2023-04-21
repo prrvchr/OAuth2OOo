@@ -120,7 +120,7 @@ class RequestParameter(unohelper.Base,
     @property
     def Text(self):
         return self._text
-    @Data.setter
+    @Text.setter
     def Text(self, text):
         self._text = text
     @property
