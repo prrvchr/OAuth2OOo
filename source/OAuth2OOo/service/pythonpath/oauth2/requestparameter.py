@@ -41,6 +41,7 @@ from com.sun.star.rest.ParameterType import REDIRECT
 from com.sun.star.rest import XRequestParameter
 
 import json
+from collections import defaultdict
 import traceback
 
 
@@ -191,15 +192,11 @@ class RequestParameter(unohelper.Base,
         self._headers[key] = value
 
     def setJson(self, key, value):
-        # FIXME: In order to make the setting easy,
-        # FIXME: we must be able to load a string in JSON format
-        if value.startswith(('{', '[')):
-            try:
-                self._json[key] = json.loads(value)
-            except ValueError:
-                self._json[key] = value
-        else:
-            self._json[key] = value
+        self._json[key] = value
+
+    def setNestedJson(self, path, separator, value):
+        item = self._getJsonItem(path, separator, value)
+        self._json = self._updateJson(dict(self._json), item)
 
     def setQuery(self, key, value):
         self._query[key] = value
@@ -233,4 +230,20 @@ class RequestParameter(unohelper.Base,
         if self._stream or stream:
             kwargs['stream'] = True
         return json.dumps(kwargs)
+
+    def _getJsonItem(self, path, separator, value):
+        for index, name in enumerate(reversed(path.split(separator))):
+            if index:
+                item = {name: dict(item)}
+            else:
+                item = {name: value}
+        return item
+
+    def _updateJson(self, root, item):
+        for key, value in item.items():
+            if isinstance(value, dict):
+                root[key] = self._updateJson(root.get(key, {}), value)
+            else:
+                root[key] = value
+        return root
 
