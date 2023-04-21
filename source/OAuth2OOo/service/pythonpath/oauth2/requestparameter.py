@@ -82,10 +82,11 @@ class RequestParameter(unohelper.Base,
         self._method = method
     @property
     def Url(self):
-        if self._type & REDIRECT == REDIRECT:
-            return self._value
-        elif self._count and self._type & URL == URL:
-            return self._nexturl
+        if self._count:
+            if self._type & URL == URL:
+                return self._nexturl
+            if self._type & REDIRECT == REDIRECT:
+                return self._value
         return self._url
     @Url.setter
     def Url(self, url):
@@ -189,6 +190,20 @@ class RequestParameter(unohelper.Base,
     def setHeader(self, key, value):
         self._headers[key] = value
 
+    def setJson(self, key, value):
+        # FIXME: In order to make the setting easy,
+        # FIXME: we must be able to load a string in JSON format
+        if value.startswith(('{', '[')):
+            try:
+                self._json[key] = json.loads(value)
+            except ValueError:
+                self._json[key] = value
+        else:
+            self._json[key] = value
+
+    def setQuery(self, key, value):
+        self._query[key] = value
+
     def toJson(self, stream):
         # FIXME: It is necessary to be able to manage nextPage
         # FIXME: tokens and sync token present in various XML/JSON APIs
@@ -196,17 +211,17 @@ class RequestParameter(unohelper.Base,
         nextdata = {self._key: self._value}
         if self._headers:
             data = self._headers
-            if self._type == HEADER:
+            if self._type & HEADER == HEADER:
                 data.update(nextdata)
             kwargs['headers'] = data
-        if self._query and self._type != REDIRECT:
+        if self._query and self._type & REDIRECT != REDIRECT:
             data = self._query
-            if self._type == QUERY:
+            if self._type & QUERY == QUERY:
                 data.update(nextdata)
             kwargs['params'] = data
         if self._json:
             data = self._json
-            if self._type == JSON:
+            if self._type & JSON == JSON:
                 data.update(nextdata)
             kwargs['json'] = data
         if self._auth:

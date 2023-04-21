@@ -84,6 +84,7 @@ def getDuration(delta):
     duration.NanoSeconds = delta.microseconds * 1000
     return duration
 
+
 def execute(ctx, session, parameter, timeout, stream=False):
     response = None
     clazz, method = 'OAuth2Service', 'execute()'
@@ -135,9 +136,11 @@ def execute(ctx, session, parameter, timeout, stream=False):
         raise error
     return response
 
+
 def getRequestResponse(ctx, session, parameter, timeout):
     response = execute(ctx, session, parameter, timeout)
     return RequestResponse(ctx, parameter, response)
+
 
 class RequestResponse(unohelper.Base,
                       XRequestResponse):
@@ -153,6 +156,9 @@ class RequestResponse(unohelper.Base,
     @property
     def Url(self):
         return self._response.url
+    @property
+    def FullUrl(self):
+        return self._response.fullurl
     @property
     def StatusCode(self):
         return self._response.status_code
@@ -187,6 +193,9 @@ class RequestResponse(unohelper.Base,
     def Ok(self):
         return self._response.ok
     @property
+    def Error(self):
+        return self._getHTTPException(self._response.error)
+    @property
     def IsPermanentRedirect(self):
         return self._response.is_permanent_redirect
     @property
@@ -208,16 +217,11 @@ class RequestResponse(unohelper.Base,
     def getHeader(self, key):
         return self._response.headers.get(key, '')
 
-    def raiseForStatus(self):
+    def raiseForStatus(self, redirect):
         try:
-            self._response.raise_for_status()
+            self._response.raise_for_status(redirect)
         except HTTPError as e:
-            error = HTTPException()
-            error.Url = e.response.url
-            error.StatusCode = e.response.status_code
-            error.Content = e.response.text
-            error.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 105, self._parameter.Name, error.Url, error.StatusCode)
-            raise error
+            raise self._getHTTPException(e)
 
     def iterContent(self, length, decode):
         chunk = length if length > 0 else None
@@ -227,6 +231,15 @@ class RequestResponse(unohelper.Base,
         chunk = length if length > 0 else None
         delimiter = separator if separator != '' else None
         return Enumerator(self._response.iter_lines(chunk, decode, delimiter), decode)
+
+    def _getHTTPException(self, error):
+        e = HTTPException()
+        e.Url = error.response.url
+        e.StatusCode = error.response.status_code
+        e.Content = error.response.text
+        e.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 105, self._parameter.Name, e.Url, e.StatusCode)
+        return e
+
 
 class InputStream(unohelper.Base,
                   XInputStream):
@@ -260,6 +273,7 @@ class InputStream(unohelper.Base,
     def getLength(self):
         return self._length
 
+
 class Enumerator(unohelper.Base,
                  XEnumeration):
     def __init__(self, iterator, decode):
@@ -288,6 +302,7 @@ class Enumerator(unohelper.Base,
             self._stopped = True
             return None
 
+
 class FileLike():
     def __init__(self, input):
         self._input = input
@@ -309,6 +324,7 @@ class FileLike():
 
     def tell(self):
         return self._input.getPosition()
+
 
 # Private method
 def _getExceptionMessage(ctx, clazz, method, resource, *args):

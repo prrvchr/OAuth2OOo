@@ -89,6 +89,7 @@ def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay)
         return RequestResponse(ctx, parameter, response)
     return None
 
+
 def upload(ctx, logger, session, parameter, url, timeout):
     sf = getSimpleFile(ctx)
     if sf.exists(url):
@@ -115,6 +116,7 @@ def upload(ctx, logger, session, parameter, url, timeout):
             return RequestResponse(ctx, parameter, response)
     return None
 
+
 def getSessionMode(ctx, host, port=80):
     connector = ctx.ServiceManager.createInstance('com.sun.star.connection.Connector')
     try:
@@ -126,9 +128,11 @@ def getSessionMode(ctx, host, port=80):
         mode = ONLINE
     return mode
 
+
 def getInputStream(session, parameter, timeout, chunk, decode):
     response = execute(session, parameter, timeout, True)
     return InputStream(response, chunk, decode)
+
 
 class InputStream(unohelper.Base,
                   XInputStream):
