@@ -192,7 +192,7 @@ class RequestParameter(unohelper.Base,
         self._headers[key] = value
 
     def setJson(self, key, value):
-        self._json[key] = value
+            self._json[key] = value
 
     def setNestedJson(self, path, separator, value):
         item = self._getJsonItem(path, separator, value)
