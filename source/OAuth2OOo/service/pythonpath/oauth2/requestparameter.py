@@ -57,6 +57,7 @@ class RequestParameter(unohelper.Base,
         self._query = {}
         self._json = {}
         self._data = uno.ByteSequence(b'')
+        self._text = ''
         self._datasink = None
         self._noauth = False
         self._auth = ()
@@ -116,6 +117,12 @@ class RequestParameter(unohelper.Base,
     @Data.setter
     def Data(self, data):
         self._data = data
+    @property
+    def Text(self):
+        return self._text
+    @Data.setter
+    def Text(self, text):
+        self._text = text
     @property
     def DataSink(self):
         return self._datasink

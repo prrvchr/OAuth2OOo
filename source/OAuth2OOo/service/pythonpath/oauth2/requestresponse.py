@@ -96,6 +96,8 @@ def execute(ctx, session, parameter, timeout, stream=False):
         kwargs['data'] = FileLike(parameter.DataSink)
     elif parameter.Data.value:
         kwargs['data'] = parameter.Data.value
+    elif parameter.Text:
+        kwargs['data'] = parameter.Text
     print("Request.executeRequest() 2")
     try:
         response = session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
