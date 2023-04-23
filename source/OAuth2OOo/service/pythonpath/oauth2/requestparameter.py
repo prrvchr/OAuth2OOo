@@ -85,7 +85,7 @@ class RequestParameter(unohelper.Base,
         self._method = method
     @property
     def Url(self):
-        if self._count:
+        if self._count > 1:
             if self._type & URL == URL:
                 return self._nexturl
             if self._type & REDIRECT == REDIRECT:
