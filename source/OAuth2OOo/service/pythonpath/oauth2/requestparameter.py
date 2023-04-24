@@ -230,10 +230,11 @@ class RequestParameter(unohelper.Base,
             if self._type & QUERY == QUERY:
                 data.update(nextdata)
             kwargs['params'] = data
-        if self._json:
-            data = self._json
+        if self._json or self._type & JSON == JSON:
             if self._type & JSON == JSON:
-                data.update(nextdata)
+                data = nextdata
+            else:
+                data = self._json
             kwargs['json'] = data
         if self._noredirect:
             kwargs['allow_redirects'] = False
