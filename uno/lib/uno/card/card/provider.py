@@ -32,17 +32,27 @@ import unohelper
 
 from com.sun.star.logging.LogLevel import SEVERE
 
-from .dbtool import getSqlException
+from .book import Book
 
-from .logger import getLogger
+from ..dbtool import getDateTimeFromString
+from ..dbtool import getSqlException as getException
 
-from .configuration import g_errorlog
-from .configuration import g_basename
+from ..logger import getLogger
+
+from ..configuration import g_errorlog
+from ..configuration import g_basename
 
 import traceback
 
 
-class ProviderBase(unohelper.Base):
+class Provider(unohelper.Base):
+
+    @property
+    def DateTimeFormat(self):
+        return '%Y-%m-%dT%H:%M:%SZ'
+
+    def parseDateTime(self, timestamp):
+        return getDateTimeFromString(timestamp, self.DateTimeFormat)
 
     # Need to be implemented method
     def insertUser(self, database, request, scheme, server, name, pwd):
@@ -51,20 +61,55 @@ class ProviderBase(unohelper.Base):
     def initAddressbooks(self, database, user):
         raise NotImplementedError
 
-    def firstPullCard(self, database, user, addressbook):
+    def initUserBooks(self, database, user, books):
+        count = 0
+        modified = False
+        for uri, name, tag, token in books:
+            print("Provider.initUserBooks() 1 Name: %s - Uri: %s - Tag: %s - Token: %s" % (name, uri, tag, token))
+            if user.Books.hasBook(uri):
+                book = user.Books.getBook(uri)
+                if book.hasNameChanged(name):
+                    database.updateAddressbookName(book.Id, name)
+                    book.setName(name)
+                    modified = True
+                    print("Provider.initUserBooks() 2 %s" % (name, ))
+            else:
+                newid = database.insertBook(user.Id, uri, name, tag, token)
+                book = Book(self._ctx, newid, uri, name, tag, token, True)
+                user.Books.setBook(uri, book)
+                modified = True
+                print("Provider.initUserBooks() 3 %s - %s - %s" % (book.Id, name, uri))
+            self.initUserGroups(database, user, book)
+            count += 1
+        print("Provider.initUserBooks() 4")
+        if not count:
+            #TODO: Raise SqlException with correct message!
+            print("Provider.initUserBooks() 1 %s" % (books, ))
+            raise self.getSqlException(1004, 1108, 'initUserBooks', '%s has no support of CardDAV!' % user.Server)
+        if modified:
+            database.initAddressbooks(user)
+
+    def initUserGroups(self, database, user, book):
         raise NotImplementedError
 
-    def pullCard(self, database, user, addressbook, dltd, mdfd):
+    def firstPullCard(self, database, user, addressbook, pages, count):
         raise NotImplementedError
 
-    def parseCard(self, connection):
+    def pullCard(self, database, user, addressbook, pages, count):
         raise NotImplementedError
+
+    def parseCard(self, database):
+        raise NotImplementedError
+
+    # Can be overwritten method
+    def syncGroups(self, database, user, addressbook, pages, count):
+        pass
 
 def getSqlException(ctx, source, state, code, method, *args):
     logger = getLogger(ctx, g_errorlog, g_basename)
     state = logger.resolveString(state)
     msg = logger.resolveString(code, *args)
     logger.logp(SEVERE, g_basename, method, msg)
-    error = getSqlException(state, code, msg, source)
+    error = getException(state, code, msg, source)
     return error
 

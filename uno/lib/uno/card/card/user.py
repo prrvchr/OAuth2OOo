@@ -33,26 +33,18 @@ import unohelper
 from com.sun.star.ucb.ConnectionMode import OFFLINE
 from com.sun.star.ucb.ConnectionMode import ONLINE
 
-from .addressbook import AddressBooks
+from .book import Books
 
-from .provider import Provider
+from .provider import getSqlException
 
-from .unotool import getConnectionMode
-from .providerbase import getSqlException
+from ..dbconfig import g_user
+from ..dbconfig import g_schema
 
-from .oauth2 import getRequest
-from .oauth2 import g_oauth2
-
-from .dbconfig import g_user
-from .dbconfig import g_schema
-
-from .configuration import g_path
+from ..unotool import getConnectionMode
+from ..oauth2 import getRequest
+from ..oauth2 import g_oauth2
 
 import traceback
-
-
-def getUserUri(server, name):
-    return server + '/' + name
 
 
 class User(unohelper.Base):
@@ -69,7 +61,7 @@ class User(unohelper.Base):
                     raise getSqlException(self._ctx, self, 1004, 1108, '_getNewUser', name)
                 self._metadata = self._getNewUser(database, provider, scheme, server, name, pwd)
                 self._initNewUser(database, provider)
-            self._addressbooks = AddressBooks(ctx, self._metadata, new)
+            self._books = Books(ctx, self._metadata, new)
         except Exception as e:
             msg = "Error: %s" % traceback.format_exc()
             print(msg)
@@ -96,8 +88,8 @@ class User(unohelper.Base):
     def Password(self):
         return self._password
     @property
-    def Addressbooks(self):
-        return self._addressbooks
+    def Books(self):
+        return self._books
     @property
     def BaseUrl(self):
         return self.Scheme + self.Server + self.Path
@@ -108,9 +100,6 @@ class User(unohelper.Base):
         return self._isOffLine(self.Server)
 
 # Procedures called by DataSource
-    def getUri(self):
-        return getUserUri(self.Server, self.Name)
-
     def getName(self):
         return g_user % self.Id
 
@@ -134,19 +123,8 @@ class User(unohelper.Base):
     def unquoteUrl(self, url):
         return self.Request.unquoteUrl(url)
 
-    def addAddressbook(self, aid):
-        pass
-        #if aid not in self._addressbooks:
-        #    self._addressbooks.append(aid)
-
-    def removeAddressbook(self, aid):
-        pass
-        #if aid in self._addressbooks:
-        #    print("User.removeAddressbook() 1 %s" % (self._addressbooks, ))
-        #    self._addressbooks.remove(aid)
-
-    def getAddressbooks(self):
-        return self._addressbooks.getAddressbooks()
+    def getBooks(self):
+        return self._books.getBooks()
 
     def _isOffLine(self, server):
         return getConnectionMode(self._ctx, server) != ONLINE
