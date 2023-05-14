@@ -123,8 +123,7 @@ class OAuth2Service(unohelper.Base,
         return requests.utils.unquote(url)
 
     def initializeUrl(self, url):
-        self._model.initializeUrl(url)
-        return True
+        return self._model.initializeUrl(url)
 
     def initializeSession(self, url, user):
         return self._model.initializeSession(url, user)
@@ -170,8 +169,8 @@ class OAuth2Service(unohelper.Base,
     def download(self, parameter, url, chunk, retry, delay):
         return download(self._ctx, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
-    def upload(self, parameter, url):
-        return upload(self._ctx, self._logger, self._session, parameter, url, self.Timeout)
+    def upload(self, parameter, url, chunk, retry, delay):
+        return upload(self._ctx, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
     # Private method
     def _getSession(self):

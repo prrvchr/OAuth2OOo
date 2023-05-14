@@ -102,17 +102,22 @@ class OAuth2Model(unohelper.Base):
         self.initialize(url, user, close)
 
     def initialize(self, url, user, close=None):
+        self._initialize(url, user, close)
+
+    def _initialize(self, url, user, close=None):
         self._user = user
-        self.initializeUrl(url, close)
+        return self.initializeUrl(url, close)
 
     def initializeUrl(self, url, close=None):
         self._url = url
-        self._scope, self._provider = self._getUrlData(url)
+        configured, self._scope, self._provider = self._getUrlData(url)
         self._uuid = generateUuid()
         if close is not None:
             self._close = close
+        return configured
 
     def _getUrlData(self, url):
+        configured = False
         scope = provider = ''
         urls = self._config.getByName('Urls')
         if urls.hasByName(url):
@@ -120,7 +125,8 @@ class OAuth2Model(unohelper.Base):
             scopes = self._config.getByName('Scopes')
             if scopes.hasByName(scope):
                 provider = scopes.getByName(scope).getByName('Provider')
-        return scope, provider
+                configured = True
+        return configured, scope, provider
 
     @property
     def User(self):
@@ -223,8 +229,9 @@ class OAuth2Model(unohelper.Base):
         return user.getByName('AccessToken')
 
     def initializeSession(self, url, user):
-        self.initialize(url, user)
-        return self.isAuthorized()
+        if self._initialize(url, user):
+            return self.isAuthorized()
+        return False
 
     def isAuthorized(self):
         providers = self._config.getByName('Providers')

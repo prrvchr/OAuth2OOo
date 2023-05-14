@@ -59,7 +59,7 @@ Here's how we use its API:
 
 ### Create OAuth2 service:
 
-> identifier = "com.gmail.prrvchr.extensions.OAuth2OOo.OAuth2Service"  
+> identifier = "io.github.prrvchr.OAuth2OOo.OAuth2Service"  
 > service = ctx.ServiceManager.createInstanceWithContext(identifier, ctx)
 
 ### Initialize Session or at least Url:
