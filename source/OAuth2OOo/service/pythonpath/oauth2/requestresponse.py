@@ -86,9 +86,12 @@ def getDuration(delta):
 
 
 def execute(ctx, session, parameter, timeout, stream=False):
-    response = None
-    clazz, method = 'OAuth2Service', 'execute()'
-    print("Request.executeRequest() 1")
+    kwargs = getKwArgs(parameter, stream)
+    return getResponse(ctx, session, parameter.Name, parameter.Method, parameter.Url, kwargs, timeout)
+
+
+def getKwArgs(parameter, stream=False):
+    print("Request.getKWArgs() 1")
     kwargs = json.loads(parameter.toJson(stream))
     if parameter.NoAuth:
         kwargs['auth'] = NoOAuth2()
@@ -100,44 +103,52 @@ def execute(ctx, session, parameter, timeout, stream=False):
         kwargs['data'] = parameter.Data.value
     elif parameter.Text:
         kwargs['data'] = parameter.Text
-    print("Request.executeRequest() 2")
+    print("Request.getKWArgs() 2")
+    return kwargs
+
+
+def getResponse(ctx, session, name, method, url, kwargs, timeout):
+    response = None
+    cls, mtd = 'OAuth2Service', 'executeRequest()'
+    print("Request.executeRequest() 1")
     try:
-        response = session.request(parameter.Method, parameter.Url, timeout=timeout, **kwargs)
+        response = session.request(method, url, timeout=timeout, **kwargs)
     except URLRequired as e:
         error = URLRequiredException()
-        error.Url = parameter.Url
-        error.Message = _getExceptionMessage(ctx, clazz, method, 101, parameter.Name, error.Url)
+        error.Url = url
+        error.Message = _getExceptionMessage(ctx, cls, mtd, 101, name, error.Url)
         raise error
     except ConnectTimeout as e:
         error = ConnectTimeoutException()
-        error.Url = parameter.Url
+        error.Url = url
         connect, read = timeout
         error.ConnectTimeout = connect
-        error.Message = _getExceptionMessage(ctx, clazz, method, 102, error.ConnectTimeout, parameter.Name, error.Url)
+        error.Message = _getExceptionMessage(ctx, cls, mtd, 102, error.ConnectTimeout, name, error.Url)
         raise error
     except ReadTimeout as e:
         error = ReadTimeoutException()
-        error.Url = parameter.Url
+        error.Url = url
         connect, read = timeout
         error.ReadTimeout = read
-        error.Message = _getExceptionMessage(ctx, clazz, method, 103, error.ReadTimeout, parameter.Name, error.Url)
+        error.Message = _getExceptionMessage(ctx, cls, mtd, 103, error.ReadTimeout, name, error.Url)
         raise error
     except ConnectionError as e:
         error = ConnectionException()
-        error.Url = parameter.Url
-        error.Message = _getExceptionMessage(ctx, clazz, method, 104, parameter.Name, error.Url)
+        error.Url = url
+        error.Message = _getExceptionMessage(ctx, cls, mtd, 104, name, error.Url)
         raise error
     except TooManyRedirects as e:
         error = TooManyRedirectsException()
-        error.Url = parameter.Url
-        error.Message = _getExceptionMessage(ctx, clazz, method, 106, parameter.Name, error.Url)
+        error.Url = url
+        error.Message = _getExceptionMessage(ctx, cls, mtd, 106, name, error.Url)
         raise error
     except RequestError as e:
         error = RequestException()
-        error.Url = parameter.Url
+        error.Url = url
         text = '' if response is None else response.Text
-        error.Message = _getExceptionMessage(ctx, clazz, method, 107, parameter.Name, error.Url, text)
+        error.Message = _getExceptionMessage(ctx, cls, mtd, 107, name, error.Url, text)
         raise error
+    print("Request.executeRequest() 2")
     return response
 
 

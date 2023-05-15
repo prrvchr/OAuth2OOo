@@ -38,18 +38,30 @@ from com.sun.star.rest.ParameterType import QUERY
 from com.sun.star.rest.ParameterType import HEADER
 from com.sun.star.rest.ParameterType import REDIRECT
 
+from com.sun.star.rest.HTTPStatusCode import CREATED
+from com.sun.star.rest.HTTPStatusCode import OK
+from com.sun.star.rest.HTTPStatusCode import PERMANENT_REDIRECT
+
 from com.sun.star.rest import XRequestParameter
+
+from .requestresponse import getDuration
+from .requestresponse import getKwArgs
+from .requestresponse import getResponse
 
 import json
 from collections import defaultdict
+from datetime import timedelta
+import re
 import traceback
 
 
 class RequestParameter(unohelper.Base,
                        XRequestParameter):
-    def __init__(self, ctx, name):
+    def __init__(self, ctx, session, name, timeout):
         self._ctx = ctx
+        self._session = session
         self._name = name
+        self._timeout = timeout
         # FIXME: Requests parameters
         self._method = 'GET'
         self._url = ''
@@ -73,6 +85,14 @@ class RequestParameter(unohelper.Base,
         self._value = None
         self._type = NONE
         self._next = True
+        self._range = None
+        self._status = PERMANENT_REDIRECT
+        self._rkey = 'Range'
+        self._regex = re.compile('-([0-9]+)')
+        self._offset = 1
+        self._rtype = HEADER
+        self._match = None
+        self._delta = timedelta()
 
     @property
     def Name(self):
@@ -183,6 +203,31 @@ class RequestParameter(unohelper.Base,
     def PageCount(self):
         return self._count
 
+    def setNextRange(self, status, key, pattern, offset, parameter):
+        self._status = status
+        self._rkey = key
+        self._regex = re.compile(pattern)
+        self._offset = offset
+        self._rtype = parameter
+
+    def uploadRange(self, start, end, size):
+        range = 'bytes %s-%s/%s' % (start, end, size)
+        self._headers['Content-Range'] = range
+        kwargs = getKwArgs(self)
+        response = getResponse(self._ctx, self._session, self.Name, self.Method, self.Url, kwargs, self._timeout)
+        upload = uno.createUnoStruct('com.sun.star.rest.UploadResponse')
+        upload.StatusCode = response.status_code
+        upload.Elapsed = self._getDuration(response.elapsed)
+        upload.Count = self._getCount()
+        if response.status_code == OK or response.status_code == CREATED:
+            upload.Uploaded = True
+        elif response.status_code == self._status and self._hasRange(response):
+            upload.HasNextRange = True
+            upload.NextRange = self._getNextRange()
+        else:
+            upload.Text = response.text
+        return upload
+
     def hasNextPage(self):
         hasnext = self._next
         if hasnext:
@@ -219,7 +264,7 @@ class RequestParameter(unohelper.Base,
         # FIXME: It is necessary to be able to manage nextPage
         # FIXME: tokens and sync token present in various XML/JSON APIs
         kwargs = {}
-        nextdata = {self._key: self._value}
+        nextdata = {self._key: self._value} if self._key else {}
         if self._headers:
             data = self._headers
             if self._type & HEADER == HEADER:
@@ -259,4 +304,36 @@ class RequestParameter(unohelper.Base,
             else:
                 root[key] = value
         return root
+
+    def _hasRange(self, response):
+        if self._regex is not None:
+            if self._rtype == HEADER:
+                return self._hasDataRange(response.headers)
+            if self._rtype == JSON:
+                return self._hasDataRange(response.json())
+        return False
+
+    def _hasDataRange(self, data):
+        self._range = matched = None
+        if self._rkey in data:
+            range = data.get(self._rkey)
+            # FIXME: Some provider like Microsoft give a Range as a JSON list
+            # FIXME: if so we only get the first value
+            if isinstance(range, list):
+                range = range[0]
+            matched = self._regex.search(range)
+        if matched is not None:
+            self._range = matched.group(1)
+        return self._range is not None
+
+    def _getNextRange(self):
+        return int(self._range) + self._offset
+
+    def _getDuration(self, delta):
+        self._delta += delta
+        return getDuration(self._delta)
+
+    def _getCount(self):
+        self._count += 1
+        return self._count
 

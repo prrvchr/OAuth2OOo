@@ -29,13 +29,26 @@
 
 #include <com/sun/star/uno/XInterface.idl>
 #include <com/sun/star/io/XInputStream.idl>
+#include <com/sun/star/rest/UploadResponse.idl>
 #include <com/sun/star/rest/JSONDecodeException.idl>
+#include <com/sun/star/rest/RequestException.idl>
 
 
 module com { module sun { module star { module rest {
 
 interface XRequestParameter: com::sun::star::uno::XInterface
 {
+
+    void setNextRange([in] long StatusCode,
+                      [in] string Key,
+                      [in] string Pattern,
+                      [in] short Offset,
+                      [in] short ParameterType);
+
+    UploadResponse uploadRange([in] hyper Start,
+                               [in] hyper End,
+                               [in] hyper Size)
+                   raises(RequestException);
 
     boolean hasNextPage();
 

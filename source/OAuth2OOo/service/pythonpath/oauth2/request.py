@@ -55,12 +55,12 @@ from .requestresponse import getDuration
 from .unotool import getSimpleFile
 
 import time
-from datetime import timedelta
 import traceback
 
 
 def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
     downloaded = False
+    cls, mtd = 'OAuth2Service', 'download()'
     retry = max(1, retry)
     sf = getSimpleFile(ctx)
     stream = sf.openFileWrite(url)
@@ -69,7 +69,7 @@ def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay)
         try:
             response = execute(ctx, session, parameter, timeout, True)
         except:
-            logger.logprb(SEVERE, 'OAuth2Service', 'download()', 121, parameter.Name, traceback.format_exc())
+            logger.logprb(SEVERE, cls, mtd, 121, parameter.Name, traceback.format_exc())
             time.sleep(delay)
         else:
             if response.ok:
@@ -77,14 +77,14 @@ def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay)
                     for buffer in response.iter_content(chunk, False):
                         stream.writeBytes(uno.ByteSequence(buffer))
                 except:
-                    logger.logprb(SEVERE, 'OAuth2Service', 'download()', 121, parameter.Name, traceback.format_exc())
+                    logger.logprb(SEVERE, cls, mtd, 121, parameter.Name, traceback.format_exc())
                     print('request.download() Download ERROR')
                     range = 'bytes=%s-' % stream.getLength()
                     parameter.setHeader('Range', range)
                     time.sleep(delay)
                 else:
                     d = getDuration(response.elapsed)
-                    logger.logprb(INFO, 'OAuth2Service', 'download()', 122, url, d.Hours, d.Minutes, d.Seconds, d.NanoSeconds)
+                    logger.logprb(INFO, cls, mtd, 122, url, d.Hours, d.Minutes, d.Seconds, d.NanoSeconds)
                     retry = 0
                     downloaded = True
             else:
@@ -93,40 +93,35 @@ def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay)
     return downloaded
 
 
-def upload(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
+def upload(ctx, logger, parameter, url, chunk, retry, delay):
     uploaded = False
+    cls, mtd = 'OAuth2Service', 'upload()'
     sf = getSimpleFile(ctx)
     if sf.exists(url):
         start = 0
-        delta = timedelta()
         retry = max(1, retry)
         size = sf.getSize(url)
         stream = sf.openFileRead(url)
         while retry > 0:
             try:
-                while retry > 0 and start < size:
-                    stream.seek(start)
-                    length, parameter.Data = stream.readBytes(None, chunk)
-                    end = start + length -1
-                    range = 'bytes %s-%s/%s' % (start, end, size)
-                    parameter.setHeader('Content-Range', range)
-                    response = execute(ctx, session, parameter, timeout)
-                    if response.status_code == OK or response.status_code == CREATED:
-                        d = getDuration(delta + response.elapsed)
-                        logger.logprb(INFO, 'OAuth2Service', 'upload()', 132, url, d.Hours, d.Minutes, d.Seconds, d.NanoSeconds)
-                        retry = 0
-                        uploaded = True
-                    elif response.status_code != PERMANENT_REDIRECT or 'Range' not in response.headers:
-                        logger.logprb(SEVERE, 'OAuth2Service', 'upload()', 131, parameter.Name, response.text)
-                        retry -= 1
-                        time.sleep(delay)
-                    else:
-                        dummy, sep, range = response.headers.get('Range').rpartition('-')
-                        start = int(range) +1
-                        delta += response.elapsed
-                    response.close()
+                stream.seek(start)
+                length, parameter.Data = stream.readBytes(None, chunk)
+                end = start + length -1
+                range = 'bytes %s-%s/%s' % (start, end, size)
+                response = parameter.uploadRange(start, end, size)
+                if response.Uploaded:
+                    delta = response.Elapsed
+                    logger.logprb(INFO, cls, mtd, 131, url, response.Count, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
+                    retry = 0
+                    uploaded = True
+                elif response.HasNextRange:
+                    start = response.NextRange
+                else:
+                    logger.logprb(SEVERE, cls, mtd, 132, parameter.Name, response.StatusCode, response.Text)
+                    retry -= 1
+                    time.sleep(delay)
             except:
-                logger.logprb(SEVERE, 'OAuth2Service', 'upload()', 131, parameter.Name, traceback.format_exc())
+                logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
                 retry -= 1
                 time.sleep(delay)
         stream.closeInput()
