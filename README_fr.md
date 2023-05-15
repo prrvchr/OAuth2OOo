@@ -68,11 +68,13 @@ Voici comment nous utilisons son API:
 
 > initialized = service.initializeSession(registered_url, user_account)
 
+La valeur renvoyée: `initialized` est True si `user_account` est déjà autorisé pour `registered_url`.
+
 - Initialiser l'Url:
 
 > initialized = service.initializeUrl(registered_url)
 
-La valeur renvoyée:: `initialized` est True si `registered_url` et/ou `user_account` a été récupérée de la configuration du service OAuth2.
+La valeur renvoyée: `initialized` est True si `registered_url` a été trouvé avec succès dans la configuration du service OAuth2.
 
 ### Obtenir le jeton d'accès:
 

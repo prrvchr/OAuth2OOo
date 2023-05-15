@@ -68,11 +68,13 @@ Here's how we use its API:
 
 > initialized = service.initializeSession(registered_url, user_account)
 
+The return value: `initialized` is True if `user_account` is already authorized for `registered_url`.
+
 - Initialize Url:
 
 > initialized = service.initializeUrl(registered_url)
 
-The returned value: `initialized` is True if `registered_url` and/or `user_account` has been retreived from the OAuth2 service configuration.
+The return value: `initialized` is True if `registered_url` was successfully found in the OAuth2 service configuration.
 
 ### Get the access token:
 
