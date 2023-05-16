@@ -40,7 +40,9 @@ from com.sun.star.ucb.ConnectionMode import OFFLINE
 
 from com.sun.star.rest.HTTPStatusCode import CREATED
 from com.sun.star.rest.HTTPStatusCode import OK
-from com.sun.star.rest.HTTPStatusCode import PERMANENT_REDIRECT
+
+from com.sun.star.rest.ParameterType import JSON
+from com.sun.star.rest.ParameterType import HEADER
 
 from com.sun.star.connection import NoConnectException
 
@@ -48,13 +50,14 @@ from com.sun.star.rest import ConnectionException
 from com.sun.star.rest import ConnectTimeoutException
 from com.sun.star.rest import ReadTimeoutException
 
-from .requestresponse import RequestResponse
 from .requestresponse import execute
 from .requestresponse import getDuration
 
 from .unotool import getSimpleFile
 
 import time
+from datetime import timedelta
+import re
 import traceback
 
 
@@ -93,39 +96,120 @@ def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay)
     return downloaded
 
 
-def upload(ctx, logger, parameter, url, chunk, retry, delay):
+def upload(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
     uploaded = False
     cls, mtd = 'OAuth2Service', 'upload()'
     sf = getSimpleFile(ctx)
     if sf.exists(url):
-        start = 0
-        retry = max(1, retry)
-        size = sf.getSize(url)
         stream = sf.openFileRead(url)
-        while retry > 0:
-            try:
-                stream.seek(start)
-                length, parameter.Data = stream.readBytes(None, chunk)
-                end = start + length -1
-                range = 'bytes %s-%s/%s' % (start, end, size)
-                response = parameter.uploadRange(start, end, size)
-                if response.Uploaded:
-                    delta = response.Elapsed
-                    logger.logprb(INFO, cls, mtd, 131, url, response.Count, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
-                    retry = 0
-                    uploaded = True
-                elif response.HasNextRange:
-                    start = response.NextRange
-                else:
-                    logger.logprb(SEVERE, cls, mtd, 132, parameter.Name, response.StatusCode, response.Text)
+        if parameter.isResumable():
+            start = 0
+            retry = max(1, retry)
+            size = sf.getSize(url)
+            uploader = Uploader(ctx, session, parameter, timeout)
+            while retry > 0:
+                try:
+                    stream.seek(start)
+                    length, uploader.Data = stream.readBytes(None, chunk)
+                    end = start + length -1
+                    response = uploader.uploadRange(start, end, size)
+                    if response.Uploaded:
+                        delta = response.Elapsed
+                        logger.logprb(INFO, cls, mtd, 131, url, response.Count, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
+                        retry = 0
+                        uploaded = True
+                    elif response.HasNextRange:
+                        start = response.NextRange
+                    else:
+                        logger.logprb(SEVERE, cls, mtd, 132, parameter.Name, response.StatusCode, response.Text)
+                        retry -= 1
+                        time.sleep(delay)
+                except:
+                    logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
                     retry -= 1
                     time.sleep(delay)
+        else:
+            parameter.DataSink = stream
+            try:
+                response = execute(ctx, session, parameter, timeout, True)
             except:
                 logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
-                retry -= 1
-                time.sleep(delay)
+            else:
+                delta = getDuration(response.elapsed)
+                response.close()
+                logger.logprb(INFO, cls, mtd, 131, url, 1, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
+                uploaded = True
         stream.closeInput()
     return uploaded
+
+
+class Uploader():
+    def __init__(self, ctx, session, parameter, timeout):
+        self._ctx = ctx
+        self._session = session
+        self._parameter = parameter
+        self._regex = re.compile(parameter.RangePattern)
+        self._range = None
+        self._timeout = timeout
+        self._delta = timedelta()
+        self._count = 0
+
+    @property
+    def Data(self):
+        return self._parameter.Data
+    @Data.setter
+    def Data(self, data):
+        self._parameter.Data = data
+
+    def uploadRange(self, start, end, size):
+        range = 'bytes %s-%s/%s' % (start, end, size)
+        self._parameter.setHeader('Content-Range', range)
+        response = execute(self._ctx, self._session, self._parameter, self._timeout)
+        upload = uno.createUnoStruct('com.sun.star.rest.UploadResponse')
+        upload.StatusCode = response.status_code
+        upload.Elapsed = self._getDuration(response.elapsed)
+        upload.Count = self._getCount()
+        if response.status_code == OK or response.status_code == CREATED:
+            upload.Uploaded = True
+        elif response.status_code == self._parameter.RangeStatus and self._hasRange(response):
+            upload.HasNextRange = True
+            upload.NextRange = self._getNextRange()
+        else:
+            upload.Text = response.text
+        response.close()
+        return upload
+
+    def _getDuration(self, delta):
+        self._delta += delta
+        return getDuration(self._delta)
+
+    def _getCount(self):
+        self._count += 1
+        return self._count
+
+    def _hasRange(self, response):
+        if self._regex is not None:
+            if self._parameter.RangeType == HEADER:
+                return self._hasDataRange(response.headers)
+            if self._parameter.RangeType == JSON:
+                return self._hasDataRange(response.json())
+        return False
+
+    def _hasDataRange(self, data):
+        self._range = matched = None
+        if self._parameter.RangeField in data:
+            range = data.get(self._parameter.RangeField)
+            # FIXME: Some provider like Microsoft give a Range as a JSON list
+            # FIXME: if so we only get the first value
+            if isinstance(range, list):
+                range = range[0]
+            matched = self._regex.search(range)
+        if matched is not None:
+            self._range = matched.group(1)
+        return self._range is not None
+
+    def _getNextRange(self):
+        return int(self._range) + self._parameter.RangeOffset
 
 
 def getSessionMode(ctx, host, port=80):
