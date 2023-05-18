@@ -24,13 +24,11 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 -->
-<oor:component-schema
+<oor:component-schema oor:name="OAuth2OOo" oor:package="io.github.prrvchr"
   xml:lang="en-US"
   xmlns:oor="http://openoffice.org/2001/registry"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  oor:package="io.github.prrvchr"
-  oor:name="OAuth2OOo">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <templates>
         <group oor:name="UserSet">
             <prop oor:name="RefreshToken" oor:type="xs:string" />
