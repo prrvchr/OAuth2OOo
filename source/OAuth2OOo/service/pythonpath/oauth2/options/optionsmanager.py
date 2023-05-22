@@ -48,9 +48,13 @@ from ..oauth2 import g_oauth2
 from ..configuration import g_identifier
 from ..configuration import g_defaultlog
 from ..configuration import g_errorlog
+from ..configuration import g_basename
 
 from ..logger import getLogger
 
+from six import binary_type
+from six import PY34
+from collections import OrderedDict
 import os
 import sys
 import traceback
@@ -61,9 +65,9 @@ class OptionsManager(unohelper.Base):
         self._ctx = ctx
         self._model = OAuth2Model(ctx)
         self._view = OptionsView(window)
-        self._logger = LogManager(ctx, window.getPeer(), self._getInfos(), g_identifier, g_defaultlog)
         connect, read, handler, urls = self._model.getOptionsDialogData()
         self._view.initView(connect, read, handler, urls)
+        self._logger = LogManager(ctx, window.Peer, self._getInfos(), g_identifier, g_defaultlog)
         window.addEventListener(OptionsListener(self))
 
     def dispose(self):
@@ -82,35 +86,81 @@ class OptionsManager(unohelper.Base):
         self._logger.loadSetting()
 
     def _getInfos(self):
-        infos = {}
+        infos = OrderedDict()
         version  = ' '.join(sys.version.split())
         infos[111] = version
         path = os.pathsep.join(sys.path)
         infos[112] = path
+        # Required modules for cryptography
         try:
-            import requests
-        except ImportError as e:
-            infos[113] = getExceptionMessage(e)
+            import cffi
+        except Exception as e:
+            infos[113] = self._getExceptionMessage(e)
         else:
-            infos[114] = requests.__version__
+            infos[114] = cffi.__version__
+        # FIXME: Only the backported enum34 has version (ie: python < 3.4)
+        if not PY34:
+            try:
+                import enum
+            except Exception as e:
+                infos[115] = self._getExceptionMessage(e)
+            else:
+                infos[116] = '%s.%s.%s' % enum.version
         try:
-            import urllib3
-        except ImportError as e:
-            infos[115] = getExceptionMessage(e)
+            import ipaddress
+        except Exception as e:
+            infos[117] = self._getExceptionMessage(e)
         else:
-            infos[116] = urllib3.__version__
+            infos[118] = ipaddress.__version__
+        try:
+            import six
+        except Exception as e:
+            infos[119] = self._getExceptionMessage(e)
+        else:
+            infos[120] = six.__version__
+        try:
+            import pycparser
+        except Exception as e:
+            infos[121] = self._getExceptionMessage(e)
+        else:
+            infos[122] = pycparser.__version__
+        try:
+            import cryptography
+        except Exception as e:
+            infos[123] = self._getExceptionMessage(e)
+        else:
+            infos[124] = cryptography.__version__
+        # Required modules for Requests
+        try:
+            import idna
+        except Exception as e:
+            infos[125] = self._getExceptionMessage(e)
+        else:
+            infos[126] = idna.__version__
         try:
             import chardet
-        except ImportError as e:
-            infos[117] = getExceptionMessage(e)
+        except Exception as e:
+            infos[127] = self._getExceptionMessage(e)
         else:
-            infos[118] = chardet.__version__
+            infos[128] = chardet.__version__
         try:
-            import ssl
-        except ImportError as e:
-            infos[119] = getExceptionMessage(e)
+            import certifi
+        except Exception as e:
+            infos[129] = self._getExceptionMessage(e)
         else:
-            infos[120] = ssl.OPENSSL_VERSION
+            infos[130] = certifi.__version__
+        try:
+            import urllib3
+        except Exception as e:
+            infos[131] = self._getExceptionMessage(e)
+        else:
+            infos[132] = urllib3.__version__
+        try:
+            import requests
+        except Exception as e:
+            infos[133] = self._getExceptionMessage(e)
+        else:
+            infos[134] = requests.__version__
         return infos
 
     def connect(self):
@@ -126,6 +176,12 @@ class OptionsManager(unohelper.Base):
             enabled = service.getAuthorization(url, user, autoclose, self._view.getParent())
             service.dispose()
         except Exception as e:
-            msg = "Error: %s - %s" % (e, traceback.print_exc())
+            msg = "Error: %s - %s" % (e, traceback.format_exc())
             getLogger(self._ctx, g_errorlog).logp(SEVERE, 'OptionsManager', 'connect()', msg)
 
+    def _getExceptionMessage(self, e):
+        logger = getLogger(self._ctx, g_errorlog, g_basename)
+        error = repr(e)
+        if isinstance(error, binary_type):
+            error = error.decode('utf-8')
+        return logger.resolveString(151, error, repr(traceback.format_exc()))

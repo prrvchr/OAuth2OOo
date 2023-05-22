@@ -30,12 +30,16 @@
 import uno
 import unohelper
 
+from com.sun.star.logging.LogLevel import SEVERE
+
 from com.sun.star.awt import XContainerWindowEventHandler
 from com.sun.star.lang import XServiceInfo
 
 from oauth2 import OptionsManager
 
 from oauth2 import g_identifier
+from oauth2 import g_errorlog
+from oauth2 import g_basename
 
 import traceback
 
@@ -72,8 +76,8 @@ class OptionsHandler(unohelper.Base,
                 handled = True
             return handled
         except Exception as e:
-            msg = "OptionsHandler.callHandlerMethod() Error: %s" % traceback.format_exc()
-            print(msg)
+            logger = getLogger(self._ctx, g_errorlog, g_basename)
+            logger.logprb(SEVERE, 'OptionsHandler', 'callHandlerMethod()', 141, e, traceback.format_exc())
 
     def getSupportedMethodNames(self):
         return ('external_event',
