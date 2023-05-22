@@ -43,6 +43,13 @@ The revocation takes place in the management of the applications associated with
 
 No more password is stored in LibreOffice / OpenOffice.
 
+## Requirement:
+
+If you are using **LibreOffice on Linux** and have the python3-cffi-backend package installed then you need to **install the python3-cffi package** with the commands:
+    - `dpkg -s python3-cffi-backend` (to know if the package is installed)
+    - `sudo apt install python3-cffi`
+OpenOffice and LibreOffice on Windows are not subject to this malfunction.
+
 ## Install:
 
 It seems important that the file was not renamed when it was downloaded.

@@ -43,6 +43,13 @@ La révocation a lieu dans la gestion des applications associées à votre compt
 
 Plus aucun mot de passe n'est stocké dans LibreOffice / OpenOffice.
 
+## Prérequis:
+
+Si vous utilisez **LibreOffice sur Linux** et que le paquet python3-cffi-backend est installé alors vous devez **installer le paquet python3-cffi** avec les commandes:
+    - `dpkg -s python3-cffi-backend` (pour savoir si le paquet est installé)
+    - `sudo apt install python3-cffi`
+OpenOffice et LibreOffice sous Windows ne sont pas soumis à ces dysfonctionnements.
+
 ## Installation:
 
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
