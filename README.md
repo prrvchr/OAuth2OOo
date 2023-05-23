@@ -91,11 +91,15 @@ The return value: `initialized` is True if `registered_url` was successfully fou
 
 ## Has been tested with:
 
-* LibreOffice 7.3.7.2 - Lubuntu 22.04 - LXQt 1.1.0
+* LibreOffice 7.3.7.2 - Lubuntu 22.04 - OpenJDK-11-JRE pour amd64
 
-* LibreOffice 7.4.3.2.(x64) - Windows 10(x64)
+* LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Adoptium JDK Hotspot 11.0.17 (x64) (under Lubuntu 22.04 / VirtualBox 6.1.38)
 
-* OpenOffice 4.1.13 - Lubuntu 22.04 - LXQt 0.17.0
+* OpenOffice 4.1.13 - Lubuntu 22.04 - OpenJDK-11-JRE pour amd64 (under Lubuntu 22.04 / VirtualBox 6.1.38)
+
+* OpenOffice 4.1.14 - Windows 10(x64) - Adoptium JDK Hotspot 11.0.19 (x32) (under Lubuntu 22.04 / VirtualBox 6.1.38)
+
+* OpenOffice 4.1.13 - Windows 10(x32) - Adoptium JDK Hotspot 11.0.19 (x32) (under Lubuntu 22.04 / VirtualBox 6.1.38)
 
 I encourage you in case of problem :-(  
 to create an [issue][10]  
