@@ -91,11 +91,11 @@ La valeur renvoyée: `initialized` est True si `registered_url` a été trouvé 
 
 ## A été testé avec:
 
-* LibreOffice 7.3.7.2 - Lubuntu 22.04 - OpenJDK-11-JRE pour amd64
+* LibreOffice 7.3.7.2 - Lubuntu 22.04 - OpenJDK-11-JRE (amd64)
 
 * LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Adoptium JDK Hotspot 11.0.17 (x64) (sous Lubuntu 22.04 / VirtualBox 6.1.38)
 
-* OpenOffice 4.1.13 - Lubuntu 22.04 - OpenJDK-11-JRE pour amd64 (sous Lubuntu 22.04 / VirtualBox 6.1.38)
+* OpenOffice 4.1.13 - Lubuntu 22.04 - OpenJDK-11-JRE (amd64) (sous Lubuntu 22.04 / VirtualBox 6.1.38)
 
 * OpenOffice 4.1.14 - Windows 10(x64) - Adoptium JDK Hotspot 11.0.19 (x32) (sous Lubuntu 22.04 / VirtualBox 6.1.38)
 
