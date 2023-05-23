@@ -46,10 +46,10 @@ Plus aucun mot de passe n'est stocké dans LibreOffice / OpenOffice.
 ## Prérequis:
 
 Si vous utilisez **LibreOffice sur Linux** et que le paquet python3-cffi-backend est installé alors vous devez **installer le paquet python3-cffi** avec les commandes:
-  - `dpkg -s python3-cffi-backend` (pour savoir si le paquet est installé)
-  - `sudo apt install python3-cffi`
+  - `dpkg -s python3-cffi-backend` (pour savoir si le paquet python3-cffi-backend est installé)
+  - `sudo apt install python3-cffi` (pour installer le package python3-cffi si nécessaire)
 
-OpenOffice et LibreOffice sous Windows ne sont pas soumis à ces dysfonctionnements.
+OpenOffice quelle que soit la plate-forme et LibreOffice sous Windows ne sont pas sujets à ces dysfonctionnements.
 
 ## Installation:
 

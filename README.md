@@ -46,10 +46,10 @@ No more password is stored in LibreOffice / OpenOffice.
 ## Requirement:
 
 If you are using **LibreOffice on Linux** and have the python3-cffi-backend package installed then you need to **install the python3-cffi package** with the commands:
-  - `dpkg -s python3-cffi-backend` (to know if the package is installed)
-  - `sudo apt install python3-cffi`
+  - `dpkg -s python3-cffi-backend` (to know if the python3-cffi-backend package is installed)
+  - `sudo apt install python3-cffi` (to install the python3-cffi package if needed)
 
-OpenOffice and LibreOffice on Windows are not subject to this malfunction.
+OpenOffice whatever the platform and LibreOffice under Windows are not subject to these malfunctions.
 
 ## Install:
 
