@@ -124,13 +124,13 @@ J'essaierai de le résoudre ;-)
 
 ### Ce qui a été fait pour la version 0.0.6:
 
-- Réécriture de l'assistant OAuth2 (Wizard) en essayant de suivre au mieux le [modèle MVC][24]. Cet assistant est composé de 5 pages héritant de l'interface UNO [XWizardPage][25]:
+- Réécriture de l'assistant OAuth2 (Wizard) en essayant de suivre au mieux le [modèle MVA][24]. Cet assistant est composé de 5 pages héritant de l'interface UNO [XWizardPage][25]:
 
-    - Page 1: [Controlleur][26] et [Vue][27]
-    - Page 2: [Controlleur][28] et [Vue][29]
-    - Page 3: [Controlleur][30] et [Vue][31]
-    - Page 4: [Controlleur][32] et [Vue][33]
-    - Page 5: [Controlleur][34] et [Vue][35]
+    - Page 1: [Adapteur][26] et [Vue][27]
+    - Page 2: [Adapteur][28] et [Vue][29]
+    - Page 3: [Adapteur][30] et [Vue][31]
+    - Page 4: [Adapteur][32] et [Vue][33]
+    - Page 5: [Adapteur][34] et [Vue][35]
 
 - Réécriture des trois services UNO fournis par l'extension OAuth2OOo dans trois fichiers distincts:
 
@@ -140,8 +140,8 @@ J'essaierai de le résoudre ;-)
 
 - Réécriture de la fenêtre des options accessible par **Outils -> Options -> Internet -> Protocole OAuth2**. Cette fenêtre est composée de deux fenêtres:
 
-    - La fenêtre de journalisation: [Controlleur][42] et [Vue][43].
-    - La fenêtre des options de configuration de l'extension OAuth2OOo: [Controlleur][44] et [Vue][45].
+    - La fenêtre de journalisation: [Adapteur][42] et [Vue][43].
+    - La fenêtre des options de configuration de l'extension OAuth2OOo: [Adapteur][44] et [Vue][45].
 
 - Réécriture d'un modèle de données unique [OAuth2Model][46] gérant l'assistant, les services, et la fenêtre des options.
 
@@ -182,7 +182,7 @@ J'essaierai de le résoudre ;-)
 [21]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132110>
 [22]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
 [23]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
-[24]: <https://fr.wikipedia.org/wiki/Mod%C3%A8le-vue-contr%C3%B4leur>
+[24]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
 [25]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/ui/dialogs/XWizardPage.html>
 [26]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2manager.py>
 [27]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2view.py>

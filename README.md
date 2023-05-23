@@ -124,13 +124,13 @@ I will try to solve it ;-)
 
 ### What has been done for version 0.0.6:
 
-- Rewrite of the OAuth2 wizard trying to follow the [MVC model][24] as best as possible. This wizard is made up of 5 pages inheriting from the UNO [XWizardPage][25] interface:
+- Rewrite of the OAuth2 wizard trying to follow the [MVA model][24] as best as possible. This wizard is made up of 5 pages inheriting from the UNO [XWizardPage][25] interface:
 
-    - Page 1: [Controller][26] and [View][27]
-    - Page 2: [Controller][28] and [View][29]
-    - Page 3: [Controller][30] and [View][31]
-    - Page 4: [Controller][32] and [View][33]
-    - Page 5: [Controller][34] and [View][35]
+    - Page 1: [Adapter][26] and [View][27]
+    - Page 2: [Adapter][28] and [View][29]
+    - Page 3: [Adapter][30] and [View][31]
+    - Page 4: [Adapter][32] and [View][33]
+    - Page 5: [Adapter][34] and [View][35]
 
 - Rewrite of the three UNO services provided by the OAuth2OOo extension in three separate files:
 
@@ -140,8 +140,8 @@ I will try to solve it ;-)
 
 - Rewrite of the options dialog accessible by **Tools -> Options -> Internet -> Protocol OAuth2**. This dialog is composed of two windows:
 
-    - The logging window: [Controller][42] and [View][43].
-    - The OAuth2OOo extension configuration options window: [Controller][44] and [View][45].
+    - The logging window: [Adapter][42] and [View][43].
+    - The OAuth2OOo extension configuration options window: [Adapter][44] and [View][45].
 
 - Rewrite a single data model: [OAuth2Model][46] managing wizard, services and options dialog.
 
@@ -182,7 +182,7 @@ I will try to solve it ;-)
 [21]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132110>
 [22]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
 [23]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
-[24]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller>
+[24]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
 [25]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/ui/dialogs/XWizardPage.html>
 [26]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2manager.py>
 [27]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2view.py>
