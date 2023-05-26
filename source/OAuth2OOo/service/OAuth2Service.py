@@ -78,6 +78,14 @@ from oauth2 import g_basename
 from oauth2 import OAuth2Model
 from oauth2 import OAuth2OOo
 
+try:
+    import ssl
+except:
+    try:
+        import urllib3.contrib.pyopenssl
+        urllib3.contrib.pyopenssl.inject_into_urllib3()
+    except:
+        pass
 import requests
 import traceback
 
@@ -157,7 +165,7 @@ class OAuth2Service(unohelper.Base,
         return token
 
     def getRequestParameter(self, name):
-        return RequestParameter(self._ctx, self._session, name, self.Timeout)
+        return RequestParameter(name)
 
     def execute(self, parameter):
         print("OAuth2Service.executeRequest() 1")

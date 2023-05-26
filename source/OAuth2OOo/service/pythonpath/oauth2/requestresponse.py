@@ -99,7 +99,9 @@ def getKwArgs(parameter, stream=False):
         kwargs['auth'] = parameter.Auth
     if parameter.DataSink:
         kwargs['data'] = FileLike(parameter.DataSink)
-    elif parameter.Data.value:
+    elif parameter.Data:
+        data = parameter.Data.value
+        print("Request.getKWArgs() Data Type: %s - Length: %s" % (type(data), len(data)))
         kwargs['data'] = parameter.Data.value
     elif parameter.Text:
         kwargs['data'] = parameter.Text

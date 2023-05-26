@@ -45,18 +45,15 @@ import traceback
 
 class RequestParameter(unohelper.Base,
                        XRequestParameter):
-    def __init__(self, ctx, session, name, timeout):
-        self._ctx = ctx
-        self._session = session
+    def __init__(self, name):
         self._name = name
-        self._timeout = timeout
         # FIXME: Requests parameters
         self._method = 'GET'
         self._url = ''
         self._headers = {}
         self._query = {}
         self._json = {}
-        self._data = uno.ByteSequence(b'')
+        self._data = None
         self._text = ''
         self._datasink = None
         self._noauth = False

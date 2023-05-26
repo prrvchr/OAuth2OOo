@@ -106,13 +106,12 @@ def upload(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
             start = 0
             retry = max(1, retry)
             size = sf.getSize(url)
-            uploader = Uploader(ctx, session, parameter, timeout)
+            uploader = Uploader(ctx, session, parameter, timeout, size)
             while retry > 0:
                 try:
                     stream.seek(start)
-                    length, uploader.Data = stream.readBytes(None, chunk)
-                    end = start + length -1
-                    response = uploader.uploadRange(start, end, size)
+                    length, data = stream.readBytes(None, chunk)
+                    response = uploader.uploadRange(start, length, data)
                     if response.Uploaded:
                         delta = response.Elapsed
                         logger.logprb(INFO, cls, mtd, 131, url, response.Count, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
@@ -144,25 +143,21 @@ def upload(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
 
 
 class Uploader():
-    def __init__(self, ctx, session, parameter, timeout):
+    def __init__(self, ctx, session, parameter, timeout, size):
         self._ctx = ctx
         self._session = session
         self._parameter = parameter
-        self._regex = re.compile(parameter.RangePattern)
+        self._regex = re.compile(parameter.RangePattern, re.UNICODE)
         self._range = None
         self._timeout = timeout
+        self._size = size
         self._delta = timedelta()
         self._count = 0
 
-    @property
-    def Data(self):
-        return self._parameter.Data
-    @Data.setter
-    def Data(self, data):
+    def uploadRange(self, start, length, data):
         self._parameter.Data = data
-
-    def uploadRange(self, start, end, size):
-        range = 'bytes %s-%s/%s' % (start, end, size)
+        end = start + length -1
+        range = 'bytes %s-%s/%s' % (start, end, self._size)
         self._parameter.setHeader('Content-Range', range)
         response = execute(self._ctx, self._session, self._parameter, self._timeout)
         upload = uno.createUnoStruct('com.sun.star.rest.UploadResponse')
@@ -204,8 +199,8 @@ class Uploader():
             if isinstance(range, list):
                 range = range[0]
             matched = self._regex.search(range)
-        if matched is not None:
-            self._range = matched.group(1)
+            if matched:
+                self._range = matched.group(1)
         return self._range is not None
 
     def _getNextRange(self):

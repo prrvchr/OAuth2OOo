@@ -59,6 +59,7 @@ from requests.compat import urlencode
 from requests import Session
 from requests import ConnectionError
 from requests import HTTPError
+from six import string_types
 import time
 import validators
 import base64
@@ -696,9 +697,13 @@ class OAuth2Model(unohelper.Base):
         return parameters
 
     def _getCodeChallenge(self, method):
+        print("OAuth2Model._getCodeChallenge() 1")
         code = self._getCodeVerifier()
         if method == 'S256':
-            code = hashlib.sha256(code.encode('utf-8')).digest()
+            if isinstance(code, string_types):
+                print("OAuth2Model._getCodeChallenge() 2")
+                code = code.encode('utf-8')
+            code = hashlib.sha256(code).digest()
             padding = {0:0, 1:2, 2:1}[len(code) % 3]
             challenge = base64.urlsafe_b64encode(code).decode('utf-8')
             code = challenge[:len(challenge)-padding]
@@ -773,12 +778,13 @@ class OAuth2Model(unohelper.Base):
         session = Session()
         with session as s:
             try:
-                with s.post(url, data=data, timeout=self.Timeout) as r:
+                print("OAuth2Model._getResponseFromRequest() Url: %s - Data: %s - Timeout: %s" % (url, data, self.Timeout))
+                with s.post(url, data=data, timeout=self.Timeout, verify=False) as r:
                     response = r.json()
                     r.raise_for_status()
             except ConnectionError:
                 # TODO: The provided url may be unreachable
-                error = self.getRequestErrorMessage(300) % url
+                error = self.getRequestErrorMessage(300) %  (url, repr(traceback.format_exc()))
                 self._logger.logp(SEVERE, 'OAuth2Model', '_getResponseFromRequest()', error)
             except json.decoder.JSONDecodeError:
                 # TODO: Normally the content of the page must be in json format,

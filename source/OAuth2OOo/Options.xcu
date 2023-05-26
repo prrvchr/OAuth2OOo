@@ -92,7 +92,7 @@
         <value>{"prompt": "consent", "response_mode": "query", "scope": null, "login_hint": "current_user", "hl": "current_language"}</value>
       </prop>
       <prop oor:name="TokenUrl">
-        <value>https://oauth2.googleapis.com/token</value>
+        <value>https://www.googleapis.com/oauth2/v4/token</value>
       </prop>
       <prop oor:name="TokenParameters">
         <value>{"client_secret": null}</value>

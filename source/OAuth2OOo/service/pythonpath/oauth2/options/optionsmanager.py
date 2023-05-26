@@ -91,7 +91,7 @@ class OptionsManager(unohelper.Base):
         infos[111] = version
         path = os.pathsep.join(sys.path)
         infos[112] = path
-        # Required modules for cryptography
+        # Required modules for cryptography / pyopenssl
         try:
             import cffi
         except Exception as e:
@@ -130,37 +130,57 @@ class OptionsManager(unohelper.Base):
             infos[123] = self._getExceptionMessage(e)
         else:
             infos[124] = cryptography.__version__
+        # FIXME: Only python 2.7.18 need pyopenssl (ie: python < 3.4)
+        try:
+            import ssl
+        except Exception as e:
+            infos[125] = self._getExceptionMessage(e)
+        else:
+            infos[126] = ssl.OPENSSL_VERSION
+        try:
+            import OpenSSL
+        except Exception as e:
+            infos[127] = self._getExceptionMessage(e)
+        else:
+            infos[128] = OpenSSL.__version__
         # Required modules for Requests
         try:
             import idna
         except Exception as e:
-            infos[125] = self._getExceptionMessage(e)
+            infos[129] = self._getExceptionMessage(e)
         else:
-            infos[126] = idna.__version__
+            infos[130] = idna.__version__
         try:
             import chardet
         except Exception as e:
-            infos[127] = self._getExceptionMessage(e)
+            infos[131] = self._getExceptionMessage(e)
         else:
-            infos[128] = chardet.__version__
+            infos[132] = chardet.__version__
         try:
             import certifi
         except Exception as e:
-            infos[129] = self._getExceptionMessage(e)
+            infos[133] = self._getExceptionMessage(e)
         else:
-            infos[130] = certifi.__version__
+            infos[134] = certifi.__version__
         try:
             import urllib3
         except Exception as e:
-            infos[131] = self._getExceptionMessage(e)
+            infos[135] = self._getExceptionMessage(e)
         else:
-            infos[132] = urllib3.__version__
+            infos[136] = urllib3.__version__
         try:
             import requests
         except Exception as e:
-            infos[133] = self._getExceptionMessage(e)
+            infos[137] = self._getExceptionMessage(e)
         else:
-            infos[134] = requests.__version__
+            infos[138] = requests.__version__
+        try:
+            import urllib3.contrib.pyopenssl
+            urllib3.contrib.pyopenssl.inject_into_urllib3()
+        except Exception as e:
+            infos[139] = self._getExceptionMessage(e)
+        else:
+            infos[140] = 'OK'
         return infos
 
     def connect(self):
@@ -182,6 +202,5 @@ class OptionsManager(unohelper.Base):
     def _getExceptionMessage(self, e):
         logger = getLogger(self._ctx, g_errorlog, g_basename)
         error = repr(e)
-        if isinstance(error, binary_type):
-            error = error.decode('utf-8')
-        return logger.resolveString(151, error, repr(traceback.format_exc()))
+        trace = repr(traceback.format_exc())
+        return logger.resolveString(151, error, trace)
