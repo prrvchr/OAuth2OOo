@@ -45,18 +45,20 @@ Plus aucun mot de passe n'est stocké dans LibreOffice / OpenOffice.
 
 ## Prérequis:
 
-Si vous utilisez **LibreOffice sur Linux** et que le paquet python3-cffi-backend est installé alors vous devez **installer le paquet python3-cffi** avec les commandes:
+- Si vous utilisez **OpenOffice sur Windows** quelle que soit la version, vous êtes sujet au [dysfonctionnement 128569][19]. Je n'ai pas trouvé de solution de contournement, pour l'instant je ne peux que vous conseiller d'installer **LibreOffice**...
+
+- Si vous utilisez **LibreOffice sur Linux** et que le paquet python3-cffi-backend est installé alors vous devez **installer le paquet python3-cffi** avec les commandes:
   - `dpkg -s python3-cffi-backend` (pour savoir si le paquet python3-cffi-backend est installé)
   - `sudo apt install python3-cffi` (pour installer le paquet python3-cffi si nécessaire)
 
-OpenOffice quelle que soit la plate-forme et LibreOffice sous Windows ne sont pas sujets à ces dysfonctionnements.
+OpenOffice sous Linux et LibreOffice sous Windows ne sont pas sujets à ces dysfonctionnements.
 
 ## Installation:
 
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][19]** version 0.0.6.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** version 0.0.6.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -97,9 +99,7 @@ La valeur renvoyée: `initialized` est True si `registered_url` a été trouvé 
 
 * OpenOffice 4.1.13 - Lubuntu 22.04 - OpenJDK-11-JRE (amd64) (sous Lubuntu 22.04 / VirtualBox 6.1.38)
 
-* OpenOffice 4.1.14 - Windows 10(x64) - Adoptium JDK Hotspot 11.0.19 (x32) (sous Lubuntu 22.04 / VirtualBox 6.1.38)
-
-* OpenOffice 4.1.13 - Windows 10(x32) - Adoptium JDK Hotspot 11.0.19 (x32) (sous Lubuntu 22.04 / VirtualBox 6.1.38)
+* **Ne fonctionne pas avec OpenOffice sous Windows** voir [dysfonctionnement 128569][19]. N'ayant aucune solution, je vous encourrage d'installer **LibreOffice**.
 
 Je vous encourage en cas de problème :-(  
 de créer un [dysfonctionnement][10]  
@@ -109,9 +109,9 @@ J'essaierai de le résoudre ;-)
 
 ### Ce qui a été fait pour la version 0.0.5:
 
-- Ecriture d'une nouvelle interface [XWizard][20] afin de remplacer le service Wizard devenu défectueux avec les versions 6.4.x et 7.x de LibreOffice (voir [bug 132110][21]).
+- Ecriture d'une nouvelle interface [XWizard][21] afin de remplacer le service Wizard devenu défectueux avec les versions 6.4.x et 7.x de LibreOffice (voir [bug 132110][22]).
 
-    Cette nouvelle interface corrige également le [bug 132661][22] et le [bug 132666][23] et permet d'accéder aux versions 6.4.x et 7.x de LibreOffice...
+    Cette nouvelle interface corrige également le [bug 132661][23] et le [bug 132666][24] et permet d'accéder aux versions 6.4.x et 7.x de LibreOffice...
 
     De plus, ce nouveau XWizard ajoute de nouvelles fonctionnalités telles que:
 
@@ -124,28 +124,28 @@ J'essaierai de le résoudre ;-)
 
 ### Ce qui a été fait pour la version 0.0.6:
 
-- Réécriture de l'assistant OAuth2 (Wizard) en essayant de suivre au mieux le [modèle MVA][24]. Cet assistant est composé de 5 pages héritant de l'interface UNO [XWizardPage][25]:
+- Réécriture de l'assistant OAuth2 (Wizard) en essayant de suivre au mieux le [modèle MVA][25]. Cet assistant est composé de 5 pages héritant de l'interface UNO [XWizardPage][26]:
 
-    - Page 1: [Adapteur][26] et [Vue][27]
-    - Page 2: [Adapteur][28] et [Vue][29]
-    - Page 3: [Adapteur][30] et [Vue][31]
-    - Page 4: [Adapteur][32] et [Vue][33]
-    - Page 5: [Adapteur][34] et [Vue][35]
+    - Page 1: [Adapteur][27] et [Vue][28]
+    - Page 2: [Adapteur][29] et [Vue][30]
+    - Page 3: [Adapteur][31] et [Vue][32]
+    - Page 4: [Adapteur][33] et [Vue][34]
+    - Page 5: [Adapteur][35] et [Vue][36]
 
 - Réécriture des trois services UNO fournis par l'extension OAuth2OOo dans trois fichiers distincts:
 
-    - Le service [OAuth2Service][36] implémentant l'interface décrite dans le fichier IDL [XOAuth2Service][37].
-    - Le service [OAuth2Dispacher][38] implémentant l'interface UNO [XDispatchProvider][39].
-    - Le service [OAuth2Handler][40] implémentant l'interface UNO [XInteractionHandler2][41].
+    - Le service [OAuth2Service][37] implémentant l'interface décrite dans le fichier IDL [XOAuth2Service][38].
+    - Le service [OAuth2Dispacher][39] implémentant l'interface UNO [XDispatchProvider][40].
+    - Le service [OAuth2Handler][41] implémentant l'interface UNO [XInteractionHandler2][42].
 
 - Réécriture de la fenêtre des options accessible par **Outils -> Options -> Internet -> Protocole OAuth2**. Cette fenêtre est composée de deux fenêtres:
 
-    - La fenêtre de journalisation: [Adapteur][42] et [Vue][43].
-    - La fenêtre des options de configuration de l'extension OAuth2OOo: [Adapteur][44] et [Vue][45].
+    - La fenêtre de journalisation: [Adapteur][43] et [Vue][44].
+    - La fenêtre des options de configuration de l'extension OAuth2OOo: [Adapteur][45] et [Vue][46].
 
-- Réécriture d'un modèle de données unique [OAuth2Model][46] gérant l'assistant, les services, et la fenêtre des options.
+- Réécriture d'un modèle de données unique [OAuth2Model][47] gérant l'assistant, les services, et la fenêtre des options.
 
-- L'erreur de flux de bouclage Google a été corrigée. Voir [Dysfonctionnement #10][47]
+- L'erreur de flux de bouclage Google a été corrigée. Voir [Dysfonctionnement #10][48]
 
 - Utilisation pour Dropbox de leur nouvelle API avec des jetons expirables.
 
@@ -153,7 +153,7 @@ J'essaierai de le résoudre ;-)
 
 ### Que reste-t-il à faire pour la version 0.0.6:
 
-- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][20].
+- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][21].
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -177,32 +177,33 @@ J'essaierai de le résoudre ;-)
 [16]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6_fr.png>
 [17]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7_fr.png>
 [18]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8_fr.png>
-[19]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
-[20]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/wizard/wizard.py>
-[21]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132110>
-[22]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
-[23]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
-[24]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
-[25]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/ui/dialogs/XWizardPage.html>
-[26]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2manager.py>
-[27]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2view.py>
-[28]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page2/oauth2manager.py>
-[29]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page2/oauth2view.py>
-[30]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page3/oauth2manager.py>
-[31]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page3/oauth2view.py>
-[32]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page4/oauth2manager.py>
-[33]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page4/oauth2view.py>
-[34]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page5/oauth2manager.py>
-[35]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page5/oauth2view.py>
-[36]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Service.py>
-[37]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
-[38]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Dispatcher.py>
-[39]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/frame/XDispatchProvider.html>
-[40]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Handler.py>
-[41]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/task/XInteractionHandler2.html>
-[42]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logmanager.py>
-[43]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logview.py>
-[44]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsmanager.py>
-[45]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
-[46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
-[47]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
+[19]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
+[20]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
+[21]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/wizard/wizard.py>
+[22]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132110>
+[23]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
+[24]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
+[25]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
+[26]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/ui/dialogs/XWizardPage.html>
+[27]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2manager.py>
+[28]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2view.py>
+[29]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page2/oauth2manager.py>
+[30]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page2/oauth2view.py>
+[31]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page3/oauth2manager.py>
+[32]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page3/oauth2view.py>
+[33]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page4/oauth2manager.py>
+[34]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page4/oauth2view.py>
+[35]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page5/oauth2manager.py>
+[36]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page5/oauth2view.py>
+[37]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Service.py>
+[38]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
+[39]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Dispatcher.py>
+[40]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/frame/XDispatchProvider.html>
+[41]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Handler.py>
+[42]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/task/XInteractionHandler2.html>
+[43]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logmanager.py>
+[44]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logview.py>
+[45]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsmanager.py>
+[46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
+[47]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
+[48]: <https://github.com/prrvchr/OAuth2OOo/issues/10>

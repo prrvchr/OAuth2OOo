@@ -48,11 +48,9 @@ from ..oauth2 import g_oauth2
 from ..configuration import g_identifier
 from ..configuration import g_defaultlog
 from ..configuration import g_errorlog
-from ..configuration import g_basename
 
 from ..logger import getLogger
 
-from six import binary_type
 from six import PY34
 from collections import OrderedDict
 import os
@@ -91,96 +89,82 @@ class OptionsManager(unohelper.Base):
         infos[111] = version
         path = os.pathsep.join(sys.path)
         infos[112] = path
-        # Required modules for cryptography / pyopenssl
+        # Required modules for cryptography
         try:
             import cffi
         except Exception as e:
-            infos[113] = self._getExceptionMessage(e)
+            infos[113] = self._getExceptionMsg(e)
         else:
-            infos[114] = cffi.__version__
+            infos[114] = (cffi.__version__, cffi.__file__)
         # FIXME: Only the backported enum34 has version (ie: python < 3.4)
         if not PY34:
             try:
                 import enum
             except Exception as e:
-                infos[115] = self._getExceptionMessage(e)
+                infos[115] = self._getExceptionMsg(e)
             else:
-                infos[116] = '%s.%s.%s' % enum.version
+                infos[116] = '%s.%s.%s' % enum.version, enum.__file__
         try:
             import ipaddress
         except Exception as e:
-            infos[117] = self._getExceptionMessage(e)
+            infos[117] = self._getExceptionMsg(e)
         else:
-            infos[118] = ipaddress.__version__
+            infos[118] = ipaddress.__version__, ipaddress.__file__
         try:
             import six
         except Exception as e:
-            infos[119] = self._getExceptionMessage(e)
+            infos[119] = self._getExceptionMsg(e)
         else:
-            infos[120] = six.__version__
+            infos[120] = six.__version__, six.__file__
         try:
             import pycparser
         except Exception as e:
-            infos[121] = self._getExceptionMessage(e)
+            infos[121] = self._getExceptionMsg(e)
         else:
-            infos[122] = pycparser.__version__
+            infos[122] = pycparser.__version__, pycparser.__file__
         try:
             import cryptography
         except Exception as e:
-            infos[123] = self._getExceptionMessage(e)
+            infos[123] = self._getExceptionMsg(e)
         else:
-            infos[124] = cryptography.__version__
-        # FIXME: Only python 2.7.18 need pyopenssl (ie: python < 3.4)
+            infos[124] = cryptography.__version__, cryptography.__file__
         try:
             import ssl
         except Exception as e:
-            infos[125] = self._getExceptionMessage(e)
+            infos[125] = self._getExceptionMsg(e)
         else:
-            infos[126] = ssl.OPENSSL_VERSION
-        try:
-            import OpenSSL
-        except Exception as e:
-            infos[127] = self._getExceptionMessage(e)
-        else:
-            infos[128] = OpenSSL.__version__
+            infos[126] = ssl.OPENSSL_VERSION, ssl.__file__
         # Required modules for Requests
         try:
             import idna
         except Exception as e:
-            infos[129] = self._getExceptionMessage(e)
+            infos[127] = self._getExceptionMsg(e)
         else:
-            infos[130] = idna.__version__
+            infos[128] = idna.__version__, idna.__file__
         try:
             import chardet
         except Exception as e:
-            infos[131] = self._getExceptionMessage(e)
+            infos[129] = self._getExceptionMsg(e)
         else:
-            infos[132] = chardet.__version__
+            infos[130] = chardet.__version__, chardet.__file__
         try:
             import certifi
         except Exception as e:
-            infos[133] = self._getExceptionMessage(e)
+            infos[131] = self._getExceptionMsg(e)
         else:
-            infos[134] = certifi.__version__
+            infos[132] = certifi.__version__, certifi.__file__
         try:
             import urllib3
         except Exception as e:
-            infos[135] = self._getExceptionMessage(e)
+            infos[133] = self._getExceptionMsg(e)
         else:
-            infos[136] = urllib3.__version__
+            infos[134] = urllib3.__version__, urllib3.__file__
         try:
             import requests
         except Exception as e:
-            infos[137] = self._getExceptionMessage(e)
+            infos[135] = self._getExceptionMsg(e)
         else:
-            infos[138] = requests.__version__
-        try:
-            import urllib3.contrib.pyopenssl
-            urllib3.contrib.pyopenssl.inject_into_urllib3()
-        except Exception as e:
-            infos[139] = self._getExceptionMessage(e)
-        else:
-            infos[140] = 'OK'
+            infos[136] = requests.__version__, requests.__file__
         return infos
 
     def connect(self):
@@ -199,8 +183,7 @@ class OptionsManager(unohelper.Base):
             msg = "Error: %s - %s" % (e, traceback.format_exc())
             getLogger(self._ctx, g_errorlog).logp(SEVERE, 'OptionsManager', 'connect()', msg)
 
-    def _getExceptionMessage(self, e):
-        logger = getLogger(self._ctx, g_errorlog, g_basename)
+    def _getExceptionMsg(self, e):
         error = repr(e)
         trace = repr(traceback.format_exc())
-        return logger.resolveString(151, error, trace)
+        return error, trace
