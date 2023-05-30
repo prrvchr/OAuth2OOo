@@ -53,7 +53,7 @@ class RequestParameter(unohelper.Base,
         self._headers = {}
         self._query = {}
         self._json = {}
-        self._data = None
+        self._data = uno.ByteSequence(b'')
         self._text = ''
         self._datasink = None
         self._noauth = False

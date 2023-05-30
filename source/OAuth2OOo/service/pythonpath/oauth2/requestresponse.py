@@ -94,16 +94,19 @@ def getKwArgs(parameter, stream=False):
     print("Request.getKWArgs() 1")
     kwargs = json.loads(parameter.toJson(stream))
     if parameter.NoAuth:
+        print("Request.getKWArgs() NoAuth")
         kwargs['auth'] = NoOAuth2()
     elif parameter.Auth:
+        print("Request.getKWArgs() Auth")
         kwargs['auth'] = parameter.Auth
     if parameter.DataSink:
+        print("Request.getKWArgs() DataSink")
         kwargs['data'] = FileLike(parameter.DataSink)
     elif parameter.Data:
-        data = parameter.Data.value
-        print("Request.getKWArgs() Data Type: %s - Length: %s" % (type(data), len(data)))
+        print("Request.getKWArgs() Data")
         kwargs['data'] = parameter.Data.value
     elif parameter.Text:
+        print("Request.getKWArgs() Text")
         kwargs['data'] = parameter.Text
     print("Request.getKWArgs() 2")
     return kwargs
