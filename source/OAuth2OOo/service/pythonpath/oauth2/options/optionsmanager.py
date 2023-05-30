@@ -51,7 +51,6 @@ from ..configuration import g_errorlog
 
 from ..logger import getLogger
 
-from six import PY34
 from collections import OrderedDict
 import os
 import sys
@@ -96,14 +95,17 @@ class OptionsManager(unohelper.Base):
             infos[113] = self._getExceptionMsg(e)
         else:
             infos[114] = (cffi.__version__, cffi.__file__)
-        # FIXME: Only the backported enum34 has version (ie: python < 3.4)
-        if not PY34:
+        try:
+            import enum
+        except Exception as e:
+            infos[115] = self._getExceptionMsg(e)
+        else:
+            # FIXME: Only the backported enum34 has version (ie: python < 3.4)
             try:
-                import enum
-            except Exception as e:
-                infos[115] = self._getExceptionMsg(e)
-            else:
-                infos[116] = '%s.%s.%s' % enum.version, enum.__file__
+                version = enum.version
+            except:
+                version = sys.version_info[0], sys.version_info[1], sys.version_info[2]
+            infos[116] = '%s.%s.%s' % version, enum.__file__
         try:
             import ipaddress
         except Exception as e:
@@ -187,3 +189,4 @@ class OptionsManager(unohelper.Base):
         error = repr(e)
         trace = repr(traceback.format_exc())
         return error, trace
+
