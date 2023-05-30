@@ -54,8 +54,6 @@ from com.sun.star.frame.DispatchResultState import SUCCESS
 from com.sun.star.uno import Exception as UnoException
 from com.sun.star.auth import OAuth2Request
 
-from oauth2 import KeyMap
-
 from oauth2 import getAccessToken
 from oauth2 import getParentWindow
 from oauth2 import getSessionMode
@@ -78,14 +76,6 @@ from oauth2 import g_basename
 from oauth2 import OAuth2Model
 from oauth2 import OAuth2OOo
 
-try:
-    import ssl
-except:
-    try:
-        import urllib3.contrib.pyopenssl
-        urllib3.contrib.pyopenssl.inject_into_urllib3()
-    except:
-        pass
 import requests
 import traceback
 
@@ -135,9 +125,6 @@ class OAuth2Service(unohelper.Base,
 
     def initializeSession(self, url, user):
         return self._model.initializeSession(url, user)
-
-    def getKeyMap(self):
-        return KeyMap()
 
     def getSessionMode(self, host):
         return getSessionMode(self._ctx, host)

@@ -36,8 +36,6 @@ from .configuration import g_defaultlog
 from .configuration import g_errorlog
 from .configuration import g_basename
 
-from .unolib import KeyMap
-
 from .unotool import createService
 from .unotool import getDialog
 from .unotool import getParentWindow
