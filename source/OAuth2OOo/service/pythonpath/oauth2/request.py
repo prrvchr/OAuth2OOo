@@ -52,6 +52,7 @@ from com.sun.star.rest import ReadTimeoutException
 
 from .requestresponse import execute
 from .requestresponse import getDuration
+from .requestresponse import RequestResponse
 
 from .unotool import getSimpleFile
 
@@ -97,11 +98,12 @@ def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay)
 
 
 def upload(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
-    uploaded = False
+    response = None
     cls, mtd = 'OAuth2Service', 'upload()'
     sf = getSimpleFile(ctx)
     if sf.exists(url):
         stream = sf.openFileRead(url)
+        # TODO: As the given parameter is resumable we do a resumable upload
         if parameter.isResumable():
             start = 0
             retry = max(1, retry)
@@ -111,35 +113,34 @@ def upload(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
                 try:
                     stream.seek(start)
                     length, data = stream.readBytes(None, chunk)
-                    response = uploader.uploadRange(start, length, data)
-                    if response.Uploaded:
-                        delta = response.Elapsed
-                        logger.logprb(INFO, cls, mtd, 131, url, response.Count, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
+                    if uploader.uploadRange(start, length, data):
+                        delta = uploader.Elapsed
+                        logger.logprb(INFO, cls, mtd, 131, url, uploader.Count, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
                         retry = 0
-                        uploaded = True
-                    elif response.HasNextRange:
-                        start = response.NextRange
+                        response = uploader.Response
+                    elif uploader.HasNextRange:
+                        start = uploader.NextRange
                     else:
-                        logger.logprb(SEVERE, cls, mtd, 132, parameter.Name, response.StatusCode, response.Text)
+                        logger.logprb(SEVERE, cls, mtd, 132, parameter.Name, uploader.StatusCode, uploader.Text)
                         retry -= 1
                         time.sleep(delay)
                 except:
                     logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
                     retry -= 1
                     time.sleep(delay)
+        # TODO: As the given parameter is not resumable we do a normal upload
         else:
             parameter.DataSink = stream
             try:
-                response = execute(ctx, session, parameter, timeout, True)
+                upload = execute(ctx, session, parameter, timeout, True)
             except:
                 logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
             else:
-                delta = getDuration(response.elapsed)
-                response.close()
+                delta = getDuration(upload.elapsed)
                 logger.logprb(INFO, cls, mtd, 131, url, 1, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
-                uploaded = True
+                response = RequestResponse(ctx, parameter, upload)
         stream.closeInput()
-    return uploaded
+    return response
 
 
 class Uploader():
@@ -153,34 +154,52 @@ class Uploader():
         self._size = size
         self._delta = timedelta()
         self._count = 0
+        self._hasnext = False
+        self._status = None
+        self._text = ''
+        self._response = None
+
+    @property
+    def HasNextRange(self):
+        return self._hasnext
+    @property
+    def NextRange(self):
+        return self._getNextRange()
+    @property
+    def Text(self):
+        return self._text
+    @property
+    def Count(self):
+        return self._count
+    @property
+    def StatusCode(self):
+        return self._status
+    @property
+    def Elapsed(self):
+        return getDuration(self._delta)
+    @property
+    def Response(self):
+        return self._response
 
     def uploadRange(self, start, length, data):
+        self._hasnext = False
         self._parameter.Data = data
         end = start + length -1
         range = 'bytes %s-%s/%s' % (start, end, self._size)
         self._parameter.setHeader('Content-Range', range)
         response = execute(self._ctx, self._session, self._parameter, self._timeout)
-        upload = uno.createUnoStruct('com.sun.star.rest.UploadResponse')
-        upload.StatusCode = response.status_code
-        upload.Elapsed = self._getDuration(response.elapsed)
-        upload.Count = self._getCount()
-        if response.status_code == OK or response.status_code == CREATED:
-            upload.Uploaded = True
-        elif response.status_code == self._parameter.RangeStatus and self._hasRange(response):
-            upload.HasNextRange = True
-            upload.NextRange = self._getNextRange()
-        else:
-            upload.Text = response.text
-        response.close()
-        return upload
-
-    def _getDuration(self, delta):
-        self._delta += delta
-        return getDuration(self._delta)
-
-    def _getCount(self):
+        self._status = response.status_code
+        self._delta += response.elapsed
         self._count += 1
-        return self._count
+        if self._status == OK or self._status == CREATED:
+            self._response = RequestResponse(self._ctx, self._parameter, response)
+            return True
+        if self._status == self._parameter.RangeStatus and self._hasRange(response):
+            self._hasnext = True
+        else:
+            self._text = response.text
+        response.close()
+        return False
 
     def _hasRange(self, response):
         if self._regex is not None:
