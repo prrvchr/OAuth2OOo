@@ -85,9 +85,9 @@ def getDuration(delta):
     return duration
 
 
-def execute(ctx, session, parameter, timeout, stream=False):
+def execute(ctx, source, session, parameter, timeout, stream=False):
     kwargs = getKwArgs(parameter, stream)
-    return getResponse(ctx, session, parameter.Name, parameter.Method, parameter.Url, kwargs, timeout)
+    return getResponse(ctx, source, session, parameter.Name, parameter.Method, parameter.Url, kwargs, timeout)
 
 
 def getKwArgs(parameter, stream=False):
@@ -112,7 +112,7 @@ def getKwArgs(parameter, stream=False):
     return kwargs
 
 
-def getResponse(ctx, session, name, method, url, kwargs, timeout):
+def getResponse(ctx, source, session, name, method, url, kwargs, timeout):
     response = None
     cls, mtd = 'OAuth2Service', 'executeRequest()'
     print("Request.executeRequest() 1")
@@ -120,46 +120,77 @@ def getResponse(ctx, session, name, method, url, kwargs, timeout):
         response = session.request(method, url, timeout=timeout, **kwargs)
     except URLRequired as e:
         error = URLRequiredException()
+        error.Context = source
         error.Url = url
-        error.Message = _getExceptionMessage(ctx, cls, mtd, 101, name, error.Url)
+        error.Message = getExceptionMessage(ctx, cls, mtd, 101, name, error.Url)
         raise error
     except ConnectTimeout as e:
         error = ConnectTimeoutException()
+        error.Context = source
         error.Url = url
         connect, read = timeout
         error.ConnectTimeout = connect
-        error.Message = _getExceptionMessage(ctx, cls, mtd, 102, error.ConnectTimeout, name, error.Url)
+        error.Message = getExceptionMessage(ctx, cls, mtd, 102, error.ConnectTimeout, name, error.Url)
         raise error
     except ReadTimeout as e:
         error = ReadTimeoutException()
+        error.Context = source
         error.Url = url
         connect, read = timeout
         error.ReadTimeout = read
-        error.Message = _getExceptionMessage(ctx, cls, mtd, 103, error.ReadTimeout, name, error.Url)
+        error.Message = getExceptionMessage(ctx, cls, mtd, 103, error.ReadTimeout, name, error.Url)
         raise error
     except ConnectionError as e:
         error = ConnectionException()
+        error.Context = source
         error.Url = url
-        error.Message = _getExceptionMessage(ctx, cls, mtd, 104, name, error.Url)
+        error.Message = getExceptionMessage(ctx, cls, mtd, 104, name, error.Url)
         raise error
     except TooManyRedirects as e:
         error = TooManyRedirectsException()
+        error.Context = source
         error.Url = url
-        error.Message = _getExceptionMessage(ctx, cls, mtd, 106, name, error.Url)
+        error.Message = getExceptionMessage(ctx, cls, mtd, 106, name, error.Url)
         raise error
     except RequestError as e:
         error = RequestException()
+        error.Context = source
         error.Url = url
-        text = '' if response is None else response.Text
-        error.Message = _getExceptionMessage(ctx, cls, mtd, 107, name, error.Url, text)
+        text = '' if response is None else response.text
+        error.Message = getExceptionMessage(ctx, cls, mtd, 107, name, error.Url, text)
         raise error
     print("Request.executeRequest() 2")
     return response
 
 
-def getRequestResponse(ctx, session, parameter, timeout):
-    response = execute(ctx, session, parameter, timeout)
+def getRequestResponse(ctx, source, session, parameter, timeout):
+    response = execute(ctx, source, session, parameter, timeout)
     return RequestResponse(ctx, parameter, response)
+
+
+def raiseHTTPException(ctx, source, cls, mtd, name, code, error):
+    e = HTTPException()
+    e.Context = source
+    e.Url = error.response.url
+    e.StatusCode = error.response.status_code
+    e.Content = error.response.text
+    e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, e.StatusCode, e.Content)
+    return e
+
+
+def raiseRequestException(ctx, source, cls, mtd, name, code, error):
+    e = RequestException()
+    e.Context = source
+    e.Url = error.response.url
+    e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, error.response.status_code, error.response.text)
+    raise e
+
+
+def getExceptionMessage(ctx, cls, method, resource, *args):
+    logger = getLogger(ctx, g_errorlog, g_basename)
+    message = logger.resolveString(resource, *args)
+    logger.logp(SEVERE, cls, method, message)
+    return message
 
 
 class RequestResponse(unohelper.Base,
@@ -241,7 +272,7 @@ class RequestResponse(unohelper.Base,
         try:
             self._response.raise_for_status(redirect)
         except HTTPError as e:
-            raise self._getHTTPException(e)
+            raiseHTTPException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, e)
 
     def iterContent(self, length, decode):
         chunk = length if length > 0 else None
@@ -251,14 +282,6 @@ class RequestResponse(unohelper.Base,
         chunk = length if length > 0 else None
         delimiter = separator if separator != '' else None
         return Enumerator(self._response.iter_lines(chunk, decode, delimiter), decode)
-
-    def _getHTTPException(self, error):
-        e = HTTPException()
-        e.Url = error.response.url
-        e.StatusCode = error.response.status_code
-        e.Content = error.response.text
-        e.Message = _getExceptionMessage(self._ctx, 'OAuth2Service', 'execute()', 105, self._parameter.Name, e.Url, e.StatusCode)
-        return e
 
 
 class InputStream(unohelper.Base,
@@ -344,12 +367,4 @@ class FileLike():
 
     def tell(self):
         return self._input.getPosition()
-
-
-# Private method
-def _getExceptionMessage(ctx, clazz, method, resource, *args):
-    logger = getLogger(ctx, g_errorlog, g_basename)
-    message = logger.resolveString(resource, *args)
-    logger.logp(SEVERE, clazz, method, message)
-    return message
 

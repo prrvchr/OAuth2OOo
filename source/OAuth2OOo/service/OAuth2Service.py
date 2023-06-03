@@ -156,16 +156,16 @@ class OAuth2Service(unohelper.Base,
 
     def execute(self, parameter):
         print("OAuth2Service.executeRequest() 1")
-        return getRequestResponse(self._ctx, self._session, parameter, self.Timeout)
+        return getRequestResponse(self._ctx, self, self._session, parameter, self.Timeout)
 
     def getInputStream(self, parameter, chunk, decode):
-        return getInputStream(self._session, parameter, self.Timeout, chunk, decode)
+        return getInputStream(self._ctx, self, self._session, parameter, self.Timeout, chunk, decode)
 
     def download(self, parameter, url, chunk, retry, delay):
-        return download(self._ctx, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
+        return download(self._ctx, self, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
     def upload(self, parameter, url, chunk, retry, delay):
-        return upload(self._ctx, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
+        return upload(self._ctx, self, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
     # Private method
     def _getSession(self):

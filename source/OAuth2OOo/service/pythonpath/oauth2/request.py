@@ -41,6 +41,10 @@ from com.sun.star.ucb.ConnectionMode import OFFLINE
 from com.sun.star.rest.HTTPStatusCode import CREATED
 from com.sun.star.rest.HTTPStatusCode import OK
 
+from com.sun.star.rest import FileNotFoundException
+from com.sun.star.rest import HTTPException
+from com.sun.star.rest import RequestException
+
 from com.sun.star.rest.ParameterType import JSON
 from com.sun.star.rest.ParameterType import HEADER
 
@@ -52,17 +56,22 @@ from com.sun.star.rest import ReadTimeoutException
 
 from .requestresponse import execute
 from .requestresponse import getDuration
+from .requestresponse import getExceptionMessage
+from .requestresponse import raiseHTTPException
+from .requestresponse import raiseRequestException
 from .requestresponse import RequestResponse
 
 from .unotool import getSimpleFile
 
+from requests.exceptions import HTTPError
+from requests.exceptions import RequestException as RequestError
 import time
 from datetime import timedelta
 import re
 import traceback
 
 
-def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
+def download(ctx, source, logger, session, parameter, url, timeout, chunk, retry, delay):
     downloaded = False
     cls, mtd = 'OAuth2Service', 'download()'
     retry = max(1, retry)
@@ -71,109 +80,115 @@ def download(ctx, logger, session, parameter, url, timeout, chunk, retry, delay)
     while retry > 0:
         retry -= 1
         try:
-            response = execute(ctx, session, parameter, timeout, True)
-        except:
-            logger.logprb(SEVERE, cls, mtd, 121, parameter.Name, traceback.format_exc())
+            response = execute(ctx, source, session, parameter, timeout, True)
+        except RequestException as e:
+            logger.logprb(SEVERE, cls, mtd, 122, parameter.Name, traceback.format_exc())
+            if not retry > 0:
+                stream.closeOutput()
+                raise e
             time.sleep(delay)
         else:
             if response.ok:
                 try:
                     for buffer in response.iter_content(chunk, False):
                         stream.writeBytes(uno.ByteSequence(buffer))
-                except:
-                    logger.logprb(SEVERE, cls, mtd, 121, parameter.Name, traceback.format_exc())
+                except RequestError as e:
+                    logger.logprb(SEVERE, cls, mtd, 122, parameter.Name, traceback.format_exc())
+                    if not retry > 0:
+                        stream.closeOutput()
+                        raiseRequestException(ctx, source, cls, mtd, parameter.Name, 123, e)
                     print('request.download() Download ERROR')
                     range = 'bytes=%s-' % stream.getLength()
                     parameter.setHeader('Range', range)
                     time.sleep(delay)
                 else:
                     d = getDuration(response.elapsed)
-                    logger.logprb(INFO, cls, mtd, 122, url, d.Hours, d.Minutes, d.Seconds, d.NanoSeconds)
+                    logger.logprb(INFO, cls, mtd, 121, url, d.Hours, d.Minutes, d.Seconds, d.NanoSeconds)
                     retry = 0
                     downloaded = True
             else:
+                if not retry > 0:
+                    stream.closeOutput()
+                    _raiseResponseException(ctx, source, cls, mtd, 123, parameter, response)
                 time.sleep(delay)
     stream.closeOutput()
     return downloaded
 
 
-def upload(ctx, logger, session, parameter, url, timeout, chunk, retry, delay):
+def upload(ctx, source, logger, session, parameter, url, timeout, chunk, retry, delay):
+    sf = getSimpleFile(ctx)
+    if not sf.exists(url):
+        e = FileNotFoundException()
+        e.Context = source
+        e.FileUrl = url
+        e.Url = parameter.Url
+        raise e
     response = None
     cls, mtd = 'OAuth2Service', 'upload()'
-    sf = getSimpleFile(ctx)
-    if sf.exists(url):
-        stream = sf.openFileRead(url)
-        # TODO: As the given parameter is resumable we do a resumable upload
-        if parameter.isResumable():
-            start = 0
-            retry = max(1, retry)
-            size = sf.getSize(url)
-            uploader = Uploader(ctx, session, parameter, timeout, size)
-            while retry > 0:
-                try:
-                    stream.seek(start)
-                    length, data = stream.readBytes(None, chunk)
-                    if uploader.uploadRange(start, length, data):
-                        delta = uploader.Elapsed
-                        logger.logprb(INFO, cls, mtd, 131, url, uploader.Count, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
-                        retry = 0
-                        response = uploader.Response
-                    elif uploader.HasNextRange:
-                        start = uploader.NextRange
-                    else:
-                        logger.logprb(SEVERE, cls, mtd, 132, parameter.Name, uploader.StatusCode, uploader.Text)
-                        retry -= 1
-                        time.sleep(delay)
-                except:
-                    logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
-                    retry -= 1
-                    time.sleep(delay)
-        # TODO: As the given parameter is not resumable we do a normal upload
-        else:
-            parameter.DataSink = stream
+    stream = sf.openFileRead(url)
+    # TODO: If the given parameter is resumable we do a resumable upload
+    if parameter.isResumable():
+        start = 0
+        retry = max(1, retry)
+        size = sf.getSize(url)
+        uploader = Uploader(ctx, source, session, parameter, timeout, size, cls, mtd)
+        while retry > 0:
             try:
-                upload = execute(ctx, session, parameter, timeout, True)
-            except:
+                stream.seek(start)
+                length, data = stream.readBytes(None, chunk)
+                if uploader.uploadRange(start, length, data):
+                    delta = uploader.Elapsed
+                    logger.logprb(INFO, cls, mtd, 131, url, uploader.Count, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
+                    retry = 0
+                    response = uploader.Response
+                else:
+                    start = uploader.NextRange
+            except RequestException as e:
+                retry -= 1
                 logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
-            else:
-                delta = getDuration(upload.elapsed)
-                logger.logprb(INFO, cls, mtd, 131, url, 1, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
-                response = RequestResponse(ctx, parameter, upload)
-        stream.closeInput()
+                if not retry > 0:
+                    stream.closeInput()
+                    raise e
+                time.sleep(delay)
+    # TODO: As the given parameter is not resumable we do a normal upload
+    else:
+        parameter.DataSink = stream
+        try:
+            upload = execute(ctx, source, session, parameter, timeout, True)
+        except RequestException as e:
+            logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
+            stream.closeInput()
+            raise e
+        else:
+            delta = getDuration(upload.elapsed)
+            logger.logprb(INFO, cls, mtd, 131, url, 1, delta.Hours, delta.Minutes, delta.Seconds, delta.NanoSeconds)
+            response = RequestResponse(ctx, parameter, upload)
+    stream.closeInput()
     return response
 
 
 class Uploader():
-    def __init__(self, ctx, session, parameter, timeout, size):
+    def __init__(self, ctx, source, session, parameter, timeout, size, cls, mtd):
         self._ctx = ctx
+        self._source = source
         self._session = session
         self._parameter = parameter
         self._regex = re.compile(parameter.RangePattern, re.UNICODE)
         self._range = None
         self._timeout = timeout
         self._size = size
+        self._cls = cls
+        self._mtd = mtd
         self._delta = timedelta()
         self._count = 0
-        self._hasnext = False
-        self._status = None
-        self._text = ''
         self._response = None
 
-    @property
-    def HasNextRange(self):
-        return self._hasnext
     @property
     def NextRange(self):
         return self._getNextRange()
     @property
-    def Text(self):
-        return self._text
-    @property
     def Count(self):
         return self._count
-    @property
-    def StatusCode(self):
-        return self._status
     @property
     def Elapsed(self):
         return getDuration(self._delta)
@@ -182,12 +197,11 @@ class Uploader():
         return self._response
 
     def uploadRange(self, start, length, data):
-        self._hasnext = False
         self._parameter.Data = data
         end = start + length -1
         range = 'bytes %s-%s/%s' % (start, end, self._size)
         self._parameter.setHeader('Content-Range', range)
-        response = execute(self._ctx, self._session, self._parameter, self._timeout)
+        response = execute(self._ctx, self._source, self._session, self._parameter, self._timeout)
         self._status = response.status_code
         self._delta += response.elapsed
         self._count += 1
@@ -195,11 +209,9 @@ class Uploader():
             self._response = RequestResponse(self._ctx, self._parameter, response)
             return True
         if self._status == self._parameter.RangeStatus and self._hasRange(response):
-            self._hasnext = True
-        else:
-            self._text = response.text
-        response.close()
-        return False
+            response.close()
+            return False
+        _raiseResponseException(self._ctx, self._source, self._cls, self._mtd, 134, self._parameter, response)
 
     def _hasRange(self, response):
         if self._regex is not None:
@@ -238,8 +250,8 @@ def getSessionMode(ctx, host, port=80):
     return mode
 
 
-def getInputStream(session, parameter, timeout, chunk, decode):
-    response = execute(session, parameter, timeout, True)
+def getInputStream(ctx, source, session, parameter, timeout, chunk, decode):
+    response = execute(ctx, source, session, parameter, timeout, True)
     return InputStream(response, chunk, decode)
 
 
@@ -281,4 +293,16 @@ class InputStream(unohelper.Base,
                 pass
         self._buffer = buffer[length:]
         return buffer[:length]
+
+
+def _raiseResponseException(ctx, source, cls, mtd, code, parameter, response):
+    try:
+        response.raise_for_status()
+    except HTTPError as e:
+        raiseHTTPException(ctx, source, cls, mtd, parameter.Name, code, e)
+    e = RequestException()
+    e.Context = source
+    e.Url = parameter.Url
+    e.Message = getExceptionMessage(ctx, cls, mtd, code +1, parameter.Name, parameter.Url, response.text)
+    raise e
 
