@@ -48,6 +48,7 @@ from com.sun.star.rest.ParameterType import REDIRECT
 from com.sun.star.rest import ConnectionException
 from com.sun.star.rest import ConnectTimeoutException
 from com.sun.star.rest import HTTPException
+from com.sun.star.rest import JSONDecodeException
 from com.sun.star.rest import ReadTimeoutException
 from com.sun.star.rest import RequestException
 from com.sun.star.rest import TooManyRedirectsException
@@ -59,6 +60,8 @@ from .oauth2 import NoOAuth2
 
 from .logger import getLogger
 
+from .json import getJsonStructure
+
 from .configuration import g_errorlog
 from .configuration import g_basename
 
@@ -68,6 +71,7 @@ from requests.exceptions import ConnectTimeout
 from requests.exceptions import ReadTimeout
 from requests.exceptions import ConnectionError
 from requests.exceptions import TooManyRedirects
+from requests.exceptions import JSONDecodeError
 from requests.exceptions import RequestException as RequestError
 import json
 import traceback
@@ -177,6 +181,14 @@ def raiseHTTPException(ctx, source, cls, mtd, name, code, error):
     e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, e.StatusCode, e.Content)
     raise e
 
+def raiseJSONDecodeException(ctx, source, cls, mtd, name, code, error):
+    e = JSONDecodeException()
+    e.Context = source
+    e.Url = error.response.url
+    e.StatusCode = error.response.status_code
+    e.Content = error.response.text
+    e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, e.StatusCode, e.Content)
+    raise e
 
 def raiseRequestException(ctx, source, cls, mtd, name, code, error):
     e = RequestException()
@@ -267,6 +279,14 @@ class RequestResponse(unohelper.Base,
 
     def getHeader(self, key):
         return self._response.headers.get(key, '')
+
+    def getJson(self):
+        try:
+            data = self._response.json()
+        except JSONDecodeError as e:
+            raiseJSONDecodeException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, e)
+        else:
+            return getJsonStructure(data)
 
     def raiseForStatus(self, redirect):
         try:

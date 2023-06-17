@@ -39,6 +39,8 @@ from com.sun.star.rest.ParameterType import REDIRECT
 
 from com.sun.star.rest import XRequestParameter
 
+from .json import JsonBuilder
+
 import json
 import traceback
 
@@ -237,6 +239,12 @@ class RequestParameter(unohelper.Base,
 
     def setQuery(self, key, value):
         self._query[key] = value
+
+    def getJsonBuilder(self):
+        return JsonBuilder()
+
+    def setJsonStructure(self, structure):
+        self._json.update(json.loads(structure.toJson()))
 
     def toJson(self, stream):
         # FIXME: It is necessary to be able to manage nextPage

@@ -40,6 +40,10 @@ ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonNumber
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonStructure
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonArray
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonObject
+${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonStructureBuilder
+${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonArrayBuilder
+${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonObjectBuilder
+${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonBuilder
 
 read -p "Press enter to continue"
 
