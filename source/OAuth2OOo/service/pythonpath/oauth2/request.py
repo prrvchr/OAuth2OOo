@@ -300,9 +300,6 @@ def _raiseResponseException(ctx, source, cls, mtd, code, parameter, response):
         response.raise_for_status()
     except HTTPError as e:
         raiseHTTPException(ctx, source, cls, mtd, parameter.Name, code, e)
-    e = RequestException()
-    e.Context = source
-    e.Url = parameter.Url
-    e.Message = getExceptionMessage(ctx, cls, mtd, code +1, parameter.Name, parameter.Url, response.text)
-    raise e
+    else:
+        raiseRequestException(ctx, source, cls, mtd, parameter.Name, code, e)
 

@@ -4,7 +4,7 @@
 
 **The use of this software subjects you to our** [**Terms Of Use**][3] **and** [**Data Protection Policy**][4].
 
-# version [0.0.6][5]
+# version [1.0.0][5]
 
 ## Introduction:
 

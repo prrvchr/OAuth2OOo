@@ -59,11 +59,8 @@ interface XRequestParameter: com::sun::star::uno::XInterface
     void setHeader([in] string Key,
                    [in] string Value);
 
-    void setJson([in] string Key,
+    void setJson([in] string Path,
                  [in] any Value);
-
-    void setNesting([in] string Path,
-                    [in] any Value);
 
     void setQuery([in] string Key,
                   [in] string Value);

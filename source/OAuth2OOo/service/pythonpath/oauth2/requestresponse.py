@@ -175,7 +175,7 @@ def raiseHTTPException(ctx, source, cls, mtd, name, code, error):
     e.StatusCode = error.response.status_code
     e.Content = error.response.text
     e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, e.StatusCode, e.Content)
-    return e
+    raise e
 
 
 def raiseRequestException(ctx, source, cls, mtd, name, code, error):
@@ -273,6 +273,8 @@ class RequestResponse(unohelper.Base,
             self._response.raise_for_status(redirect)
         except HTTPError as e:
             raiseHTTPException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, e)
+        except RequestException as e:
+            raiseRequestException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, e)
 
     def iterContent(self, length, decode):
         chunk = length if length > 0 else None
