@@ -58,7 +58,7 @@ OpenOffice sous Linux et LibreOffice sous Windows ne sont pas sujets à ces dysf
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** version 0.0.6.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** version 1.0.0.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -151,7 +151,18 @@ J'essaierai de le résoudre ;-)
 
 - Beaucoup d'autres correctifs...
 
-### Que reste-t-il à faire pour la version 0.0.6:
+### Ce qui a été fait pour la version 1.0.0:
+
+- Portage de l'API Java [JSON-P][49] vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl : [com.sun.star.json.*][50]
+
+    - Une fabrique de structures Json est accessible via l'interface `getJsonBuilder()` de [com.sun.star.rest.XRequestParameter.idl][51]
+    - Un analyseur Json est renvoyé par l'interface `getJson()` de [com.sun.star.rest.XRequestResponse.idl][52]
+
+**Cela rend les requêtes HTTP utilisant Json facilement utilisable dans le langage Basic de LibreOffice / OpenOffice.**
+
+Voir les macros [Requêtes HTTP sous Basic][53] et [Requêtes ChatGPT en Basic][54].
+
+### Que reste-t-il à faire pour la version 1.0.0:
 
 - Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][21].
 
@@ -207,3 +218,9 @@ J'essaierai de le résoudre ;-)
 [46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
 [47]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
 [48]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
+[49]: <https://javaee.github.io/jsonp/>
+[50]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/json>
+[51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
+[52]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
+[53]: <https://forum.openoffice.org/fr/forum/viewtopic.php?t=67387>
+[54]: <https://forum.openoffice.org/fr/forum/viewtopic.php?t=67402>

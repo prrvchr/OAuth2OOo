@@ -49,6 +49,7 @@ from com.sun.star.json import XJsonBuilder
 from com.sun.star.json import XJsonArrayBuilder
 from com.sun.star.json import XJsonObjectBuilder
 
+from collections import OrderedDict
 import json
 import traceback
 
@@ -62,6 +63,17 @@ def getJsonStructure(data, null=True):
         return data
     else:
         return None
+
+
+class JsonBuilder(unohelper.Base,
+                  XJsonBuilder):
+
+    #XJsonBuilder
+    def createArray(self):
+        return JsonArrayBuilder()
+
+    def createObject(self):
+        return JsonObjectBuilder()
 
 
 class JsonValue(unohelper.Base,
@@ -182,130 +194,112 @@ class Enumerator(unohelper.Base,
         return getJsonStructure(self._data[index], False)
 
 
-class JsonBuilder(unohelper.Base,
-                  XJsonBuilder):
-
-    #XJsonBuilder
-    def createArray(self):
-        return JsonArrayBuilder()
-
-    def createObject(self):
-        return JsonObjectBuilder()
-
-
 class JsonArrayBuilder(unohelper.Base,
                        XJsonArrayBuilder):
     def __init__(self):
-        self._data = []
-        self._build = {}
-        self._index = 0
+        self._builders = []
+        self._values = []
 
     #XJsonArrayBuilder
     def addShort(self, value):
-        self._data.append(value)
-        self._index += 1
-        return self
+        return self._addValue(value)
 
     def addLong(self, value):
-        self._data.append(value)
-        self._index += 1
-        return self
+        return self._addValue(value)
 
     def addHyper(self, value):
-        self._data.append(value)
-        self._index += 1
-        return self
+        return self._addValue(value)
 
     def addFloat(self, value):
-        self._data.append(value)
-        self._index += 1
-        return self
+        return self._addValue(value)
 
     def addDouble(self, value):
-        self._data.append(value)
-        self._index += 1
-        return self
+        return self._addValue(value)
 
     def addBoolean(self, value):
-        self._data.append(value)
-        self._index += 1
-        return self
+        return self._addValue(value)
 
     def addString(self, value):
-        self._data.append(value)
-        self._index += 1
-        return self
+        return self._addValue(value)
 
-    def addArray(self, value):
-        self._build[self._index] = value
-        self._index += 1
-        return self
+    def addArray(self, builder):
+        return self._addBuilder(builder)
 
-    def addObject(self, value):
-        self._build[self._index] = value
-        self._index += 1
-        return self
+    def addObject(self, builder):
+        return self._addBuilder(builder)
 
     def addNull(self):
-        self._data.append(None)
-        self._index += 1
-        return self
+        return self._addValue(None)
 
     def build(self):
-        for index, value in self._build.items():
-            self._data.insert(index, json.loads(value.build().toJson()))
-        return JsonArray(self._data)
+        while len(self._builders) > 0:
+            # FIXME: We need to build all builders only once
+            index = self._builders.pop()
+            builder = self._values[index]
+            self._values[index] = json.loads(builder.build().toJson())
+        return JsonArray(self._values)
+
+    # Private method
+    def _addBuilder(self, builder):
+        self._builders.insert(0, len(self._values))
+        return self._addValue(builder)
+
+    def _addValue(self, value):
+        self._values.append(value)
+        return self
 
 
 class JsonObjectBuilder(unohelper.Base,
                         XJsonObjectBuilder):
     def __init__(self):
-        self._data = {}
-        self._build = {}
+        self._builders = []
+        self._values = OrderedDict()
 
     #XJsonObjectBuilder
     def addShort(self, key, value):
-        self._data[key] = value
-        return self
+        return self._addValue(key, value)
 
     def addLong(self, key, value):
-        self._data[key] = value
-        return self
+        return self._addValue(key, value)
 
     def addHyper(self, key, value):
-        self._data[key] = value
-        return self
+        return self._addValue(key, value)
 
     def addFloat(self, key, value):
-        self._data[key] = value
-        return self
+        return self._addValue(key, value)
 
     def addDouble(self, key, value):
-        self._data[key] = value
-        return self
+        return self._addValue(key, value)
 
     def addBoolean(self, key, value):
-        self._data[key] = value
-        return self
+        return self._addValue(key, value)
 
     def addString(self, key, value):
-        self._data[key] = value
-        return self
+        return self._addValue(key, value)
 
-    def addArray(self, key, value):
-        self._build[key] = value
-        return self
+    def addArray(self, key, builder):
+        return self._addBuilder(key, builder)
 
-    def addObject(self, key, value):
-        self._build[key] = value
-        return self
+    def addObject(self, key, builder):
+        return self._addBuilder(key, builder)
 
     def addNull(self, key):
-        self._data[key] = None
-        return self
+        return self._addValue(key, None)
 
     def build(self):
-        for key, value in self._build.items():
-            self._data[key] = json.loads(value.build().toJson())
-        return JsonObject(self._data)
+        while len(self._builders) > 0:
+            # FIXME: We need to build all builders only once
+            key = self._builders.pop()
+            builder = self._values[key]
+            self._values[key] = json.loads(builder.build().toJson())
+        return JsonObject(self._values)
+
+    # Private getter method
+    def _addBuilder(self, key, builder):
+        self._builders.insert(0, key)
+        return self._addValue(key, builder)
+
+    def _addValue(self, key, value):
+        self._values[key] = value
+        return self
 

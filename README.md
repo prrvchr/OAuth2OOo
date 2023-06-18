@@ -58,7 +58,7 @@ OpenOffice on Linux and LibreOffice on Windows are not subject to these malfunct
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** extension version 0.0.6.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** extension version 1.0.0.
 
 - Restart LibreOffice / OpenOffice after installation.
 
@@ -151,7 +151,18 @@ I will try to solve it ;-)
 
 - Many other fix...
 
-### What remains to be done for version 0.0.6:
+### What has been done for version 1.0.0:
+
+- Ported Java [JSON-P][49] API to LibreOffice / OpenOffice UNO API as defined in idl files: [com.sun.star.json.*][50]
+
+    - A factory of Json structures is accessible via the `getJsonBuilder()` interface of [com.sun.star.rest.XRequestParameter.idl][51]
+    - A Json parser is returned by the `getJson()` interface of [com.sun.star.rest.XRequestResponse.idl][52]
+
+**This makes HTTP requests using Json easily usable in the Basic language of LibreOffice / OpenOffice.**
+
+See the macros [HTTP requests in Basic][53] and [ChatGPT requests in Basic][54].
+
+### What remains to be done for version 1.0.0:
 
 - Write the implementation of the Help button (CommandButton5) in the new [XWizard][21] interface.
 
@@ -207,3 +218,9 @@ I will try to solve it ;-)
 [46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
 [47]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
 [48]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
+[49]: <https://javaee.github.io/jsonp/>
+[50]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/json>
+[51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
+[52]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
+[53]: <https://forum.openoffice.org/en/forum/viewtopic.php?t=110092>
+[54]: <https://forum.openoffice.org/en/forum/viewtopic.php?t=110118>

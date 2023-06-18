@@ -50,9 +50,9 @@ interface XJsonArrayBuilder: com::sun::star::json::XJsonStructureBuilder
 
     XJsonArrayBuilder addString([in] string value);
 
-    XJsonArrayBuilder addArray([in] XJsonStructureBuilder value);
+    XJsonArrayBuilder addArray([in] XJsonStructureBuilder Builder);
 
-    XJsonArrayBuilder addObject([in] XJsonStructureBuilder value);
+    XJsonArrayBuilder addObject([in] XJsonStructureBuilder Builder);
 
     XJsonArrayBuilder addNull();
 

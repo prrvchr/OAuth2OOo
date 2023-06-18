@@ -58,10 +58,10 @@ interface XJsonObjectBuilder: com::sun::star::json::XJsonStructureBuilder
                                  [in] string Value);
 
     XJsonObjectBuilder addArray([in] string Key,
-                                [in] XJsonStructureBuilder Value);
+                                [in] XJsonStructureBuilder Builder);
 
     XJsonObjectBuilder addObject([in] string Key,
-                                 [in] XJsonStructureBuilder Value);
+                                 [in] XJsonStructureBuilder Builder);
 
     XJsonObjectBuilder addNull([in] string Key);
 
