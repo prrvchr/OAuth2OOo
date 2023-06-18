@@ -153,7 +153,7 @@ J'essaierai de le résoudre ;-)
 
 ### Ce qui a été fait pour la version 1.0.0:
 
-- Portage de l'API Java [JSON-P][49] vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl : [com.sun.star.json.*][50]
+- Portage de l'API Java [javax.json][49] vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl : [com.sun.star.json.*][50]
 
     - Une fabrique de structures Json est accessible via l'interface `getJsonBuilder()` de [com.sun.star.rest.XRequestParameter.idl][51]
     - Un analyseur Json est renvoyé par l'interface `getJson()` de [com.sun.star.rest.XRequestResponse.idl][52]
@@ -218,7 +218,7 @@ Voir les macros [Requêtes HTTP sous Basic][53] et [Requêtes ChatGPT en Basic][
 [46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
 [47]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
 [48]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
-[49]: <https://javaee.github.io/jsonp/>
+[49]: <https://javadoc.io/static/javax.json/javax.json-api/1.1.4/index.html?overview-summary.html>
 [50]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/json>
 [51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
 [52]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>

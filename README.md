@@ -153,7 +153,7 @@ I will try to solve it ;-)
 
 ### What has been done for version 1.0.0:
 
-- Ported Java [JSON-P][49] API to LibreOffice / OpenOffice UNO API as defined in idl files: [com.sun.star.json.*][50]
+- Porting Java API [javax.json][49] to LibreOffice / OpenOffice UNO API as defined in idl files: [com.sun.star.json.*][50]
 
     - A factory of Json structures is accessible via the `getJsonBuilder()` interface of [com.sun.star.rest.XRequestParameter.idl][51]
     - A Json parser is returned by the `getJson()` interface of [com.sun.star.rest.XRequestResponse.idl][52]
@@ -218,7 +218,7 @@ See the macros [HTTP requests in Basic][53] and [ChatGPT requests in Basic][54].
 [46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
 [47]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
 [48]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
-[49]: <https://javaee.github.io/jsonp/>
+[49]: <https://javadoc.io/static/javax.json/javax.json-api/1.1.4/index.html?overview-summary.html>
 [50]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/json>
 [51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
 [52]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
