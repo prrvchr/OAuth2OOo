@@ -51,7 +51,7 @@ interface XRequestResponse: com::sun::star::uno::XInterface
     com::sun::star::json::XJsonStructure getJson()
                                          raises(JSONDecodeException);
 
-    void raiseForStatus([in] boolean AllowRedirect)
+    void raiseForStatus()
          raises(HTTPException);
 
     com::sun::star::container::XEnumeration iterContent([in] long ChunkSize,

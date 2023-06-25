@@ -1,4 +1,5 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
 ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
@@ -22,43 +23,38 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
- */
+-->
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="HTTPRequest" script:language="StarBasic">
 
-#ifndef __com_sun_star_json_JsonValueType_idl__
-#define __com_sun_star_json_JsonValueType_idl__
+Rem  *****  BASIC  *****
 
+Sub Main
 
- module com {  module sun {  module star {  module json {
+Rem First we need to create the UNO OAuth2Service
+oauth2 = CreateUnoService("io.github.prrvchr.OAuth2OOo.OAuth2Service")
 
-enum JsonValueType
-{
+Rem To execute an HTTP request we first need a HTTP Request parameter
+parameter = oauth2.getRequestParameter("httpbin")
 
-    /** reflecting the XJsonArray type
-    */
-    ARRAY,
+Rem Default Requests method is GET but can be changed (ie: parameter.Method = "PUT")
 
-    /** reflecting the UNO boolean type; true and false
-    */
-    BOOLEAN,
+parameter.Url = "https://httpbin.org/ip"
 
-    /** reflecting the UNO void
-    */
-    NULL,
+Rem Default authentication is OAuth2 but can be disabled with:
+parameter.NoAuth = True
 
-    /** reflecting the XJsonNumber type
-    */
-    NUMBER,
+Rem To obtain the HTTP response we use the execute() method
+Rem of the OAuth2Service service with the HTTP parameter as argument
+response = oauth2.execute(parameter)
 
-    /** reflecting the XJsonObject type
-    */
-    OBJECT,
+If response.Ok Then
+    Msgbox response.Text
+End If
 
-    /** reflecting the UNO string type
-    */
-    STRING
+Rem When it's finished we have to close the HTTP response
+response.close()
 
-};
+End Sub
 
-}; }; }; };
-
-#endif
+</script:module>

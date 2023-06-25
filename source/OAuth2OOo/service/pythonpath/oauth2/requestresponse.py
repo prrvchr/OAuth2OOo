@@ -48,6 +48,7 @@ from com.sun.star.rest.ParameterType import REDIRECT
 from com.sun.star.rest import ConnectionException
 from com.sun.star.rest import ConnectTimeoutException
 from com.sun.star.rest import HTTPException
+from com.sun.star.rest import InvalidURLException
 from com.sun.star.rest import JSONDecodeException
 from com.sun.star.rest import ReadTimeoutException
 from com.sun.star.rest import RequestException
@@ -65,14 +66,15 @@ from .json import getJsonStructure
 from .configuration import g_errorlog
 from .configuration import g_basename
 
-from requests.exceptions import HTTPError
-from requests.exceptions import URLRequired
-from requests.exceptions import ConnectTimeout
-from requests.exceptions import ReadTimeout
 from requests.exceptions import ConnectionError
-from requests.exceptions import TooManyRedirects
+from requests.exceptions import ConnectTimeout
+from requests.exceptions import HTTPError
+from requests.exceptions import InvalidURL
 from requests.exceptions import JSONDecodeError
+from requests.exceptions import ReadTimeout
 from requests.exceptions import RequestException as RequestError
+from requests.exceptions import TooManyRedirects
+from requests.exceptions import URLRequired
 import json
 import traceback
 
@@ -89,9 +91,9 @@ def getDuration(delta):
     return duration
 
 
-def execute(ctx, source, session, parameter, timeout, stream=False):
+def execute(ctx, source, session, cls, mtd, parameter, timeout, stream=False):
     kwargs = getKwArgs(parameter, stream)
-    return getResponse(ctx, source, session, parameter.Name, parameter.Method, parameter.Url, kwargs, timeout)
+    return getResponse(ctx, source, session, cls, mtd, parameter.Name, parameter.Method, parameter.Url, timeout, kwargs)
 
 
 def getKwArgs(parameter, stream=False):
@@ -116,14 +118,21 @@ def getKwArgs(parameter, stream=False):
     return kwargs
 
 
-def getResponse(ctx, source, session, name, method, url, kwargs, timeout):
+def getResponse(ctx, source, session, cls, mtd, name, method, url, timeout, kwargs):
     response = None
     cls, mtd = 'OAuth2Service', 'executeRequest()'
     print("Request.executeRequest() 1")
     try:
         response = session.request(method, url, timeout=timeout, **kwargs)
+        print("Request.executeRequest() 2")
     except URLRequired as e:
         error = URLRequiredException()
+        error.Context = source
+        error.Url = url
+        error.Message = getExceptionMessage(ctx, cls, mtd, 101, name, error.Url)
+        raise error
+    except InvalidURL as e:
+        error = InvalidURLException()
         error.Context = source
         error.Url = url
         error.Message = getExceptionMessage(ctx, cls, mtd, 101, name, error.Url)
@@ -163,14 +172,22 @@ def getResponse(ctx, source, session, name, method, url, kwargs, timeout):
         text = '' if response is None else response.text
         error.Message = getExceptionMessage(ctx, cls, mtd, 107, name, error.Url, text)
         raise error
-    print("Request.executeRequest() 2")
+    print("Request.executeRequest() 3")
     return response
 
 
-def getRequestResponse(ctx, source, session, parameter, timeout):
-    response = execute(ctx, source, session, parameter, timeout)
+def getRequestResponse(ctx, source, session, cls, mtd, parameter, timeout):
+    response = execute(ctx, source, session, cls, mtd, parameter, timeout)
     return RequestResponse(ctx, parameter, response)
 
+
+def raiseForStatus(ctx, source, cls, mtd, name, response):
+    try:
+        response.raise_for_status()
+    except HTTPError as e:
+        raiseHTTPException(ctx, source, cls, mtd, name, 105, e)
+    except RequestException as e:
+        raiseRequestException(ctx, source, cls, mtd, name, 105, e)
 
 def raiseHTTPException(ctx, source, cls, mtd, name, code, error):
     e = HTTPException()
@@ -288,13 +305,8 @@ class RequestResponse(unohelper.Base,
         else:
             return getJsonStructure(data)
 
-    def raiseForStatus(self, redirect):
-        try:
-            self._response.raise_for_status(redirect)
-        except HTTPError as e:
-            raiseHTTPException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, e)
-        except RequestException as e:
-            raiseRequestException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, e)
+    def raiseForStatus(self):
+        raiseForStatus(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, self._response)
 
     def iterContent(self, length, decode):
         chunk = length if length > 0 else None

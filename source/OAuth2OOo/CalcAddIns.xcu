@@ -1,0 +1,673 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+╔════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                    ║
+║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
+║                                                                                    ║
+║   Permission is hereby granted, free of charge, to any person obtaining            ║
+║   a copy of this software and associated documentation files (the "Software"),     ║
+║   to deal in the Software without restriction, including without limitation        ║
+║   the rights to use, copy, modify, merge, publish, distribute, sublicense,         ║
+║   and/or sell copies of the Software, and to permit persons to whom the Software   ║
+║   is furnished to do so, subject to the following conditions:                      ║
+║                                                                                    ║
+║   The above copyright notice and this permission notice shall be included in       ║
+║   all copies or substantial portions of the Software.                              ║
+║                                                                                    ║
+║   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,                  ║
+║   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES                  ║
+║   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.        ║
+║   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY             ║
+║   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,             ║
+║   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE       ║
+║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
+║                                                                                    ║
+╚════════════════════════════════════════════════════════════════════════════════════╝
+-->
+<oor:component-data oor:name="CalcAddIns" oor:package="org.openoffice.Office"
+  xsi:schemaLocation="http://openoffice.org/2001/registry/component-update.xsd"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:oor="http://openoffice.org/2001/registry"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <node oor:name="AddInInfo">
+    <node oor:name="io.github.prrvchr.OAuth2OOo.OAuth2Plugin" oor:op="replace">
+      <node oor:name="AddInFunctions">
+        <node oor:name="getHttpBody" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">GETHTTPBODY</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function retrieves the body of the HTTP request</value>
+            <value xml:lang="fr">Cette fonction récupère le corps de la requête HTTP</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">GETHTTPBODY</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Url" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTTP request Url</value>
+                <value xml:lang="fr">L'Url de la requête HTTP</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Url to send an HTTP request to</value>
+                <value xml:lang="fr">Url à laquelle envoyer une requête HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="Method" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTTP request Method</value>
+                <value xml:lang="fr">La méthode de la requête HTTP</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">HTTP request method (default is GET)</value>
+                <value xml:lang="fr">La méthode de requête HTTP (la valeur par défaut est GET)</value>
+              </prop>
+            </node>
+            <node oor:name="Encoding" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Encoding to use</value>
+                <value xml:lang="fr">Encodage à utiliser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Encoding to use to decode the HTTP request body</value>
+                <value xml:lang="fr">Encodage à utiliser pour décoder le corps de la requête HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="Parameters" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTTP request parameters</value>
+                <value xml:lang="fr">Paramètres de la requête HTTP</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Parameters in JSON format which is used to send an HTTP Python request</value>
+                <value xml:lang="fr">Paramètres au format JSON utilisés pour envoyer une requête HTTP Python</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="parseHtml" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">PARSEHTML</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function parses the HTML data with the provided XPath as argument.</value>
+            <value xml:lang="fr">Cette fonction analyse les données HTML avec le XPath fourni comme argument.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">PARSEHTML</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTML data to be parsed</value>
+                <value xml:lang="fr">Les données HTML à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The HTML data intended for parsing.</value>
+                <value xml:lang="fr">Les données HTML destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">XPath expression</value>
+                <value xml:lang="fr">L'expression XPath</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The XPath selector expression used to get the substructures.</value>
+                <value xml:lang="fr">L'expression du sélecteur XPath utilisée pour obtenir les sous-structures.</value>
+              </prop>
+            </node>
+            <node oor:name="BaseUrl" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Base Url</value>
+                <value xml:lang="fr">Url de base</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Allows you to define a Url for the document.</value>
+                <value xml:lang="fr">Permet de définir une Url pour le document.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="parseXml" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">PARSEXML</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function parses the XML data with the provided XPath as argument.</value>
+            <value xml:lang="fr">Cette fonction analyse les données XML avec le XPath fourni comme argument.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">PARSEXML</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">XML data to be parsed</value>
+                <value xml:lang="fr">Les données XML à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The XML data intended for parsing.</value>
+                <value xml:lang="fr">Les données XML destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">XPath expression</value>
+                <value xml:lang="fr">L'expression XPath</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The XPath selector expression used to get the substructures.</value>
+                <value xml:lang="fr">L'expression du sélecteur XPath utilisée pour obtenir les sous-structures.</value>
+              </prop>
+            </node>
+            <node oor:name="BaseUrl" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Base Url</value>
+                <value xml:lang="fr">Url de base</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Allows you to define a Url for the document.</value>
+                <value xml:lang="fr">Permet de définir une Url pour le document.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="parseJson" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">PARSEJSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function parses the JSON structure with the provided JSONPATH as argument.</value>
+            <value xml:lang="fr">Cette fonction analyse la structure JSON avec le JSONPATH fourni comme argument.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">PARSEJSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">JSON structure to be parsed</value>
+                <value xml:lang="fr">La structure JSON à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The JSON structure intended for parsing.</value>
+                <value xml:lang="fr">La structure JSON destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">JSONPATH expression</value>
+                <value xml:lang="fr">L'expression JSONPATH</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The JSONPATH selector expression used to get the substructures.</value>
+                <value xml:lang="fr">L'expression du sélecteur JSONPATH utilisée pour obtenir les sous-structures.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="javaScript2Xml" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">JAVASCRIPT2XML</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function convert JavaScript code to an XML document.</value>
+            <value xml:lang="fr">Cette fonction convertit du code JavaScript en un document XML.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">JAVASCRIPT2XML</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">JavaScript code</value>
+                <value xml:lang="fr">Code JavaScript</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The JavaScript code intended for conversion.</value>
+                <value xml:lang="fr">Le code JavaScript destiné à la conversion.</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">XPath expression</value>
+                <value xml:lang="fr">L'expression XPath</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The XPath selector expression used to get the substructures.</value>
+                <value xml:lang="fr">L'expression du sélecteur XPath utilisée pour obtenir les sous-structures.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="xml2Json" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">XML2JSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function convert an XML document into a JSON structure.</value>
+            <value xml:lang="fr">Cette fonction convertit un document XML en une structure JSON.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">XML2JSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">XML document</value>
+                <value xml:lang="fr">document XML</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The XML document intended for conversion.</value>
+                <value xml:lang="fr">Le document XML destiné à la conversion.</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">XPath expression</value>
+                <value xml:lang="fr">L'expression XPath</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The XPath selector expression used to get the substructures.</value>
+                <value xml:lang="fr">L'expression du sélecteur XPath utilisée pour obtenir les sous-structures.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="javaScript2Json" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">JAVASCRIPT2JSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function transforms the JavaScript code into a JSON structure.</value>
+            <value xml:lang="fr">Cette fonction transforme le code JavaScript en une structure JSON.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">JAVASCRIPT2JSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">JavaScript code</value>
+                <value xml:lang="fr">Code JavaScript</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The JavaScript code intended for conversion.</value>
+                <value xml:lang="fr">Le code JavaScript destiné à la conversion.</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">XPath expression</value>
+                <value xml:lang="fr">L'expression XPath</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The XPath selector expression used to get the substructures.</value>
+                <value xml:lang="fr">L'expression du sélecteur XPath utilisée pour obtenir les sous-structures.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="dublinCore2Json" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">DUBLINCORE2JSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function extract DublinCore metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette fonction extrait les métadonnées DublinCore du document HTML.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">DUBLINCORE2JSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTML data to be parsed</value>
+                <value xml:lang="fr">Les données HTML à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The HTML data intended for parsing.</value>
+                <value xml:lang="fr">Les données HTML destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="BaseUrl" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Base Url</value>
+                <value xml:lang="fr">Url de base</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Allows you to define a Url for the document.</value>
+                <value xml:lang="fr">Permet de définir une Url pour le document.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="jsonLd2Json" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">JSONLD2JSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function extract JSON-LD metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette fonction extrait les métadonnées JSON-LD du document HTML.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">JSONLD2JSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTML data to be parsed</value>
+                <value xml:lang="fr">Les données HTML à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The HTML data intended for parsing.</value>
+                <value xml:lang="fr">Les données HTML destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="BaseUrl" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Base Url</value>
+                <value xml:lang="fr">Url de base</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Allows you to define a Url for the document.</value>
+                <value xml:lang="fr">Permet de définir une Url pour le document.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="microData2Json" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">MICRODATA2JSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function extract MicroData metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette fonction extrait les métadonnées MicroData du document HTML.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">MICRODATA2JSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTML data to be parsed</value>
+                <value xml:lang="fr">Les données HTML à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The HTML data intended for parsing.</value>
+                <value xml:lang="fr">Les données HTML destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="BaseUrl" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Base Url</value>
+                <value xml:lang="fr">Url de base</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Allows you to define a Url for the document.</value>
+                <value xml:lang="fr">Permet de définir une Url pour le document.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="microFormat2Json" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">MICROFORMAT2JSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function extract MicroFormat metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette fonction extrait les métadonnées MicroFormat du document HTML.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">MICROFORMAT2JSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTML data to be parsed</value>
+                <value xml:lang="fr">Les données HTML à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The HTML data intended for parsing.</value>
+                <value xml:lang="fr">Les données HTML destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="BaseUrl" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Base Url</value>
+                <value xml:lang="fr">Url de base</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Allows you to define a Url for the document.</value>
+                <value xml:lang="fr">Permet de définir une Url pour le document.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="openGraph2Json" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">OPENGRAPH2JSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function extract OpenGraph metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette fonction extrait les métadonnées OpenGraph du document HTML.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">OPENGRAPH2JSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTML data to be parsed</value>
+                <value xml:lang="fr">Les données HTML à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The HTML data intended for parsing.</value>
+                <value xml:lang="fr">Les données HTML destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="BaseUrl" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Base Url</value>
+                <value xml:lang="fr">Url de base</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Allows you to define a Url for the document.</value>
+                <value xml:lang="fr">Permet de définir une Url pour le document.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="rdfa2Json" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">RDFA2JSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function extract RDFA metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette fonction extrait les métadonnées RDFA du document HTML.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">RDFA2JSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTML data to be parsed</value>
+                <value xml:lang="fr">Les données HTML à analyser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The HTML data intended for parsing.</value>
+                <value xml:lang="fr">Les données HTML destinées à l'analyse.</value>
+              </prop>
+            </node>
+            <node oor:name="BaseUrl" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Base Url</value>
+                <value xml:lang="fr">Url de base</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Allows you to define a Url for the document.</value>
+                <value xml:lang="fr">Permet de définir une Url pour le document.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="splitJson" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">SPLITJSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function splits an array of JSON structures</value>
+            <value xml:lang="fr">Cette fonction scinde une tableau de structures JSON.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">SPLITJSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">JSON structure</value>
+                <value xml:lang="fr">StructureJSON</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">JSON structure containing the array to split.</value>
+                <value xml:lang="fr">La structure JSON contenant le tableau à fractionner.</value>
+              </prop>
+            </node>
+            <node oor:name="TypeName" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">The name of the property defining the type</value>
+                <value xml:lang="fr">Le nom de la propriété définissant le type</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The default is the name of the parent property.</value>
+                <value xml:lang="fr">La valeur par défaut est le nom de la propriété parent.</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">JSONPATH of the JSON array</value>
+                <value xml:lang="fr">JSONPATH du tableau JSON</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">JSONPATH to find the array in the JSON stucture.</value>
+                <value xml:lang="fr">JSONPATH pour trouver le tableau dans la structure JSON.</value>
+              </prop>
+            </node>
+            <node oor:name="Separator" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Separator for nested property names</value>
+                <value xml:lang="fr">Séparateur pour les noms de propriété imbriqués</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The default separator is '::'.</value>
+                <value xml:lang="fr">Le séparateur par défaut est '::'.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="flattenJson" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">FLATTENJSON</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This function flatten an JSON structure</value>
+            <value xml:lang="fr">Cette fonction aplati une structure JSON.</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">FLATTENJSON</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Data" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">JSON structure</value>
+                <value xml:lang="fr">Structure JSON</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The JSON structure to flatten</value>
+                <value xml:lang="fr">La structure JSON à aplatir.</value>
+              </prop>
+            </node>
+            <node oor:name="TypeName" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">The name of the property defining the type</value>
+                <value xml:lang="fr">Le nom de la propriété définissant le type</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The default is the name of the parent property.</value>
+                <value xml:lang="fr">La valeur par défaut est le nom de la propriété parent.</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">JSONPATH of the JSON structure</value>
+                <value xml:lang="fr">JSONPATH de la structure JSON</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">JSONPATH to find the JSON stucture.</value>
+                <value xml:lang="fr">JSONPATH pour trouver la structure JSON.</value>
+              </prop>
+            </node>
+            <node oor:name="Separator" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Separator for nested property names</value>
+                <value xml:lang="fr">Séparateur pour les noms de propriété imbriqués</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">The default separator is '::'.</value>
+                <value xml:lang="fr">Le séparateur par défaut est '::'.</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</oor:component-data>

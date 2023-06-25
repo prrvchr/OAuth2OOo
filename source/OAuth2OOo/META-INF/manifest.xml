@@ -13,4 +13,6 @@
     <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="ProtocolHandler.xcu"/>
     <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="service/OAuth2Handler.py"/>
     <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="InteractionHandler.xcu"/>
+    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="service/OAuth2Plugin.py"/>
+    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="CalcAddIns.xcu"/>
 </manifest:manifest>

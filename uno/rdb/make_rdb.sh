@@ -34,7 +34,8 @@ ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/rest/XRequestParameter
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/rest/HTTPStatusCode
 ${Path}/merge_rdb.sh ${OOoPath} io/github/prrvchr/css/util/Duration
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/XOAuth2Service
-${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/JsonValueType
+${Path}/merge_rdb.sh ${OOoPath} com/sun/star/auth/XOAuth2Plugin
+${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/JsonType
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonValue
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonNumber
 ${Path}/merge_rdb.sh ${OOoPath} com/sun/star/json/XJsonStructure

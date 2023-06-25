@@ -4,7 +4,7 @@
 
 **The use of this software subjects you to our** [**Terms Of Use**][3] **and** [**Data Protection Policy**][4].
 
-# version [1.0.0][5]
+# version [1.0.1][5]
 
 ## Introduction:
 
@@ -58,7 +58,7 @@ OpenOffice on Linux and LibreOffice on Windows are not subject to these malfunct
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** extension version 1.0.0.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** extension version 1.0.1.
 
 - Restart LibreOffice / OpenOffice after installation.
 
@@ -162,7 +162,27 @@ I will try to solve it ;-)
 
 See the macros [HTTP requests in Basic][53] and [ChatGPT requests in Basic][54].
 
-### What remains to be done for version 1.0.0:
+### What has been done for version 1.0.1:
+
+- Writing of 15 functions in Calc AddIns as described in the idl file [OAuth2Plugin.idl][55]
+
+    - `GETHTTPBOBY(URL,METHOD,ENCODING,PARAMETERS)`
+    - `PARSEHTML(DATA,PATH,BASEURL)`
+    - `PARSEXML(DATA,PATH,BASEURL)`
+    - `PARSEJSON(DATA,PATH)`
+    - `JAVASCRIPT2XML(DATA,PATH)`
+    - `XML2JSON(DATA,PATH)`
+    - `JAVASCRIPT2JSON(DATA,PATH)`
+    - `DUBLINCORE2JSON(DATA,BASEURL)`
+    - `JSONLD2JSON(DATA,BASEURL)`
+    - `MICRODATA2JSON(DATA,BASEURL)`
+    - `MICROFORMAT2JSON(DATA,BASEURL)`
+    - `OPENGRAPH2JSON(DATA,BASEURL)`
+    - `RDFA2JSON(DATA,BASEURL)`
+    - `FLATTENJSON(DATA,TYPENAME,PATH,SEPARATOR)`
+    - `SPLITJSON(DATA,TYPENAME,PATH,SEPARATOR)`
+
+### What remains to be done for version 1.0.1:
 
 - Write the implementation of the Help button (CommandButton5) in the new [XWizard][21] interface.
 
@@ -224,3 +244,4 @@ See the macros [HTTP requests in Basic][53] and [ChatGPT requests in Basic][54].
 [52]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
 [53]: <https://forum.openoffice.org/en/forum/viewtopic.php?t=110092>
 [54]: <https://forum.openoffice.org/en/forum/viewtopic.php?t=110118>
+[55]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Plugin.idl>

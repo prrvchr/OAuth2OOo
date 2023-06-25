@@ -33,12 +33,12 @@ import unohelper
 from com.sun.star.container import XEnumeration
 from com.sun.star.container import NoSuchElementException
 
-from com.sun.star.json.JsonValueType import ARRAY
-from com.sun.star.json.JsonValueType import BOOLEAN
-from com.sun.star.json.JsonValueType import NULL
-from com.sun.star.json.JsonValueType import NUMBER
-from com.sun.star.json.JsonValueType import OBJECT
-from com.sun.star.json.JsonValueType import STRING
+from com.sun.star.json.JsonType import ARRAY
+from com.sun.star.json.JsonType import BOOLEAN
+from com.sun.star.json.JsonType import NULL
+from com.sun.star.json.JsonType import NUMBER
+from com.sun.star.json.JsonType import OBJECT
+from com.sun.star.json.JsonType import STRING
 
 from com.sun.star.json import XJsonValue
 from com.sun.star.json import XJsonNumber
@@ -50,6 +50,8 @@ from com.sun.star.json import XJsonArrayBuilder
 from com.sun.star.json import XJsonObjectBuilder
 
 from collections import OrderedDict
+from six import string_types
+from six import integer_types
 import json
 import traceback
 
@@ -121,6 +123,20 @@ class JsonStructure(JsonValue,
     def toJson(self):
         return json.dumps(self._data)
 
+    def _getElementType(self, data):
+        jsontype = NULL
+        if isinstance(data, dict):
+            jsontype = OBJECT
+        elif isinstance(data, (list, tuple)):
+            jsontype = ARRAY
+        elif isinstance(data, string_types):
+            jsontype = STRING
+        elif isinstance(data, (integer_types, float)):
+            jsontype = NUMBER
+        elif isinstance(data, bool):
+            jsontype = BOOLEAN
+        return jsontype
+
 
 class JsonArray(JsonStructure,
                 XJsonArray):
@@ -147,6 +163,9 @@ class JsonArray(JsonStructure,
     def isNull(self, index):
         return self._data[index] is None
 
+    def getElementType(self, index):
+        return _getElementType(self._data[index])
+
     def createEnumeration(self):
         return Enumerator(self._data)
 
@@ -171,6 +190,9 @@ class JsonObject(JsonStructure,
 
     def isNull(self, key):
         return self._data[key] is None
+
+    def getElementType(self, index):
+        return _getElementType(self._data[key])
 
     def getElementNames(self):
         return tuple(self._data.keys())

@@ -80,7 +80,7 @@ def download(ctx, source, logger, session, parameter, url, timeout, chunk, retry
     while retry > 0:
         retry -= 1
         try:
-            response = execute(ctx, source, session, parameter, timeout, True)
+            response = execute(ctx, source, session, cls, mtd, parameter, timeout, True)
         except RequestException as e:
             logger.logprb(SEVERE, cls, mtd, 122, parameter.Name, traceback.format_exc())
             if not retry > 0:
@@ -154,7 +154,7 @@ def upload(ctx, source, logger, session, parameter, url, timeout, chunk, retry, 
     else:
         parameter.DataSink = stream
         try:
-            upload = execute(ctx, source, session, parameter, timeout, True)
+            upload = execute(ctx, source, session, cls, mtd, parameter, timeout, True)
         except RequestException as e:
             logger.logprb(SEVERE, cls, mtd, 133, parameter.Name, traceback.format_exc())
             stream.closeInput()
@@ -201,7 +201,7 @@ class Uploader():
         end = start + length -1
         range = 'bytes %s-%s/%s' % (start, end, self._size)
         self._parameter.setHeader('Content-Range', range)
-        response = execute(self._ctx, self._source, self._session, self._parameter, self._timeout)
+        response = execute(self._ctx, self._source, self._session, self._cls, self._mtd, self._parameter, self._timeout)
         self._status = response.status_code
         self._delta += response.elapsed
         self._count += 1
@@ -250,8 +250,8 @@ def getSessionMode(ctx, host, port=80):
     return mode
 
 
-def getInputStream(ctx, source, session, parameter, timeout, chunk, decode):
-    response = execute(ctx, source, session, parameter, timeout, True)
+def getInputStream(ctx, source, session, cls, mtd, parameter, timeout, chunk, decode):
+    response = execute(ctx, source, session, cls, mtd, parameter, timeout, True)
     return InputStream(response, chunk, decode)
 
 

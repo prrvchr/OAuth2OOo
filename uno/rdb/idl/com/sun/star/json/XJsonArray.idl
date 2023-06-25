@@ -27,6 +27,7 @@
 #ifndef __com_sun_star_json_XJsonArray_idl__
 #define __com_sun_star_json_XJsonArray_idl__
 
+#include <com/sun/star/json/JsonType.idl>
 #include <com/sun/star/json/XJsonStructure.idl>
 #include <com/sun/star/json/XJsonNumber.idl>
 #include <com/sun/star/container/XEnumeration.idl>
@@ -46,6 +47,8 @@ interface XJsonArray: com::sun::star::json::XJsonStructure
     XJsonStructure getStructure([in] long Index);
 
     boolean isNull([in] long Index);
+
+    JsonType getElementType([in] long Index);
 
     com::sun::star::container::XEnumeration createEnumeration();
 

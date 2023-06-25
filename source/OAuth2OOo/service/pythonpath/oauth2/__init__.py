@@ -37,6 +37,8 @@ from .configuration import g_errorlog
 from .configuration import g_basename
 
 from .unotool import createService
+from .unotool import getConfiguration
+from .unotool import getCurrentLocale
 from .unotool import getDialog
 from .unotool import getParentWindow
 from .unotool import getStringResource
@@ -54,9 +56,21 @@ from .request import getInputStream
 from .request import getSessionMode
 from .request import upload
 
-from .requestresponse import getRequestResponse
-
 from .requestparameter import RequestParameter
+
+from .requestresponse import raiseForStatus
+from .requestresponse import getRequestResponse
+from .requestresponse import getResponse
+
+from .plugin import extract2Json
+from .plugin import flattenJson
+from .plugin import javaScript2Json
+from .plugin import javaScript2Xml
+from .plugin import parseData
+from .plugin import parseJson
+from .plugin import splitJson
+from .plugin import xml2Json
+
 
 from .oauth2 import OAuth2OOo
 from .oauth2 import NoOAuth2

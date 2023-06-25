@@ -4,7 +4,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos** [**Conditions d'utilisation**][3] **et à notre** [**Politique de protection des données**][4].
 
-# version [1.0.0][5]
+# version [1.0.1][5]
 
 ## Introduction:
 
@@ -58,7 +58,7 @@ OpenOffice sous Linux et LibreOffice sous Windows ne sont pas sujets à ces dysf
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** version 1.0.0.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][20]** version 1.0.1.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -162,7 +162,27 @@ J'essaierai de le résoudre ;-)
 
 Voir les macros [Requêtes HTTP sous Basic][53] et [Requêtes ChatGPT en Basic][54].
 
-### Que reste-t-il à faire pour la version 1.0.0:
+### Ce qui a été fait pour la version 1.0.1:
+
+- Ecriture de 15 fonctions en AddIns de Calc comme décrit dans le fichier idl [OAuth2Plugin.idl][55]
+
+    - `GETHTTPBOBY(URL,METHOD,ENCODING,PARAMETERS)`
+    - `PARSEHTML(DATA,PATH,BASEURL)`
+    - `PARSEXML(DATA,PATH,BASEURL)`
+    - `PARSEJSON(DATA,PATH)`
+    - `JAVASCRIPT2XML(DATA,PATH)`
+    - `XML2JSON(DATA,PATH)`
+    - `JAVASCRIPT2JSON(DATA,PATH)`
+    - `DUBLINCORE2JSON(DATA,BASEURL)`
+    - `JSONLD2JSON(DATA,BASEURL)`
+    - `MICRODATA2JSON(DATA,BASEURL)`
+    - `MICROFORMAT2JSON(DATA,BASEURL)`
+    - `OPENGRAPH2JSON(DATA,BASEURL)`
+    - `RDFA2JSON(DATA,BASEURL)`
+    - `FLATTENJSON(DATA,TYPENAME,PATH,SEPARATOR)`
+    - `SPLITJSON(DATA,TYPENAME,PATH,SEPARATOR)`
+
+### Que reste-t-il à faire pour la version 1.0.1:
 
 - Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][21].
 
@@ -224,3 +244,4 @@ Voir les macros [Requêtes HTTP sous Basic][53] et [Requêtes ChatGPT en Basic][
 [52]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
 [53]: <https://forum.openoffice.org/fr/forum/viewtopic.php?t=67387>
 [54]: <https://forum.openoffice.org/fr/forum/viewtopic.php?t=67402>
+[55]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Plugin.idl>

@@ -89,6 +89,7 @@ class OAuth2Service(unohelper.Base,
                     XServiceInfo,
                     XOAuth2Service):
     def __init__(self, ctx):
+        print("OAuth2Service.__init__() 1")
         self._ctx = ctx
         self._result = None
         self._model = OAuth2Model(ctx, True)
@@ -96,6 +97,7 @@ class OAuth2Service(unohelper.Base,
         self._listeners = []
         self._mode = OFFLINE
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
+        print("OAuth2Service.__init__() 2")
 
     @property
     def ResourceUrl(self):
@@ -155,11 +157,13 @@ class OAuth2Service(unohelper.Base,
         return RequestParameter(name)
 
     def execute(self, parameter):
+        cls, mtd = 'OAuth2Service', 'execute'
         print("OAuth2Service.executeRequest() 1")
-        return getRequestResponse(self._ctx, self, self._session, parameter, self.Timeout)
+        return getRequestResponse(self._ctx, self, self._session, cls, mtd, parameter, self.Timeout)
 
     def getInputStream(self, parameter, chunk, decode):
-        return getInputStream(self._ctx, self, self._session, parameter, self.Timeout, chunk, decode)
+        cls, mtd = 'OAuth2Service', 'getInputStream'
+        return getInputStream(self._ctx, self, self._session, cls, mtd, parameter, self.Timeout, chunk, decode)
 
     def download(self, parameter, url, chunk, retry, delay):
         return download(self._ctx, self, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
@@ -167,12 +171,14 @@ class OAuth2Service(unohelper.Base,
     def upload(self, parameter, url, chunk, retry, delay):
         return upload(self._ctx, self, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
+
     # Private method
     def _getSession(self):
         session = requests.Session()
         session.auth = OAuth2OOo(self)
         session.codes = requests.codes
         return session
+
 
     # XComponent
     def dispose(self):
