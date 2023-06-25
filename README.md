@@ -164,7 +164,14 @@ See the macros [HTTP requests in Basic][53] and [ChatGPT requests in Basic][54].
 
 ### What has been done for version 1.0.1:
 
-- Writing of 15 functions in Calc AddIns as described in the idl file [OAuth2Plugin.idl][55]
+- Writing of 15 functions in Calc AddIns as described in the following files:
+
+   - The file [OAuth2Plugin.idl][55] which declares new interfaces to UNO.
+   - The file [CalcAddIns.xcu][56] which makes available these new interfaces in the list of Calc functions.
+   - The file [OAuth2Plugin.py][57] which is the implementation of the UNO service `com.sun.star.auth.Oauth2Plugin` providing these new interfaces.
+   - The file [plugin.py][58] which is the library implementing the interfaces of this new UNO service.
+
+- These 4 new files give access to **15 new Calc formulas** which are:
 
     - `GETHTTPBOBY(URL,METHOD,ENCODING,PARAMETERS)`
     - `PARSEHTML(DATA,PATH,BASEURL)`
@@ -181,6 +188,11 @@ See the macros [HTTP requests in Basic][53] and [ChatGPT requests in Basic][54].
     - `RDFA2JSON(DATA,BASEURL)`
     - `FLATTENJSON(DATA,TYPENAME,PATH,SEPARATOR)`
     - `SPLITJSON(DATA,TYPENAME,PATH,SEPARATOR)`
+
+- A good example is better than a long speech, so I invite you to download two Calc sheets allowing you to very easily recover HTML micro data from any Web site.
+
+    - [LDLC Home.ods][59]
+    - [LDLC poducts.ods][60]
 
 ### What remains to be done for version 1.0.1:
 
@@ -245,3 +257,8 @@ See the macros [HTTP requests in Basic][53] and [ChatGPT requests in Basic][54].
 [53]: <https://forum.openoffice.org/en/forum/viewtopic.php?t=110092>
 [54]: <https://forum.openoffice.org/en/forum/viewtopic.php?t=110118>
 [55]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Plugin.idl>
+[56]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/CalcAddIns.xcu>
+[57]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Plugin.py>
+[58]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/plugin.py>
+[59]: <https://forum.openoffice.org/en/forum/download/file.php?id=47297>
+[60]: <https://forum.openoffice.org/en/forum/download/file.php?id=47301>
