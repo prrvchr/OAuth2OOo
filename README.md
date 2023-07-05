@@ -260,11 +260,11 @@ See the macros [HTTP requests in Basic][60] and [ChatGPT requests in Basic][61].
 [17]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7.png>
 [18]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8.png>
 [19]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/charset_normalizer>
-[20]: <https://pypi.org/project/charset-normalizer/#files>
+[20]: <https://pypi.org/project/charset-normalizer/3.1.0/#files>
 [21]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/ijson/backends>
-[22]: <https://pypi.org/project/ijson/#files>
+[22]: <https://pypi.org/project/ijson/3.2.2/#files>
 [23]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/lxml>
-[24]: <https://pypi.org/project/lxml/#files>
+[24]: <https://pypi.org/project/lxml/4.9.2/#files>
 [25]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
 [26]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
 [27]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
