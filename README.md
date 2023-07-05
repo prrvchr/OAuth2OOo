@@ -76,7 +76,7 @@ To install the Mozilla PPA please type the command:
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][26]** extension version 1.0.1.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][26]** extension version 1.1.0.
 
 - Restart LibreOffice / OpenOffice after installation.
 
