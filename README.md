@@ -45,12 +45,13 @@ No more password is stored in LibreOffice.
 
 ## Requirement:
 
-In order to take advantage of the latest versions of the Python libraries used in OAuth2OOo, version 2 of Python has been abandoned in favor of **Python 3.7 minimum**.  
-This means that **OAuth2OOo no longer supports OpenOffice since version 1.1.0**. I can only advise you **to migrate to LibreOffice**.
+In order to take advantage of the latest versions of the Python libraries used in OAuth2OOo, version 2 of Python has been abandoned in favor of **Python 3.8 minimum**.  
+This means that **OAuth2OOo no longer supports OpenOffice and LibreOffice 6.x on Windows since version 1.1.0**.  
+I can only advise you **to migrate to LibreOffice 7.x**.
 
 To offer you all these new services in LibreOffice, the OAuth2OOo extension uses many Python libraries.
 Some of these libraries embed binary files which depend on:
-- Python version (between 3.7 and 3.11 included)
+- Python version (between 3.8 and 3.11 included)
 - Operating system (Linux, Windows, Macos, etc...)
 - The architecture of your computer (i386, adm x64, arm64, ppc, etc...)
 
@@ -110,9 +111,9 @@ The return value: `initialized` is True if `registered_url` was successfully fou
 
 ## Has been tested with:
 
-* LibreOffice 7.3.7.2 - Lubuntu 22.04 - OpenJDK-11-JRE (amd64)
+* LibreOffice 7.3.7.2 - Lubuntu 22.04 - Python version 3.10
 
-* LibreOffice 7.5.4.2(x86) - Windows 10(x86) - Adoptium JDK Hotspot 11.0.19 (x86) (under Lubuntu 22.04 / VirtualBox 6.1.38)
+* LibreOffice 7.5.4.2(x86) - Windows 10(x86) - Python  (under Lubuntu 22.04 / VirtualBox 6.1.38)
 
 * LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Adoptium JDK Hotspot 11.0.17 (x64) (under Lubuntu 22.04 / VirtualBox 6.1.38)
 

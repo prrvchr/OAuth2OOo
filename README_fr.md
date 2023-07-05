@@ -45,8 +45,9 @@ Plus aucun mot de passe n'est stocké dans LibreOffice.
 
 ## Prérequis:
 
-Afin de profiter des dernières versions des bibliothèques Python utilisées dans OAuth2OOo, la version 2 de Python a été abandonnée au profit de **Python 3.7 minimum**.  
-Cela signifie que **OAuth2OOo ne supporte plus OpenOffice depuis sa version 1.1.0**. Je ne peux que vous conseiller **de migrer vers LibreOffice**.
+Afin de profiter des dernières versions des bibliothèques Python utilisées dans OAuth2OOo, la version 2 de Python a été abandonnée au profit de **Python 3.8 minimum**.  
+Cela signifie que **OAuth2OOo ne supporte plus OpenOffice et LibreOffice 6.x sous Windows depuis sa version 1.1.0**.  
+Je ne peux que vous conseiller **de migrer vers LibreOffice 7.x**.
 
 Pour vous proposer tous ces nouveaux services dans LibreOffice, l'extension OAuth2OOo utilise de nombreuses bibliothèques Python.
 Certaines de ces librairies embarquent des fichiers binaires qui dépendent:
