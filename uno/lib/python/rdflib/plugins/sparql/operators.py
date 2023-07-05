@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 This contains evaluation functions for expressions
 
@@ -6,38 +8,48 @@ using setEvalFn
 
 """
 
-import sys
-import re
-import math
-import random
-import uuid
+import datetime as py_datetime  # naming conflict with function within this module
 import hashlib
-
-from functools import reduce
-
-from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
-
+import math
 import operator as pyop  # python operators
+import random
+import re
+import uuid
+import warnings
+from decimal import ROUND_HALF_DOWN, ROUND_HALF_UP, Decimal, InvalidOperation
+from functools import reduce
+from typing import Any, Callable, Dict, NoReturn, Optional, Tuple, Union, overload
+from urllib.parse import quote
 
 import isodate
-
-from rdflib.plugins.sparql.parserutils import CompValue, Expr
-from rdflib.plugins.sparql.datatypes import XSD_DTs, type_promotion
-from rdflib import URIRef, BNode, Variable, Literal, XSD, RDF
-from rdflib.term import Node
-from six import text_type
-from six.moves.urllib.parse import quote
-
 from pyparsing import ParseResults
 
-from rdflib.plugins.sparql.sparql import SPARQLError, SPARQLTypeError
+from rdflib.namespace import RDF, XSD
+from rdflib.plugins.sparql.datatypes import (
+    XSD_DateTime_DTs,
+    XSD_DTs,
+    XSD_Duration_DTs,
+    type_promotion,
+)
+from rdflib.plugins.sparql.parserutils import CompValue, Expr
+from rdflib.plugins.sparql.sparql import (
+    FrozenBindings,
+    QueryContext,
+    SPARQLError,
+    SPARQLTypeError,
+)
+from rdflib.term import (
+    BNode,
+    IdentifiedNode,
+    Identifier,
+    Literal,
+    Node,
+    URIRef,
+    Variable,
+)
 
 
-# closed namespace, langString isn't in it
-RDF_langString = URIRef(RDF.uri + "langString")
-
-
-def Builtin_IRI(expr, ctx):
+def Builtin_IRI(expr: Expr, ctx: FrozenBindings) -> URIRef:
     """
     http://www.w3.org/TR/sparql11-query/#func-iri
     """
@@ -47,32 +59,34 @@ def Builtin_IRI(expr, ctx):
     if isinstance(a, URIRef):
         return a
     if isinstance(a, Literal):
-        return ctx.prologue.absolutize(URIRef(a))
+        # type error: Item "None" of "Optional[Prologue]" has no attribute "absolutize"
+        # type error: Incompatible return value type (got "Union[CompValue, str, None, Any]", expected "URIRef")
+        return ctx.prologue.absolutize(URIRef(a))  # type: ignore[union-attr,return-value]
 
-    raise SPARQLError('IRI function only accepts URIRefs or Literals/Strings!')
+    raise SPARQLError("IRI function only accepts URIRefs or Literals/Strings!")
 
 
-def Builtin_isBLANK(expr, ctx):
+def Builtin_isBLANK(expr: Expr, ctx: FrozenBindings) -> Literal:
     return Literal(isinstance(expr.arg, BNode))
 
 
-def Builtin_isLITERAL(expr, ctx):
+def Builtin_isLITERAL(expr, ctx) -> Literal:
     return Literal(isinstance(expr.arg, Literal))
 
 
-def Builtin_isIRI(expr, ctx):
+def Builtin_isIRI(expr, ctx) -> Literal:
     return Literal(isinstance(expr.arg, URIRef))
 
 
-def Builtin_isNUMERIC(expr, ctx):
+def Builtin_isNUMERIC(expr, ctx) -> Literal:
     try:
         numeric(expr.arg)
         return Literal(True)
-    except:
+    except:  # noqa: E722
         return Literal(False)
 
 
-def Builtin_BNODE(expr, ctx):
+def Builtin_BNODE(expr, ctx) -> BNode:
     """
     http://www.w3.org/TR/sparql11-query/#func-bnode
     """
@@ -85,11 +99,10 @@ def Builtin_BNODE(expr, ctx):
     if isinstance(a, Literal):
         return ctx.bnodes[a]  # defaultdict does the right thing
 
-    raise SPARQLError(
-        'BNode function only accepts no argument or literal/string')
+    raise SPARQLError("BNode function only accepts no argument or literal/string")
 
 
-def Builtin_ABS(expr, ctx):
+def Builtin_ABS(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-abs
     """
@@ -97,7 +110,7 @@ def Builtin_ABS(expr, ctx):
     return Literal(abs(numeric(expr.arg)))
 
 
-def Builtin_IF(expr, ctx):
+def Builtin_IF(expr: Expr, ctx):
     """
     http://www.w3.org/TR/sparql11-query/#func-if
     """
@@ -105,7 +118,7 @@ def Builtin_IF(expr, ctx):
     return expr.arg2 if EBV(expr.arg1) else expr.arg3
 
 
-def Builtin_RAND(expr, ctx):
+def Builtin_RAND(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#idp2133952
     """
@@ -113,7 +126,7 @@ def Builtin_RAND(expr, ctx):
     return Literal(random.random())
 
 
-def Builtin_UUID(expr, ctx):
+def Builtin_UUID(expr: Expr, ctx) -> URIRef:
     """
     http://www.w3.org/TR/sparql11-query/#func-strdt
     """
@@ -121,7 +134,7 @@ def Builtin_UUID(expr, ctx):
     return URIRef(uuid.uuid4().urn)
 
 
-def Builtin_STRUUID(expr, ctx):
+def Builtin_STRUUID(expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-strdt
     """
@@ -129,60 +142,59 @@ def Builtin_STRUUID(expr, ctx):
     return Literal(str(uuid.uuid4()))
 
 
-def Builtin_MD5(expr, ctx):
+def Builtin_MD5(expr: Expr, ctx) -> Literal:
     s = string(expr.arg).encode("utf-8")
     return Literal(hashlib.md5(s).hexdigest())
 
 
-def Builtin_SHA1(expr, ctx):
+def Builtin_SHA1(expr: Expr, ctx) -> Literal:
     s = string(expr.arg).encode("utf-8")
     return Literal(hashlib.sha1(s).hexdigest())
 
 
-def Builtin_SHA256(expr, ctx):
+def Builtin_SHA256(expr: Expr, ctx) -> Literal:
     s = string(expr.arg).encode("utf-8")
     return Literal(hashlib.sha256(s).hexdigest())
 
 
-def Builtin_SHA384(expr, ctx):
+def Builtin_SHA384(expr: Expr, ctx) -> Literal:
     s = string(expr.arg).encode("utf-8")
     return Literal(hashlib.sha384(s).hexdigest())
 
 
-def Builtin_SHA512(expr, ctx):
+def Builtin_SHA512(expr: Expr, ctx) -> Literal:
     s = string(expr.arg).encode("utf-8")
     return Literal(hashlib.sha512(s).hexdigest())
 
 
-def Builtin_COALESCE(expr, ctx):
+def Builtin_COALESCE(expr: Expr, ctx):
     """
     http://www.w3.org/TR/sparql11-query/#func-coalesce
     """
-    for x in expr.get('arg', variables=True):
+    for x in expr.get("arg", variables=True):
         if x is not None and not isinstance(x, (SPARQLError, Variable)):
             return x
-    raise SPARQLError(
-        "COALESCE got no arguments that did not evaluate to an error")
+    raise SPARQLError("COALESCE got no arguments that did not evaluate to an error")
 
 
-def Builtin_CEIL(expr, ctx):
+def Builtin_CEIL(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-ceil
     """
 
-    l = expr.arg
-    return Literal(int(math.ceil(numeric(l))), datatype=l.datatype)
+    l_ = expr.arg
+    return Literal(int(math.ceil(numeric(l_))), datatype=l_.datatype)
 
 
-def Builtin_FLOOR(expr, ctx):
+def Builtin_FLOOR(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-floor
     """
-    l = expr.arg
-    return Literal(int(math.floor(numeric(l))), datatype=l.datatype)
+    l_ = expr.arg
+    return Literal(int(math.floor(numeric(l_))), datatype=l_.datatype)
 
 
-def Builtin_ROUND(expr, ctx):
+def Builtin_ROUND(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-round
     """
@@ -191,13 +203,13 @@ def Builtin_ROUND(expr, ctx):
     # but in py3k bound was changed to
     # "round-to-even" behaviour
     # this is an ugly work-around
-    l = expr.arg
-    v = numeric(l)
-    v = int(Decimal(v).quantize(1, ROUND_HALF_UP))
-    return Literal(v, datatype=l.datatype)
+    l_ = expr.arg
+    v = numeric(l_)
+    v = int(Decimal(v).quantize(1, ROUND_HALF_UP if v > 0 else ROUND_HALF_DOWN))
+    return Literal(v, datatype=l_.datatype)
 
 
-def Builtin_REGEX(expr, ctx):
+def Builtin_REGEX(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-regex
     Invokes the XPath fn:matches function to match text against a regular
@@ -214,14 +226,13 @@ def Builtin_REGEX(expr, ctx):
     if flags:
         # Maps XPath REGEX flags (http://www.w3.org/TR/xpath-functions/#flags)
         # to Python's re flags
-        flagMap = dict(
-            [('i', re.IGNORECASE), ('s', re.DOTALL), ('m', re.MULTILINE)])
+        flagMap = dict([("i", re.IGNORECASE), ("s", re.DOTALL), ("m", re.MULTILINE)])
         cFlag = reduce(pyop.or_, [flagMap.get(f, 0) for f in flags])
 
-    return Literal(bool(re.search(text_type(pattern), text, cFlag)))
+    return Literal(bool(re.search(str(pattern), text, cFlag)))
 
 
-def Builtin_REPLACE(expr, ctx):
+def Builtin_REPLACE(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-substr
     """
@@ -231,96 +242,77 @@ def Builtin_REPLACE(expr, ctx):
     flags = expr.flags
 
     # python uses \1, xpath/sparql uses $1
-    replacement = re.sub('\\$([0-9]*)', r'\\\1', replacement)
-
-    def _r(m):
-
-        # Now this is ugly.
-        # Python has a "feature" where unmatched groups return None
-        # then re.sub chokes on this.
-        # see http://bugs.python.org/issue1519638 , fixed and errs in py3.5
-
-        # this works around and hooks into the internal of the re module...
-
-        # the match object is replaced with a wrapper that
-        # returns "" instead of None for unmatched groups
-
-        class _m():
-            def __init__(self, m):
-                self.m = m
-                self.string = m.string
-
-            def group(self, n):
-                return m.group(n) or ""
-
-        return re._expand(pattern, _m(m), replacement)
+    # type error: Incompatible types in assignment (expression has type "str", variable has type "Literal")
+    replacement = re.sub("\\$([0-9]*)", r"\\\1", replacement)  # type: ignore[assignment]
 
     cFlag = 0
     if flags:
         # Maps XPath REGEX flags (http://www.w3.org/TR/xpath-functions/#flags)
         # to Python's re flags
-        flagMap = dict(
-            [('i', re.IGNORECASE), ('s', re.DOTALL), ('m', re.MULTILINE)])
+        flagMap = dict([("i", re.IGNORECASE), ("s", re.DOTALL), ("m", re.MULTILINE)])
         cFlag = reduce(pyop.or_, [flagMap.get(f, 0) for f in flags])
 
         # @@FIXME@@ either datatype OR lang, NOT both
 
-    # this is necessary due to different treatment of unmatched groups in
-    # python versions. see comments above in _r(m).
-    compat_r = text_type(replacement) if sys.version_info[:2] >= (3, 5) else _r
+    return Literal(
+        re.sub(str(pattern), replacement, text, cFlag),
+        datatype=text.datatype,
+        lang=text.language,
+    )
 
-    return Literal(re.sub(text_type(pattern), compat_r, text, cFlag),
-                   datatype=text.datatype, lang=text.language)
 
-
-def Builtin_STRDT(expr, ctx):
+def Builtin_STRDT(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-strdt
     """
 
-    return Literal(text_type(expr.arg1), datatype=expr.arg2)
+    return Literal(str(expr.arg1), datatype=expr.arg2)
 
 
-def Builtin_STRLANG(expr, ctx):
+def Builtin_STRLANG(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-strlang
     """
 
     s = string(expr.arg1)
     if s.language or s.datatype:
-        raise SPARQLError('STRLANG expects a simple literal')
+        raise SPARQLError("STRLANG expects a simple literal")
 
     # TODO: normalisation of lang tag to lower-case
     # should probably happen in literal __init__
-    return Literal(text_type(s), lang=str(expr.arg2).lower())
+    return Literal(str(s), lang=str(expr.arg2).lower())
 
 
-def Builtin_CONCAT(expr, ctx):
+def Builtin_CONCAT(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-concat
     """
 
     # dt/lang passed on only if they all match
 
-    dt = set(x.datatype for x in expr.arg)
-    dt = dt.pop() if len(dt) == 1 else None
+    dt = set(x.datatype for x in expr.arg if isinstance(x, Literal))
+    # type error: Incompatible types in assignment (expression has type "Optional[str]", variable has type "Set[Optional[str]]")
+    dt = dt.pop() if len(dt) == 1 else None  # type: ignore[assignment]
 
-    lang = set(x.language for x in expr.arg)
-    lang = lang.pop() if len(lang) == 1 else None
+    lang = set(x.language for x in expr.arg if isinstance(x, Literal))
+    # type error: error: Incompatible types in assignment (expression has type "Optional[str]", variable has type "Set[Optional[str]]")
+    lang = lang.pop() if len(lang) == 1 else None  # type: ignore[assignment]
 
-    return Literal("".join(string(x)
-                           for x in expr.arg), datatype=dt, lang=lang)
+    # NOTE on type errors: this is because same variable is used for two incompatibel types
+    # type error: Argument "datatype" to "Literal" has incompatible type "Set[Any]"; expected "Optional[str]"  [arg-type]
+    # type error: Argument "lang" to "Literal" has incompatible type "Set[Any]"; expected "Optional[str]"
+    return Literal("".join(string(x) for x in expr.arg), datatype=dt, lang=lang)  # type: ignore[arg-type]
 
 
-def _compatibleStrings(a, b):
+def _compatibleStrings(a: Literal, b: Literal) -> None:
     string(a)
     string(b)
 
     if b.language and a.language != b.language:
-        raise SPARQLError('incompatible arguments to str functions')
+        raise SPARQLError("incompatible arguments to str functions")
 
 
-def Builtin_STRSTARTS(expr, ctx):
+def Builtin_STRSTARTS(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-strstarts
     """
@@ -332,7 +324,7 @@ def Builtin_STRSTARTS(expr, ctx):
     return Literal(a.startswith(b))
 
 
-def Builtin_STRENDS(expr, ctx):
+def Builtin_STRENDS(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-strends
     """
@@ -344,7 +336,7 @@ def Builtin_STRENDS(expr, ctx):
     return Literal(a.endswith(b))
 
 
-def Builtin_STRBEFORE(expr, ctx):
+def Builtin_STRBEFORE(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-strbefore
     """
@@ -360,7 +352,7 @@ def Builtin_STRBEFORE(expr, ctx):
         return Literal(a[:i], lang=a.language, datatype=a.datatype)
 
 
-def Builtin_STRAFTER(expr, ctx):
+def Builtin_STRAFTER(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-strafter
     """
@@ -373,10 +365,10 @@ def Builtin_STRAFTER(expr, ctx):
     if i == -1:
         return Literal("")
     else:
-        return Literal(a[i + len(b):], lang=a.language, datatype=a.datatype)
+        return Literal(a[i + len(b) :], lang=a.language, datatype=a.datatype)
 
 
-def Builtin_CONTAINS(expr, ctx):
+def Builtin_CONTAINS(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-strcontains
     """
@@ -388,11 +380,11 @@ def Builtin_CONTAINS(expr, ctx):
     return Literal(b in a)
 
 
-def Builtin_ENCODE_FOR_URI(expr, ctx):
-    return Literal(quote(string(expr.arg).encode("utf-8")))
+def Builtin_ENCODE_FOR_URI(expr: Expr, ctx) -> Literal:
+    return Literal(quote(string(expr.arg).encode("utf-8"), safe=""))
 
 
-def Builtin_SUBSTR(expr, ctx):
+def Builtin_SUBSTR(expr: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-substr
     """
@@ -408,26 +400,26 @@ def Builtin_SUBSTR(expr, ctx):
     return Literal(a[start:length], lang=a.language, datatype=a.datatype)
 
 
-def Builtin_STRLEN(e, ctx):
-    l = string(e.arg)
+def Builtin_STRLEN(e: Expr, ctx) -> Literal:
+    l_ = string(e.arg)
 
-    return Literal(len(l))
+    return Literal(len(l_))
 
 
-def Builtin_STR(e, ctx):
+def Builtin_STR(e: Expr, ctx) -> Literal:
     arg = e.arg
     if isinstance(arg, SPARQLError):
         raise arg
-    return Literal(text_type(arg))  # plain literal
+    return Literal(str(arg))  # plain literal
 
 
-def Builtin_LCASE(e, ctx):
-    l = string(e.arg)
+def Builtin_LCASE(e: Expr, ctx) -> Literal:
+    l_ = string(e.arg)
 
-    return Literal(l.lower(), datatype=l.datatype, lang=l.language)
+    return Literal(l_.lower(), datatype=l_.datatype, lang=l_.language)
 
 
-def Builtin_LANGMATCHES(e, ctx):
+def Builtin_LANGMATCHES(e: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-langMatches
 
@@ -436,53 +428,56 @@ def Builtin_LANGMATCHES(e, ctx):
     langTag = string(e.arg1)
     langRange = string(e.arg2)
 
-    if text_type(langTag) == "":
+    if str(langTag) == "":
         return Literal(False)  # nothing matches empty!
 
     return Literal(_lang_range_check(langRange, langTag))
 
 
-def Builtin_NOW(e, ctx):
+def Builtin_NOW(e: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-now
     """
     return Literal(ctx.now)
 
 
-def Builtin_YEAR(e, ctx):
-    d = datetime(e.arg)
+def Builtin_YEAR(e: Expr, ctx) -> Literal:
+    d = date(e.arg)
     return Literal(d.year)
 
 
-def Builtin_MONTH(e, ctx):
-    d = datetime(e.arg)
+def Builtin_MONTH(e: Expr, ctx) -> Literal:
+    d = date(e.arg)
     return Literal(d.month)
 
 
-def Builtin_DAY(e, ctx):
-    d = datetime(e.arg)
+def Builtin_DAY(e: Expr, ctx) -> Literal:
+    d = date(e.arg)
     return Literal(d.day)
 
 
-def Builtin_HOURS(e, ctx):
+def Builtin_HOURS(e: Expr, ctx) -> Literal:
     d = datetime(e.arg)
     return Literal(d.hour)
 
 
-def Builtin_MINUTES(e, ctx):
+def Builtin_MINUTES(e: Expr, ctx) -> Literal:
     d = datetime(e.arg)
     return Literal(d.minute)
 
 
-def Builtin_SECONDS(e, ctx):
+def Builtin_SECONDS(e: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-seconds
     """
     d = datetime(e.arg)
-    return Literal(d.second, datatype=XSD.decimal)
+    result_value = Decimal(d.second)
+    if d.microsecond:
+        result_value += Decimal(d.microsecond) / Decimal(1000000)
+    return Literal(result_value, datatype=XSD.decimal)
 
 
-def Builtin_TIMEZONE(e, ctx):
+def Builtin_TIMEZONE(e: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-timezone
 
@@ -491,12 +486,14 @@ def Builtin_TIMEZONE(e, ctx):
     """
     dt = datetime(e.arg)
     if not dt.tzinfo:
-        raise SPARQLError('datatime has no timezone: %r' % dt)
+        raise SPARQLError("datatime has no timezone: %r" % dt)
 
-    delta = dt.tzinfo.utcoffset(ctx.now)
+    delta = dt.utcoffset()
 
-    d = delta.days
-    s = delta.seconds
+    # type error: Item "None" of "Optional[timedelta]" has no attribute "days"
+    d = delta.days  # type: ignore[union-attr]
+    # type error: Item "None" of "Optional[timedelta]" has no attribute "seconds"
+    s = delta.seconds  # type: ignore[union-attr]
     neg = ""
 
     if d < 0:
@@ -508,16 +505,18 @@ def Builtin_TIMEZONE(e, ctx):
     m = (s - h * 60 * 60) / 60
     s = s - h * 60 * 60 - m * 60
 
-    tzdelta = "%sP%sT%s%s%s" % (neg,
-                                "%dD" % d if d else "",
-                                "%dH" % h if h else "",
-                                "%dM" % m if m else "",
-                                "%dS" % s if not d and not h and not m else "")
+    tzdelta = "%sP%sT%s%s%s" % (
+        neg,
+        "%dD" % d if d else "",
+        "%dH" % h if h else "",
+        "%dM" % m if m else "",
+        "%dS" % s if not d and not h and not m else "",
+    )
 
     return Literal(tzdelta, datatype=XSD.dayTimeDuration)
 
 
-def Builtin_TZ(e, ctx):
+def Builtin_TZ(e: Expr, ctx) -> Literal:
     d = datetime(e.arg)
     if not d.tzinfo:
         return Literal("")
@@ -527,13 +526,13 @@ def Builtin_TZ(e, ctx):
     return Literal(n)
 
 
-def Builtin_UCASE(e, ctx):
-    l = string(e.arg)
+def Builtin_UCASE(e: Expr, ctx) -> Literal:
+    l_ = string(e.arg)
 
-    return Literal(l.upper(), datatype=l.datatype, lang=l.language)
+    return Literal(l_.upper(), datatype=l_.datatype, lang=l_.language)
 
 
-def Builtin_LANG(e, ctx):
+def Builtin_LANG(e: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-lang
 
@@ -542,52 +541,58 @@ def Builtin_LANG(e, ctx):
     with an empty language tag.
     """
 
-    l = literal(e.arg)
-    return Literal(l.language or "")
+    l_ = literal(e.arg)
+    return Literal(l_.language or "")
 
 
-def Builtin_DATATYPE(e, ctx):
-    l = e.arg
-    if not isinstance(l, Literal):
-        raise SPARQLError('Can only get datatype of literal: %r' % l)
-    if l.language:
-        return RDF_langString
-    if not l.datatype and not l.language:
+def Builtin_DATATYPE(e: Expr, ctx) -> Optional[str]:
+    l_ = e.arg
+    if not isinstance(l_, Literal):
+        raise SPARQLError("Can only get datatype of literal: %r" % l_)
+    if l_.language:
+        return RDF.langString
+    if not l_.datatype and not l_.language:
         return XSD.string
-    return l.datatype
+    return l_.datatype
 
 
-def Builtin_sameTerm(e, ctx):
+def Builtin_sameTerm(e: Expr, ctx) -> Literal:
     a = e.arg1
     b = e.arg2
     return Literal(a == b)
 
 
-def Builtin_BOUND(e, ctx):
+def Builtin_BOUND(e: Expr, ctx) -> Literal:
     """
     http://www.w3.org/TR/sparql11-query/#func-bound
     """
-    n = e.get('arg', variables=True)
+    n = e.get("arg", variables=True)
 
     return Literal(not isinstance(n, Variable))
 
 
-def Builtin_EXISTS(e, ctx):
+def Builtin_EXISTS(e: Expr, ctx: FrozenBindings) -> Literal:
     # damn...
     from rdflib.plugins.sparql.evaluate import evalPart
 
-    exists = e.name == 'Builtin_EXISTS'
+    exists = e.name == "Builtin_EXISTS"
 
-    ctx = ctx.ctx.thaw(ctx)  # hmm
-    for x in evalPart(ctx, e.graph):
+    # type error: Incompatible types in assignment (expression has type "QueryContext", variable has type "FrozenBindings")
+    ctx = ctx.ctx.thaw(ctx)  # type: ignore[assignment] # hmm
+    # type error: Argument 1 to "evalPart" has incompatible type "FrozenBindings"; expected "QueryContext"
+    for x in evalPart(ctx, e.graph):  # type: ignore[arg-type]
         return Literal(exists)
     return Literal(not exists)
 
 
-_CUSTOM_FUNCTIONS = {}
+_CustomFunction = Callable[[Expr, FrozenBindings], Node]
+
+_CUSTOM_FUNCTIONS: Dict[URIRef, Tuple[_CustomFunction, bool]] = {}
 
 
-def register_custom_function(uri, func, override=False, raw=False):
+def register_custom_function(
+    uri: URIRef, func: _CustomFunction, override: bool = False, raw: bool = False
+) -> None:
     """
     Register a custom SPARQL function.
 
@@ -601,30 +606,43 @@ def register_custom_function(uri, func, override=False, raw=False):
     _CUSTOM_FUNCTIONS[uri] = (func, raw)
 
 
-def custom_function(uri, override=False, raw=False):
+def custom_function(
+    uri: URIRef, override: bool = False, raw: bool = False
+) -> Callable[[_CustomFunction], _CustomFunction]:
     """
     Decorator version of :func:`register_custom_function`.
     """
-    def decorator(func):
+
+    def decorator(func: _CustomFunction) -> _CustomFunction:
         register_custom_function(uri, func, override=override, raw=raw)
         return func
+
     return decorator
 
 
-def unregister_custom_function(uri, func):
-    if _CUSTOM_FUNCTIONS.get(uri, (None, None))[0] != func:
-        raise ValueError("This function is not registered as %s" % uri.n3())
-    del _CUSTOM_FUNCTIONS[uri]
+def unregister_custom_function(
+    uri: URIRef, func: Optional[Callable[..., Any]] = None
+) -> None:
+    """
+    The 'func' argument is included for compatibility with existing code.
+    A previous implementation checked that the function associated with
+    the given uri was actually 'func', but this is not necessary as the
+    uri should uniquely identify the function.
+    """
+    if _CUSTOM_FUNCTIONS.get(uri):
+        del _CUSTOM_FUNCTIONS[uri]
+    else:
+        warnings.warn("This function is not registered as %s" % uri.n3())
 
 
-def Function(e, ctx):
+def Function(e: Expr, ctx: FrozenBindings) -> Node:
     """
     Custom functions and casts
     """
     pair = _CUSTOM_FUNCTIONS.get(e.iri)
     if pair is None:
         # no such function is registered
-        raise SPARQLError('Unknown function %r' % e.iri)
+        raise SPARQLError("Unknown function %r" % e.iri)
     func, raw = pair
     if raw:
         # function expects expression and context
@@ -645,7 +663,7 @@ def Function(e, ctx):
 @custom_function(XSD.decimal, raw=True)
 @custom_function(XSD.integer, raw=True)
 @custom_function(XSD.boolean, raw=True)
-def default_cast(e, ctx):
+def default_cast(e: Expr, ctx: FrozenBindings) -> Literal:  # type: ignore[return]
     if not e.expr:
         raise SPARQLError("Nothing given to cast.")
     if len(e.expr) > 1:
@@ -654,28 +672,23 @@ def default_cast(e, ctx):
     x = e.expr[0]
 
     if e.iri == XSD.string:
-
         if isinstance(x, (URIRef, Literal)):
             return Literal(x, datatype=XSD.string)
         else:
-            raise SPARQLError(
-                "Cannot cast term %r of type %r" % (x, type(x)))
+            raise SPARQLError("Cannot cast term %r of type %r" % (x, type(x)))
 
     if not isinstance(x, Literal):
-        raise SPARQLError(
-            "Can only cast Literals to non-string data-types")
+        raise SPARQLError("Can only cast Literals to non-string data-types")
 
-    if x.datatype and not x.datatype in XSD_DTs:
-        raise SPARQLError(
-            "Cannot cast literal with unknown datatype: %r" % x.datatype)
+    if x.datatype and not x.datatype in XSD_DTs:  # noqa: E713
+        raise SPARQLError("Cannot cast literal with unknown datatype: %r" % x.datatype)
 
     if e.iri == XSD.dateTime:
         if x.datatype and x.datatype not in (XSD.dateTime, XSD.string):
-            raise SPARQLError(
-                "Cannot cast %r to XSD:dateTime" % x.datatype)
+            raise SPARQLError("Cannot cast %r to XSD:dateTime" % x.datatype)
         try:
             return Literal(isodate.parse_datetime(x), datatype=e.iri)
-        except:
+        except:  # noqa: E722
             raise SPARQLError("Cannot interpret '%r' as datetime" % x)
 
     if x.datatype == XSD.dateTime:
@@ -684,7 +697,7 @@ def default_cast(e, ctx):
     if e.iri in (XSD.float, XSD.double):
         try:
             return Literal(float(x), datatype=e.iri)
-        except:
+        except:  # noqa: E722
             raise SPARQLError("Cannot interpret '%r' as float" % x)
 
     elif e.iri == XSD.decimal:
@@ -692,13 +705,13 @@ def default_cast(e, ctx):
             raise SPARQLError("Cannot interpret '%r' as decimal" % x)
         try:
             return Literal(Decimal(x), datatype=e.iri)
-        except:
+        except:  # noqa: E722
             raise SPARQLError("Cannot interpret '%r' as decimal" % x)
 
     elif e.iri == XSD.integer:
         try:
             return Literal(int(x), datatype=XSD.integer)
-        except:
+        except:  # noqa: E722
             raise SPARQLError("Cannot interpret '%r' as int" % x)
 
     elif e.iri == XSD.boolean:
@@ -713,20 +726,21 @@ def default_cast(e, ctx):
         raise SPARQLError("Cannot interpret '%r' as bool" % x)
 
 
-def UnaryNot(expr, ctx):
+def UnaryNot(expr: Expr, ctx: FrozenBindings) -> Literal:
     return Literal(not EBV(expr.expr))
 
 
-def UnaryMinus(expr, ctx):
+def UnaryMinus(expr: Expr, ctx: FrozenBindings) -> Literal:
     return Literal(-numeric(expr.expr))
 
 
-def UnaryPlus(expr, ctx):
+def UnaryPlus(expr: Expr, ctx: FrozenBindings) -> Literal:
     return Literal(+numeric(expr.expr))
 
 
-def MultiplicativeExpression(e, ctx):
-
+def MultiplicativeExpression(
+    e: Expr, ctx: Union[QueryContext, FrozenBindings]
+) -> Literal:
     expr = e.expr
     other = e.other
 
@@ -735,6 +749,7 @@ def MultiplicativeExpression(e, ctx):
     if other is None:
         return expr
     try:
+        res: Union[Decimal, float]
         res = Decimal(numeric(expr))
         for op, f in zip(e.op, other):
             f = numeric(f)
@@ -742,18 +757,18 @@ def MultiplicativeExpression(e, ctx):
             if type(f) == float:
                 res = float(res)
 
-            if op == '*':
+            if op == "*":
                 res *= f
             else:
                 res /= f
     except (InvalidOperation, ZeroDivisionError):
-        raise SPARQLError('divide by 0')
+        raise SPARQLError("divide by 0")
 
     return Literal(res)
 
 
-def AdditiveExpression(e, ctx):
-
+# type error: Missing return statement
+def AdditiveExpression(e: Expr, ctx: Union[QueryContext, FrozenBindings]) -> Literal:  # type: ignore[return]
     expr = e.expr
     other = e.other
 
@@ -762,29 +777,71 @@ def AdditiveExpression(e, ctx):
     if other is None:
         return expr
 
-    res = numeric(expr)
+    # handling arithmetic(addition/subtraction) of dateTime, date, time
+    # and duration datatypes (if any)
+    if hasattr(expr, "datatype") and (
+        expr.datatype in XSD_DateTime_DTs or expr.datatype in XSD_Duration_DTs
+    ):
+        res = dateTimeObjects(expr)
+        dt = expr.datatype
 
-    dt = expr.datatype
+        for op, term in zip(e.op, other):
+            # check if operation is datetime,date,time operation over
+            # another datetime,date,time datatype
+            if dt in XSD_DateTime_DTs and dt == term.datatype and op == "-":
+                # checking if there are more than one datetime operands -
+                # in that case it doesn't make sense for example
+                # ( dateTime1 - dateTime2 - dateTime3 ) is an invalid operation
+                if len(other) > 1:
+                    error_message = "Can't evaluate multiple %r arguments"
+                    # type error: Too many arguments for "SPARQLError"
+                    raise SPARQLError(error_message, dt.datatype)  # type: ignore[call-arg]
+                else:
+                    n = dateTimeObjects(term)
+                    res = calculateDuration(res, n)
+                    return res
 
-    for op, term in zip(e.op, other):
-        n = numeric(term)
-        if isinstance(n, Decimal) and isinstance(res, float):
-            n = float(n)
-        if isinstance(n, float) and isinstance(res, Decimal):
-            res = float(res)
+            # datetime,date,time +/- duration,dayTimeDuration,yearMonthDuration
+            elif dt in XSD_DateTime_DTs and term.datatype in XSD_Duration_DTs:
+                n = dateTimeObjects(term)
+                res = calculateFinalDateTime(res, dt, n, term.datatype, op)
+                return res
 
-        dt = type_promotion(dt, term.datatype)
+            # duration,dayTimeDuration,yearMonthDuration + datetime,date,time
+            elif dt in XSD_Duration_DTs and term.datatype in XSD_DateTime_DTs:
+                if op == "+":
+                    n = dateTimeObjects(term)
+                    res = calculateFinalDateTime(res, dt, n, term.datatype, op)
+                    return res
 
-        if op == '+':
-            res += n
-        else:
-            res -= n
+            # rest are invalid types
+            else:
+                raise SPARQLError("Invalid DateTime Operations")
 
-    return Literal(res, datatype=dt)
+    # handling arithmetic(addition/subtraction) of numeric datatypes (if any)
+    else:
+        res = numeric(expr)
+
+        dt = expr.datatype
+
+        for op, term in zip(e.op, other):
+            n = numeric(term)
+            if isinstance(n, Decimal) and isinstance(res, float):
+                n = float(n)
+            if isinstance(n, float) and isinstance(res, Decimal):
+                res = float(res)
+
+            dt = type_promotion(dt, term.datatype)
+
+            if op == "+":
+                res += n
+            else:
+                res -= n
+
+        return Literal(res, datatype=dt)
 
 
-def RelationalExpression(e, ctx):
-
+def RelationalExpression(e: Expr, ctx: Union[QueryContext, FrozenBindings]) -> Literal:
     expr = e.expr
     other = e.other
     op = e.op
@@ -794,20 +851,23 @@ def RelationalExpression(e, ctx):
     if other is None:
         return expr
 
-    ops = dict([('>', lambda x, y: x.__gt__(y)),
-                ('<', lambda x, y: x.__lt__(y)),
-                ('=', lambda x, y: x.eq(y)),
-                ('!=', lambda x, y: x.neq(y)),
-                ('>=', lambda x, y: x.__ge__(y)),
-                ('<=', lambda x, y: x.__le__(y)),
-                ('IN', pyop.contains),
-                ('NOT IN', lambda x, y: not pyop.contains(x, y))])
+    ops = dict(
+        [
+            (">", lambda x, y: x.__gt__(y)),
+            ("<", lambda x, y: x.__lt__(y)),
+            ("=", lambda x, y: x.eq(y)),
+            ("!=", lambda x, y: x.neq(y)),
+            (">=", lambda x, y: x.__ge__(y)),
+            ("<=", lambda x, y: x.__le__(y)),
+            ("IN", pyop.contains),
+            ("NOT IN", lambda x, y: not pyop.contains(x, y)),
+        ]
+    )
 
-    if op in ('IN', 'NOT IN'):
+    if op in ("IN", "NOT IN"):
+        res = op == "NOT IN"
 
-        res = (op == 'NOT IN')
-
-        error = False
+        error: Union[bool, SPARQLError] = False
 
         if other == RDF.nil:
             other = []
@@ -821,42 +881,48 @@ def RelationalExpression(e, ctx):
         if not error:
             return Literal(False ^ res)
         else:
-            raise error
+            # Note on type error: this is because variable is Union[bool, SPARQLError]
+            # type error: Exception must be derived from BaseException
+            raise error  # type: ignore[misc]
 
-    if not op in ('=', '!=', 'IN', 'NOT IN'):
+    if op not in ("=", "!=", "IN", "NOT IN"):
         if not isinstance(expr, Literal):
             raise SPARQLError(
-                "Compare other than =, != of non-literals is an error: %r" %
-                expr)
+                "Compare other than =, != of non-literals is an error: %r" % expr
+            )
         if not isinstance(other, Literal):
             raise SPARQLError(
-                "Compare other than =, != of non-literals is an error: %r" %
-                other)
+                "Compare other than =, != of non-literals is an error: %r" % other
+            )
     else:
         if not isinstance(expr, Node):
-            raise SPARQLError('I cannot compare this non-node: %r' % expr)
+            raise SPARQLError("I cannot compare this non-node: %r" % expr)
         if not isinstance(other, Node):
-            raise SPARQLError('I cannot compare this non-node: %r' % other)
+            raise SPARQLError("I cannot compare this non-node: %r" % other)
 
     if isinstance(expr, Literal) and isinstance(other, Literal):
-
-        if expr.datatype is not None and expr.datatype not in XSD_DTs and other.datatype is not None and other.datatype not in XSD_DTs:
+        if (
+            expr.datatype is not None
+            and expr.datatype not in XSD_DTs
+            and other.datatype is not None
+            and other.datatype not in XSD_DTs
+        ):
             # in SPARQL for non-XSD DT Literals we can only do =,!=
-            if op not in ('=', '!='):
-                raise SPARQLError(
-                    'Can only do =,!= comparisons of non-XSD Literals')
+            if op not in ("=", "!="):
+                raise SPARQLError("Can only do =,!= comparisons of non-XSD Literals")
 
     try:
         r = ops[op](expr, other)
         if r == NotImplemented:
-            raise SPARQLError('Error when comparing')
+            raise SPARQLError("Error when comparing")
     except TypeError as te:
         raise SPARQLError(*te.args)
     return Literal(r)
 
 
-def ConditionalAndExpression(e, ctx):
-
+def ConditionalAndExpression(
+    e: Expr, ctx: Union[QueryContext, FrozenBindings]
+) -> Literal:
     # TODO: handle returned errors
 
     expr = e.expr
@@ -870,8 +936,9 @@ def ConditionalAndExpression(e, ctx):
     return Literal(all(EBV(x) for x in [expr] + other))
 
 
-def ConditionalOrExpression(e, ctx):
-
+def ConditionalOrExpression(
+    e: Expr, ctx: Union[QueryContext, FrozenBindings]
+) -> Literal:
     # TODO: handle errors
 
     expr = e.expr
@@ -896,30 +963,35 @@ def ConditionalOrExpression(e, ctx):
     return Literal(False)
 
 
-def not_(arg):
-    return Expr('UnaryNot', UnaryNot, expr=arg)
+def not_(arg) -> Expr:
+    return Expr("UnaryNot", UnaryNot, expr=arg)
 
 
-def and_(*args):
+def and_(*args: Expr) -> Expr:
     if len(args) == 1:
         return args[0]
 
-    return Expr('ConditionalAndExpression', ConditionalAndExpression,
-                expr=args[0], other=list(args[1:]))
+    return Expr(
+        "ConditionalAndExpression",
+        ConditionalAndExpression,
+        expr=args[0],
+        other=list(args[1:]),
+    )
 
 
-TrueFilter = Expr('TrueFilter', lambda _1, _2: Literal(True))
+TrueFilter = Expr("TrueFilter", lambda _1, _2: Literal(True))
 
 
-def simplify(expr):
+def simplify(expr: Any) -> Any:
     if isinstance(expr, ParseResults) and len(expr) == 1:
         return simplify(expr[0])
 
     if isinstance(expr, (list, ParseResults)):
         return list(map(simplify, expr))
-    if not isinstance(expr, CompValue):
+    # type error: Statement is unreachable
+    if not isinstance(expr, CompValue):  # type: ignore[unreachable]
         return expr
-    if expr.name.endswith('Expression'):
+    if expr.name.endswith("Expression"):
         if expr.other is None:
             return simplify(expr.expr)
 
@@ -931,22 +1003,32 @@ def simplify(expr):
     return expr
 
 
-def literal(s):
+def literal(s: Literal) -> Literal:
     if not isinstance(s, Literal):
         raise SPARQLError("Non-literal passed as string: %r" % s)
     return s
 
 
-def datetime(e):
+def datetime(e: Literal) -> py_datetime.datetime:
     if not isinstance(e, Literal):
         raise SPARQLError("Non-literal passed as datetime: %r" % e)
     if not e.datatype == XSD.dateTime:
-        raise SPARQLError(
-            "Literal with wrong datatype passed as datetime: %r" % e)
+        raise SPARQLError("Literal with wrong datatype passed as datetime: %r" % e)
     return e.toPython()
 
 
-def string(s):
+def date(e: Literal) -> py_datetime.date:
+    if not isinstance(e, Literal):
+        raise SPARQLError("Non-literal passed as date: %r" % e)
+    if e.datatype not in (XSD.date, XSD.dateTime):
+        raise SPARQLError("Literal with wrong datatype passed as date: %r" % e)
+    result = e.toPython()
+    if isinstance(result, py_datetime.datetime):
+        return result.date()
+    return result
+
+
+def string(s: Literal) -> Literal:
     """
     Make sure the passed thing is a string literal
     i.e. plain literal, xsd:string literal or lang-tagged literal
@@ -954,12 +1036,11 @@ def string(s):
     if not isinstance(s, Literal):
         raise SPARQLError("Non-literal passes as string: %r" % s)
     if s.datatype and s.datatype != XSD.string:
-        raise SPARQLError(
-            "Non-string datatype-literal passes as string: %r" % s)
+        raise SPARQLError("Non-string datatype-literal passes as string: %r" % s)
     return s
 
 
-def numeric(expr):
+def numeric(expr: Literal) -> Any:
     """
     return a number from a literal
     http://www.w3.org/TR/xpath20/#promotion
@@ -970,20 +1051,137 @@ def numeric(expr):
     if not isinstance(expr, Literal):
         raise SPARQLTypeError("%r is not a literal!" % expr)
 
-    if expr.datatype not in (XSD.float, XSD.double,
-                             XSD.decimal, XSD.integer,
-                             XSD.nonPositiveInteger, XSD.negativeInteger,
-                             XSD.nonNegativeInteger, XSD.positiveInteger,
-                             XSD.unsignedLong, XSD.unsignedInt,
-                             XSD.unsignedShort, XSD.unsignedByte,
-                             XSD.long, XSD.int, XSD.short, XSD.byte):
+    if expr.datatype not in (
+        XSD.float,
+        XSD.double,
+        XSD.decimal,
+        XSD.integer,
+        XSD.nonPositiveInteger,
+        XSD.negativeInteger,
+        XSD.nonNegativeInteger,
+        XSD.positiveInteger,
+        XSD.unsignedLong,
+        XSD.unsignedInt,
+        XSD.unsignedShort,
+        XSD.unsignedByte,
+        XSD.long,
+        XSD.int,
+        XSD.short,
+        XSD.byte,
+    ):
         raise SPARQLTypeError("%r does not have a numeric datatype!" % expr)
 
     return expr.toPython()
 
 
-def EBV(rt):
+def dateTimeObjects(expr: Literal) -> Any:
     """
+    return a dataTime/date/time/duration/dayTimeDuration/yearMonthDuration python objects from a literal
+
+    """
+    return expr.toPython()
+
+
+# type error: Missing return statement
+def isCompatibleDateTimeDatatype(  # type: ignore[return]
+    obj1: Union[py_datetime.date, py_datetime.datetime],
+    dt1: URIRef,
+    obj2: Union[isodate.Duration, py_datetime.timedelta],
+    dt2: URIRef,
+) -> bool:
+    """
+    Returns a boolean indicating if first object is compatible
+    with operation(+/-) over second object.
+
+    """
+    if dt1 == XSD.date:
+        if dt2 == XSD.yearMonthDuration:
+            return True
+        elif dt2 == XSD.dayTimeDuration or dt2 == XSD.Duration:
+            # checking if the dayTimeDuration has no Time Component
+            # else it wont be compatible with Date Literal
+            if "T" in str(obj2):
+                return False
+            else:
+                return True
+
+    if dt1 == XSD.time:
+        if dt2 == XSD.yearMonthDuration:
+            return False
+        elif dt2 == XSD.dayTimeDuration or dt2 == XSD.Duration:
+            # checking if the dayTimeDuration has no Date Component
+            # (by checking if the format is "PT...." )
+            # else it wont be compatible with Time Literal
+            if "T" == str(obj2)[1]:
+                return True
+            else:
+                return False
+
+    if dt1 == XSD.dateTime:
+        # compatible with all
+        return True
+
+
+def calculateDuration(
+    obj1: Union[py_datetime.date, py_datetime.datetime],
+    obj2: Union[py_datetime.date, py_datetime.datetime],
+) -> Literal:
+    """
+    returns the duration Literal between two datetime
+
+    """
+    date1 = obj1
+    date2 = obj2
+    # type error: No overload variant of "__sub__" of "datetime" matches argument type "date"
+    difference = date1 - date2  # type: ignore[operator]
+    return Literal(difference, datatype=XSD.duration)
+
+
+def calculateFinalDateTime(
+    obj1: Union[py_datetime.date, py_datetime.datetime],
+    dt1: URIRef,
+    obj2: Union[isodate.Duration, py_datetime.timedelta],
+    dt2: URIRef,
+    operation: str,
+) -> Literal:
+    """
+    Calculates the final dateTime/date/time resultant after addition/
+    subtraction of duration/dayTimeDuration/yearMonthDuration
+    """
+
+    # checking compatibility of datatypes (duration types and date/time/dateTime)
+    if isCompatibleDateTimeDatatype(obj1, dt1, obj2, dt2):
+        # proceed
+        if operation == "-":
+            ans = obj1 - obj2
+            return Literal(ans, datatype=dt1)
+        else:
+            ans = obj1 + obj2
+            return Literal(ans, datatype=dt1)
+
+    else:
+        raise SPARQLError("Incompatible Data types to DateTime Operations")
+
+
+@overload
+def EBV(rt: Literal) -> bool:
+    ...
+
+
+@overload
+def EBV(rt: Union[Variable, IdentifiedNode, SPARQLError, Expr]) -> NoReturn:
+    ...
+
+
+@overload
+def EBV(rt: Union[Identifier, SPARQLError, Expr]) -> Union[bool, NoReturn]:
+    ...
+
+
+def EBV(rt: Union[Identifier, SPARQLError, Expr]) -> bool:
+    """
+    Effective Boolean Value (EBV)
+
     * If the argument is a typed literal with a datatype of xsd:boolean,
       the EBV is the value of that argument.
     * If the argument is a plain literal or a typed literal with a
@@ -997,7 +1195,6 @@ def EBV(rt):
     """
 
     if isinstance(rt, Literal):
-
         if rt.datatype == XSD.boolean:
             return rt.toPython()
 
@@ -1011,17 +1208,21 @@ def EBV(rt):
                 # Type error, see: http://www.w3.org/TR/rdf-sparql-query/#ebv
                 raise SPARQLTypeError(
                     "http://www.w3.org/TR/rdf-sparql-query/#ebv - ' + \
-                    'Could not determine the EBV for : %r" % rt)
+                    'Could not determine the EBV for : %r"
+                    % rt
+                )
             else:
                 return bool(pyRT)
 
     else:
         raise SPARQLTypeError(
             "http://www.w3.org/TR/rdf-sparql-query/#ebv - ' + \
-            'Only literals have Boolean values! %r" % rt)
+            'Only literals have Boolean values! %r"
+            % rt
+        )
 
 
-def _lang_range_check(range, lang):
+def _lang_range_check(range: Literal, lang: Literal) -> bool:
     """
     Implementation of the extended filtering algorithm, as defined in point
     3.3.2, of U{RFC 4647<http://www.rfc-editor.org/rfc/rfc4647.txt>}, on
@@ -1038,18 +1239,19 @@ def _lang_range_check(range, lang):
     .. __:http://dev.w3.org/2004/PythonLib-IH/RDFClosure/RestrictedDatatype.py
 
     """
-    def _match(r, l):
+
+    def _match(r: str, l_: str) -> bool:
         """
         Matching of a range and language item: either range is a wildcard
         or the two are equal
         @param r: language range item
-        @param l: language tag item
+        @param l_: language tag item
         @rtype: boolean
         """
-        return r == '*' or r == l
+        return r == "*" or r == l_
 
-    rangeList = range.strip().lower().split('-')
-    langList = lang.strip().lower().split('-')
+    rangeList = range.strip().lower().split("-")
+    langList = lang.strip().lower().split("-")
     if not _match(rangeList[0], langList[0]):
         return False
     if len(rangeList) > len(langList):

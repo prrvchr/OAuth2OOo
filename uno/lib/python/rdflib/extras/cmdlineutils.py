@@ -1,21 +1,23 @@
+import codecs
+import getopt
 import sys
 import time
-import getopt
-import rdflib
-import codecs
 
+import rdflib
 from rdflib.util import guess_format
 
 
 def _help():
-    sys.stderr.write("""
+    sys.stderr.write(
+        """
 program.py [-f <format>] [-o <output>] [files...]
 Read RDF files given on STDOUT - does something to the resulting graph
 If no files are given, read from stdin
 -o specifies file for output, if not given stdout is used
 -f specifies parser to use, if not given it is guessed from extension
 
-""")
+"""
+    )
 
 
 def main(target, _help=_help, options="", stdin=True):
@@ -47,7 +49,7 @@ def main(target, _help=_help, options="", stdin=True):
     start = time.time()
     if len(files) == 0 and stdin:
         sys.stderr.write("Reading from stdin as %s..." % f)
-        g.load(sys.stdin, format=f)
+        g.parse(sys.stdin, format=f)
         sys.stderr.write("[done]\n")
     else:
         size = 0
@@ -56,12 +58,16 @@ def main(target, _help=_help, options="", stdin=True):
                 f = guess_format(x)
             start1 = time.time()
             sys.stderr.write("Loading %s as %s... " % (x, f))
-            g.load(x, format=f)
-            sys.stderr.write("done.\t(%d triples\t%.2f seconds)\n" %
-                             (len(g) - size, time.time() - start1))
+            g.parse(x, format=f)
+            sys.stderr.write(
+                "done.\t(%d triples\t%.2f seconds)\n"
+                % (len(g) - size, time.time() - start1)
+            )
             size = len(g)
 
-    sys.stderr.write("Loaded a total of %d triples in %.2f seconds.\n" %
-                     (len(g), time.time() - start))
+    sys.stderr.write(
+        "Loaded a total of %d triples in %.2f seconds.\n"
+        % (len(g), time.time() - start)
+    )
 
     target(g, out, args)

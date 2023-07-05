@@ -32,19 +32,391 @@
   <node oor:name="AddInInfo">
     <node oor:name="io.github.prrvchr.OAuth2OOo.OAuth2Plugin" oor:op="replace">
       <node oor:name="AddInFunctions">
-        <node oor:name="getHttpBody" oor:op="replace">
+        <node oor:name="browserOpen" oor:op="replace">
           <prop oor:name="DisplayName">
-            <value xml:lang="en">GETHTTPBODY</value>
+            <value xml:lang="en">BROWSEROPEN</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function retrieves the body of the HTTP request</value>
-            <value xml:lang="fr">Cette fonction récupère le corps de la requête HTTP</value>
+            <value xml:lang="en">This formula opens the HTTP browser and returns a session id</value>
+            <value xml:lang="fr">Cette formule ouvre le navigateur HTTP et renvoie un identifiant de session</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
           </prop>
           <prop oor:name="CompatibilityName">
-            <value xml:lang="en">GETHTTPBODY</value>
+            <value xml:lang="en">BROWSEROPEN</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Browser" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Browser WebDriver</value>
+                <value xml:lang="fr">WebDriver du navigateur</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Used browser WebDriver</value>
+                <value xml:lang="fr">Le WebDriver utilisé par le navigateur</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Browser file location</value>
+                <value xml:lang="fr">Emplacement du fichier du navigateur</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Browser binary file location</value>
+                <value xml:lang="fr">Emplacement du fichier binaire du navigateur</value>
+              </prop>
+            </node>
+            <node oor:name="Init" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Number of initialization formula</value>
+                <value xml:lang="fr">Nombre de formules d'initialisation</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Number of browser initialization formula (Default to 0)</value>
+                <value xml:lang="fr">Nombre de formule d'initialisation du navigateur (0 par défaut)</value>
+              </prop>
+            </node>
+            <node oor:name="Options" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">WebDriver options</value>
+                <value xml:lang="fr">Options du WebDriver</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">WebDriver options</value>
+                <value xml:lang="fr">Options du WebDriver</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="browserClick" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">BROWSERCLICK</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This formula is used to click a browser button</value>
+            <value xml:lang="fr">Cette formule est utilisée pour cliquer sur un bouton du navigateur</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">BROWSERCLICK</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Session" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Session id</value>
+                <value xml:lang="fr">L'identifiant de la session</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Session id of the HTTP browser</value>
+                <value xml:lang="fr">L'identifiant de la session du navigateur HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="By" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Selector type</value>
+                <value xml:lang="fr">Type du sélecteur</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Path selector type used</value>
+                <value xml:lang="fr">Type de sélecteur de chemin utilisé</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Selector path</value>
+                <value xml:lang="fr">Chemin du sélecteur</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Selector path value</value>
+                <value xml:lang="fr">Valeur du chemin du sélecteur</value>
+              </prop>
+            </node>
+            <node oor:name="Url" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTTP browser Url</value>
+                <value xml:lang="fr">L'Url du navigateur HTTP</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">HTTP browser Url</value>
+                <value xml:lang="fr">L'Url du navigateur HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="Init" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Run only on initialization</value>
+                <value xml:lang="fr">Executer uniquement à l'initialisation</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Execute this formula only at browser initialization (Default to 0)</value>
+                <value xml:lang="fr">Exécuter cette formule uniquement à l'initialisation du navigateur (0 par défaut)</value>
+              </prop>
+            </node>
+            <node oor:name="Wait" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Wait before running</value>
+                <value xml:lang="fr">Attendre avant l'exécution</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Wait before executing this formula in the browser (0 seconds by default)</value>
+                <value xml:lang="fr">Attendre avant d'exécuter cette formule dans le navigateur (0 seconde par défaut)</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="browserField" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">BROWSERFIELD</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This formula is used to fill an HTML field</value>
+            <value xml:lang="fr">Cette formule permet de remplir un champ HTML</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">BROWSERFIELD</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Session" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Session id</value>
+                <value xml:lang="fr">L'identifiant de la session</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Session id of the HTTP browser</value>
+                <value xml:lang="fr">L'identifiant de la session du navigateur HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="By" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Selector type</value>
+                <value xml:lang="fr">Type du sélecteur</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Path selector type used</value>
+                <value xml:lang="fr">Type de sélecteur de chemin utilisé</value>
+              </prop>
+            </node>
+            <node oor:name="Path" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Selector path</value>
+                <value xml:lang="fr">Chemin du sélecteur</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Selector path value</value>
+                <value xml:lang="fr">Valeur du chemin du sélecteur</value>
+              </prop>
+            </node>
+            <node oor:name="Value" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Field value</value>
+                <value xml:lang="fr">Valeur du champ</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Browser field value</value>
+                <value xml:lang="fr">Valeur du champ du navigateur</value>
+              </prop>
+            </node>
+            <node oor:name="Url" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTTP browser Url</value>
+                <value xml:lang="fr">L'Url du navigateur HTTP</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">HTTP browser Url</value>
+                <value xml:lang="fr">L'Url du navigateur HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="Init" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Run only on initialization</value>
+                <value xml:lang="fr">Executer uniquement à l'initialisation</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Execute this formula only at browser initialization (Default to 0)</value>
+                <value xml:lang="fr">Exécuter cette formule uniquement à l'initialisation du navigateur (0 par défaut)</value>
+              </prop>
+            </node>
+            <node oor:name="Wait" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Wait before running</value>
+                <value xml:lang="fr">Attendre avant l'exécution</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Wait before executing this formula in the browser (0 seconds by default)</value>
+                <value xml:lang="fr">Attendre avant d'exécuter cette formule dans le navigateur (0 seconde par défaut)</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="browserForm" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">BROWSERFORM</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This formula is used to fill a HTML form</value>
+            <value xml:lang="fr">Cette formule permet de remplir un formulaire HTML</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">BROWSERFORM</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Session" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Session id</value>
+                <value xml:lang="fr">L'identifiant de la session</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Session id of the HTTP browser</value>
+                <value xml:lang="fr">L'identifiant de la session du navigateur HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="Form" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTML form data range</value>
+                <value xml:lang="fr">Plage de données du formulaire HTML</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">HTML form data range (BY, PATH, VALUE) or (PATH, VALUE) with xpath</value>
+                <value xml:lang="fr">Plage de données du formulaire HTML (BY, PATH, VALUE) ou (PATH, VALUE) pour xpath</value>
+              </prop>
+            </node>
+            <node oor:name="Url" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTTP browser Url</value>
+                <value xml:lang="fr">L'Url du navigateur HTTP</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">HTTP browser Url</value>
+                <value xml:lang="fr">L'Url du navigateur HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="Init" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Run only on initialization</value>
+                <value xml:lang="fr">Executer uniquement à l'initialisation</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Execute this formula only at browser initialization (Default to 0)</value>
+                <value xml:lang="fr">Exécuter cette formule uniquement à l'initialisation du navigateur (0 par défaut)</value>
+              </prop>
+            </node>
+            <node oor:name="Wait" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Wait before running</value>
+                <value xml:lang="fr">Attendre avant l'exécution</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Wait before executing this formula in the browser (0 seconds by default)</value>
+                <value xml:lang="fr">Attendre avant d'exécuter cette formule dans le navigateur (0 seconde par défaut)</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="browserContent" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">BROWSERCONTENT</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This formula retrieves the content of a HTTP browser session</value>
+            <value xml:lang="fr">Cette formule récupère le contenu d'une session du navigateur HTTP</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">BROWSERCONTENT</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Session" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Session id</value>
+                <value xml:lang="fr">L'identifiant de la session</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Session id of the HTTP browser</value>
+                <value xml:lang="fr">L'identifiant de la session du navigateur HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="Url" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">HTTP browser Url</value>
+                <value xml:lang="fr">L'Url du navigateur HTTP</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Url to send to the HTTP browser</value>
+                <value xml:lang="fr">Url à envoyer au navigateur HTTP</value>
+              </prop>
+            </node>
+            <node oor:name="Encoding" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">Encoding to use</value>
+                <value xml:lang="fr">Encodage à utiliser</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">Encoding to use to decode the HTTP request body</value>
+                <value xml:lang="fr">Encodage à utiliser pour décoder le corps de la requête HTTP</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="httpAuth" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">HTTPAUTH</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This formula returns the JSON structure allowing Basic HTTP authentication</value>
+            <value xml:lang="fr">Cette formule renvoie la structure JSON permettant l'authentification HTTP Basic</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">HTTPAUTH</value>
+          </prop>
+          <node oor:name="Parameters">
+            <node oor:name="Name" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">User name</value>
+                <value xml:lang="fr">Nom de l'utilisateur</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">User name for authentification</value>
+                <value xml:lang="fr">Nom d'utilisateur pour l'authentification</value>
+              </prop>
+            </node>
+            <node oor:name="Password" oor:op="replace">
+              <prop oor:name="DisplayName">
+                <value xml:lang="en">User password</value>
+                <value xml:lang="fr">Mot de passe de l'utilisateur</value>
+              </prop>
+              <prop oor:name="Description">
+                <value xml:lang="en">User password for authentification</value>
+                <value xml:lang="fr">Mot de passe de l'utilisateur pour l'authentification</value>
+              </prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="httpContent" oor:op="replace">
+          <prop oor:name="DisplayName">
+            <value xml:lang="en">HTTPCONTENT</value>
+          </prop>
+          <prop oor:name="Description">
+            <value xml:lang="en">This formula retrieves the body of the HTTP request</value>
+            <value xml:lang="fr">Cette formule récupère le corps de la requête HTTP</value>
+          </prop>
+          <prop oor:name="Category">
+            <value>Add-In</value>
+          </prop>
+          <prop oor:name="CompatibilityName">
+            <value xml:lang="en">HTTPCONTENT</value>
           </prop>
           <node oor:name="Parameters">
             <node oor:name="Url" oor:op="replace">
@@ -94,8 +466,8 @@
             <value xml:lang="en">PARSEHTML</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function parses the HTML data with the provided XPath as argument.</value>
-            <value xml:lang="fr">Cette fonction analyse les données HTML avec le XPath fourni comme argument.</value>
+            <value xml:lang="en">This formula parses the HTML data with the provided XPath as argument.</value>
+            <value xml:lang="fr">Cette formule analyse les données HTML avec le XPath fourni comme argument.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -141,8 +513,8 @@
             <value xml:lang="en">PARSEXML</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function parses the XML data with the provided XPath as argument.</value>
-            <value xml:lang="fr">Cette fonction analyse les données XML avec le XPath fourni comme argument.</value>
+            <value xml:lang="en">This formula parses the XML data with the provided XPath as argument.</value>
+            <value xml:lang="fr">Cette formule analyse les données XML avec le XPath fourni comme argument.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -188,8 +560,8 @@
             <value xml:lang="en">PARSEJSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function parses the JSON structure with the provided JSONPATH as argument.</value>
-            <value xml:lang="fr">Cette fonction analyse la structure JSON avec le JSONPATH fourni comme argument.</value>
+            <value xml:lang="en">This formula parses the JSON structure with the provided JSONPATH as argument.</value>
+            <value xml:lang="fr">Cette formule analyse la structure JSON avec le JSONPATH fourni comme argument.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -225,8 +597,8 @@
             <value xml:lang="en">JAVASCRIPT2XML</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function convert JavaScript code to an XML document.</value>
-            <value xml:lang="fr">Cette fonction convertit du code JavaScript en un document XML.</value>
+            <value xml:lang="en">This formula convert JavaScript code to an XML document.</value>
+            <value xml:lang="fr">Cette formule convertit du code JavaScript en un document XML.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -262,8 +634,8 @@
             <value xml:lang="en">XML2JSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function convert an XML document into a JSON structure.</value>
-            <value xml:lang="fr">Cette fonction convertit un document XML en une structure JSON.</value>
+            <value xml:lang="en">This formula convert an XML document into a JSON structure.</value>
+            <value xml:lang="fr">Cette formule convertit un document XML en une structure JSON.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -299,8 +671,8 @@
             <value xml:lang="en">JAVASCRIPT2JSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function transforms the JavaScript code into a JSON structure.</value>
-            <value xml:lang="fr">Cette fonction transforme le code JavaScript en une structure JSON.</value>
+            <value xml:lang="en">This formula transforms the JavaScript code into a JSON structure.</value>
+            <value xml:lang="fr">Cette formule transforme le code JavaScript en une structure JSON.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -336,8 +708,8 @@
             <value xml:lang="en">DUBLINCORE2JSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function extract DublinCore metadata from the HTML document.</value>
-            <value xml:lang="fr">Cette fonction extrait les métadonnées DublinCore du document HTML.</value>
+            <value xml:lang="en">This formula extract DublinCore metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette formule extrait les métadonnées DublinCore du document HTML.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -373,8 +745,8 @@
             <value xml:lang="en">JSONLD2JSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function extract JSON-LD metadata from the HTML document.</value>
-            <value xml:lang="fr">Cette fonction extrait les métadonnées JSON-LD du document HTML.</value>
+            <value xml:lang="en">This formula extract JSON-LD metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette formule extrait les métadonnées JSON-LD du document HTML.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -410,8 +782,8 @@
             <value xml:lang="en">MICRODATA2JSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function extract MicroData metadata from the HTML document.</value>
-            <value xml:lang="fr">Cette fonction extrait les métadonnées MicroData du document HTML.</value>
+            <value xml:lang="en">This formula extract MicroData metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette formule extrait les métadonnées MicroData du document HTML.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -447,8 +819,8 @@
             <value xml:lang="en">MICROFORMAT2JSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function extract MicroFormat metadata from the HTML document.</value>
-            <value xml:lang="fr">Cette fonction extrait les métadonnées MicroFormat du document HTML.</value>
+            <value xml:lang="en">This formula extract MicroFormat metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette formule extrait les métadonnées MicroFormat du document HTML.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -484,8 +856,8 @@
             <value xml:lang="en">OPENGRAPH2JSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function extract OpenGraph metadata from the HTML document.</value>
-            <value xml:lang="fr">Cette fonction extrait les métadonnées OpenGraph du document HTML.</value>
+            <value xml:lang="en">This formula extract OpenGraph metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette formule extrait les métadonnées OpenGraph du document HTML.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -521,8 +893,8 @@
             <value xml:lang="en">RDFA2JSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function extract RDFA metadata from the HTML document.</value>
-            <value xml:lang="fr">Cette fonction extrait les métadonnées RDFA du document HTML.</value>
+            <value xml:lang="en">This formula extract RDFA metadata from the HTML document.</value>
+            <value xml:lang="fr">Cette formule extrait les métadonnées RDFA du document HTML.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -558,8 +930,8 @@
             <value xml:lang="en">SPLITJSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function splits an array of JSON structures</value>
-            <value xml:lang="fr">Cette fonction scinde une tableau de structures JSON.</value>
+            <value xml:lang="en">This formula splits an array of JSON structures</value>
+            <value xml:lang="fr">Cette formule scinde une tableau de structures JSON.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>
@@ -615,8 +987,8 @@
             <value xml:lang="en">FLATTENJSON</value>
           </prop>
           <prop oor:name="Description">
-            <value xml:lang="en">This function flatten an JSON structure</value>
-            <value xml:lang="fr">Cette fonction aplati une structure JSON.</value>
+            <value xml:lang="en">This formula flatten an JSON structure</value>
+            <value xml:lang="fr">Cette formule aplati une structure JSON.</value>
           </prop>
           <prop oor:name="Category">
             <value>Add-In</value>

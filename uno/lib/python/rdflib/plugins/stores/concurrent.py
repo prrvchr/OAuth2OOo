@@ -4,7 +4,7 @@ from threading import Lock
 class ResponsibleGenerator(object):
     """A generator that will help clean up when it is done being used."""
 
-    __slots__ = ['cleanup', 'gen']
+    __slots__ = ["cleanup", "gen"]
 
     def __init__(self, gen, cleanup):
         self.cleanup = cleanup
@@ -21,7 +21,6 @@ class ResponsibleGenerator(object):
 
 
 class ConcurrentStore(object):
-
     def __init__(self, store):
         self.store = store
 
@@ -59,10 +58,12 @@ class ConcurrentStore(object):
             if not (s, p, o) in pending_removes:
                 yield s, p, o
 
-        for (s, p, o) in self.__pending_adds:
-            if (su is None or su == s) \
-                    and (pr is None or pr == p) \
-                    and (ob is None or ob == o):
+        for s, p, o in self.__pending_adds:
+            if (
+                (su is None or su == s)
+                and (pr is None or pr == p)
+                and (ob is None or ob == o)
+            ):
                 yield s, p, o
 
     def __len__(self):
@@ -84,7 +85,7 @@ class ConcurrentStore(object):
                 (s, p, o) = pending_removes.pop()
                 try:
                     self.store.remove((s, p, o))
-                except:
+                except:  # noqa: E722
                     # TODO: change to try finally?
                     print(s, p, o, "Not in store to remove")
             pending_adds = self.__pending_adds

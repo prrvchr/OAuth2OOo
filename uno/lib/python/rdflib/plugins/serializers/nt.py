@@ -1,16 +1,22 @@
+from __future__ import annotations
+
 """
 N-Triples RDF graph serializer for RDFLib.
 See <http://www.w3.org/TR/rdf-testcases/#ntriples> for details about the
 format.
 """
-from rdflib.term import Literal
-from rdflib.serializer import Serializer
-from six import b
-
-import warnings
 import codecs
+import warnings
+from typing import IO, TYPE_CHECKING, Optional, Tuple, Union
 
-__all__ = ['NTSerializer']
+from rdflib.graph import Graph
+from rdflib.serializer import Serializer
+from rdflib.term import Literal
+
+if TYPE_CHECKING:
+    from rdflib.graph import _TripleType
+
+__all__ = ["NTSerializer"]
 
 
 class NTSerializer(Serializer):
@@ -18,19 +24,26 @@ class NTSerializer(Serializer):
     Serializes RDF graphs to NTriples format.
     """
 
-    def __init__(self, store):
+    def __init__(self, store: Graph):
         Serializer.__init__(self, store)
-        self.encoding = 'ascii'  # n-triples are ascii encoded
 
-    def serialize(self, stream, base=None, encoding=None, **args):
+    def serialize(
+        self,
+        stream: IO[bytes],
+        base: Optional[str] = None,
+        encoding: Optional[str] = "utf-8",
+        **args,
+    ) -> None:
         if base is not None:
             warnings.warn("NTSerializer does not support base.")
-        if encoding is not None and encoding.lower() != self.encoding.lower():
-            warnings.warn("NTSerializer does not use custom encoding.")
-        encoding = self.encoding
+        if encoding != "utf-8":
+            warnings.warn(
+                "NTSerializer always uses UTF-8 encoding. "
+                f"Given encoding was: {encoding}"
+            )
+
         for triple in self.store:
-            stream.write(_nt_row(triple).encode(self.encoding, "_rdflib_nt_escape"))
-        stream.write(b("\n"))
+            stream.write(_nt_row(triple).encode())
 
 
 class NT11Serializer(NTSerializer):
@@ -40,58 +53,64 @@ class NT11Serializer(NTSerializer):
     Exactly like nt - only utf8 encoded.
     """
 
-    def __init__(self, store):
+    def __init__(self, store: Graph):
         Serializer.__init__(self, store)  # default to utf-8
 
 
-def _nt_row(triple):
+def _nt_row(triple: _TripleType) -> str:
     if isinstance(triple[2], Literal):
-        return u"%s %s %s .\n" % (
-            triple[0].n3(),
-            triple[1].n3(),
-            _quoteLiteral(triple[2]))
+        return "%s %s %s .\n" % (
+            # type error: "Node" has no attribute "n3"
+            triple[0].n3(),  # type: ignore[attr-defined]
+            triple[1].n3(),  # type: ignore[attr-defined]
+            _quoteLiteral(triple[2]),
+        )
     else:
-        return u"%s %s %s .\n" % (triple[0].n3(),
-                                  triple[1].n3(),
-                                  triple[2].n3())
+        # type error: "Node" has no attribute "n3"
+        return "%s %s %s .\n" % (triple[0].n3(), triple[1].n3(), triple[2].n3())  # type: ignore[attr-defined]
 
 
-def _quoteLiteral(l):
-    '''
+def _quoteLiteral(l_: Literal) -> str:  # noqa: N802
+    """
     a simpler version of term.Literal.n3()
-    '''
+    """
 
-    encoded = _quote_encode(l)
+    encoded = _quote_encode(l_)
 
-    if l.language:
-        if l.datatype:
+    if l_.language:
+        if l_.datatype:
             raise Exception("Literal has datatype AND language!")
-        return '%s@%s' % (encoded, l.language)
-    elif l.datatype:
-        return '%s^^<%s>' % (encoded, l.datatype)
+        return "%s@%s" % (encoded, l_.language)
+    elif l_.datatype:
+        return "%s^^<%s>" % (encoded, l_.datatype)
     else:
-        return '%s' % encoded
+        return "%s" % encoded
 
 
-def _quote_encode(l):
-    return '"%s"' % l.replace('\\', '\\\\')\
-        .replace('\n', '\\n')\
-        .replace('"', '\\"')\
-        .replace('\r', '\\r')
+def _quote_encode(l_: str) -> str:
+    return '"%s"' % l_.replace("\\", "\\\\").replace("\n", "\\n").replace(
+        '"', '\\"'
+    ).replace("\r", "\\r")
 
 
-def _nt_unicode_error_resolver(err):
+def _nt_unicode_error_resolver(
+    err: UnicodeError,
+) -> Tuple[Union[str, bytes], int]:
     """
     Do unicode char replaces as defined in https://www.w3.org/TR/2004/REC-rdf-testcases-20040210/#ntrip_strings
     """
 
     def _replace_single(c):
         c = ord(c)
-        fmt = u'\\u%04X' if c <= 0xFFFF else u'\\U%08X'
+        fmt = "\\u%04X" if c <= 0xFFFF else "\\U%08X"
         return fmt % c
 
-    string = err.object[err.start:err.end]
-    return ("".join(_replace_single(c) for c in string), err.end)
+    # type error: "UnicodeError" has no attribute "object"
+    # type error: "UnicodeError" has no attribute "start"
+    # type error: "UnicodeError" has no attribute "end"
+    string = err.object[err.start : err.end]  # type: ignore[attr-defined]
+    # type error: "UnicodeError" has no attribute "end"
+    return "".join(_replace_single(c) for c in string), err.end  # type: ignore[attr-defined]
 
 
-codecs.register_error('_rdflib_nt_escape', _nt_unicode_error_resolver)
+codecs.register_error("_rdflib_nt_escape", _nt_unicode_error_resolver)

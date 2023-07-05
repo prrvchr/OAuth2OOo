@@ -1,18 +1,15 @@
-from rdflib import Graph
+from __future__ import annotations
 
-from rdflib.query import (
-    Result,
-    ResultParser,
-    ResultSerializer,
-    ResultException
-)
+from typing import IO, Optional
+
+from rdflib.graph import Graph
+from rdflib.query import Result, ResultParser
 
 
 class GraphResultParser(ResultParser):
-
-    def parse(self, source, content_type):
-
-        res = Result('CONSTRUCT')  # hmm - or describe?type_)
+    # type error: Signature of "parse" incompatible with supertype "ResultParser"
+    def parse(self, source: IO, content_type: Optional[str]) -> Result:  # type: ignore[override]
+        res = Result("CONSTRUCT")  # hmm - or describe?type_)
         res.graph = Graph()
         res.graph.parse(source, format=content_type)
 

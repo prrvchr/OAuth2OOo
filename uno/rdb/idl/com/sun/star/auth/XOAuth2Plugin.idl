@@ -28,13 +28,50 @@
 #define __com_sun_star_auth_XOAuth2Plugin_idl__
 
 #include <com/sun/star/uno/XInterface.idl>
+#include <com/sun/star/beans/XPropertySet.idl>
+#include <com/sun/star/sheet/XVolatileResult.idl>
+
 
 module com { module sun { module star { module auth {
 
 interface XOAuth2Plugin: com::sun::star::uno::XInterface
 {
 
-    string getHttpBody([in] string Url,
+    string browserOpen([in] com::sun::star::beans::XPropertySet Document,
+                       [in] string Browser,
+                       [in] string Path,
+                       [in] any Init,
+                       [in] sequence <any> Options);
+
+    string browserClick([in] string Session,
+                        [in] string By,
+                        [in] string Path,
+                        [in] any Url,
+                        [in] any Init,
+                        [in] any Wait);
+
+    string browserField([in] string Session,
+                        [in] string By,
+                        [in] string Path,
+                        [in] string Value,
+                        [in] any Url,
+                        [in] any Init,
+                        [in] any Wait);
+
+    string browserForm([in] string Session,
+                       [in] sequence <sequence <string> > Form,
+                       [in] any Url,
+                       [in] any Init,
+                       [in] any Wait);
+
+    string browserContent([in] string Session,
+                          [in] any Url,
+                          [in] any Encoding);
+
+    string httpAuth([in] string Name,
+                    [in] any Password);
+
+    string httpContent([in] string Url,
                        [in] any Method,
                        [in] any Encoding,
                        [in] any Parameters);

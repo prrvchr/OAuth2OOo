@@ -41,6 +41,7 @@ from .unotool import getConfiguration
 from .unotool import getCurrentLocale
 from .unotool import getDialog
 from .unotool import getParentWindow
+from .unotool import getResourceLocation
 from .unotool import getStringResource
 from .unotool import getSimpleFile
 
@@ -71,6 +72,9 @@ from .plugin import parseJson
 from .plugin import splitJson
 from .plugin import xml2Json
 
+from .webdriver import Browsers
+from .webdriver import clickButton
+from .webdriver import sendKey
 
 from .oauth2 import OAuth2OOo
 from .oauth2 import NoOAuth2
@@ -79,4 +83,3 @@ from .oauth2 import getOAuth2UserName
 
 from .oauth2helper import getAccessToken
 from .oauth2helper import showOAuth2Wizard
-

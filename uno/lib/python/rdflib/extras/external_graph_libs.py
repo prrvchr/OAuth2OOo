@@ -1,9 +1,6 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 # encoding: utf-8
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import annotations
 
 """Convert (to and) from rdflib graphs to other well known graph libraries.
 
@@ -17,18 +14,26 @@ see ../../test/test_extras_external_graph_libs.py for conditional tests
 """
 
 import logging
+from typing import TYPE_CHECKING, Any, Dict, List
+
+if TYPE_CHECKING:
+    from rdflib.graph import Graph
+
 logger = logging.getLogger(__name__)
 
 
-def _identity(x): return x
+def _identity(x):
+    return x
 
 
 def _rdflib_to_networkx_graph(
-        graph,
-        nxgraph,
-        calc_weights,
-        edge_attrs,
-        transform_s=_identity, transform_o=_identity):
+    graph: Graph,
+    nxgraph,
+    calc_weights: bool,
+    edge_attrs,
+    transform_s=_identity,
+    transform_o=_identity,
+):
     """Helper method for multidigraph, digraph and graph.
 
     Modifies nxgraph in-place!
@@ -50,6 +55,7 @@ def _rdflib_to_networkx_graph(
     assert callable(transform_s)
     assert callable(transform_o)
     import networkx as nx
+
     for s, p, o in graph:
         ts, to = transform_s(s), transform_o(o)  # apply possible transformations
         data = nxgraph.get_edge_data(ts, to)
@@ -57,35 +63,35 @@ def _rdflib_to_networkx_graph(
             # no edge yet, set defaults
             data = edge_attrs(s, p, o)
             if calc_weights:
-                data['weight'] = 1
+                data["weight"] = 1
             nxgraph.add_edge(ts, to, **data)
         else:
             # already have an edge, just update attributes
             if calc_weights:
-                data['weight'] += 1
-            if 'triples' in data:
+                data["weight"] += 1
+            if "triples" in data:
                 d = edge_attrs(s, p, o)
-                data['triples'].extend(d['triples'])
+                data["triples"].extend(d["triples"])
 
 
 def rdflib_to_networkx_multidigraph(
-        graph,
-        edge_attrs=lambda s, p, o: {'key': p},
-        **kwds):
+    graph: Graph, edge_attrs=lambda s, p, o: {"key": p}, **kwds
+):
     """Converts the given graph into a networkx.MultiDiGraph.
 
     The subjects and objects are the later nodes of the MultiDiGraph.
     The predicates are used as edge keys (to identify multi-edges).
 
-    Arguments:
-        graph: a rdflib.Graph.
-        edge_attrs: Callable to construct later edge_attributes. It receives
+    :Parameters:
+
+        - graph: a rdflib.Graph.
+        - edge_attrs: Callable to construct later edge_attributes. It receives
             3 variables (s, p, o) and should construct a dictionary that is
-            passed to networkx's add_edge(s, o, **attrs) function.
+            passed to networkx's add_edge(s, o, \*\*attrs) function.
 
             By default this will include setting the MultiDiGraph key=p here.
             If you don't want to be able to re-identify the edge later on, you
-            can set this to `lambda s, p, o: {}`. In this case MultiDiGraph's
+            can set this to ``lambda s, p, o: {}``. In this case MultiDiGraph's
             default (increasing ints) will be used.
 
     Returns:
@@ -114,18 +120,20 @@ def rdflib_to_networkx_multidigraph(
     True
     >>> mdg.has_edge(a, b, key=1)
     True
-    """
+    """  # noqa: W605
     import networkx as nx
+
     mdg = nx.MultiDiGraph()
     _rdflib_to_networkx_graph(graph, mdg, False, edge_attrs, **kwds)
     return mdg
 
 
 def rdflib_to_networkx_digraph(
-        graph,
-        calc_weights=True,
-        edge_attrs=lambda s, p, o: {'triples': [(s, p, o)]},
-        **kwds):
+    graph: Graph,
+    calc_weights: bool = True,
+    edge_attrs=lambda s, p, o: {"triples": [(s, p, o)]},
+    **kwds,
+):
     """Converts the given graph into a networkx.DiGraph.
 
     As an rdflib.Graph() can contain multiple edges between nodes, by default
@@ -133,21 +141,21 @@ def rdflib_to_networkx_digraph(
     all triples between s and o.
     Also by default calculates the edge weight as the length of triples.
 
-    Args:
-        graph: a rdflib.Graph.
-        calc_weights: If true calculate multi-graph edge-count as edge 'weight'
-        edge_attrs: Callable to construct later edge_attributes. It receives
-            3 variables (s, p, o) and should construct a dictionary that is
-            passed to networkx's add_edge(s, o, **attrs) function.
+    :Parameters:
+
+        - ``graph``: a rdflib.Graph.
+        - ``calc_weights``: If true calculate multi-graph edge-count as edge 'weight'
+        - ``edge_attrs``: Callable to construct later edge_attributes. It receives
+            3 variables (s, p, o) and should construct a dictionary that is passed to
+            networkx's add_edge(s, o, \*\*attrs) function.
 
             By default this will include setting the 'triples' attribute here,
             which is treated specially by us to be merged. Other attributes of
             multi-edges will only contain the attributes of the first edge.
             If you don't want the 'triples' attribute for tracking, set this to
-            `lambda s, p, o: {}`.
+            ``lambda s, p, o: {}``.
 
-    Returns:
-        networkx.DiGraph
+    Returns: networkx.DiGraph
 
     >>> from rdflib import Graph, URIRef, Literal
     >>> g = Graph()
@@ -174,18 +182,21 @@ def rdflib_to_networkx_digraph(
     False
     >>> 'triples' in dg[a][b]
     False
-    """
+
+    """  # noqa: W605
     import networkx as nx
+
     dg = nx.DiGraph()
     _rdflib_to_networkx_graph(graph, dg, calc_weights, edge_attrs, **kwds)
     return dg
 
 
 def rdflib_to_networkx_graph(
-        graph,
-        calc_weights=True,
-        edge_attrs=lambda s, p, o: {'triples': [(s, p, o)]},
-        **kwds):
+    graph: Graph,
+    calc_weights: bool = True,
+    edge_attrs=lambda s, p, o: {"triples": [(s, p, o)]},
+    **kwds,
+):
     """Converts the given graph into a networkx.Graph.
 
     As an rdflib.Graph() can contain multiple directed edges between nodes, by
@@ -193,18 +204,19 @@ def rdflib_to_networkx_graph(
     list of triples between s and o in graph.
     Also by default calculates the edge weight as the len(triples).
 
-    Args:
-        graph: a rdflib.Graph.
-        calc_weights: If true calculate multi-graph edge-count as edge 'weight'
-        edge_attrs: Callable to construct later edge_attributes. It receives
-            3 variables (s, p, o) and should construct a dictionary that is
-            passed to networkx's add_edge(s, o, **attrs) function.
+    :Parameters:
 
-            By default this will include setting the 'triples' attribute here,
-            which is treated specially by us to be merged. Other attributes of
-            multi-edges will only contain the attributes of the first edge.
-            If you don't want the 'triples' attribute for tracking, set this to
-            `lambda s, p, o: {}`.
+        - graph: a rdflib.Graph.
+        - calc_weights: If true calculate multi-graph edge-count as edge 'weight'
+        - edge_attrs: Callable to construct later edge_attributes. It receives
+                    3 variables (s, p, o) and should construct a dictionary that is
+                    passed to networkx's add_edge(s, o, \*\*attrs) function.
+
+                    By default this will include setting the 'triples' attribute here,
+                    which is treated specially by us to be merged. Other attributes of
+                    multi-edges will only contain the attributes of the first edge.
+                    If you don't want the 'triples' attribute for tracking, set this to
+                    ``lambda s, p, o: {}``.
 
     Returns:
         networkx.Graph
@@ -234,42 +246,42 @@ def rdflib_to_networkx_graph(
     False
     >>> 'triples' in ug[a][b]
     False
-    """
+    """  # noqa: W605
     import networkx as nx
+
     g = nx.Graph()
     _rdflib_to_networkx_graph(graph, g, calc_weights, edge_attrs, **kwds)
     return g
 
 
 def rdflib_to_graphtool(
-    graph,
-    v_prop_names=[str('term')],
-    e_prop_names=[str('term')],
-    transform_s=lambda s, p, o: {str('term'): s},
-    transform_p=lambda s, p, o: {str('term'): p},
-    transform_o=lambda s, p, o: {str('term'): o},
+    graph: Graph,
+    v_prop_names: List[str] = [str("term")],
+    e_prop_names: List[str] = [str("term")],
+    transform_s=lambda s, p, o: {str("term"): s},
+    transform_p=lambda s, p, o: {str("term"): p},
+    transform_o=lambda s, p, o: {str("term"): o},
 ):
     """Converts the given graph into a graph_tool.Graph().
 
     The subjects and objects are the later vertices of the Graph.
     The predicates become edges.
 
-    Arguments:
-        graph: a rdflib.Graph.
-        v_prop_names: a list of names for the vertex properties. The default is
-            set to ['term'] (see transform_s, transform_o below).
-        e_prop_names: a list of names for the edge properties.
-        transform_s: callable with s, p, o input. Should return a dictionary
-            containing a value for each name in v_prop_names. By default is set
-            to {'term': s} which in combination with v_prop_names = ['term']
-            adds s as 'term' property to the generated vertex for s.
-        transform_p: similar to transform_s, but wrt. e_prop_names. By default
-            returns {'term': p} which adds p as a property to the generated
-            edge between the vertex for s and the vertex for o.
-        transform_o: similar to transform_s.
+    :Parameters:
+        - graph: a rdflib.Graph.
+        - v_prop_names: a list of names for the vertex properties. The default is set
+          to ['term'] (see transform_s, transform_o below).
+        - e_prop_names: a list of names for the edge properties.
+        - transform_s: callable with s, p, o input. Should return a dictionary
+          containing a value for each name in v_prop_names. By default is set
+          to {'term': s} which in combination with v_prop_names = ['term']
+          adds s as 'term' property to the generated vertex for s.
+        - transform_p: similar to transform_s, but wrt. e_prop_names. By default
+          returns {'term': p} which adds p as a property to the generated
+          edge between the vertex for s and the vertex for o.
+        - transform_o: similar to transform_s.
 
-    Returns:
-        graph_tool.Graph()
+    Returns: graph_tool.Graph()
 
     >>> from rdflib import Graph, URIRef, Literal
     >>> g = Graph()
@@ -304,17 +316,20 @@ def rdflib_to_graphtool(
     True
     >>> len(list(gt_util.find_edge(mdg, epterm, unicode(q)))) == 1
     True
+
     """
-    import graph_tool as gt
+    # pytype error: Can't find module 'graph_tool'.
+    import graph_tool as gt  # pytype: disable=import-error
+
     g = gt.Graph()
 
-    vprops = [(vpn, g.new_vertex_property('object')) for vpn in v_prop_names]
+    vprops = [(vpn, g.new_vertex_property("object")) for vpn in v_prop_names]
     for vpn, vprop in vprops:
         g.vertex_properties[vpn] = vprop
-    eprops = [(epn, g.new_edge_property('object')) for epn in e_prop_names]
+    eprops = [(epn, g.new_edge_property("object")) for epn in e_prop_names]
     for epn, eprop in eprops:
         g.edge_properties[epn] = eprop
-    node_to_vertex = {}
+    node_to_vertex: Dict[Any, Any] = {}
     for s, p, o in graph:
         sv = node_to_vertex.get(s)
         if sv is None:
@@ -339,12 +354,3 @@ def rdflib_to_graphtool(
         for epn, eprop in eprops:
             eprop[e] = tmp_props[epn]
     return g
-
-
-if __name__ == '__main__':
-    import sys
-    import logging.config
-    logging.basicConfig(level=logging.DEBUG)
-
-    import nose
-    nose.run(argv=[sys.argv[0], sys.argv[0], '-v', '--without-doctest'])

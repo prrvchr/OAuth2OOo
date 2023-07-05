@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 __doc__ = """
 Dirt Simple Events
 
@@ -17,7 +13,8 @@ to handle Event events.  A handler is a simple function or method that
 accepts the event as an argument:
 
   >>> def handler1(event): print(repr(event))
-  >>> d.subscribe(Event, handler1)
+  >>> d.subscribe(Event, handler1) # doctest: +ELLIPSIS
+  <rdflib.events.Dispatcher object at ...>
 
 Now dispatch a new event into the dispatcher, and see handler1 get
 fired:
@@ -26,7 +23,7 @@ fired:
   <rdflib.events.Event ['data', 'foo', 'used_by']>
 """
 
-__all__ = ['Event', 'Dispatcher']
+__all__ = ["Event", "Dispatcher"]
 
 
 class Event(object):
@@ -47,7 +44,7 @@ class Event(object):
 
     def __repr__(self):
         attrs = sorted(self.__dict__.keys())
-        return '<rdflib.events.Event %s>' % ([a for a in attrs],)
+        return "<rdflib.events.Event %s>" % ([a for a in attrs],)
 
 
 class Dispatcher(object):
@@ -60,12 +57,13 @@ class Dispatcher(object):
 
     def set_map(self, amap):
         self._dispatch_map = amap
+        return self
 
     def get_map(self):
         return self._dispatch_map
 
     def subscribe(self, event_type, handler):
-        """ Subscribe the given handler to an event_type.  Handlers
+        """Subscribe the given handler to an event_type.  Handlers
         are called in the order they are subscribed.
         """
         if self._dispatch_map is None:
@@ -76,22 +74,14 @@ class Dispatcher(object):
         else:
             lst.append(handler)
         self._dispatch_map[event_type] = lst
+        return self
 
     def dispatch(self, event):
-        """ Dispatch the given event to the subscribed handlers for
+        """Dispatch the given event to the subscribed handlers for
         the event's type"""
         if self._dispatch_map is not None:
             lst = self._dispatch_map.get(type(event), None)
             if lst is None:
                 raise ValueError("unknown event type: %s" % type(event))
-            for l in lst:
-                l(event)
-
-
-def test():
-    import doctest
-    doctest.testmod()
-
-
-if __name__ == '__main__':
-    test()
+            for l_ in lst:
+                l_(event)

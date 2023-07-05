@@ -5,36 +5,64 @@ This is an RDFLib store around Ivan Herman et al.'s SPARQL service wrapper.
 This was first done in layer-cake, and then ported to RDFLib
 
 """
-
-# Defines some SPARQL keywords
-LIMIT = 'LIMIT'
-OFFSET = 'OFFSET'
-ORDERBY = 'ORDER BY'
-
-import re
 import collections
+import re
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+    overload,
+)
+
+from rdflib.graph import DATASET_DEFAULT_GRAPH_ID, Graph
+from rdflib.plugins.stores.regexmatching import NATIVE_REGEX
+from rdflib.store import Store
+from rdflib.term import BNode, Identifier, Node, URIRef, Variable
+
+if TYPE_CHECKING:
+    import typing_extensions as te
+    from rdflib.graph import (
+        _TripleType,
+        _ContextType,
+        _QuadType,
+        _TriplePatternType,
+        _SubjectType,
+        _PredicateType,
+        _ObjectType,
+        _ContextIdentifierType,
+    )
+    from rdflib.plugins.sparql.sparql import Query, Update
+    from rdflib.query import Result, ResultRow
 
 from .sparqlconnector import SPARQLConnector
 
-from rdflib.plugins.stores.regexmatching import NATIVE_REGEX
+# Defines some SPARQL keywords
+LIMIT = "LIMIT"
+OFFSET = "OFFSET"
+ORDERBY = "ORDER BY"
 
-from rdflib.store import Store
-from rdflib import Variable, BNode
-from rdflib.graph import DATASET_DEFAULT_GRAPH_ID
-from rdflib.term import Node
+BNODE_IDENT_PATTERN = re.compile(r"(?P<label>_\:[^\s]+)")
 
-from six import string_types
-
-BNODE_IDENT_PATTERN = re.compile('(?P<label>_\:[^\s]+)')
+_NodeToSparql = Callable[["Node"], str]
 
 
-def _node_to_sparql(node):
+def _node_to_sparql(node: "Node") -> str:
     if isinstance(node, BNode):
         raise Exception(
             "SPARQLStore does not support BNodes! "
             "See http://www.w3.org/TR/sparql11-query/#BGPsparqlBNodes"
         )
-    return node.n3()
+    # type error: "Node" has no attribute "n3"
+    return node.n3()  # type: ignore[attr-defined]
 
 
 class SPARQLStore(SPARQLConnector, Store):
@@ -76,9 +104,9 @@ class SPARQLStore(SPARQLConnector, Store):
     matching plugin registered. Built in is support for ``xml``,
     ``json``, ``csv``, ``tsv`` and ``application/rdf+xml``.
 
-    The underlying SPARQLConnector builds in the requests library.
+    The underlying SPARQLConnector uses the urllib library.
     Any extra kwargs passed to the SPARQLStore connector are passed to
-    requests when doing HTTP calls. I.e. you have full control of
+    urllib when doing HTTP calls. I.e. you have full control of
     cookies/auth/headers.
 
     Form example:
@@ -88,166 +116,205 @@ class SPARQLStore(SPARQLConnector, Store):
     will use HTTP basic auth.
 
     """
+
     formula_aware = False
     transaction_aware = False
     graph_aware = True
     regex_matching = NATIVE_REGEX
 
-    def __init__(self,
-                 endpoint=None,
-                 sparql11=True, context_aware=True,
-                 node_to_sparql=_node_to_sparql,
-                 returnFormat='xml',
-                 **sparqlconnector_kwargs):
-        """
-        """
+    def __init__(
+        self,
+        query_endpoint: Optional[str] = None,
+        sparql11: bool = True,
+        context_aware: bool = True,
+        node_to_sparql: _NodeToSparql = _node_to_sparql,
+        returnFormat: str = "xml",  # noqa: N803
+        auth: Optional[Tuple[str, str]] = None,
+        **sparqlconnector_kwargs,
+    ):
         super(SPARQLStore, self).__init__(
-            endpoint, returnFormat=returnFormat, **sparqlconnector_kwargs)
+            query_endpoint=query_endpoint,
+            returnFormat=returnFormat,
+            auth=auth,
+            **sparqlconnector_kwargs,
+        )
 
         self.node_to_sparql = node_to_sparql
-        self.nsBindings = {}
+        self.nsBindings: Dict[str, Any] = {}
         self.sparql11 = sparql11
         self.context_aware = context_aware
         self.graph_aware = context_aware
         self._queries = 0
 
+    # type error: Missing return statement
+    def open(self, configuration: str, create: bool = False) -> Optional[int]:  # type: ignore[return]
+        """This method is included so that calls to this Store via Graph, e.g. Graph("SPARQLStore"),
+        can set the required parameters
+        """
+        if type(configuration) == str:
+            self.query_endpoint = configuration
+        else:
+            raise Exception(
+                "configuration must be a string (a single query endpoint URI)"
+            )
+
     # Database Management Methods
-    def create(self, configuration):
-        raise TypeError('The SPARQL store is read only')
+    def create(self, configuration: str) -> None:
+        raise TypeError(
+            "The SPARQL Store is read only. Try SPARQLUpdateStore for read/write."
+        )
 
-    def open(self, configuration, create=False):
-        """
-        sets the endpoint URL for this SPARQLStore
-        if create==True an exception is thrown.
-        """
-        if create:
-            raise Exception("Cannot create a SPARQL Endpoint")
-
-        self.query_endpoint = configuration
-
-    def destroy(self, configuration):
-        raise TypeError('The SPARQL store is read only')
+    def destroy(self, configuration: str) -> None:
+        raise TypeError("The SPARQL store is read only")
 
     # Transactional interfaces
-    def commit(self):
-        raise TypeError('The SPARQL store is read only')
+    def commit(self) -> None:
+        raise TypeError("The SPARQL store is read only")
 
-    def rollback(self):
-        raise TypeError('The SPARQL store is read only')
+    def rollback(self) -> None:
+        raise TypeError("The SPARQL store is read only")
 
-    def add(self, _, context=None, quoted=False):
-        raise TypeError('The SPARQL store is read only')
+    def add(
+        self, _: "_TripleType", context: "_ContextType" = None, quoted: bool = False
+    ) -> None:
+        raise TypeError("The SPARQL store is read only")
 
-    def addN(self, quads):
-        raise TypeError('The SPARQL store is read only')
+    def addN(self, quads: Iterable["_QuadType"]) -> None:  # noqa: N802
+        raise TypeError("The SPARQL store is read only")
 
-    def remove(self, _, context):
-        raise TypeError('The SPARQL store is read only')
+    # type error: Signature of "remove" incompatible with supertype "Store"
+    def remove(  # type: ignore[override]
+        self, _: "_TriplePatternType", context: Optional["_ContextType"]
+    ) -> None:
+        raise TypeError("The SPARQL store is read only")
 
-    def _query(self, *args, **kwargs):
+    # type error: Signature of "update" incompatible with supertype "SPARQLConnector"
+    def update(  # type: ignore[override]
+        self,
+        query: Union["Update", str],
+        initNs: Dict[str, Any] = {},  # noqa: N803
+        initBindings: Dict["str", "Identifier"] = {},
+        queryGraph: "Identifier" = None,
+        DEBUG: bool = False,
+    ) -> None:
+        raise TypeError("The SPARQL store is read only")
+
+    def _query(self, *args: Any, **kwargs: Any) -> "Result":
         self._queries += 1
 
         return super(SPARQLStore, self).query(*args, **kwargs)
 
-    def _inject_prefixes(self, query, extra_bindings):
-        bindings = list(self.nsBindings.items()) + list(extra_bindings.items())
+    def _inject_prefixes(self, query: str, extra_bindings: Mapping[str, Any]) -> str:
+        bindings = set(list(self.nsBindings.items()) + list(extra_bindings.items()))
         if not bindings:
             return query
-        return '\n'.join([
-            '\n'.join(['PREFIX %s: <%s>' % (k, v) for k, v in bindings]),
-            '',  # separate ns_bindings from query with an empty line
-            query
-        ])
+        return "\n".join(
+            [
+                "\n".join(["PREFIX %s: <%s>" % (k, v) for k, v in bindings]),
+                "",  # separate ns_bindings from query with an empty line
+                query,
+            ]
+        )
 
-    def _preprocess_query(self, query):
-        return self._inject_prefixes(query)
-
-    def query(self, query,
-              initNs={},
-              initBindings={},
-              queryGraph=None,
-              DEBUG=False):
+    # type error: Signature of "query" incompatible with supertype "SPARQLConnector"
+    # type error: Signature of "query" incompatible with supertype "Store"
+    def query(  # type: ignore[override]
+        self,
+        query: Union["Query", str],
+        initNs: Optional[Mapping[str, Any]] = None,  # noqa: N803
+        initBindings: Optional[Mapping["str", "Identifier"]] = None,
+        queryGraph: Optional["str"] = None,
+        DEBUG: bool = False,
+    ) -> "Result":
         self.debug = DEBUG
-        assert isinstance(query, string_types)
+        assert isinstance(query, str)
 
-        query = self._inject_prefixes(query, initNs)
+        if initNs is not None and len(initNs) > 0:
+            query = self._inject_prefixes(query, initNs)
 
         if initBindings:
             if not self.sparql11:
-                raise Exception(
-                    "initBindings not supported for SPARQL 1.0 Endpoints.")
+                raise Exception("initBindings not supported for SPARQL 1.0 Endpoints.")
             v = list(initBindings)
 
             # VALUES was added to SPARQL 1.1 on 2012/07/24
-            query += "\nVALUES ( %s )\n{ ( %s ) }\n"\
-                % (" ".join("?" + str(x) for x in v),
-                   " ".join(self.node_to_sparql(initBindings[x]) for x in v))
+            query += "\nVALUES ( %s )\n{ ( %s ) }\n" % (
+                " ".join("?" + str(x) for x in v),
+                " ".join(self.node_to_sparql(initBindings[x]) for x in v),
+            )
 
-        return self._query(query,
-                           default_graph=queryGraph if self._is_contextual(queryGraph) else None)
+        return self._query(
+            query, default_graph=queryGraph if self._is_contextual(queryGraph) else None
+        )
 
-    def triples(self, spo, context=None):
+    # type error: Return type "Iterator[Tuple[Tuple[Node, Node, Node], None]]" of "triples" incompatible with return type "Iterator[Tuple[Tuple[Node, Node, Node], Iterator[Optional[Graph]]]]"
+    def triples(  # type: ignore[override]
+        self, spo: "_TriplePatternType", context: Optional["_ContextType"] = None
+    ) -> Iterator[Tuple["_TripleType", None]]:
         """
         - tuple **(s, o, p)**
-            the triple used as filter for the SPARQL select.
-            (None, None, None) means anything.
+          the triple used as filter for the SPARQL select.
+          (None, None, None) means anything.
         - context **context**
-            the graph effectively calling this method.
+          the graph effectively calling this method.
 
         Returns a tuple of triples executing essentially a SPARQL like
         SELECT ?subj ?pred ?obj WHERE { ?subj ?pred ?obj }
 
         **context** may include three parameter
         to refine the underlying query:
-         * LIMIT: an integer to limit the number of results
-         * OFFSET: an integer to enable paging of results
-         * ORDERBY: an instance of Variable('s'), Variable('o') or Variable('p')
-        or, by default, the first 'None' from the given triple
+
+        * LIMIT: an integer to limit the number of results
+        * OFFSET: an integer to enable paging of results
+        * ORDERBY: an instance of Variable('s'), Variable('o') or Variable('p') or, by default, the first 'None' from the given triple
 
         .. warning::
-        - Using LIMIT or OFFSET automatically include ORDERBY otherwise this is
-        because the results are retrieved in a not deterministic way (depends on
-        the walking path on the graph)
-        - Using OFFSET without defining LIMIT will discard the first OFFSET - 1
-        results
 
-        ``
-        a_graph.LIMIT = limit
-        a_graph.OFFSET = offset
-        triple_generator = a_graph.triples(mytriple):
-            #do something
-        #Removes LIMIT and OFFSET if not required for the next triple() calls
-        del a_graph.LIMIT
-        del a_graph.OFFSET
-        ``
+            - Using LIMIT or OFFSET automatically include ORDERBY otherwise this is
+              because the results are retrieved in a not deterministic way (depends on
+              the walking path on the graph)
+            - Using OFFSET without defining LIMIT will discard the first OFFSET - 1 results
+
+        .. code-block:: python
+
+            a_graph.LIMIT = limit
+            a_graph.OFFSET = offset
+            triple_generator = a_graph.triples(mytriple):
+            # do something
+            # Removes LIMIT and OFFSET if not required for the next triple() calls
+            del a_graph.LIMIT
+            del a_graph.OFFSET
         """
 
         s, p, o = spo
 
         vars = []
         if not s:
-            s = Variable('s')
+            s = Variable("s")
             vars.append(s)
 
         if not p:
-            p = Variable('p')
+            p = Variable("p")
             vars.append(p)
         if not o:
-            o = Variable('o')
+            o = Variable("o")
             vars.append(o)
 
         if vars:
-            v = ' '.join([term.n3() for term in vars])
-            verb = 'SELECT %s ' % v
+            v = " ".join([term.n3() for term in vars])
+            verb = "SELECT %s " % v
         else:
-            verb = 'ASK'
+            verb = "ASK"
 
         nts = self.node_to_sparql
         query = "%s { %s %s %s }" % (verb, nts(s), nts(p), nts(o))
 
         # The ORDER BY is necessary
-        if hasattr(context, LIMIT) or hasattr(context, OFFSET) \
-                or hasattr(context, ORDERBY):
+        if (
+            hasattr(context, LIMIT)
+            or hasattr(context, OFFSET)
+            or hasattr(context, ORDERBY)
+        ):
             var = None
             if isinstance(s, Variable):
                 var = s
@@ -255,33 +322,65 @@ class SPARQLStore(SPARQLConnector, Store):
                 var = p
             elif isinstance(o, Variable):
                 var = o
-            elif hasattr(context, ORDERBY) \
-                    and isinstance(getattr(context, ORDERBY), Variable):
+            elif hasattr(context, ORDERBY) and isinstance(
+                getattr(context, ORDERBY), Variable
+            ):
                 var = getattr(context, ORDERBY)
-            query = query + ' %s %s' % (ORDERBY, var.n3())
+            # type error: Item "None" of "Optional[Variable]" has no attribute "n3"
+            query = query + " %s %s" % (ORDERBY, var.n3())  # type: ignore[union-attr]
 
         try:
-            query = query + ' LIMIT %s' % int(getattr(context, LIMIT))
+            query = query + " LIMIT %s" % int(getattr(context, LIMIT))
         except (ValueError, TypeError, AttributeError):
             pass
         try:
-            query = query + ' OFFSET %s' % int(getattr(context, OFFSET))
+            query = query + " OFFSET %s" % int(getattr(context, OFFSET))
         except (ValueError, TypeError, AttributeError):
             pass
 
-        result = self._query(query,
-                             default_graph=context.identifier if self._is_contextual(context) else None)
+        result = self._query(
+            query,
+            # type error: Item "None" of "Optional[Graph]" has no attribute "identifier"
+            default_graph=context.identifier if self._is_contextual(context) else None,  # type: ignore[union-attr]
+        )
 
         if vars:
+            if type(result) == tuple:
+                if result[0] == 401:
+                    raise ValueError(
+                        "It looks like you need to authenticate with this SPARQL Store. HTTP unauthorized"
+                    )
             for row in result:
-                yield (row.get(s, s),
-                       row.get(p, p),
-                       row.get(o, o)), None  # why is the context here not the passed in graph 'context'?
+                if TYPE_CHECKING:
+                    # This will be a ResultRow because if vars is truthish then
+                    # the query will be a SELECT query.
+                    assert isinstance(row, ResultRow)
+                yield (
+                    # type error: No overload variant of "get" of "ResultRow" matches argument types "Node", "Node"
+                    row.get(s, s),  # type: ignore[call-overload]
+                    row.get(p, p),  # type: ignore[call-overload]
+                    row.get(o, o),  # type: ignore[call-overload]
+                ), None  # why is the context here not the passed in graph 'context'?
         else:
             if result.askAnswer:
                 yield (s, p, o), None
 
-    def triples_choices(self, _, context=None):
+    def triples_choices(
+        self,
+        _: Tuple[
+            Union["_SubjectType", List["_SubjectType"]],
+            Union["_PredicateType", List["_PredicateType"]],
+            Union["_ObjectType", List["_ObjectType"]],
+        ],
+        context: Optional["_ContextType"] = None,
+    ) -> Generator[
+        Tuple[
+            Tuple["_SubjectType", "_PredicateType", "_ObjectType"],
+            Iterator[Optional["_ContextType"]],
+        ],
+        None,
+        None,
+    ]:
         """
         A variant of triples that can take a list of terms instead of a
         single term in any slot.  Stores can implement this to optimize
@@ -289,22 +388,31 @@ class SPARQLStore(SPARQLConnector, Store):
         which will iterate over each term in the list and dispatch to
         triples.
         """
-        raise NotImplementedError('Triples choices currently not supported')
+        raise NotImplementedError("Triples choices currently not supported")
 
-    def __len__(self, context=None):
+    def __len__(self, context: Optional["_ContextType"] = None) -> int:
         if not self.sparql11:
             raise NotImplementedError(
-                "For performance reasons, this is not" +
-                "supported for sparql1.0 endpoints")
+                "For performance reasons, this is not"
+                + "supported for sparql1.0 endpoints"
+            )
         else:
             q = "SELECT (count(*) as ?c) WHERE {?s ?p ?o .}"
 
-            result = self._query(q,
-                                 default_graph=context.identifier if self._is_contextual(context) else None)
+            result = self._query(
+                q,
+                # type error: Item "None" of "Optional[Graph]" has no attribute "identifier"
+                default_graph=context.identifier  # type: ignore[union-attr]
+                if self._is_contextual(context)
+                else None,
+            )
+            # type error: Item "Tuple[Node, ...]" of "Union[Tuple[Node, Node, Node], bool, ResultRow]" has no attribute "c"
+            return int(next(iter(result)).c)  # type: ignore[union-attr]
 
-            return int(next(iter(result)).c)
-
-    def contexts(self, triple=None):
+    # type error: Return type "Generator[Identifier, None, None]" of "contexts" incompatible with return type "Generator[Graph, None, None]" in supertype "Store"
+    def contexts(  # type: ignore[override]
+        self, triple: Optional["_TripleType"] = None
+    ) -> Generator["_ContextIdentifierType", None, None]:
         """
         Iterates over results to "SELECT ?NAME { GRAPH ?NAME { ?s ?p ?o } }"
         or "SELECT ?NAME { GRAPH ?NAME {} }" if triple is `None`.
@@ -322,53 +430,110 @@ class SPARQLStore(SPARQLConnector, Store):
         if triple:
             nts = self.node_to_sparql
             s, p, o = triple
-            params = (nts(s if s else Variable('s')),
-                      nts(p if p else Variable('p')),
-                      nts(o if o else Variable('o')))
-            q = 'SELECT ?name WHERE { GRAPH ?name { %s %s %s }}' % params
+            params = (
+                nts(s if s else Variable("s")),
+                nts(p if p else Variable("p")),
+                nts(o if o else Variable("o")),
+            )
+            q = "SELECT ?name WHERE { GRAPH ?name { %s %s %s }}" % params
         else:
-            q = 'SELECT ?name WHERE { GRAPH ?name {} }'
+            q = "SELECT ?name WHERE { GRAPH ?name {} }"
 
         result = self._query(q)
-
-        return (row.name for row in result)
+        # type error: Item "bool" of "Union[Tuple[Node, Node, Node], bool, ResultRow]" has no attribute "name"
+        # error: Generator has incompatible item type "Union[Any, Identifier]"; expected "IdentifiedNode"
+        return (row.name for row in result)  # type: ignore[union-attr,misc]
 
     # Namespace persistence interface implementation
-    def bind(self, prefix, namespace):
+    def bind(self, prefix: str, namespace: "URIRef", override: bool = True) -> None:
+        bound_prefix = self.prefix(namespace)
+        if override and bound_prefix:
+            del self.nsBindings[bound_prefix]
         self.nsBindings[prefix] = namespace
 
-    def prefix(self, namespace):
+    def prefix(self, namespace: "URIRef") -> Optional["str"]:
         """ """
-        return dict(
-            [(v, k) for k, v in self.nsBindings.items()]
-        ).get(namespace)
+        return dict([(v, k) for k, v in self.nsBindings.items()]).get(namespace)
 
-    def namespace(self, prefix):
+    def namespace(self, prefix: str) -> Optional["URIRef"]:
         return self.nsBindings.get(prefix)
 
-    def namespaces(self):
+    def namespaces(self) -> Iterator[Tuple[str, "URIRef"]]:
         for prefix, ns in self.nsBindings.items():
             yield prefix, ns
 
-    def add_graph(self, graph):
-        raise TypeError('The SPARQL store is read only')
+    def add_graph(self, graph: "Graph") -> None:
+        raise TypeError("The SPARQL store is read only")
 
-    def remove_graph(self, graph):
-        raise TypeError('The SPARQL store is read only')
+    def remove_graph(self, graph: "Graph") -> None:
+        raise TypeError("The SPARQL store is read only")
 
-    def _is_contextual(self, graph):
-        """ Returns `True` if the "GRAPH" keyword must appear
+    @overload
+    def _is_contextual(self, graph: None) -> "te.Literal[False]":
+        ...
+
+    @overload
+    def _is_contextual(self, graph: Optional[Union["Graph", "str"]]) -> bool:
+        ...
+
+    def _is_contextual(self, graph: Optional[Union["Graph", "str"]]) -> bool:
+        """Returns `True` if the "GRAPH" keyword must appear
         in the final SPARQL query sent to the endpoint.
         """
         if (not self.context_aware) or (graph is None):
             return False
-        if isinstance(graph, string_types):
-            return graph != '__UNION__'
+        if isinstance(graph, str):
+            return graph != "__UNION__"
         else:
             return graph.identifier != DATASET_DEFAULT_GRAPH_ID
 
-    def close(self, commit_pending_transaction=None):
-        SPARQLConnector.close(self)
+    def subjects(
+        self,
+        predicate: Optional["_PredicateType"] = None,
+        object: Optional["_ObjectType"] = None,
+    ) -> Generator["_SubjectType", None, None]:
+        """A generator of subjects with the given predicate and object"""
+        for t, c in self.triples((None, predicate, object)):
+            yield t[0]
+
+    def predicates(
+        self,
+        subject: Optional["_SubjectType"] = None,
+        object: Optional["_ObjectType"] = None,
+    ) -> Generator["_PredicateType", None, None]:
+        """A generator of predicates with the given subject and object"""
+        for t, c in self.triples((subject, None, object)):
+            yield t[1]
+
+    def objects(
+        self,
+        subject: Optional["_SubjectType"] = None,
+        predicate: Optional["_PredicateType"] = None,
+    ) -> Generator["_ObjectType", None, None]:
+        """A generator of objects with the given subject and predicate"""
+        for t, c in self.triples((subject, predicate, None)):
+            yield t[2]
+
+    def subject_predicates(
+        self, object: Optional["_ObjectType"] = None
+    ) -> Generator[Tuple["_SubjectType", "_PredicateType"], None, None]:
+        """A generator of (subject, predicate) tuples for the given object"""
+        for t, c in self.triples((None, None, object)):
+            yield t[0], t[1]
+
+    def subject_objects(
+        self, predicate: Optional["_PredicateType"] = None
+    ) -> Generator[Tuple["_SubjectType", "_ObjectType"], None, None]:
+        """A generator of (subject, object) tuples for the given predicate"""
+        for t, c in self.triples((None, predicate, None)):
+            yield t[0], t[2]
+
+    def predicate_objects(
+        self, subject: Optional["_SubjectType"] = None
+    ) -> Generator[Tuple["_PredicateType", "_ObjectType"], None, None]:
+        """A generator of (predicate, object) tuples for the given subject"""
+        for t, c in self.triples((subject, None, None)):
+            yield t[1], t[2]
 
 
 class SPARQLUpdateStore(SPARQLStore):
@@ -390,9 +555,9 @@ class SPARQLUpdateStore(SPARQLStore):
 
     where_pattern = re.compile(r"""(?P<where>WHERE\s*\{)""", re.IGNORECASE)
 
-    ##################################################################
-    ### Regex for injecting GRAPH blocks into updates on a context ###
-    ##################################################################
+    ##############################################################
+    # Regex for injecting GRAPH blocks into updates on a context #
+    ##############################################################
 
     # Observations on the SPARQL grammar (http://www.w3.org/TR/2013/REC-sparql11-query-20130321/):
     # 1. Only the terminals STRING_LITERAL1, STRING_LITERAL2,
@@ -411,23 +576,31 @@ class SPARQLUpdateStore(SPARQLStore):
     # in order to avoid unbalanced curly braces.
 
     # From the SPARQL grammar
-    STRING_LITERAL1 = u"'([^'\\\\]|\\\\.)*'"
-    STRING_LITERAL2 = u'"([^"\\\\]|\\\\.)*"'
-    STRING_LITERAL_LONG1 = u"'''(('|'')?([^'\\\\]|\\\\.))*'''"
-    STRING_LITERAL_LONG2 = u'"""(("|"")?([^"\\\\]|\\\\.))*"""'
-    String = u'(%s)|(%s)|(%s)|(%s)' % (STRING_LITERAL1, STRING_LITERAL2,
-                                       STRING_LITERAL_LONG1, STRING_LITERAL_LONG2)
-    IRIREF = u'<([^<>"{}|^`\\]\\\\\[\\x00-\\x20])*>'
-    COMMENT = u'#[^\\x0D\\x0A]*([\\x0D\\x0A]|\\Z)'
+    STRING_LITERAL1 = "'([^'\\\\]|\\\\.)*'"
+    STRING_LITERAL2 = '"([^"\\\\]|\\\\.)*"'
+    STRING_LITERAL_LONG1 = "'''(('|'')?([^'\\\\]|\\\\.))*'''"
+    STRING_LITERAL_LONG2 = '"""(("|"")?([^"\\\\]|\\\\.))*"""'
+    String = "(%s)|(%s)|(%s)|(%s)" % (
+        STRING_LITERAL1,
+        STRING_LITERAL2,
+        STRING_LITERAL_LONG1,
+        STRING_LITERAL_LONG2,
+    )
+    IRIREF = '<([^<>"{}|^`\\]\\\\[\\x00-\\x20])*>'
+    COMMENT = "#[^\\x0D\\x0A]*([\\x0D\\x0A]|\\Z)"
 
     # Simplified grammar to find { at beginning and } at end of blocks
-    BLOCK_START = u'{'
-    BLOCK_END = u'}'
-    ESCAPED = u'\\\\.'
+    BLOCK_START = "{"
+    BLOCK_END = "}"
+    ESCAPED = "\\\\."
 
     # Match anything that doesn't start or end a block:
-    BlockContent = u'(%s)|(%s)|(%s)|(%s)' % (String, IRIREF, COMMENT, ESCAPED)
-    BlockFinding = u'(?P<block_start>%s)|(?P<block_end>%s)|(?P<block_content>%s)' % (BLOCK_START, BLOCK_END, BlockContent)
+    BlockContent = "(%s)|(%s)|(%s)|(%s)" % (String, IRIREF, COMMENT, ESCAPED)
+    BlockFinding = "(?P<block_start>%s)|(?P<block_end>%s)|(?P<block_content>%s)" % (
+        BLOCK_START,
+        BLOCK_END,
+        BlockContent,
+    )
     BLOCK_FINDING_PATTERN = re.compile(BlockFinding)
 
     # Note that BLOCK_FINDING_PATTERN.finditer() will not cover the whole
@@ -436,15 +609,17 @@ class SPARQLUpdateStore(SPARQLStore):
 
     ##################################################################
 
-    def __init__(self,
-                 queryEndpoint=None, update_endpoint=None,
-                 sparql11=True,
-                 context_aware=True,
-                 postAsEncoded=True,
-                 autocommit=True,
-                 dirty_reads=False,
-                 **kwds
-                 ):
+    def __init__(
+        self,
+        query_endpoint: Optional[str] = None,
+        update_endpoint: Optional[str] = None,
+        sparql11: bool = True,
+        context_aware: bool = True,
+        postAsEncoded: bool = True,  # noqa: N803
+        autocommit: bool = True,
+        dirty_reads: bool = False,
+        **kwds,
+    ):
         """
         :param autocommit if set, the store will commit after every
         writing operations. If False, we only make queries on the
@@ -457,44 +632,70 @@ class SPARQLUpdateStore(SPARQLStore):
 
         SPARQLStore.__init__(
             self,
-            queryEndpoint,
+            query_endpoint,
             sparql11,
             context_aware,
             update_endpoint=update_endpoint,
-            **kwds
+            **kwds,
         )
 
         self.postAsEncoded = postAsEncoded
         self.autocommit = autocommit
         self.dirty_reads = dirty_reads
-        self._edits = None
+        self._edits: Optional[List[str]] = None
         self._updates = 0
 
-    def query(self, *args, **kwargs):
+    def open(
+        self, configuration: Union[str, Tuple[str, str]], create: bool = False
+    ) -> None:
+        """
+        This method is included so that calls to this Store via Graph, e.g.
+        Graph("SPARQLStore"), can set the required parameters
+        """
+        if type(configuration) == str:
+            self.query_endpoint = configuration
+        elif type(configuration) == tuple:
+            self.query_endpoint = configuration[0]
+            self.update_endpoint = configuration[1]
+        else:
+            raise Exception(
+                "configuration must be either a string (a single query endpoint URI) "
+                "or a tuple (a query/update endpoint URI pair)"
+            )
+
+    def query(self, *args: Any, **kwargs: Any) -> "Result":
         if not self.autocommit and not self.dirty_reads:
             self.commit()
         return SPARQLStore.query(self, *args, **kwargs)
 
-    def triples(self, *args, **kwargs):
+    # type error: Signature of "triples" incompatible with supertype "Store"
+    def triples(  # type: ignore[override]
+        self, *args: Any, **kwargs: Any
+    ) -> Iterator[Tuple["_TripleType", None]]:
         if not self.autocommit and not self.dirty_reads:
             self.commit()
         return SPARQLStore.triples(self, *args, **kwargs)
 
-    def contexts(self, *args, **kwargs):
+    # type error: Signature of "contexts" incompatible with supertype "Store"
+    def contexts(  # type: ignore[override]
+        self, *args: Any, **kwargs: Any
+    ) -> Generator["_ContextIdentifierType", None, None]:
         if not self.autocommit and not self.dirty_reads:
             self.commit()
         return SPARQLStore.contexts(self, *args, **kwargs)
 
-    def __len__(self, *args, **kwargs):
+    def __len__(self, *args: Any, **kwargs: Any) -> int:
         if not self.autocommit and not self.dirty_reads:
             self.commit()
         return SPARQLStore.__len__(self, *args, **kwargs)
 
-    def open(self, configuration, create=False):
+    # TODO: FIXME: open is defined twice
+    def open(self, configuration: Union[str, Tuple[str, str]], create: bool = False) -> None:  # type: ignore[no-redef]  # noqa: F811
         """
         sets the endpoint URLs for this SPARQLStore
-        :param configuration: either a tuple of (queryEndpoint, update_endpoint),
-            or a string with the query endpoint
+
+        :param configuration: either a tuple of (query_endpoint, update_endpoint),
+            or a string with the endpoint which is configured as query and update endpoint
         :param create: if True an exception is thrown.
         """
 
@@ -507,34 +708,37 @@ class SPARQLUpdateStore(SPARQLStore):
                 self.update_endpoint = configuration[1]
         else:
             self.query_endpoint = configuration
+            self.update_endpoint = configuration
 
-        if not self.update_endpoint:
-            self.update_endpoint = self.endpoint
-
-    def _transaction(self):
+    def _transaction(self) -> List[str]:
         if self._edits is None:
             self._edits = []
         return self._edits
 
     # Transactional interfaces
-    def commit(self):
-        """ add(), addN(), and remove() are transactional to reduce overhead of many small edits.
-            Read and update() calls will automatically commit any outstanding edits.
-            This should behave as expected most of the time, except that alternating writes
-            and reads can degenerate to the original call-per-triple situation that originally existed.
+    def commit(self) -> None:
+        """add(), addN(), and remove() are transactional to reduce overhead of many small edits.
+        Read and update() calls will automatically commit any outstanding edits.
+        This should behave as expected most of the time, except that alternating writes
+        and reads can degenerate to the original call-per-triple situation that originally existed.
         """
         if self._edits and len(self._edits) > 0:
-            self._update('\n;\n'.join(self._edits))
+            self._update("\n;\n".join(self._edits))
             self._edits = None
 
-    def rollback(self):
+    def rollback(self) -> None:
         self._edits = None
 
-    def add(self, spo, context=None, quoted=False):
-        """ Add a triple to the store of triples. """
+    def add(
+        self,
+        spo: "_TripleType",
+        context: Optional["_ContextType"] = None,
+        quoted: bool = False,
+    ) -> None:
+        """Add a triple to the store of triples."""
 
         if not self.update_endpoint:
-            raise Exception("UpdateEndpoint is not set - call 'open'")
+            raise Exception("UpdateEndpoint is not set")
 
         assert not quoted
         (subject, predicate, obj) = spo
@@ -542,38 +746,44 @@ class SPARQLUpdateStore(SPARQLStore):
         nts = self.node_to_sparql
         triple = "%s %s %s ." % (nts(subject), nts(predicate), nts(obj))
         if self._is_contextual(context):
-            q = "INSERT DATA { GRAPH %s { %s } }" % (
-                nts(context.identifier), triple)
+            if TYPE_CHECKING:
+                # _is_contextual will never return true if context is None
+                assert context is not None
+            q = "INSERT DATA { GRAPH %s { %s } }" % (nts(context.identifier), triple)
         else:
             q = "INSERT DATA { %s }" % triple
         self._transaction().append(q)
         if self.autocommit:
             self.commit()
 
-    def addN(self, quads):
-        """ Add a list of quads to the store. """
+    def addN(self, quads: Iterable["_QuadType"]) -> None:  # noqa: N802
+        """Add a list of quads to the store."""
         if not self.update_endpoint:
             raise Exception("UpdateEndpoint is not set - call 'open'")
 
         contexts = collections.defaultdict(list)
         for subject, predicate, obj, context in quads:
             contexts[context].append((subject, predicate, obj))
-        data = []
+        data: List[str] = []
         nts = self.node_to_sparql
         for context in contexts:
             triples = [
-                "%s %s %s ." % (
-                    nts(subject), nts(predicate), nts(obj)
-                ) for subject, predicate, obj in contexts[context]
+                "%s %s %s ." % (nts(subject), nts(predicate), nts(obj))
+                for subject, predicate, obj in contexts[context]
             ]
-            data.append("INSERT DATA { GRAPH %s { %s } }\n" % (
-                nts(context.identifier), '\n'.join(triples)))
+            data.append(
+                "INSERT DATA { GRAPH %s { %s } }\n"
+                % (nts(context.identifier), "\n".join(triples))
+            )
         self._transaction().extend(data)
         if self.autocommit:
             self.commit()
 
-    def remove(self, spo, context):
-        """ Remove a triple from the store """
+    # type error: Signature of "remove" incompatible with supertype "Store"
+    def remove(  # type: ignore[override]
+        self, spo: "_TriplePatternType", context: Optional["_ContextType"]
+    ) -> None:
+        """Remove a triple from the store"""
         if not self.update_endpoint:
             raise Exception("UpdateEndpoint is not set - call 'open'")
 
@@ -588,28 +798,38 @@ class SPARQLUpdateStore(SPARQLStore):
         nts = self.node_to_sparql
         triple = "%s %s %s ." % (nts(subject), nts(predicate), nts(obj))
         if self._is_contextual(context):
+            if TYPE_CHECKING:
+                # _is_contextual will never return true if context is None
+                assert context is not None
             cid = nts(context.identifier)
-            q = "WITH %(graph)s DELETE { %(triple)s } WHERE { %(triple)s }" % { 'graph': cid, 'triple': triple }
+            q = "WITH %(graph)s DELETE { %(triple)s } WHERE { %(triple)s }" % {
+                "graph": cid,
+                "triple": triple,
+            }
         else:
             q = "DELETE { %s } WHERE { %s } " % (triple, triple)
         self._transaction().append(q)
         if self.autocommit:
             self.commit()
 
-    def setTimeout(self, timeout):
+    def setTimeout(self, timeout) -> None:  # noqa: N802
         self._timeout = int(timeout)
 
     def _update(self, update):
-
         self._updates += 1
 
         SPARQLConnector.update(self, update)
 
-    def update(self, query,
-               initNs={},
-               initBindings={},
-               queryGraph=None,
-               DEBUG=False):
+    # type error: Signature of "update" incompatible with supertype "SPARQLConnector"
+    # type error: Signature of "update" incompatible with supertype "Store"
+    def update(  # type: ignore[override]
+        self,
+        query: Union["Update", str],
+        initNs: Dict[str, Any] = {},  # noqa: N803
+        initBindings: Dict["str", "Identifier"] = {},
+        queryGraph: Optional[str] = None,
+        DEBUG: bool = False,
+    ):
         """
         Perform a SPARQL Update Query against the endpoint,
         INSERT, LOAD, DELETE etc.
@@ -625,16 +845,16 @@ class SPARQLUpdateStore(SPARQLStore):
         .. admonition:: Context-aware query rewriting
 
             - **When:**  If context-awareness is enabled and the graph is not the default graph of the store.
-            - **Why:** To ensure consistency with the :class:`~rdflib.plugins.memory.IOMemory` store.
-              The graph must except "local" SPARQL requests (requests with no GRAPH keyword)
-              like if it was the default graph.
+            - **Why:** To ensure consistency with the :class:`~rdflib.plugins.stores.memory.Memory` store.
+              The graph must accept "local" SPARQL requests (requests with no GRAPH keyword)
+              as if it was the default graph.
             - **What is done:** These "local" queries are rewritten by this store.
               The content of each block of a SPARQL Update operation is wrapped in a GRAPH block
               except if the block is empty.
               This basically causes INSERT, INSERT DATA, DELETE, DELETE DATA and WHERE to operate
               only on the context.
-            - **Example:** `"INSERT DATA { <urn:michel> <urn:likes> <urn:pizza> }"` is converted into
-              `"INSERT DATA { GRAPH <urn:graph> { <urn:michel> <urn:likes> <urn:pizza> } }"`.
+            - **Example:** ``"INSERT DATA { <urn:michel> <urn:likes> <urn:pizza> }"`` is converted into
+              ``"INSERT DATA { GRAPH <urn:graph> { <urn:michel> <urn:likes> <urn:pizza> } }"``.
             - **Warning:** Queries are presumed to be "local" but this assumption is **not checked**.
               For instance, if the query already contains GRAPH blocks, the latter will be wrapped in new GRAPH blocks.
             - **Warning:** A simplified grammar is used that should tolerate
@@ -643,13 +863,16 @@ class SPARQLUpdateStore(SPARQLStore):
 
         """
         if not self.update_endpoint:
-            raise Exception("UpdateEndpoint is not set - call 'open'")
+            raise Exception("Update endpoint is not set!")
 
         self.debug = DEBUG
-        assert isinstance(query, string_types)
+        assert isinstance(query, str)
         query = self._inject_prefixes(query, initNs)
 
         if self._is_contextual(queryGraph):
+            if TYPE_CHECKING:
+                # _is_contextual will never return true if context is None
+                assert queryGraph is not None
             query = self._insert_named_graph(query, queryGraph)
 
         if initBindings:
@@ -659,9 +882,10 @@ class SPARQLUpdateStore(SPARQLStore):
             # have a WHERE clause.  This also works for updates with
             # more than one INSERT/DELETE.
             v = list(initBindings)
-            values = "\nVALUES ( %s )\n{ ( %s ) }\n"\
-                % (" ".join("?" + str(x) for x in v),
-                   " ".join(self.node_to_sparql(initBindings[x]) for x in v))
+            values = "\nVALUES ( %s )\n{ ( %s ) }\n" % (
+                " ".join("?" + str(x) for x in v),
+                " ".join(self.node_to_sparql(initBindings[x]) for x in v),
+            )
 
             query = self.where_pattern.sub("WHERE { " + values, query)
 
@@ -669,18 +893,18 @@ class SPARQLUpdateStore(SPARQLStore):
         if self.autocommit:
             self.commit()
 
-    def _insert_named_graph(self, query, query_graph):
+    def _insert_named_graph(self, query: str, query_graph: str) -> str:
         """
-            Inserts GRAPH <query_graph> {} into blocks of SPARQL Update operations
+        Inserts GRAPH <query_graph> {} into blocks of SPARQL Update operations
 
-            For instance,  "INSERT DATA { <urn:michel> <urn:likes> <urn:pizza> }"
-            is converted into
-            "INSERT DATA { GRAPH <urn:graph> { <urn:michel> <urn:likes> <urn:pizza> } }"
+        For instance,  "INSERT DATA { <urn:michel> <urn:likes> <urn:pizza> }"
+        is converted into
+        "INSERT DATA { GRAPH <urn:graph> { <urn:michel> <urn:likes> <urn:pizza> } }"
         """
         if isinstance(query_graph, Node):
             query_graph = self.node_to_sparql(query_graph)
         else:
-            query_graph = '<%s>' % query_graph
+            query_graph = "<%s>" % query_graph
         graph_block_open = " GRAPH %s {" % query_graph
         graph_block_close = "} "
 
@@ -699,19 +923,21 @@ class SPARQLUpdateStore(SPARQLStore):
         modified_query = []
         pos = 0
         for match in self.BLOCK_FINDING_PATTERN.finditer(query):
-            if match.group('block_start') is not None:
+            if match.group("block_start") is not None:
                 level += 1
                 if level == 1:
-                    modified_query.append(query[pos:match.end()])
+                    modified_query.append(query[pos : match.end()])
                     modified_query.append(graph_block_open)
                     pos = match.end()
-            elif match.group('block_end') is not None:
+            elif match.group("block_end") is not None:
                 if level == 1:
-                    since_previous_pos = query[pos:match.start()]
-                    if modified_query[-1] is graph_block_open and (since_previous_pos == "" or since_previous_pos.isspace()):
+                    since_previous_pos = query[pos : match.start()]
+                    if modified_query[-1] is graph_block_open and (
+                        since_previous_pos == "" or since_previous_pos.isspace()
+                    ):
                         # In this case, adding graph_block_start and
                         # graph_block_end results in an empty GRAPH block. Some
-                        # enpoints (e.g. TDB) can not handle this. Therefore
+                        # endpoints (e.g. TDB) can not handle this. Therefore
                         # remove the previously added block_start.
                         modified_query.pop()
                         modified_query.append(since_previous_pos)
@@ -724,25 +950,64 @@ class SPARQLUpdateStore(SPARQLStore):
 
         return "".join(modified_query)
 
-    def add_graph(self, graph):
+    def add_graph(self, graph: "Graph") -> None:
         if not self.graph_aware:
             Store.add_graph(self, graph)
         elif graph.identifier != DATASET_DEFAULT_GRAPH_ID:
-            self.update(
-                "CREATE GRAPH %s" % self.node_to_sparql(graph.identifier))
+            self.update("CREATE GRAPH %s" % self.node_to_sparql(graph.identifier))
 
-    def close(self, commit_pending_transaction=False):
-
-        if commit_pending_transaction:
-            self.commit()
-
-        super(SPARQLStore, self).close()
-
-    def remove_graph(self, graph):
+    def remove_graph(self, graph: "Graph") -> None:
         if not self.graph_aware:
             Store.remove_graph(self, graph)
         elif graph.identifier == DATASET_DEFAULT_GRAPH_ID:
             self.update("DROP DEFAULT")
         else:
-            self.update(
-                "DROP GRAPH %s" % self.node_to_sparql(graph.identifier))
+            self.update("DROP GRAPH %s" % self.node_to_sparql(graph.identifier))
+
+    def subjects(
+        self,
+        predicate: Optional["_PredicateType"] = None,
+        object: Optional["_ObjectType"] = None,
+    ) -> Generator["_SubjectType", None, None]:
+        """A generator of subjects with the given predicate and object"""
+        for t, c in self.triples((None, predicate, object)):
+            yield t[0]
+
+    def predicates(
+        self,
+        subject: Optional["_SubjectType"] = None,
+        object: Optional["_ObjectType"] = None,
+    ) -> Generator["_PredicateType", None, None]:
+        """A generator of predicates with the given subject and object"""
+        for t, c in self.triples((subject, None, object)):
+            yield t[1]
+
+    def objects(
+        self,
+        subject: Optional["_SubjectType"] = None,
+        predicate: Optional["_PredicateType"] = None,
+    ) -> Generator["_ObjectType", None, None]:
+        """A generator of objects with the given subject and predicate"""
+        for t, c in self.triples((subject, predicate, None)):
+            yield t[2]
+
+    def subject_predicates(
+        self, object: Optional["_ObjectType"] = None
+    ) -> Generator[Tuple["_SubjectType", "_PredicateType"], None, None]:
+        """A generator of (subject, predicate) tuples for the given object"""
+        for t, c in self.triples((None, None, object)):
+            yield t[0], t[1]
+
+    def subject_objects(
+        self, predicate: Optional["_PredicateType"] = None
+    ) -> Generator[Tuple["_SubjectType", "_ObjectType"], None, None]:
+        """A generator of (subject, object) tuples for the given predicate"""
+        for t, c in self.triples((None, predicate, None)):
+            yield t[0], t[2]
+
+    def predicate_objects(
+        self, subject: Optional["_SubjectType"] = None
+    ) -> Generator[Tuple["_PredicateType", "_ObjectType"], None, None]:
+        """A generator of (predicate, object) tuples for the given subject"""
+        for t, c in self.triples((subject, None, None)):
+            yield t[1], t[2]

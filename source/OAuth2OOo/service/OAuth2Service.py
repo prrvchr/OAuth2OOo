@@ -30,9 +30,9 @@
 import uno
 import unohelper
 
+from com.sun.star.lang import EventObject
 from com.sun.star.lang import XComponent
 from com.sun.star.lang import XServiceInfo
-from com.sun.star.lang import EventObject
 from com.sun.star.auth import XOAuth2Service
 from com.sun.star.auth import RefreshTokenException
 

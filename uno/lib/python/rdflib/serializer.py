@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Serializer plugin interface.
 
@@ -10,23 +12,36 @@ See also rdflib.plugin
 
 """
 
+from typing import IO, TYPE_CHECKING, Any, Optional, TypeVar, Union
+
 from rdflib.term import URIRef
 
-__all__ = ['Serializer']
+if TYPE_CHECKING:
+    from rdflib.graph import Graph
+
+__all__ = ["Serializer"]
+
+_StrT = TypeVar("_StrT", bound=str)
 
 
-class Serializer(object):
+class Serializer:
+    def __init__(self, store: "Graph"):
+        self.store: "Graph" = store
+        self.encoding: str = "utf-8"
+        self.base: Optional[str] = None
 
-    def __init__(self, store):
-        self.store = store
-        self.encoding = "UTF-8"
-        self.base = None
-
-    def serialize(self, stream, base=None, encoding=None, **args):
+    def serialize(
+        self,
+        stream: IO[bytes],
+        base: Optional[str] = None,
+        encoding: Optional[str] = None,
+        **args: Any,
+    ) -> None:
         """Abstract method"""
 
-    def relativize(self, uri):
+    def relativize(self, uri: _StrT) -> Union[_StrT, URIRef]:
         base = self.base
         if base is not None and uri.startswith(base):
-            uri = URIRef(uri.replace(base, "", 1))
+            # type error: Incompatible types in assignment (expression has type "str", variable has type "Node")
+            uri = URIRef(uri.replace(base, "", 1))  # type: ignore[assignment]
         return uri

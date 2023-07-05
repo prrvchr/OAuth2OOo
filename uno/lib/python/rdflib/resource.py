@@ -1,12 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from six import text_type, PY3
-
-
-__doc__ = """
+"""
 The :class:`~rdflib.resource.Resource` class wraps a
 :class:`~rdflib.graph.Graph`
 and a resource reference (i.e. a :class:`rdflib.term.URIRef` or
@@ -20,7 +12,7 @@ tracking both the graph and a current subject. This makes for a "resource
 oriented" style, as compared to the triple orientation of the Graph API.
 
 Resulting generators are also wrapped so that any resource reference values
-(:class:`rdflib.term.URIRef`s and :class:`rdflib.term.BNode`s) are in turn
+(:class:`rdflib.term.URIRef` and :class:`rdflib.term.BNode`) are in turn
 wrapped as Resources. (Note that this behaviour differs from the corresponding
 methods in :class:`~rdflib.graph.Graph`, where no such conversion takes place.)
 
@@ -111,13 +103,9 @@ Follow relations and get more data from their Resources as well::
     >>> for pic in person.objects(FOAF.depiction):
     ...     print(pic.identifier)
     ...     print(pic.value(RDF.type).qname())
-    ...     print(pic.label())
-    ...     print(pic.comment())
     ...     print(pic.value(FOAF.thumbnail).identifier)
     http://example.org/images/person/some1.jpg
     foaf:Image
-    some 1
-    Just an image
     http://example.org/images/person/some1-thumb.jpg
 
     >>> for cv in person.subjects(CV.aboutPerson):
@@ -149,18 +137,6 @@ This is useful for e.g. inspection::
     ...     print(o.qname())
     rdf:type
     foaf:Image
-
-Similarly, adding, setting and removing data is easy::
-
-    >>> thumb.add(RDFS.label, Literal("thumb"))
-    >>> print(thumb.label())
-    thumb
-    >>> thumb.set(RDFS.label, Literal("thumbnail"))
-    >>> print(thumb.label())
-    thumbnail
-    >>> thumb.remove(RDFS.label)
-    >>> list(thumb.objects(RDFS.label))
-    []
 
 
 Schema Example
@@ -207,12 +183,6 @@ Get items from the Choice::
 
     >>> choice = Resource(graph, URIRef("http://example.org/def/v#Choice"))
     >>> [it.qname() for it in choice.value(OWL.oneOf).items()]
-    [u'v:One', u'v:Other']
-
-And the sequence of Stuff::
-
-    >>> stuff = Resource(graph, URIRef("http://example.org/def/v#Stuff"))
-    >>> [it.qname() for it in stuff.seq()]
     [u'v:One', u'v:Other']
 
 On add, other resources are auto-unboxed:
@@ -316,32 +286,38 @@ objects::
 
 """
 
-from rdflib.term import Node, BNode, URIRef
 from rdflib.namespace import RDF
 from rdflib.paths import Path
+from rdflib.term import BNode, Node, URIRef
 
-__all__ = ['Resource']
+__all__ = ["Resource"]
 
 
 class Resource(object):
-
     def __init__(self, graph, subject):
         self._graph = graph
         self._identifier = subject
 
-    graph = property(lambda self: self._graph)
+    @property
+    def graph(self):
+        return self._graph
 
-    identifier = property(lambda self: self._identifier)
+    @property
+    def identifier(self):
+        return self._identifier
 
     def __hash__(self):
         return hash(Resource) ^ hash(self._graph) ^ hash(self._identifier)
 
     def __eq__(self, other):
-        return (isinstance(other, Resource) and
-                self._graph == other._graph and
-                self._identifier == other._identifier)
+        return (
+            isinstance(other, Resource)
+            and self._graph == other._graph
+            and self._identifier == other._identifier
+        )
 
-    def __ne__(self, other): return not self == other
+    def __ne__(self, other):
+        return not self == other
 
     def __lt__(self, other):
         if isinstance(other, Resource):
@@ -349,17 +325,17 @@ class Resource(object):
         else:
             return False
 
-    def __gt__(self, other): return not (self < other or self == other)
+    def __gt__(self, other):
+        return not (self < other or self == other)
 
-    def __le__(self, other): return self < other or self == other
+    def __le__(self, other):
+        return self < other or self == other
 
-    def __ge__(self, other): return not self < other
+    def __ge__(self, other):
+        return not self < other
 
     def __unicode__(self):
-        return text_type(self._identifier)
-
-    if PY3:
-        __str__ = __unicode__
+        return str(self._identifier)
 
     def add(self, p, o):
         if isinstance(o, Resource):
@@ -380,58 +356,44 @@ class Resource(object):
         self._graph.set((self._identifier, p, o))
 
     def subjects(self, predicate=None):  # rev
-        return self._resources(
-            self._graph.subjects(predicate, self._identifier))
+        return self._resources(self._graph.subjects(predicate, self._identifier))
 
     def predicates(self, o=None):
         if isinstance(o, Resource):
             o = o._identifier
 
-        return self._resources(
-            self._graph.predicates(self._identifier, o))
+        return self._resources(self._graph.predicates(self._identifier, o))
 
     def objects(self, predicate=None):
-        return self._resources(
-            self._graph.objects(self._identifier, predicate))
+        return self._resources(self._graph.objects(self._identifier, predicate))
 
     def subject_predicates(self):
-        return self._resource_pairs(
-            self._graph.subject_predicates(self._identifier))
+        return self._resource_pairs(self._graph.subject_predicates(self._identifier))
 
     def subject_objects(self):
-        return self._resource_pairs(
-            self._graph.subject_objects(self._identifier))
+        return self._resource_pairs(self._graph.subject_objects(self._identifier))
 
     def predicate_objects(self):
-        return self._resource_pairs(
-            self._graph.predicate_objects(self._identifier))
+        return self._resource_pairs(self._graph.predicate_objects(self._identifier))
 
     def value(self, p=RDF.value, o=None, default=None, any=True):
         if isinstance(o, Resource):
             o = o._identifier
 
-        return self._cast(
-            self._graph.value(self._identifier, p, o, default, any))
-
-    def label(self):
-        return self._graph.label(self._identifier)
-
-    def comment(self):
-        return self._graph.comment(self._identifier)
+        return self._cast(self._graph.value(self._identifier, p, o, default, any))
 
     def items(self):
         return self._resources(self._graph.items(self._identifier))
 
     def transitive_objects(self, predicate, remember=None):
-        return self._resources(self._graph.transitive_objects(
-            self._identifier, predicate, remember))
+        return self._resources(
+            self._graph.transitive_objects(self._identifier, predicate, remember)
+        )
 
     def transitive_subjects(self, predicate, remember=None):
-        return self._resources(self._graph.transitive_subjects(
-            predicate, self._identifier, remember))
-
-    def seq(self):
-        return self._resources(self._graph.seq(self._identifier))
+        return self._resources(
+            self._graph.transitive_subjects(predicate, self._identifier, remember)
+        )
 
     def qname(self):
         return self._graph.qname(self._identifier)
@@ -455,12 +417,16 @@ class Resource(object):
             return node
 
     def __iter__(self):
-        return self._resource_triples(self._graph.triples((self.identifier, None, None)))
+        return self._resource_triples(
+            self._graph.triples((self.identifier, None, None))
+        )
 
     def __getitem__(self, item):
         if isinstance(item, slice):
             if item.step:
-                raise TypeError("Resources fix the subject for slicing, and can only be sliced by predicate/object. ")
+                raise TypeError(
+                    "Resources fix the subject for slicing, and can only be sliced by predicate/object. "
+                )
             p, o = item.start, item.stop
             if isinstance(p, Resource):
                 p = p._identifier
@@ -477,7 +443,10 @@ class Resource(object):
         elif isinstance(item, (Node, Path)):
             return self.objects(item)
         else:
-            raise TypeError("You can only index a resource by a single rdflib term, a slice of rdflib terms, not %s (%s)"%(item, type(item)))
+            raise TypeError(
+                "You can only index a resource by a single rdflib term, a slice of rdflib terms, not %s (%s)"
+                % (item, type(item))
+            )
 
     def __setitem__(self, item, value):
         self.set(item, value)
@@ -486,7 +455,7 @@ class Resource(object):
         return type(self)(self._graph, subject)
 
     def __str__(self):
-        return 'Resource(%s)' % self._identifier
+        return "Resource(%s)" % self._identifier
 
     def __repr__(self):
-        return 'Resource(%s,%s)' % (self._graph, self._identifier)
+        return "Resource(%s,%s)" % (self._graph, self._identifier)

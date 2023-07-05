@@ -141,8 +141,6 @@ def get_textContent(el, replace_img=False, img_to_src=True, base_url=''):
 
         return items
 
-    #results = [t for t in text_collection(el, replace_img, img_to_src, base_url) if t is not '']
-    # FIXME: if t is not '': generate a SyntaxWarning: "is not" with a literal. Did you mean "!="?
     results = [t for t in text_collection(el, replace_img, img_to_src, base_url) if t != '']
 
     if results:

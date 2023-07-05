@@ -1,4 +1,3 @@
-
 """
 This implements the Tab Separated SPARQL Result Format
 
@@ -6,31 +5,48 @@ It is implemented with pyparsing, reusing the elements from the SPARQL Parser
 """
 
 import codecs
+import typing
+from typing import IO, Union
 
 from pyparsing import (
-    Optional, ZeroOrMore, Literal, ParserElement, ParseException, Suppress,
-    FollowedBy, LineEnd)
-
-from rdflib.query import Result, ResultParser
+    FollowedBy,
+    LineEnd,
+    Literal,
+    Optional,
+    ParserElement,
+    Suppress,
+    ZeroOrMore,
+)
 
 from rdflib.plugins.sparql.parser import (
-    Var, STRING_LITERAL1, STRING_LITERAL2, IRIREF, BLANK_NODE_LABEL,
-    NumericLiteral, BooleanLiteral, LANGTAG)
-from rdflib.plugins.sparql.parserutils import Comp, Param, CompValue
-
-from rdflib import Literal as RDFLiteral
-
-from six import binary_type
+    BLANK_NODE_LABEL,
+    IRIREF,
+    LANGTAG,
+    STRING_LITERAL1,
+    STRING_LITERAL2,
+    BooleanLiteral,
+    NumericLiteral,
+    Var,
+)
+from rdflib.plugins.sparql.parserutils import Comp, CompValue, Param
+from rdflib.query import Result, ResultParser
+from rdflib.term import BNode
+from rdflib.term import Literal as RDFLiteral
+from rdflib.term import URIRef
 
 ParserElement.setDefaultWhitespaceChars(" \n")
 
 
 String = STRING_LITERAL1 | STRING_LITERAL2
 
-RDFLITERAL = Comp('literal', Param('string', String) + Optional(
-    Param('lang', LANGTAG.leaveWhitespace()
-          ) | Literal('^^').leaveWhitespace(
-    ) + Param('datatype', IRIREF).leaveWhitespace()))
+RDFLITERAL = Comp(
+    "literal",
+    Param("string", String)
+    + Optional(
+        Param("lang", LANGTAG.leaveWhitespace())
+        | Literal("^^").leaveWhitespace() + Param("datatype", IRIREF).leaveWhitespace()
+    ),
+)
 
 NONE_VALUE = object()
 
@@ -47,53 +63,42 @@ HEADER.parseWithTabs()
 
 
 class TSVResultParser(ResultParser):
-    def parse(self, source, content_type=None):
-
-        if isinstance(source.read(0), binary_type):
+    # type error: Signature of "parse" incompatible with supertype "ResultParser"  [override]
+    def parse(self, source: IO, content_type: typing.Optional[str] = None) -> Result:  # type: ignore[override]
+        if isinstance(source.read(0), bytes):
             # if reading from source returns bytes do utf-8 decoding
-            source = codecs.getreader('utf-8')(source)
+            # type error: Incompatible types in assignment (expression has type "StreamReader", variable has type "IO[Any]")
+            source = codecs.getreader("utf-8")(source)  # type: ignore[assignment]
 
-        try:
-            r = Result('SELECT')
+        r = Result("SELECT")
 
-            header = source.readline()
+        header = source.readline()
 
-            r.vars = list(HEADER.parseString(header.strip(), parseAll=True))
-            r.bindings = []
-            while True:
-                line = source.readline()
-                if not line:
-                    break
-                line = line.strip('\n')
-                if line == "":
-                    continue
+        r.vars = list(HEADER.parseString(header.strip(), parseAll=True))
+        r.bindings = []
+        while True:
+            line = source.readline()
+            if not line:
+                break
+            line = line.strip("\n")
+            if line == "":
+                continue
 
-                row = ROW.parseString(line, parseAll=True)
-                r.bindings.append(
-                    dict(zip(r.vars, (self.convertTerm(x) for x in row))))
+            row = ROW.parseString(line, parseAll=True)
+            # type error: Generator has incompatible item type "object"; expected "Identifier"
+            r.bindings.append(dict(zip(r.vars, (self.convertTerm(x) for x in row))))  # type: ignore[misc]
 
-            return r
+        return r
 
-        except ParseException as err:
-            print(err.line)
-            print(" " * (err.column - 1) + "^")
-            print(err)
-
-    def convertTerm(self, t):
+    def convertTerm(
+        self, t: Union[object, RDFLiteral, BNode, CompValue, URIRef]
+    ) -> typing.Optional[Union[object, BNode, URIRef, RDFLiteral]]:
         if t is NONE_VALUE:
             return None
         if isinstance(t, CompValue):
-            if t.name == 'literal':
+            if t.name == "literal":
                 return RDFLiteral(t.string, lang=t.lang, datatype=t.datatype)
             else:
                 raise Exception("I dont know how to handle this: %s" % (t,))
         else:
             return t
-
-
-if __name__ == '__main__':
-    import sys
-    r = Result.parse(file(sys.argv[1]), format='tsv')
-    print(r.vars)
-    print(r.bindings)
-    # print r.serialize(format='json')

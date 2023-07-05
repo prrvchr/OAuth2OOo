@@ -192,7 +192,7 @@ class Parser(object):
                 if "name" not in properties and parsed_types_aggregation.isdisjoint("peh"):
                     properties["name"] = [implied_properties.name(el, base_url=self.__url__)]
 
-                if "photo" not in properties:
+                if "photo" not in properties and parsed_types_aggregation.isdisjoint("uh"):
                     x = implied_properties.photo(el, self.dict_class, self.__img_with_alt__, base_url=self.__url__)
                     if x is not None:
                         properties["photo"] = [x]
@@ -221,6 +221,11 @@ class Parser(object):
             # insert children if any
             if children:
                 microformat["children"] = children
+
+            Id = get_attr(el, 'id')
+            if Id:
+                microformat['id'] = Id
+
             # simple value is the parsed property value if it were not
             # an h-* class
             if simple_value is not None:
@@ -256,7 +261,7 @@ class Parser(object):
 
             if root_class_names:
                 parsed_types_aggregation.add('h')
-            
+
             # Is this a property element (p-*, u-*, etc.) flag
             # False is default
             is_property_el = False
@@ -379,7 +384,7 @@ class Parser(object):
 
                 # 1st one wins
                 if "text" not in value_dict:
-                    value_dict["text"] = el.get_text().strip()  
+                    value_dict["text"] = el.get_text().strip()
 
                 url_rels = value_dict.get("rels", [])
                 value_dict["rels"] = url_rels
@@ -406,8 +411,6 @@ class Parser(object):
                     alternate_dict["url"] = url
                     x = " ".join(
                         [r for r in rel_attrs if not r == "alternate"])
-                    #if x is not "":
-                    # FIXME: if x is not "": generate a SyntaxWarning: "is not" with a literal. Did you mean "!="?
                     if x != "":
                         alternate_dict["rel"] = x
                     alternate_dict["text"] = text_type(el.get_text().strip())
