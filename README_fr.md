@@ -46,7 +46,7 @@ Plus aucun mot de passe n'est stocké dans LibreOffice.
 ## Prérequis:
 
 Afin de profiter des dernières versions des bibliothèques Python utilisées dans OAuth2OOo, la version 2 de Python a été abandonnée au profit de **Python 3.8 minimum**.  
-Cela signifie que **OAuth2OOo ne supporte plus OpenOffice et LibreOffice 6.x sous Windows depuis sa version 1.1.0**.  
+Cela signifie que **OAuth2OOo ne supporte plus OpenOffice et LibreOffice 6.x sous Windows depuis sa version 1.1.0**.
 Je ne peux que vous conseiller **de migrer vers LibreOffice 7.x**.
 
 Pour vous proposer tous ces nouveaux services dans LibreOffice, l'extension OAuth2OOo utilise de nombreuses bibliothèques Python.
@@ -63,11 +63,11 @@ Trois bibliothèques ou **paquets Python** dépendent de votre système et ont l
 Pour toutes ces raisons:
 - Si vous êtes **sous Windows tous les différents binaires nécessaires sont livrés avec l'extension OAuth2OOo**.
 - Si vous êtes **sur Linux x86_64 les binaires nécessaires pour Python version 3.10 sont livrés avec l'extension OAuth2OOo**.
-- **Pour toutes les autres combinaisons de configuration possibles, vous devrez installer ces 3 packages python**.  
-Si ces fichiers binaires ne sont pas présents, une erreur devrait apparaître lors de l'installation de l'extension OAuthOOo lors de l'importation du package lxml.
+- **Pour toutes les autres combinaisons de configuration possibles, si ils ne sont pas déjà présents, vous devrez installer ces 3 paquets python**.  
+En leur absence, une erreur devrait apparaître lors de l'installation de l'extension OAuthOOo lors de l'importation du package lxml.
 Cette erreur peut être corrigée en installant, généralement à l'aide de [pip][25], les 3 paquets Python requis par votre configuration.
 
-Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox et GeckoDriver à partir du PPA de Mozilla.
+Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.
 Pour installer le PPA de Mozilla veuillez taper la commande:
 - `sudo add-apt-repository ppa:mozillateam/ppa`
 

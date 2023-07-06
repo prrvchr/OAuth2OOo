@@ -46,7 +46,7 @@ No more password is stored in LibreOffice.
 ## Requirement:
 
 In order to take advantage of the latest versions of the Python libraries used in OAuth2OOo, version 2 of Python has been abandoned in favor of **Python 3.8 minimum**.  
-This means that **OAuth2OOo no longer supports OpenOffice and LibreOffice 6.x on Windows since version 1.1.0**.  
+This means that **OAuth2OOo no longer supports OpenOffice and LibreOffice 6.x on Windows since version 1.1.0**.
 I can only advise you **to migrate to LibreOffice 7.x**.
 
 To offer you all these new services in LibreOffice, the OAuth2OOo extension uses many Python libraries.
@@ -63,11 +63,11 @@ Three libraries or **Python packages** depend on your system and have the follow
 For all these reasons:
 - If you are **on Windows all the different necessary binaries come with the OAuth2OOo extension**.
 - If you are **on Linux x86_64 necessary binaries for Python version 3.10 come with the OAuth2OOo extension**.
-- **For all other possible configuration combinations you will need to install these 3 python packages**.  
-If these binaries are not present, an error should appear when installing the OAuthOOo extension while importing the lxml package.
+- **For all other possible configuration combinations, if they are not already present, you will need to install these 3 python packages**.  
+In their absence, an error should appear when installing the OAuthOOo extension while importing the lxml package.
 This error can be corrected by installing, usually with the help of [pip][25], the 3 Python packages required by your configuration.
 
-If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox and GeckoDriver from the Mozilla PPA.
+If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.
 To install the Mozilla PPA please type the command:
 - `sudo add-apt-repository ppa:mozillateam/ppa`
 
