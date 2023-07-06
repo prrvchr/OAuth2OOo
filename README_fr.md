@@ -51,7 +51,7 @@ Je ne peux que vous conseiller **de migrer vers LibreOffice 7.x**.
 
 Pour vous proposer tous ces nouveaux services dans LibreOffice, l'extension OAuth2OOo utilise de nombreuses bibliothèques Python.
 Certaines de ces librairies embarquent des fichiers binaires qui dépendent:
-- De la version de Python (entre 3.7 et 3.11 inclus)
+- De la version de Python (entre 3.8 et 3.11 inclus)
 - Du système d'exploitation (Linux, Windows, Macos, etc...)
 - De l'architecture de votre ordinateur (i386, adm x64, arm64, ppc, etc...)
 
@@ -111,11 +111,11 @@ La valeur renvoyée: `initialized` est True si `registered_url` a été trouvé 
 
 ## A été testé avec:
 
-* LibreOffice 7.3.7.2 - Lubuntu 22.04 - OpenJDK-11-JRE (amd64)
+* LibreOffice 7.3.7.2 - Lubuntu 22.04 - Python version 3.10.12
 
-* LibreOffice 7.5.4.2(x86) - Windows 10(x86) - Adoptium JDK Hotspot 11.0.19 (x86) (sous Lubuntu 22.04 / VirtualBox 6.1.38)
+* LibreOffice 7.5.4.2(x86) - Windows 10 - Python version 3.8.16 (sous Lubuntu 22.04 / VirtualBox 6.1.38)
 
-* LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Adoptium JDK Hotspot 11.0.17 (x64) (sous Lubuntu 22.04 / VirtualBox 6.1.38)
+* LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Python version 3.8.15 (sous Lubuntu 22.04 / VirtualBox 6.1.38)
 
 * **Ne fonctionne pas avec OpenOffice** voir [dysfonctionnement 128569][27]. N'ayant aucune solution, je vous encourrage d'installer **LibreOffice**.
 
@@ -171,7 +171,7 @@ J'essaierai de le résoudre ;-)
 
 ### Ce qui a été fait pour la version 1.0.0:
 
-- Portage de l'API Java [javax.json][56 vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl : [com.sun.star.json.*][57]
+- Portage de l'API Java [javax.json][56] vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl : [com.sun.star.json.*][57]
 
     - Une fabrique de structures Json est accessible via l'interface `getJsonBuilder()` de [com.sun.star.rest.XRequestParameter.idl][58]
     - Un analyseur Json est renvoyé par l'interface `getJson()` de [com.sun.star.rest.XRequestResponse.idl][59]

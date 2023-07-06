@@ -111,11 +111,11 @@ The return value: `initialized` is True if `registered_url` was successfully fou
 
 ## Has been tested with:
 
-* LibreOffice 7.3.7.2 - Lubuntu 22.04 - Python version 3.10
+* LibreOffice 7.3.7.2 - Lubuntu 22.04 - Python version 3.10.12
 
-* LibreOffice 7.5.4.2(x86) - Windows 10(x86) - Python  (under Lubuntu 22.04 / VirtualBox 6.1.38)
+* LibreOffice 7.5.4.2(x86) - Windows 10 - Python version 3.8.16 (under Lubuntu 22.04 / VirtualBox 6.1.38)
 
-* LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Adoptium JDK Hotspot 11.0.17 (x64) (under Lubuntu 22.04 / VirtualBox 6.1.38)
+* LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Python version 3.8.15 (under Lubuntu 22.04 / VirtualBox 6.1.38)
 
 * **Does not work with OpenOffice** see [bug 128569][27]. Having no solution, I encourage you to install **LibreOffice**.
 
