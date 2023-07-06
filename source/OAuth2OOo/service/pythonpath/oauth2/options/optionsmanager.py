@@ -88,85 +88,73 @@ class OptionsManager(unohelper.Base):
         infos[111] = version
         path = os.pathsep.join(sys.path)
         infos[112] = path
-        # Required modules for cryptography
-        try:
-            import cffi
-        except Exception as e:
-            infos[113] = self._getExceptionMsg(e)
-        else:
-            infos[114] = (cffi.__version__, cffi.__file__)
-        try:
-            import enum
-        except Exception as e:
-            infos[115] = self._getExceptionMsg(e)
-        else:
-            # FIXME: Only the backported enum34 has version (ie: python < 3.4)
-            try:
-                version = enum.version
-            except:
-                version = sys.version_info[0], sys.version_info[1], sys.version_info[2]
-            infos[116] = '%s.%s.%s' % version, enum.__file__
-        try:
-            import ipaddress
-        except Exception as e:
-            infos[117] = self._getExceptionMsg(e)
-        else:
-            infos[118] = ipaddress.__version__, ipaddress.__file__
+        # Required modules for Requests
         try:
             import six
         except Exception as e:
-            infos[119] = self._getExceptionMsg(e)
+            infos[120] = self._getExceptionMsg(e)
         else:
-            infos[120] = six.__version__, six.__file__
-        try:
-            import pycparser
-        except Exception as e:
-            infos[121] = self._getExceptionMsg(e)
-        else:
-            infos[122] = pycparser.__version__, pycparser.__file__
-        try:
-            import cryptography
-        except Exception as e:
-            infos[123] = self._getExceptionMsg(e)
-        else:
-            infos[124] = cryptography.__version__, cryptography.__file__
+            infos[121] = six.__version__, six.__file__
         try:
             import ssl
         except Exception as e:
-            infos[125] = self._getExceptionMsg(e)
+            infos[122] = self._getExceptionMsg(e)
         else:
-            infos[126] = ssl.OPENSSL_VERSION, ssl.__file__
-        # Required modules for Requests
+            infos[123] = ssl.OPENSSL_VERSION, ssl.__file__
         try:
             import idna
         except Exception as e:
-            infos[127] = self._getExceptionMsg(e)
+            infos[124] = self._getExceptionMsg(e)
         else:
-            infos[128] = idna.__version__, idna.__file__
+            infos[125] = idna.__version__, idna.__file__
         try:
-            import chardet
+            import charset_normalizer
         except Exception as e:
-            infos[129] = self._getExceptionMsg(e)
+            infos[126] = self._getExceptionMsg(e)
         else:
-            infos[130] = chardet.__version__, chardet.__file__
+            infos[127] = charset_normalizer.__version__, charset_normalizer.__file__
         try:
             import certifi
         except Exception as e:
-            infos[131] = self._getExceptionMsg(e)
+            infos[128] = self._getExceptionMsg(e)
         else:
-            infos[132] = certifi.__version__, certifi.__file__
+            infos[129] = certifi.__version__, certifi.__file__
         try:
             import urllib3
         except Exception as e:
-            infos[133] = self._getExceptionMsg(e)
+            infos[130] = self._getExceptionMsg(e)
         else:
-            infos[134] = urllib3.__version__, urllib3.__file__
+            infos[131] = urllib3.__version__, urllib3.__file__
         try:
             import requests
         except Exception as e:
-            infos[135] = self._getExceptionMsg(e)
+            infos[132] = self._getExceptionMsg(e)
         else:
-            infos[136] = requests.__version__, requests.__file__
+            infos[133] = requests.__version__, requests.__file__
+        try:
+            import lxml
+        except Exception as e:
+            infos[134] = self._getExceptionMsg(e)
+        else:
+            infos[135] = lxml.__version__, lxml.__file__
+        try:
+            import ijson
+        except Exception as e:
+            infos[136] = self._getExceptionMsg(e)
+        else:
+            infos[137] = ijson.__version__, ijson.__file__
+        try:
+            import selenium
+        except Exception as e:
+            infos[138] = self._getExceptionMsg(e)
+        else:
+            infos[139] = selenium.__version__, selenium.__file__
+        try:
+            import webdriver_manager
+        except Exception as e:
+            infos[140] = self._getExceptionMsg(e)
+        else:
+            infos[141] = webdriver_manager.__version__, webdriver_manager.__file__
         return infos
 
     def connect(self):
@@ -186,7 +174,7 @@ class OptionsManager(unohelper.Base):
             getLogger(self._ctx, g_errorlog).logp(SEVERE, 'OptionsManager', 'connect()', msg)
 
     def _getExceptionMsg(self, e):
-        error = repr(e)
-        trace = repr(traceback.format_exc())
+        error = str(e)
+        trace = str(traceback.format_exc())
         return error, trace
 
