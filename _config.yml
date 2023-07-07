@@ -1,6 +1,9 @@
 remote_theme: BDHU/minimalist
 plugins:
   - jekyll-remote-theme
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jemoji
 favicon: true
 logo: /img/OAuth2OOo.png
 title: OAuth2OOo
