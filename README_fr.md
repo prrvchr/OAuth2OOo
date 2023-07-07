@@ -172,19 +172,26 @@ J'essaierai de le résoudre :smile:
 ### Ce qui a été fait pour la version 1.0.0:
 
 - Portage de l'API Python [Requests][56] vers l'API LibreOffice / OpenOffice UNO. Deux interfaces UNO sont accessibles:
-  - Les paramètres de requête HTTP: [com.sun.star.rest.XRequestParameter.idl][57]
-  - La réponse à la requête HTTP: [com.sun.star.rest.XRequestResponse.idl][58]
 
-L'interface XRequestParameter prend en charge la gestion des jetons de synchronisation ainsi que la pagination des requêtes HTTP, telles qu'elles sont utilisées dans les API HTTP Rest.
+    - Les paramètres de requête HTTP: [com.sun.star.rest.XRequestParameter.idl][57]
+    - La réponse à la requête HTTP: [com.sun.star.rest.XRequestResponse.idl][58]  
 
-- La mise à jour et le téléchargement des fichiers est possible grâce aux deux méthodes proposées par [XOAuth2Service][45].
+    L'interface XRequestParameter prend en charge la gestion des jetons de synchronisation ainsi que la pagination des requêtes HTTP, telles qu'elles sont utilisées dans les API HTTP Rest.
+
+- La mise à jour et le téléchargement des fichiers est possible grâce aux méthodes ou propriétés:
+
+    - `XOAuth2Service.download()` permettant le téléchargement de fichiers avec reprise.
+    - `XOAuth2Service.upload()` permettant la mise à jour de fichiers avec reprise.
+    - `XOAuth2Service.getInputStream()` pour obtenir un flux d'entrée.
+    - `XRequestParameter.DataSink` pour définir un flux d'entrée.
+    - `XRequestResponse.getInputStream()` pour obtenir un flux d'entrée.
 
 - Portage de l'API Java [javax.json][59] vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl: [com.sun.star.json.*][60]
 
-    - Une fabrique de structures Json est accessible via l'interface `getJsonBuilder()` de [XRequestParameter][57].
+    - Une fabrique de structures JSON est accessible via l'interface `getJsonBuilder()` de [XRequestParameter][57].
     - Un analyseur Json est renvoyé par l'interface `getJson()` de [XRequestResponse][58].
 
-**Cela rend les requêtes HTTP utilisant Json facilement utilisable dans le langage Basic de LibreOffice.**
+**Cela rend les requêtes HTTP utilisant JSON facilement utilisable dans le langage Basic de LibreOffice.**
 
 Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][62].
 

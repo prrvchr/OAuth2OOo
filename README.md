@@ -172,19 +172,26 @@ I will try to solve it :smile:
 ### What has been done for version 1.0.0:
 
 - Porting Python API [Requests][56] to LibreOffice / OpenOffice UNO API. Two UNO interfaces are accessible:
-  - HTTP request parameters: [com.sun.star.rest.XRequestParameter.idl][57]
-  - The response to the HTTP request: [com.sun.star.rest.XRequestResponse.idl][58]
 
-The XRequestParameter interface supports sync token handling as well as HTTP request paging, as used in the HTTP Rest APIs
+    - HTTP request parameters: [com.sun.star.rest.XRequestParameter.idl][57]
+    - The response to the HTTP request: [com.sun.star.rest.XRequestResponse.idl][58]  
 
-- Updating and downloading files is possible thanks to the two methods offered by [XOAuth2Service][45].
+    The XRequestParameter interface supports sync token handling as well as HTTP request paging, as used in the HTTP Rest APIs
+
+- Uploading and downloading files is possible thanks to the methods or properties:
+
+    - `XOAuth2Service.download()` allowing resumable file download.
+    - `XOAuth2Service.upload()` allowing resumable file upload.
+    - `XOAuth2Service.getInputStream()` to get an input stream.
+    - `XRequestParameter.DataSink` to set an input stream.
+    - `XRequestResponse.getInputStream()` to get an input stream.
 
 - Porting Java API [javax.json][59] to LibreOffice / OpenOffice UNO API as defined in idl files: [com.sun.star.json.*][60]
 
-    - A factory of Json structures is accessible via the `getJsonBuilder()` interface of [XRequestParameter][57].
+    - A factory of JSON structures is accessible via the `getJsonBuilder()` interface of [XRequestParameter][57].
     - A Json parser is returned by the `getJson()` interface of [XRequestResponse][58].
 
-**This makes HTTP requests using Json easily usable in the Basic language of LibreOffice.**
+**This makes HTTP requests using JSON easily usable in the Basic language of LibreOffice.**
 
 See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
@@ -192,10 +199,10 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
 - Writing of 15 functions in Calc AddIns as described in the following files:
 
-   - The file [OAuth2Plugin.idl][63] which declares new interfaces to UNO.
-   - The file [CalcAddIns.xcu][64] which makes available these new interfaces in the list of Calc functions.
-   - The file [OAuth2Plugin.py][65] which is the implementation of the UNO service `com.sun.star.auth.Oauth2Plugin` providing these new interfaces.
-   - The file [plugin.py][66] which is the library implementing the interfaces of this new UNO service.
+    - The file [OAuth2Plugin.idl][63] which declares new interfaces to UNO.
+    - The file [CalcAddIns.xcu][64] which makes available these new interfaces in the list of Calc functions.
+    - The file [OAuth2Plugin.py][65] which is the implementation of the UNO service `com.sun.star.auth.Oauth2Plugin` providing these new interfaces.
+    - The file [plugin.py][66] which is the library implementing the interfaces of this new UNO service.
 
 - These 4 new files give access to **15 new Calc formulas** which are:
 
@@ -230,15 +237,15 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
 - Creation of 5 Calc formulas allowing the **piloting of the browser**:
 
-     - `BROWSEROPEN(BROWSER,PATH,INIT,OPTIONS)`
-     - `BROWSERCLICK(SESSION,BY,PATH,URL,INIT,WAIT)`
-     - `BROWSERFIELD(SESSION,BY,PATH,VALUE,URL,INIT,WAIT)`
-     - `BROWSERFORM(SESSION,FORM,URL,INIT,WAIT)`
-     - `BROWSERCONTENT(SESSION,URL,ENCODING)`
+    - `BROWSEROPEN(BROWSER,PATH,INIT,OPTIONS)`
+    - `BROWSERCLICK(SESSION,BY,PATH,URL,INIT,WAIT)`
+    - `BROWSERFIELD(SESSION,BY,PATH,VALUE,URL,INIT,WAIT)`
+    - `BROWSERFORM(SESSION,FORM,URL,INIT,WAIT)`
+    - `BROWSERCONTENT(SESSION,URL,ENCODING)`
 
 - Creation of a Calc formula allowing HTTP Basic Auth authentication for HTTP requests:
 
-     - `HTTPAUTH(NAME,PASSWORD)`
+    - `HTTPAUTH(NAME,PASSWORD)`
 
 - Calc formula `GETHTTPBOBY` has been renamed to `HTTPCONTENT`.
 
