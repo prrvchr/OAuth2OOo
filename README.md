@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo][1] OAuth2OOo
+# OAuth2OOo
 
 **Ce [document][2] en français.**
 

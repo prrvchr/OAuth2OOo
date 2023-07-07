@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo][1] OAuth2OOo
+# OAuth2OOo
 
 **This [document][2] in English.**
 
