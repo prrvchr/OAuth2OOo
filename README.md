@@ -252,7 +252,7 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 [2]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
 [3]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_en>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
-[5]: <https://prrvchr.github.io/OAuth2OOo#historical>
+[5]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-101>
 [6]: <https://prrvchr.github.io>
 [7]: <https://www.libreoffice.org/download/download/>
 [8]: <https://www.openoffice.org/download/index.html>
