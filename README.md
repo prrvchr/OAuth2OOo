@@ -181,8 +181,8 @@ The XRequestParameter interface supports sync token handling as well as HTTP req
 
 - Porting Java API [javax.json][59] to LibreOffice / OpenOffice UNO API as defined in idl files: [com.sun.star.json.*][60]
 
-    - A factory of Json structures is accessible via the `getJsonBuilder()` interface of [XRequestParameter.idl][57]
-    - A Json parser is returned by the `getJson()` interface of [XRequestResponse.idl][58]
+    - A factory of Json structures is accessible via the `getJsonBuilder()` interface of [XRequestParameter][57].
+    - A Json parser is returned by the `getJson()` interface of [XRequestResponse][58].
 
 **This makes HTTP requests using Json easily usable in the Basic language of LibreOffice.**
 
