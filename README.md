@@ -117,9 +117,9 @@ The return value: `initialized` is True if `registered_url` was successfully fou
 
 * **Does not work with OpenOffice** see [bug 128569][27]. Having no solution, I encourage you to install **LibreOffice**.
 
-I encourage you in case of problem :-(  
+I encourage you in case of problem :confused:  
 to create an [issue][10]  
-I will try to solve it ;-)
+I will try to solve it :simple_smile:
 
 ## Historical:
 

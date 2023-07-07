@@ -117,9 +117,9 @@ La valeur renvoyée: `initialized` est True si `registered_url` a été trouvé 
 
 * **Ne fonctionne pas avec OpenOffice** voir [dysfonctionnement 128569][27]. N'ayant aucune solution, je vous encourrage d'installer **LibreOffice**.
 
-Je vous encourage en cas de problème :-(  
+Je vous encourage en cas de problème :confused:  
 de créer un [dysfonctionnement][10]  
-J'essaierai de le résoudre ;-)
+J'essaierai de le résoudre :simple_smile:
 
 ## Historique:
 
