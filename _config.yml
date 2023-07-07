@@ -1,7 +1,7 @@
 remote_theme: pages-themes/cayman@v0.2.0
-title: [OAuth2OOo]
-logo: [/img/OAuth2OOo.png]
-description: [Auth2 protocol and Python Request in a single LibreOffice extension]
-show_downloads: [true]
+title: OAuth2OOo
+logo: /img/OAuth2OOo.png
+description: Auth2 protocol and Python Request in a single LibreOffice extension
+show_downloads: true
 github:
   zip_url: https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt
