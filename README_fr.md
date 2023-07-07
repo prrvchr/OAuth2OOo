@@ -181,8 +181,8 @@ L'interface XRequestParameter prend en charge la gestion des jetons de synchroni
 
 - Portage de l'API Java [javax.json][59] vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl: [com.sun.star.json.*][60]
 
-    - Une fabrique de structures Json est accessible via l'interface `getJsonBuilder()` de [com.sun.star.rest.XRequestParameter.idl][57]
-    - Un analyseur Json est renvoyé par l'interface `getJson()` de [com.sun.star.rest.XRequestResponse.idl][58]
+    - Une fabrique de structures Json est accessible via l'interface `getJsonBuilder()` de [XRequestParameter.idl][57]
+    - Un analyseur Json est renvoyé par l'interface `getJson()` de [XRequestResponse.idl][58]
 
 **Cela rend les requêtes HTTP utilisant Json facilement utilisable dans le langage Basic de LibreOffice.**
 
