@@ -1,10 +1,10 @@
-## Documentation
+# Documentation
 
 **This [document][2] in English.**
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][3] et à notre [Politique de protection des données][4].**
 
-## version [1.1.0][5]
+# version [1.1.0][5]
 
 ## Introduction:
 
