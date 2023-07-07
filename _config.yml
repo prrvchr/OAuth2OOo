@@ -1,6 +1,6 @@
-remote_theme: pages-themes/minimal@v0.2.0
+remote_theme: BDHU/minimalist
 plugins:
-- jekyll-remote-theme # add this line to the plugins list if you already have onetitle: OAuth2OOo
+  - jekyll-remote-theme
 logo: /img/OAuth2OOo.png
 title: OAuth2OOo
 description: OAuth2.0 protocol, Python Requests and Selenium in a single LibreOffice extension
