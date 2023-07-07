@@ -171,23 +171,31 @@ J'essaierai de le résoudre ;-)
 
 ### Ce qui a été fait pour la version 1.0.0:
 
-- Portage de l'API Java [javax.json][56] vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl : [com.sun.star.json.*][57]
+- Portage de l'API Python [Requests][56] vers l'API LibreOffice / OpenOffice UNO. Deux interfaces UNO sont accessibles:
+  - Les paramètres de requête HTTP: [com.sun.star.rest.XRequestParameter.idl][57]
+  - La réponse à la requête HTTP: [com.sun.star.rest.XRequestResponse.idl][58]
 
-    - Une fabrique de structures Json est accessible via l'interface `getJsonBuilder()` de [com.sun.star.rest.XRequestParameter.idl][58]
-    - Un analyseur Json est renvoyé par l'interface `getJson()` de [com.sun.star.rest.XRequestResponse.idl][59]
+L'interface XRequestParameter prend en charge la gestion des jetons de synchronisation ainsi que la pagination des requêtes HTTP, telles qu'elles sont utilisées dans les API HTTP Rest.
+
+- La mise à jour et le téléchargement des fichiers est possible grâce aux deux méthodes proposées par [XOAuth2Service][45].
+
+- Portage de l'API Java [javax.json][59] vers l'API LibreOffice / OpenOffice UNO comme défini dans les fichiers idl: [com.sun.star.json.*][60]
+
+    - Une fabrique de structures Json est accessible via l'interface `getJsonBuilder()` de [com.sun.star.rest.XRequestParameter.idl][57]
+    - Un analyseur Json est renvoyé par l'interface `getJson()` de [com.sun.star.rest.XRequestResponse.idl][58]
 
 **Cela rend les requêtes HTTP utilisant Json facilement utilisable dans le langage Basic de LibreOffice.**
 
-Voir les macros [Requêtes HTTP sous Basic][60] et [Requêtes ChatGPT en Basic][61].
+Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][62].
 
 ### Ce qui a été fait pour la version 1.0.1:
 
 - Ecriture de 15 fonctions en AddIns de Calc comme décrit dans les fichiers suivants:
 
-    - Le fichier [OAuth2Plugin.idl][62] qui declare à UNO les nouvelles interfaces.
-    - Le fichier [CalcAddIns.xcu][63] qui rend disponible ces nouvelles interface dans le liste des fonctions de Calc.
-    - Le fichier [OAuth2Plugin.py][64] qui est l'implementation du service UNO `com.sun.star.auth.Oauth2Plugin` founissant ces nouvelles interfaces.
-    - Le fichier [plugin.py][65] qui est la bibliotheque implementant les interface de ce nouveau service UNO.
+    - Le fichier [OAuth2Plugin.idl][63] qui declare à UNO les nouvelles interfaces.
+    - Le fichier [CalcAddIns.xcu][64] qui rend disponible ces nouvelles interface dans le liste des fonctions de Calc.
+    - Le fichier [OAuth2Plugin.py][65] qui est l'implementation du service UNO `com.sun.star.auth.Oauth2Plugin` founissant ces nouvelles interfaces.
+    - Le fichier [plugin.py][66] qui est la bibliotheque implementant les interface de ce nouveau service UNO.
 
 - Ces 4 nouveaux fichiers donne acces à **15 nouvelles formules Calc** qui sont:
 
@@ -209,16 +217,16 @@ Voir les macros [Requêtes HTTP sous Basic][60] et [Requêtes ChatGPT en Basic][
 
 - Un bon exemple vaut mieux qu'un long discours, je vous invite donc à télécharger deux feuilles Calc permettant de récupérer très facilement les micro données HTML de n'importe quelle site Web.
 
-    - [LDLC Home.ods][66]
-    - [LDLC poducts.ods][67]
+    - [LDLC Home.ods][67]
+    - [LDLC poducts.ods][68]
 
 ### Ce qui a été fait pour la version 1.1.0:
 
 - **Fin du support de Python 2.x et donc d'OpenOffice**.
 
-- Intégration de [Selenium][68] version 4.10 dans l'extension afin de rendre **LibreOffice capable de piloter un navigateur via des formules Calc** insérées dans une feuille de calcul.
+- Intégration de [Selenium][69] version 4.10 dans l'extension afin de rendre **LibreOffice capable de piloter un navigateur via des formules Calc** insérées dans une feuille de calcul.
 
-- Utilisation de [webdriver_manager][69] version 3.8.6 permettant d'automatiser l'installation du [WebDriver][70] du navigateur.
+- Utilisation de [webdriver_manager][70] version 3.8.6 permettant d'automatiser l'installation du [WebDriver][71] du navigateur.
 
 - Création de 5 formules Calc permettant le **pilotage du navigateur**:
 
@@ -297,18 +305,19 @@ Voir les macros [Requêtes HTTP sous Basic][60] et [Requêtes ChatGPT en Basic][
 [53]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
 [54]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
 [55]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
-[56]: <https://javadoc.io/static/javax.json/javax.json-api/1.1.4/index.html?overview-summary.html>
-[57]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/json>
-[58]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
-[59]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
-[60]: <https://forum.openoffice.org/fr/forum/viewtopic.php?t=67387>
-[61]: <https://forum.openoffice.org/fr/forum/viewtopic.php?t=67402>
-[62]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Plugin.idl>
-[63]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/CalcAddIns.xcu>
-[64]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Plugin.py>
-[65]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/plugin.py>
-[66]: <https://forum.openoffice.org/fr/forum/download/file.php?id=150036>
-[67]: <https://forum.openoffice.org/fr/forum/download/file.php?id=150040>
-[68]: <https://pypi.org/project/selenium/4.10/>
-[69]: <https://pypi.org/project/webdriver-manager/3.8.6/>
-[70]: <https://developer.mozilla.org/en-US/docs/Web/WebDriver>
+[56]: <https://pypi.org/project/requests/2.31.0/>
+[57]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
+[58]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
+[59]: <https://javadoc.io/static/javax.json/javax.json-api/1.1.4/index.html?overview-summary.html>
+[60]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/json>
+[61]: <https://forum.openoffice.org/fr/forum/viewtopic.php?t=67387>
+[62]: <https://forum.openoffice.org/fr/forum/viewtopic.php?t=67402>
+[63]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Plugin.idl>
+[64]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/CalcAddIns.xcu>
+[65]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Plugin.py>
+[66]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/plugin.py>
+[67]: <https://forum.openoffice.org/fr/forum/download/file.php?id=150036>
+[68]: <https://forum.openoffice.org/fr/forum/download/file.php?id=150040>
+[69]: <https://pypi.org/project/selenium/4.10/>
+[70]: <https://pypi.org/project/webdriver-manager/3.8.6/>
+[71]: <https://developer.mozilla.org/en-US/docs/Web/WebDriver>
