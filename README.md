@@ -119,7 +119,7 @@ The return value: `initialized` is True if `registered_url` was successfully fou
 
 I encourage you in case of problem :confused:  
 to create an [issue][10]  
-I will try to solve it :simple_smile:
+I will try to solve it :smile:
 
 ## Historical:
 

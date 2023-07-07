@@ -119,7 +119,7 @@ La valeur renvoyée: `initialized` est True si `registered_url` a été trouvé 
 
 Je vous encourage en cas de problème :confused:  
 de créer un [dysfonctionnement][10]  
-J'essaierai de le résoudre :simple_smile:
+J'essaierai de le résoudre :smile:
 
 ## Historique:
 
