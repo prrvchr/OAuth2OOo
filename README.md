@@ -1,3 +1,5 @@
+# Documentation
+
 **Ce [document][2] en français.**
 
 **The use of this software subjects you to our [Terms Of Use][3] and [Data Protection Policy][4].**
