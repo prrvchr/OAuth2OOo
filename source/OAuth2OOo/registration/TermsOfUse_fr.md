@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo][1] OAuth2OOo - Conditions d'utilisation
+# Conditions d'utilisation
 
 **This [document][2] in English.**
 

@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo][1] OAuth2OOo - Politique de protection des données
+# Politique de protection des données
 
 **This [document][2] in English.**
 

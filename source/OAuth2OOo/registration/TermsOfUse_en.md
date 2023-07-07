@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo][1] OAuth2OOo - Terms Of Use
+# Terms Of Use
 
 **Ce [document][2] en français.**
 

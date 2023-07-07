@@ -1,4 +1,4 @@
-# ![OAuth2OOo logo][1] OAuth2OOo - Data Protection Policy
+# Data Protection Policy
 
 **Ce [document][2] en français.**
 
