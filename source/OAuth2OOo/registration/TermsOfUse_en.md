@@ -10,12 +10,14 @@ Regarding installation, configuration and use, please consult the **[documentati
 
 The OAuth2OOo library is a part of a personnal project.
 
+___
 ## Responsibilities:
 
 OAuth2OOo is distributed in the hope that it will be useful,
 but **WITHOUT ANY WARRANTY**; without even the implied warranty of
 **MERCHANTABILITY** or **FITNESS FOR A PARTICULAR PURPOSE**.
 
+___
 ## License:
 
 OAuth2OOo is free software; you can redistribute it and/or

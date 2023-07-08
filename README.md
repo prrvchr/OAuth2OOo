@@ -19,6 +19,7 @@ Being free software I encourage you:
 In short, to participate in the development of this extension.
 Because it is together that we can make Free Software smarter.
 
+___
 ## Requirement:
 
 In order to take advantage of the latest versions of the Python libraries used in OAuth2OOo, version 2 of Python has been abandoned in favor of **Python 3.8 minimum**.  
@@ -47,6 +48,7 @@ If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Fi
 To install the Mozilla PPA please type the command:
 - `sudo add-apt-repository ppa:mozillateam/ppa`
 
+___
 ## Install:
 
 It seems important that the file was not renamed when it was downloaded.
@@ -56,6 +58,7 @@ If necessary, rename it before installing it.
 
 - Restart LibreOffice / OpenOffice after installation.
 
+___
 ## Use:
 
 This extension is not made to be used alone, but provide OAuth2 service to other LibreOffice ~~/ OpenOffice~~ extensions.  
@@ -85,6 +88,7 @@ The return value: `initialized` is True if `registered_url` was successfully fou
 > format = 'Bearer %s'  
 > token = service.getToken(format)
 
+___
 ## Uno OAuth2.0 API for LibreOffice.
 
 ![OAuth2OOo Wizard Page1 screenshot][19]
@@ -109,6 +113,7 @@ The revocation takes place in the management of the applications associated with
 
 No more password is stored in LibreOffice.
 
+___
 ## Has been tested with:
 
 * LibreOffice 7.3.7.2 - Lubuntu 22.04 - Python version 3.10.12
@@ -123,6 +128,7 @@ I encourage you in case of problem :confused:
 to create an [issue][10]  
 I will try to solve it :smile:
 
+___
 ## Historical:
 
 ### What has been done for version 0.0.5:

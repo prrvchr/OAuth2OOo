@@ -22,12 +22,14 @@ This policy, in addition to `OAuth2OOo`, also applies to all `Extension` that us
 
 Although **OAuth2OOo does not share or transfer any data to any other application**, if you are using `OAuth2OOo` with a Google account, then `OAuth2OOo` adhere to [Google API Services User Data Policy][5], including the Limited Use requirements.
 
+___
 ## Contact:
 
 In any case, it is possible to contact the person responsible for data processing at:
 
 prrvchr@gmail.com
 
+___
 ## Use of your personal data:
 
 To work `OAuth2OOo` and/or `Extension` need to keep data locally.
@@ -42,6 +44,7 @@ Use of the `Supplier` services through `OAuth2OOo` and/or `Extension`, may submi
 
 `Supplier` is solely responsible for the use of the data it collects as described in its Policy.
 
+___
 ## Security of your personal information:
 
 Since the data collected by `OAuth2OOo` and/or `Extension` is located on the user's computer, only the `User` is responsible for the security of the data collected.
@@ -50,6 +53,7 @@ Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject yo
 
 `Supplier` is solely responsible for the security of the data it collects as described in its Policy.
 
+___
 ## Expiration of collected data:
 
 Updating the data collected locally is done each time `OAuth2OOo` and/or `Extension` is used.

@@ -22,12 +22,14 @@ Cette politique, en plus de `OAuth2OOo`, s’applique également à toutes les `
 
 Bien que **OAuth2OOo ne partage ni ne transfert aucun données avec toutes autre application**, si vous utilisez `OAuth2OOo` avec un compte Google, alors `OAuth2OOo` respecte [la politique de données utilisateur des services API Google][5], y compris les exigences d'utilisation limitée.
 
+___
 ## Contact:
 
 Dans tous les cas, il est possible de contacter le responsable du traitement des données à l'adresse suivante:
 
 prrvchr@gmail.com
 
+___
 ## Utilisation de vos données personnelles:
 
 Pour fonctionner, `OAuth2OOo` et/ou `Extension` doivent conserver des données localement.
@@ -42,6 +44,7 @@ L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Ext
 
 Le `Fournisseur` est seul responsable de l'utilisation des données qu'il collecte, comme décrit dans sa politique de protection des données.
 
+___
 ## Sécurité de vos informations personnelles:
 
 Étant donné que les données collectées par `OAuth2OOo` et/ou `Extension` sont situées sur l'ordinateur de l'utilisateur, seul l'`Utilisateur` est responsable de la sécurité des données collectées.
@@ -50,6 +53,7 @@ L'utilisation des services du `Fournisseur` via `OAuth2OOo` et/ou `Extension` pe
 
 Le `Fournisseur` est seul responsable de la sécurité des données qu'il collecte, comme décrit dans sa politique de protection des données.
 
+___
 ## Expiration des données collectées:
 
 La mise à jour des données collectées localement est effectuée chaque fois que `OAuth2OOo` et/ou `Extension` sont utilisés.
