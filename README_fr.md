@@ -19,30 +19,6 @@ Etant un logiciel libre je vous encourage:
 Bref, à participer au developpement de cette extension.
 Car c'est ensemble que nous pouvons rendre le Logiciel Libre plus intelligent.
 
-## Uno OAuth2.0 API pour LibreOffice.
-
-![OAuth2OOo Wizard Page1 screenshot][11]
-
-![OAuth2OOo Wizard Page2 screenshot][12]
-
-![OAuth2OOo Wizard Page3 screenshot][13]
-
-![OAuth2OOo Browser Page1 screenshot][14]
-
-![OAuth2OOo Browser Page2 screenshot][15]
-
-![OAuth2OOo Browser Page3 screenshot][16]
-
-![OAuth2OOo Browser Page4 screenshot][17]
-
-![OAuth2OOo Wizard Page4 screenshot][18]
-
-Le protocole OAuth2 permet d'accéder aux ressources de serveurs, après acceptation de l'autorisation de connexion, en échangeant des jetons.
-
-La révocation a lieu dans la gestion des applications associées à votre compte.
-
-Plus aucun mot de passe n'est stocké dans LibreOffice.
-
 ## Prérequis:
 
 Afin de profiter des dernières versions des bibliothèques Python utilisées dans OAuth2OOo, la version 2 de Python a été abandonnée au profit de **Python 3.8 minimum**.  
@@ -56,16 +32,16 @@ Certaines de ces librairies embarquent des fichiers binaires qui dépendent:
 - De l'architecture de votre ordinateur (i386, adm x64, arm64, ppc, etc...)
 
 Trois bibliothèques ou **paquets Python** dépendent de votre système et ont les fichiers binaires embarqués suivant:
-- [Fichiers binaires][19] pour le paquet [charset-normalizer][20] version 3.1.0.
-- [Fichiers binaires][21] pour le paquet [ijson] [22] version 3.2.2.
-- [Fichiers binaires][23] pour le paquet [lxml] [24] version 4.9.2.
+- [Fichiers binaires][11] pour le paquet [charset-normalizer][12] version 3.1.0.
+- [Fichiers binaires][13] pour le paquet [ijson] [14] version 3.2.2.
+- [Fichiers binaires][15] pour le paquet [lxml] [16] version 4.9.2.
 
 Pour toutes ces raisons:
 - Si vous êtes **sous Windows tous les différents binaires nécessaires sont livrés avec l'extension OAuth2OOo**.
 - Si vous êtes **sur Linux x86_64 les binaires nécessaires pour Python version 3.10 sont livrés avec l'extension OAuth2OOo**.
 - **Pour toutes les autres combinaisons de configuration possibles, si ils ne sont pas déjà présents, vous devrez installer ces 3 paquets python**.  
 En leur absence, une erreur devrait apparaître lors de l'installation de l'extension OAuthOOo lors de l'importation du package lxml.
-Cette erreur peut être corrigée en installant, généralement à l'aide de [pip][25], les 3 paquets Python requis par votre configuration.
+Cette erreur peut être corrigée en installant, généralement à l'aide de [pip][17], les 3 paquets Python requis par votre configuration.
 
 Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.
 Pour installer le PPA de Mozilla veuillez taper la commande:
@@ -76,7 +52,7 @@ Pour installer le PPA de Mozilla veuillez taper la commande:
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][26]** version 1.1.0.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.1.0.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -108,6 +84,30 @@ La valeur renvoyée: `initialized` est True si `registered_url` a été trouvé 
 
 > format = 'Bearer %s'  
 > token = service.getToken(format)
+
+## Uno OAuth2.0 API pour LibreOffice.
+
+![OAuth2OOo Wizard Page1 screenshot][19]
+
+![OAuth2OOo Wizard Page2 screenshot][20]
+
+![OAuth2OOo Wizard Page3 screenshot][21]
+
+![OAuth2OOo Browser Page1 screenshot][22]
+
+![OAuth2OOo Browser Page2 screenshot][23]
+
+![OAuth2OOo Browser Page3 screenshot][24]
+
+![OAuth2OOo Browser Page4 screenshot][25]
+
+![OAuth2OOo Wizard Page4 screenshot][26]
+
+Le protocole OAuth2 permet d'accéder aux ressources de serveurs, après acceptation de l'autorisation de connexion, en échangeant des jetons.
+
+La révocation a lieu dans la gestion des applications associées à votre compte.
+
+Plus aucun mot de passe n'est stocké dans LibreOffice.
 
 ## A été testé avec:
 
@@ -267,22 +267,22 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 [8]: <https://www.openoffice.org/fr/Telecharger/>
 [9]: <https://github.com/prrvchr/OAuth2OOo>
 [10]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[11]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
-[12]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
-[13]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
-[14]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4_fr.png>
-[15]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5_fr.png>
-[16]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6_fr.png>
-[17]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7_fr.png>
-[18]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8_fr.png>
-[19]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/charset_normalizer>
-[20]: <https://pypi.org/project/charset-normalizer/3.1.0/#files>
-[21]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/ijson/backends>
-[22]: <https://pypi.org/project/ijson/3.2.2/#files>
-[23]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/lxml>
-[24]: <https://pypi.org/project/lxml/4.9.2/#files>
-[25]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
-[26]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
+[11]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/charset_normalizer>
+[12]: <https://pypi.org/project/charset-normalizer/3.1.0/#files>
+[13]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/ijson/backends>
+[14]: <https://pypi.org/project/ijson/3.2.2/#files>
+[15]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/lxml>
+[16]: <https://pypi.org/project/lxml/4.9.2/#files>
+[17]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
+[18]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
+[19]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
+[20]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
+[21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
+[22]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4_fr.png>
+[23]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5_fr.png>
+[24]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6_fr.png>
+[25]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7_fr.png>
+[26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8_fr.png>
 [27]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
 [28]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/wizard/wizard.py>
 [29]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132110>
