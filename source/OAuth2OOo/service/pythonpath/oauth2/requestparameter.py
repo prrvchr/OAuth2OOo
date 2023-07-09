@@ -235,7 +235,8 @@ class RequestParameter(unohelper.Base,
         self._headers[key] = value
 
     def setJson(self, path, value):
-        self._json.update(self._getJsonItem(path, value))
+        item = self._getJsonItem(path, value)
+        self._json = self._updateJson(dict(self._json), item)
 
     def setQuery(self, key, value):
         self._query[key] = value
@@ -276,11 +277,18 @@ class RequestParameter(unohelper.Base,
         return json.dumps(kwargs)
 
     def _getJsonItem(self, path, value):
-        item = ()
-        names = path.split(self._sep)
-        if len(names) > 0:
-            item = {names.pop(): value}
-            for name in reversed(names):
-                item = {name: item}
+        for index, name in enumerate(reversed(path.split(self._sep))):
+            if index:
+                item = {name: dict(item)}
+            else:
+                item = {name: value}
         return item
+
+    def _updateJson(self, root, item):
+        for key, value in item.items():
+            if isinstance(value, dict):
+                root[key] = self._updateJson(root.get(key, {}), value)
+            else:
+                root[key] = value
+        return root
 

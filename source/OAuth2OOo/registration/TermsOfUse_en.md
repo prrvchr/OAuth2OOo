@@ -4,7 +4,8 @@
 
 **Use of this software also subjects you to our [Data Protection Policy][3].**
 
-Regarding installation, configuration and use, please consult the **[documentation][4]**.
+Regarding installation, configuration and use,
+please consult the **[documentation][4]**.
 
 ## Introduction:
 

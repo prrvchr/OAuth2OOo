@@ -4,7 +4,8 @@
 
 **L'utilisation de ce logiciel vous soumet également à notre [Politique de protection des données][3].**
 
-Concernant l'installation, la configuration et l'utilisation, veuillez consulter la **[documentation][4]**.
+Concernant l'installation, la configuration et l'utilisation,
+veuillez consulter la **[documentation][4]**.
 
 ## Introduction:
 
