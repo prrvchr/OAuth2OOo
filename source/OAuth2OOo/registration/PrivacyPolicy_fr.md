@@ -1,10 +1,10 @@
 # Politique de protection des données
 
-**This [document][2] in English.**
+**This [document][1] in English.**
 
-**L'utilisation de ce logiciel vous soumet également à nos [Conditions d'utilisation][3].**
+**L'utilisation de ce logiciel vous soumet également à nos [Conditions d'utilisation][2].**
 
-Concernant l'installation, la configuration et l'utilisation, veuillez consulter la **[documentation][4]**.
+Concernant l'installation, la configuration et l'utilisation, veuillez consulter la **[documentation][3]**.
 
 ## Introduction:
 
@@ -20,7 +20,7 @@ Pour plus de simplicité, dans la suite de ce document, on nommera:
 
 Cette politique, en plus de `OAuth2OOo`, s’applique également à toutes les `Extension` utilisant des services logiciels de `OAuth2OOo`.
 
-Bien que **OAuth2OOo ne partage ni ne transfert aucun données avec toutes autre application**, si vous utilisez `OAuth2OOo` avec un compte Google, alors `OAuth2OOo` respecte [la politique de données utilisateur des services API Google][5], y compris les exigences d'utilisation limitée.
+Bien que **OAuth2OOo ne partage ni ne transfert aucun données avec toutes autre application**, si vous utilisez `OAuth2OOo` avec un compte Google, alors `OAuth2OOo` respecte [la politique de données utilisateur des services API Google][4], y compris les exigences d'utilisation limitée.
 
 ___
 ## Contact:
@@ -66,8 +66,7 @@ L'utilisation des services du `Fournisseur` via `OAuth2OOo` et/ou `Extension` pe
 
 Le `Fournisseur` est seul responsable de l'expiration des données qu'il collecte comme décrit dans sa politique de protection des données.
 
-[1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
-[2]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
-[3]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
-[4]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
-[5]: <https://developers.google.com/terms/api-services-user-data-policy?hl=fr>
+[1]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
+[2]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
+[3]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
+[4]: <https://developers.google.com/terms/api-services-user-data-policy?hl=fr>

@@ -70,12 +70,15 @@ from requests.exceptions import ConnectionError
 from requests.exceptions import ConnectTimeout
 from requests.exceptions import HTTPError
 from requests.exceptions import InvalidURL
-from requests.exceptions import JSONDecodeError
 from requests.exceptions import ReadTimeout
 from requests.exceptions import RequestException as RequestError
 from requests.exceptions import TooManyRedirects
 from requests.exceptions import URLRequired
 import json
+# FIXME: If you have Python Requests installed and its version is lower than 2.27.0
+# FIXME: then we cannot import JSONDecoderError it is not yet available
+# from requests.exceptions import JSONDecodeError
+from json.decoder import JSONDecodeError
 import traceback
 
 
@@ -198,12 +201,12 @@ def raiseHTTPException(ctx, source, cls, mtd, name, code, error):
     e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, e.StatusCode, e.Content)
     raise e
 
-def raiseJSONDecodeException(ctx, source, cls, mtd, name, code, error):
+def raiseJSONDecodeException(ctx, source, cls, mtd, name, code, response):
     e = JSONDecodeException()
     e.Context = source
-    e.Url = error.response.url
-    e.StatusCode = error.response.status_code
-    e.Content = error.response.text
+    e.Url = response.url
+    e.StatusCode = response.status_code
+    e.Content = response.text
     e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, e.StatusCode, e.Content)
     raise e
 
@@ -301,7 +304,7 @@ class RequestResponse(unohelper.Base,
         try:
             data = self._response.json()
         except JSONDecodeError as e:
-            raiseJSONDecodeException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, e)
+            raiseJSONDecodeException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, self._response)
         else:
             return getJsonStructure(data)
 

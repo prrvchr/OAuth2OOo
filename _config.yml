@@ -5,8 +5,9 @@ plugins:
   - jekyll-seo-tag
   - jemoji
 favicon: true
-logo: /img/OAuth2OOo.png
+logo: /img/oauth2.svg
 title: OAuth2OOo
+blank_title: true
 description: The OAuth2.0 protocol, Python Requests and Selenium in a single LibreOffice extension
 sidebar:
   - name: Download
