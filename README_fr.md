@@ -263,7 +263,7 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 
 - Tout ce qui est bienvenu...
 
-[1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.png>
+[1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg>
 [2]: <https://prrvchr.github.io/OAuth2OOo>
 [3]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr>

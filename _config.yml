@@ -6,6 +6,7 @@ plugins:
   - jemoji
 favicon: true
 logo: /img/oauth2.svg
+email: prrvchr@gmail.com
 title: OAuth2OOo
 blank_title: true
 description: The OAuth2.0 protocol, Python Requests and Selenium in a single LibreOffice extension
