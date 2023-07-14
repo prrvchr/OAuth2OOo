@@ -169,7 +169,8 @@ class RequestParameter(unohelper.Base,
         return uno.Char(self._sep)
     @Separator.setter
     def Separator(self, sep):
-        self._sep = sep.value
+        if sep.value:
+            self._sep = sep.value
     @property
     def NextUrl(self):
         return self._nexturl
@@ -235,8 +236,11 @@ class RequestParameter(unohelper.Base,
         self._headers[key] = value
 
     def setJson(self, path, value):
-        item = self._getJsonItem(path, value)
-        self._json = self._updateJson(dict(self._json), item)
+        keys = path.split(self._sep)
+        if keys:
+            key = keys.pop()
+            item = self._getLastItem(keys, self._json)
+            item[key] = value
 
     def setQuery(self, key, value):
         self._query[key] = value
@@ -248,8 +252,8 @@ class RequestParameter(unohelper.Base,
         self._json.update(json.loads(structure.toJson()))
 
     def toJson(self, stream):
-        # FIXME: It is necessary to be able to manage nextPage
-        # FIXME: tokens and sync token present in various XML/JSON APIs
+        # FIXME: It is necessary to be able to manage nextPage tokens
+        # FIXME: and sync token present in various XML/JSON REST APIs
         kwargs = {}
         nextdata = {self._key: self._value} if self._key else {}
         if self._headers:
@@ -276,19 +280,13 @@ class RequestParameter(unohelper.Base,
             kwargs['stream'] = True
         return json.dumps(kwargs)
 
-    def _getJsonItem(self, path, value):
-        for index, name in enumerate(reversed(path.split(self._sep))):
-            if index:
-                item = {name: dict(item)}
-            else:
-                item = {name: value}
+    def _getLastItem(self, keys, item):
+        for key in keys:
+            item = self._getItem(key, item)
         return item
 
-    def _updateJson(self, root, item):
-        for key, value in item.items():
-            if isinstance(value, dict):
-                root[key] = self._updateJson(root.get(key, {}), value)
-            else:
-                root[key] = value
-        return root
+    def _getItem(self, key, item):
+        if key not in item:
+            item[key] = {}
+        return item[key]
 

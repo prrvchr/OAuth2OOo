@@ -100,8 +100,9 @@ def execute(ctx, source, session, cls, mtd, parameter, timeout, stream=False):
 
 
 def getKwArgs(parameter, stream=False):
-    print("Request.getKWArgs() 1")
-    kwargs = json.loads(parameter.toJson(stream))
+    args = parameter.toJson(stream)
+    print("Request.getKWArgs() Args: %s" % args)
+    kwargs = json.loads(args)
     if parameter.NoAuth:
         print("Request.getKWArgs() NoAuth")
         kwargs['auth'] = NoOAuth2()
@@ -117,7 +118,6 @@ def getKwArgs(parameter, stream=False):
     elif parameter.Text:
         print("Request.getKWArgs() Text")
         kwargs['data'] = parameter.Text
-    print("Request.getKWArgs() 2")
     return kwargs
 
 
