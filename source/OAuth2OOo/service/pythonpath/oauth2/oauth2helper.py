@@ -27,6 +27,8 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
+import uno
+
 from com.sun.star.frame.DispatchResultState import SUCCESS
 from com.sun.star.frame.DispatchResultState import FAILURE
 
@@ -35,6 +37,10 @@ from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 from .wizard import Wizard
 from .wizard import WizardController
 
+from .unotool import createService
+from .unotool import getConfiguration
+
+from .configuration import g_identifier
 from .configuration import g_wizard_page
 from .configuration import g_wizard_paths
 
@@ -58,10 +64,20 @@ def getAccessToken(ctx, model, parent):
 def showOAuth2Wizard(ctx, model, parent):
     state = FAILURE
     result = ()
-    wizard = Wizard(ctx, g_wizard_page, True, parent)
+    config = getConfiguration(ctx, g_identifier)
+    unowizard = config.getByName('UnoWizard')
+    config.dispose()
+    if unowizard:
+        wizard = createService(ctx, 'com.sun.star.ui.dialogs.Wizard')
+    else:
+        wizard = Wizard(ctx, g_wizard_page, True, parent)
     controller = WizardController(ctx, wizard, model)
-    arguments = (g_wizard_paths, controller)
-    wizard.initialize(arguments)
+    if unowizard:
+        arguments = ((uno.Any('[][]short', g_wizard_paths), controller), )
+        uno.invoke(wizard, 'initialize', arguments)
+    else:
+        arguments = (g_wizard_paths, controller)
+        wizard.initialize(arguments)
     if wizard.execute() == OK:
         state = SUCCESS
         result = (controller.Url, controller.User, controller.Token)

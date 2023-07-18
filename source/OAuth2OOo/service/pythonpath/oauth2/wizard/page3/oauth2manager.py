@@ -31,14 +31,21 @@ import unohelper
 
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 
+from com.sun.star.ui.dialogs import XWizardPage
+
 from .oauth2view import OAuth2View
 
+from ...unolib import PropertySet
+
 from ...unotool import executeShell
+from ...unotool import getProperty
 
 import traceback
 
 
-class OAuth2Manager(unohelper.Base):
+class OAuth2Manager(unohelper.Base,
+                    XWizardPage,
+                    PropertySet):
     def __init__(self, ctx, wizard, model, pageid, parent):
         self._ctx = ctx
         self._wizard = wizard
@@ -66,6 +73,14 @@ class OAuth2Manager(unohelper.Base):
     def canAdvance(self):
         return self._model.isAuthorized()
 
+# XComponent
+    def dispose(self):
+        pass
+    def addEventListener(self, listener):
+        pass
+    def removeEventListener(self, listener):
+        pass
+
 # OAuth2Manager setter methods
     def notify(self, percent):
         self._view.notify(percent)
@@ -84,4 +99,11 @@ class OAuth2Manager(unohelper.Base):
                 self._view.showError(self._model.getTokenErrorTitle(), error)
         else:
             self._view.showError(*self._model.getAuthorizationMessage(error))
+
+    def _getPropertySetInfo(self):
+        properties = {}
+        ro = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
+        properties['PageId'] = getProperty('PageId', 'short', ro)
+        properties['Window'] = getProperty('Window', 'com.sun.star.awt.XWindow', ro)
+        return properties
 

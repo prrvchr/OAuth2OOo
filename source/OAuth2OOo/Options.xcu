@@ -29,6 +29,9 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:oor="http://openoffice.org/2001/registry"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prop oor:name="UnoWizard">
+    <value>false</value>
+  </prop>
   <prop oor:name="ConnectTimeout">
     <value>5</value>
   </prop>

@@ -56,7 +56,6 @@ class WizardController(unohelper.Base,
         self._wizard = wizard
         self._model = model
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
-        
 
     @property
     def User(self):
@@ -75,6 +74,7 @@ class WizardController(unohelper.Base,
 # XWizardController
     def createPage(self, parent, pageid):
         try:
+            print("WizardController.createPage() 1 PageId: %s" % pageid)
             msg = "PageId: %s ..." % pageid
             if pageid == 1:
                 page = WizardPage1(self._ctx, self._wizard, self._model, pageid, parent)
@@ -85,9 +85,7 @@ class WizardController(unohelper.Base,
             elif pageid == 4:
                 page = WizardPage4(self._ctx, self._wizard, self._model, pageid, parent)
             elif pageid == 5:
-                print("WizardController.createPage() 1")
                 page = WizardPage5(self._ctx, self._wizard, self._model, pageid, parent)
-                print("WizardController.createPage() 2")
             msg += " Done"
             self._logger.logp(INFO, 'WizardController', 'createPage()', msg)
             return page

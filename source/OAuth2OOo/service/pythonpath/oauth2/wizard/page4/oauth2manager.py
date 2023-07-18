@@ -31,16 +31,23 @@ import unohelper
 
 from com.sun.star.ui.dialogs.WizardTravelType import FORWARD
 
+from com.sun.star.ui.dialogs import XWizardPage
+
 from .oauth2handler import WindowHandler
 
 from .oauth2view import OAuth2View
 
+from ...unolib import PropertySet
+
 from ...unotool import executeShell
+from ...unotool import getProperty
 
 import traceback
 
 
-class OAuth2Manager(unohelper.Base):
+class OAuth2Manager(unohelper.Base,
+                    XWizardPage,
+                    PropertySet):
     def __init__(self, ctx, wizard, model, pageid, parent):
         self._ctx = ctx
         self._wizard = wizard
@@ -77,7 +84,22 @@ class OAuth2Manager(unohelper.Base):
     def canAdvance(self):
         return self._model.isCodeValid(self._view.getCode())
 
+# XComponent
+    def dispose(self):
+        pass
+    def addEventListener(self, listener):
+        pass
+    def removeEventListener(self, listener):
+        pass
+
 # OAuth2Manager setter methods
     def setAuthorization(self):
         self._wizard.updateTravelUI()
+
+    def _getPropertySetInfo(self):
+        properties = {}
+        ro = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
+        properties['PageId'] = getProperty('PageId', 'short', ro)
+        properties['Window'] = getProperty('Window', 'com.sun.star.awt.XWindow', ro)
+        return properties
 
