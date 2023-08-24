@@ -257,7 +257,7 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
 ### What has been done for version 1.1.1:
 
-- Fixed an issue in the implementation of the com.sun.star.rest.XParameter interface not allowing to create empty JSON objects (ie: "Object": {} ) as requested by the Microsoft Graph API.
+- Fixed an issue in [the implementation][72] of the com.sun.star.rest.XParameter interface not allowing to create empty JSON objects (ie: "Object": {} ) as requested by the Microsoft Graph API.
 
 ### What remains to be done for version 1.1.1:
 
@@ -336,3 +336,4 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 [69]: <https://pypi.org/project/selenium/4.10/>
 [70]: <https://pypi.org/project/webdriver-manager/3.8.6/>
 [71]: <https://developer.mozilla.org/en-US/docs/Web/WebDriver>
+[72]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestparameter.py>
