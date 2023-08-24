@@ -4,7 +4,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][3] et à notre [Politique de protection des données][4].**
 
-# version [1.1.0][5]
+# version [1.1.1][5]
 
 ## Introduction:
 
@@ -54,7 +54,7 @@ ___
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.1.0.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.1.1.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -255,9 +255,11 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 
 - La formule Calc `GETHTTPBOBY` a été renommée en `HTTPCONTENT`.
 
-### Que reste-t-il à faire pour la version 1.1.0:
+### Ce qui a été fait pour la version 1.1.1:
 
-- Ecriture de l'implémentation du bouton Aide (CommandButton5) dans la nouvelle interface [XWizard][28].
+- Correction d'un problème dans l'implémentation de l'interface com.sun.star.rest.XParameter ne permettant pas de créer des objets JSON vides (ie : "Object": {} ) comme demandé par l'API Microsoft Graph.
+
+### Que reste-t-il à faire pour la version 1.1.1:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 

@@ -240,7 +240,10 @@ class RequestParameter(unohelper.Base,
         if keys:
             key = keys.pop()
             item = self._getLastItem(keys, self._json)
-            item[key] = value
+            # FIXME: If we want to be able to create empty JSON object: (ie: "item": {}) as claimed
+            # FIXME: in the Microsoft Graph API then put a trailing slash on the path...
+            if key:
+                item[key] = value
 
     def setQuery(self, key, value):
         self._query[key] = value
