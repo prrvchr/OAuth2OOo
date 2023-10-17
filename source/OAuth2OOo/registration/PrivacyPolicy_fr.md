@@ -49,7 +49,7 @@ Pour fonctionner, `OAuth2OOo` et/ou `Extension` doivent conserver des données l
 
 L'emplacement de ces données est le répertoire d'installation de l'application `OAuth2OOo` et/ou `Extension`, respectivement.
 
-**`OAuth2OOo` et/ou `Extension` ne collectent aucune donnée sur des serveurs externes, d'aucune manières.**
+`OAuth2OOo` et/ou `Extension` **ne collectent aucune donnée sur des serveurs externes, d'aucune manières.**
 
 La suppression des données collectées par `OAuth2OOo` et/ou `Extension` est garantie par la désinstallation de l'application `OAuth2OOo` et/ou `Extension`, respectivement.
 
@@ -60,30 +60,30 @@ Le `Fournisseur` est seul responsable de l'utilisation des données qu'il collec
 ___
 ## Sécurité de vos informations personnelles:
 
-Étant donné que les données collectées par `OAuth2OOo` et/ou `Extension` sont situées sur l'`Ordinateur`, seul **l'`Utilisateur` est responsable de la sécurité des données collectées**.
+Étant donné que les données collectées par `OAuth2OOo` et/ou `Extension` sont situées sur l'`Ordinateur`, **seul l'**`Utilisateur` **est responsable de la sécurité des données collectées**.
 
 L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la politique de protection des données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
 
 Le `Fournisseur` est seul responsable de la sécurité des données qu'il collecte, comme décrit dans sa politique de protection des données.
 
 ___
-## Nature des données collectées:
+## Nature et étendue des droits sur les données collectées:
 
-`OAuth2OOo` à en charge d'obtenir votre autorisation afin que les `Extension` installées sur l'`Ordinateur` puissent acceder à vos données personnelles detenue chez le `Fournisseur`. De ce fait la nature des données collectées depent de l'`Extension` utilisée et dont voici la liste exhaustive:
-- [Nature des données collectées][19] pour `gContactOOo`.
-- [Nature des données collectées][20] pour `mContactOOo`.
-- [Nature des données collectées][21] pour `vCardOOo`.
-- [Nature des données collectées][22] pour `gDriveOOo`.
-- [Nature des données collectées][23] pour `mDriveOOo`.
-- [Nature des données collectées][24] pour `dDriveOOo`.
-- [Nature des données collectées][25] pour `eMailerOOo`.
+`OAuth2OOo` à en charge d'obtenir votre autorisation afin que les `Extension` installées sur l'`Ordinateur` puissent acceder à vos données personnelles detenue chez le `Fournisseur`. De ce fait la nature et l'étendue des droits sur les données collectées dépendent de l'`Extension` utilisée dont voici la liste exhaustive:
+- [Nature et étendue des droits][19] pour `gContactOOo`.
+- [Nature et étendue des droits][20] pour `mContactOOo`.
+- [Nature et étendue des droits][21] pour `vCardOOo`.
+- [Nature et étendue des droits][22] pour `gDriveOOo`.
+- [Nature et étendue des droits][23] pour `mDriveOOo`.
+- [Nature et étendue des droits][24] pour `dDriveOOo`.
+- [Nature et étendue des droits][25] pour `eMailerOOo`.
 
 ___
 ## Expiration des données collectées:
 
 La mise à jour des données collectées localement est effectuée chaque fois que `OAuth2OOo` et/ou `Extension` sont utilisés.
 
-**La suppression des données collectées localement est possible en désinstallant `OAuth2OOo` et/ou `Extension`, respectivement**.
+**La suppression des données collectées localement est possible en désinstallant** `OAuth2OOo` et/ou `Extension`, **respectivement**.
 
 Il est de la responsabilité de l'`Utilisateur` de désinstaller `OAuth2OOo` et/ou `Extension` afin de supprimer les données collectées.
 
@@ -109,10 +109,10 @@ Le `Fournisseur` est seul responsable de l'expiration des données qu'il collect
 [16]: <https://prrvchr.github.io/gDriveOOo/source/gDriveOOo/registration/PrivacyPolicy_fr>
 [17]: <https://prrvchr.github.io/mDriveOOo/source/mDriveOOo/registration/PrivacyPolicy_fr>
 [18]: <https://prrvchr.github.io/eMailerOOo/source/eMailerOOo/registration/PrivacyPolicy_fr>
-[19]: <https://prrvchr.github.io/gContactOOo/source/gContactOOo/registration/PrivacyPolicy_fr#nature-des-données-collectées>
-[20]: <https://prrvchr.github.io/mContactOOo/source/mContactOOo/registration/PrivacyPolicy_fr#nature-des-données-collectées>
-[21]: <https://prrvchr.github.io/vCardOOo/source/vCardOOo/registration/PrivacyPolicy_fr#nature-des-données-collectées>
-[22]: <https://prrvchr.github.io/dDriveOOo/source/dDriveOOo/registration/PrivacyPolicy_fr#nature-des-données-collectées>
-[23]: <https://prrvchr.github.io/gDriveOOo/source/gDriveOOo/registration/PrivacyPolicy_fr#nature-des-données-collectées>
-[24]: <https://prrvchr.github.io/mDriveOOo/source/mDriveOOo/registration/PrivacyPolicy_fr#nature-des-données-collectées>
-[25]: <https://prrvchr.github.io/eMailerOOo/source/eMailerOOo/registration/PrivacyPolicy_fr#nature-des-données-collectées>
+[19]: <https://prrvchr.github.io/gContactOOo/source/gContactOOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-les-données-collectées>
+[20]: <https://prrvchr.github.io/mContactOOo/source/mContactOOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-les-données-collectées>
+[21]: <https://prrvchr.github.io/vCardOOo/source/vCardOOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-les-données-collectées>
+[22]: <https://prrvchr.github.io/dDriveOOo/source/dDriveOOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-les-données-collectées>
+[23]: <https://prrvchr.github.io/gDriveOOo/source/gDriveOOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-les-données-collectées>
+[24]: <https://prrvchr.github.io/mDriveOOo/source/mDriveOOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-les-données-collectées>
+[25]: <https://prrvchr.github.io/eMailerOOo/source/eMailerOOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-les-données-collectées>
