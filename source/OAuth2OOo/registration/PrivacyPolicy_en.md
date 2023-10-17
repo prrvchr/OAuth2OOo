@@ -69,7 +69,7 @@ Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject yo
 ___
 ## Nature and scope rights over the data collected:
 
-`OAuth2OOo` is responsible for obtaining your authorization so that the `Extension` installed on the `Computer` can access your personal data held by the `Supplier`. Therefore the nature and scope rights over the data collected depend on the “Extension” used, of which here is the exhaustive list:
+`OAuth2OOo` is responsible for obtaining your authorization so that the `Extension` installed on the `Computer` can access your personal data held by the `Supplier`. Therefore the nature and scope rights over the data collected depend on the `Extension` used, of which here is the exhaustive list:
 - [Nature and scope rights][19] for `gContactOOo`.
 - [Nature and scope rights][20] for `mContactOOo`.
 - [Nature and scope rights][21] for `vCardOOo`.
@@ -79,7 +79,7 @@ ___
 - [Nature and scope rights][25] for `eMailerOOo`.
 
 ___
-## Expiry of collected data:
+## Expiration of collected data:
 
 Updating the data collected locally is done each time `OAuth2OOo` and/or `Extension` is used.
 

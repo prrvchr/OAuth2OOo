@@ -69,7 +69,7 @@ Le `Fournisseur` est seul responsable de la sécurité des données qu'il collec
 ___
 ## Nature et étendue des droits sur les données collectées:
 
-`OAuth2OOo` à en charge d'obtenir votre autorisation afin que les `Extension` installées sur l'`Ordinateur` puissent acceder à vos données personnelles detenue chez le `Fournisseur`. De ce fait la nature et l'étendue des droits sur les données collectées dépendent de l'`Extension` utilisée dont voici la liste exhaustive:
+`OAuth2OOo` à en charge d'obtenir votre autorisation afin que les `Extension` installées sur l'`Ordinateur` puissent acceder à vos données personnelles detenue chez le `Fournisseur`. De ce fait la nature et l'étendue des droits sur les données collectées dépendent de l'`Extension` utilisée, dont voici la liste exhaustive:
 - [Nature et étendue des droits][19] pour `gContactOOo`.
 - [Nature et étendue des droits][20] pour `mContactOOo`.
 - [Nature et étendue des droits][21] pour `vCardOOo`.
