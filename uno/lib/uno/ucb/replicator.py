@@ -69,7 +69,7 @@ import time
 
 class Replicator(unohelper.Base,
                  Thread):
-    def __init__(self, ctx, datasource, provider, users, sync, lock):
+    def __init__(self, ctx, url, provider, users, sync, lock):
         Thread.__init__(self)
         self._ctx = ctx
         self._users = users
@@ -77,10 +77,10 @@ class Replicator(unohelper.Base,
         self._lock = lock
         self._canceled = False
         self._fullPull = False
-        self.DataBase = DataBase(ctx, datasource)
         self._provider = provider
         self._config = getConfiguration(ctx, g_identifier, False)
         self._logger = getLogger(ctx, g_synclog, g_basename)
+        self.DataBase = DataBase(ctx, self._logger, url)
         sync.clear()
         self.start()
 
@@ -176,7 +176,7 @@ class Replicator(unohelper.Base,
                 start = user.TimeStamp
                 for item in self.DataBase.getPushItems(user.Id, start, end):
                     print("Replicator._pushUsers() 1 Start: %s - End: %s" % (getDateTimeInTZToString(start), getDateTimeInTZToString(end)))
-                    print("Replicator._pushUsers() 2 Item: UserName: %s - ItemId: %s - ChangeAction: %s - TimeStamp: %s" % (user.Name, item.get('ItemId'),item.get('ChangeAction'),getDateTimeInTZToString(item.get('TimeStamp'))))
+                    print("Replicator._pushUsers() 2 Item: UserName: %s - ItemId: %s - ChangeAction: %s - TimeStamp: %s" % (user.Name, item.get('Id'),item.get('ChangeAction'),getDateTimeInTZToString(item.get('TimeStamp'))))
                     metadata = self.DataBase.getMetaData(user, item)
                     newid = self._pushItem(user, item, metadata, start, end)
                     if newid is not None:
@@ -222,7 +222,7 @@ class Replicator(unohelper.Base,
 
     def _pushItem(self, user, item, metadata, start, end):
         try:
-            itemid = item.get('ItemId')
+            itemid = item.get('Id')
             newid = None
             timestamp = item.get('TimeStamp')
             action = item.get('ChangeAction')
