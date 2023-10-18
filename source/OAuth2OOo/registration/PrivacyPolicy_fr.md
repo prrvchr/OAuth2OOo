@@ -30,9 +30,9 @@ Pour plus de simplicité, dans la suite de ce document, on nommera:
 - [Politique de protection des données][12] pour `gContactOOo`.
 - [Politique de protection des données][13] pour `mContactOOo`.
 - [Politique de protection des données][14] pour `vCardOOo`.
-- [Politique de protection des données][15] pour `gDriveOOo`.
-- [Politique de protection des données][16] pour `mDriveOOo`.
-- [Politique de protection des données][17] pour `dDriveOOo`.
+- [Politique de protection des données][15] pour `dDriveOOo`.
+- [Politique de protection des données][16] pour `gDriveOOo`.
+- [Politique de protection des données][17] pour `mDriveOOo`.
 - [Politique de protection des données][18] pour `eMailerOOo`.
 
 ___
@@ -73,9 +73,9 @@ ___
 - [Nature et étendue des droits][19] pour `gContactOOo`.
 - [Nature et étendue des droits][20] pour `mContactOOo`.
 - [Nature et étendue des droits][21] pour `vCardOOo`.
-- [Nature et étendue des droits][22] pour `gDriveOOo`.
-- [Nature et étendue des droits][23] pour `mDriveOOo`.
-- [Nature et étendue des droits][24] pour `dDriveOOo`.
+- [Nature et étendue des droits][22] pour `dDriveOOo`.
+- [Nature et étendue des droits][23] pour `gDriveOOo`.
+- [Nature et étendue des droits][24] pour `mDriveOOo`.
 - [Nature et étendue des droits][25] pour `eMailerOOo`.
 
 ___

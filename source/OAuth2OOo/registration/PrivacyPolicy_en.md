@@ -30,9 +30,9 @@ For simplicity, in the rest of this document, will be named:
 - [Data Protection Policy][12] for `gContactOOo`.
 - [Data Protection Policy][13] for `mContactOOo`.
 - [Data Protection Policy][14] for `vCardOOo`.
-- [Data Protection Policy][15] for `gDriveOOo`.
-- [Data Protection Policy][16] for `mDriveOOo`.
-- [Data Protection Policy][17] for `dDriveOOo`.
+- [Data Protection Policy][15] for `dDriveOOo`.
+- [Data Protection Policy][16] for `gDriveOOo`.
+- [Data Protection Policy][17] for `mDriveOOo`.
 - [Data Protection Policy][18] for `eMailerOOo`.
 
 ___
@@ -73,9 +73,9 @@ ___
 - [Nature and scope rights][19] for `gContactOOo`.
 - [Nature and scope rights][20] for `mContactOOo`.
 - [Nature and scope rights][21] for `vCardOOo`.
-- [Nature and scope rights][22] for `gDriveOOo`.
-- [Nature and scope rights][23] for `mDriveOOo`.
-- [Nature and scope rights][24] for `dDriveOOo`.
+- [Nature and scope rights][22] for `dDriveOOo`.
+- [Nature and scope rights][23] for `gDriveOOo`.
+- [Nature and scope rights][24] for `mDriveOOo`.
 - [Nature and scope rights][25] for `eMailerOOo`.
 
 ___
