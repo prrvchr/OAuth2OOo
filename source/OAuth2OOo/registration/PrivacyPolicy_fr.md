@@ -58,18 +58,9 @@ L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Ext
 Le `Fournisseur` est seul responsable de l'utilisation des données qu'il collecte, comme décrit dans sa politique de protection des données.
 
 ___
-## Sécurité de vos informations personnelles:
+## Nature et étendue des droits sur vos données:
 
-Étant donné que les données collectées par `OAuth2OOo` et/ou `Extension` sont situées sur l'`Ordinateur`, **seul l'**`Utilisateur` **est responsable de la sécurité des données collectées**.
-
-L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la politique de protection des données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
-
-Le `Fournisseur` est seul responsable de la sécurité des données qu'il collecte, comme décrit dans sa politique de protection des données.
-
-___
-## Nature et étendue des droits sur les données collectées:
-
-`OAuth2OOo` à en charge d'obtenir votre autorisation afin que les `Extension` installées sur l'`Ordinateur` puissent acceder à vos données personnelles detenue chez le `Fournisseur`. De ce fait la nature et l'étendue des droits sur les données collectées dépendent de l'`Extension` utilisée, dont voici la liste exhaustive:
+`OAuth2OOo` à en charge d'obtenir votre autorisation afin que les `Extension` installées sur l'`Ordinateur` puissent acceder à vos données personnelles detenue chez le `Fournisseur`. De ce fait la nature et l'étendue des droits sur vos données dépendent de l'`Extension` utilisée, dont voici la liste exhaustive:
 - [Nature et étendue des droits][19] pour `gContactOOo`.
 - [Nature et étendue des droits][20] pour `mContactOOo`.
 - [Nature et étendue des droits][21] pour `vCardOOo`.
@@ -77,6 +68,15 @@ ___
 - [Nature et étendue des droits][23] pour `gDriveOOo`.
 - [Nature et étendue des droits][24] pour `mDriveOOo`.
 - [Nature et étendue des droits][25] pour `eMailerOOo`.
+
+___
+## Sécurité des données collectées:
+
+Étant donné que les données collectées par `OAuth2OOo` et/ou `Extension` sont situées sur l'`Ordinateur`, **seul l'**`Utilisateur` **est responsable de la sécurité des données collectées**.
+
+L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la politique de protection des données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
+
+Le `Fournisseur` est seul responsable de la sécurité des données qu'il collecte, comme décrit dans sa politique de protection des données.
 
 ___
 ## Expiration des données collectées:

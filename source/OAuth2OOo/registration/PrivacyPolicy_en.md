@@ -58,18 +58,9 @@ Use of the `Supplier` services through `OAuth2OOo` and/or `Extension`, may submi
 `Supplier` is solely responsible for the use of the data it collects as described in its Policy.
 
 ___
-## Security of your personal information:
+## Nature and scope rights over your data:
 
-Since the data collected by `OAuth2OOo` and/or `Extension` is located on the `Computer`, **only the** `User` **is responsible for the security of the data collected**.
-
-Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
-
-`Supplier` is solely responsible for the security of the data it collects as described in its Policy.
-
-___
-## Nature and scope rights over the data collected:
-
-`OAuth2OOo` is responsible for obtaining your authorization so that the `Extension` installed on the `Computer` can access your personal data held by the `Supplier`. Therefore the nature and scope rights over the data collected depend on the `Extension` used, of which here is the exhaustive list:
+`OAuth2OOo` is responsible for obtaining your authorization so that the `Extension` installed on the `Computer` can access your personal data held by the `Supplier`. Therefore the nature and scope rights over your data depend on the `Extension` used, of which here is the exhaustive list:
 - [Nature and scope rights][19] for `gContactOOo`.
 - [Nature and scope rights][20] for `mContactOOo`.
 - [Nature and scope rights][21] for `vCardOOo`.
@@ -77,6 +68,15 @@ ___
 - [Nature and scope rights][23] for `gDriveOOo`.
 - [Nature and scope rights][24] for `mDriveOOo`.
 - [Nature and scope rights][25] for `eMailerOOo`.
+
+___
+## Security of collected data:
+
+Since the data collected by `OAuth2OOo` and/or `Extension` is located on the `Computer`, **only the** `User` **is responsible for the security of the data collected**.
+
+Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
+
+`Supplier` is solely responsible for the security of the data it collects as described in its Policy.
 
 ___
 ## Expiration of collected data:
