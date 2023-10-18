@@ -62,7 +62,7 @@ ___
 
 Since the data collected by `OAuth2OOo` and/or `Extension` is located on the `Computer`, **only the** `User` **is responsible for the security of the data collected**.
 
-Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to review this Policy from the `Supplier` website.
+Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
 
 `Supplier` is solely responsible for the security of the data it collects as described in its Policy.
 
@@ -87,7 +87,7 @@ Updating the data collected locally is done each time `OAuth2OOo` and/or `Extens
 
 It is the responsibility of the `User` to uninstall `OAuth2OOo` and/or `Extension` in order to delete the collected data.
 
-Use of the `Supplier` services via `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to review this Policy from the `Supplier` website.
+Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
 
 `Supplier` is solely responsible for the expiration of the data it collects as described in its Policy.
 
