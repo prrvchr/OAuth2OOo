@@ -109,10 +109,10 @@ Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subjec
 [16]: <https://prrvchr.github.io/gDriveOOo/source/gDriveOOo/registration/PrivacyPolicy_en>
 [17]: <https://prrvchr.github.io/mDriveOOo/source/mDriveOOo/registration/PrivacyPolicy_en>
 [18]: <https://prrvchr.github.io/eMailerOOo/source/eMailerOOo/registration/PrivacyPolicy_en>
-[19]: <https://prrvchr.github.io/gContactOOo/source/gContactOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-the-data-collected>
-[20]: <https://prrvchr.github.io/mContactOOo/source/mContactOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-the-data-collected>
-[21]: <https://prrvchr.github.io/vCardOOo/source/vCardOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-the-data-collected>
-[22]: <https://prrvchr.github.io/dDriveOOo/source/dDriveOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-the-data-collected>
-[23]: <https://prrvchr.github.io/gDriveOOo/source/gDriveOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-the-data-collected>
-[24]: <https://prrvchr.github.io/mDriveOOo/source/mDriveOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-the-data-collected>
-[25]: <https://prrvchr.github.io/eMailerOOo/source/eMailerOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-the-data-collected>
+[19]: <https://prrvchr.github.io/gContactOOo/source/gContactOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
+[20]: <https://prrvchr.github.io/mContactOOo/source/mContactOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
+[21]: <https://prrvchr.github.io/vCardOOo/source/vCardOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
+[22]: <https://prrvchr.github.io/dDriveOOo/source/dDriveOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
+[23]: <https://prrvchr.github.io/gDriveOOo/source/gDriveOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
+[24]: <https://prrvchr.github.io/mDriveOOo/source/mDriveOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
+[25]: <https://prrvchr.github.io/eMailerOOo/source/eMailerOOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
