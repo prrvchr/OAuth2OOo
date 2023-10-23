@@ -6,8 +6,7 @@ jobs:
     name: machineStandalone job
     runs-on: ubuntu-22.04
     steps:
-      - name: machineStandalone
-        uses: actions/checkout@master
-        uses: docker://ghcr.io/fluidattacks/makes/amd64:22.04
+      - uses: actions/checkout@master
+      - uses: docker://ghcr.io/fluidattacks/makes/amd64:22.04
         with:
           args: m gitlab:fluidattacks/universe@trunk /skims scan ./config.yaml
