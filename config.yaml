@@ -1,0 +1,17 @@
+namespace: OWASP
+output:
+  file_path: ./Fluid-Attacks-Results.csv
+  format: CSV
+working_dir: .
+sast:
+  include:
+    - .
+sca:
+  include:
+    - .
+# Note: uncomment this if you want to analyze .apk files.
+# apk:
+  # include:
+    #- /app/app-arm-debug-Android5.apk
+    #- /app/app-arm-debug.apk
+language: EN
