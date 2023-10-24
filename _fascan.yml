@@ -1,4 +1,4 @@
-namespace: OWASP
+namespace: OAuth2OOo
 output:
   file_path: ./Fluid-Attacks-Results.csv
   format: CSV
