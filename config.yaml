@@ -5,13 +5,9 @@ output:
 working_dir: .
 sast:
   include:
-    - .
+    - source/OAuth2OOo/service/pythonpath/oauth2/
+    - glob(source/OAuth2OOo/service/*.py)
 sca:
   include:
     - .
-# Note: uncomment this if you want to analyze .apk files.
-# apk:
-  # include:
-    #- /app/app-arm-debug-Android5.apk
-    #- /app/app-arm-debug.apk
 language: EN
