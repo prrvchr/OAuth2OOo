@@ -264,7 +264,6 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 - Modification of the idl files: [XRequestParameter.idl][57] and [XRequestResponse.idl][58] and the underlying python implementations: [requestparameter.py][72] and [requestresponse.py][73] in order to make it possible **POST** requests with **application/x-www-form-urlencoded** encoding.
 - 3 macros in Basic: `ChatGPTRequest`, `HTTPGetRequest` and `HTTPPostRequest` are available in: **Tools -> Macros -> Run Macros... -> My Macros -> OAuth2OOo**. Be careful, these macros **will not work if no document is open** (I don't know why?)...
 
-
 ### What remains to be done for version 1.1.2:
 
 - Add new language for internationalization...
@@ -343,3 +342,4 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 [70]: <https://pypi.org/project/webdriver-manager/3.8.6/>
 [71]: <https://developer.mozilla.org/en-US/docs/Web/WebDriver>
 [72]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestparameter.py>
+[73]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestresponse.py>
