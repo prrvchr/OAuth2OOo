@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="HTTPPostRequest" script:language="StarBasic">
+
+Rem ╔════════════════════════════════════════════════════════════════════════════════════╗
+Rem ║                                                                                    ║
+Rem ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
+Rem ║                                                                                    ║
+Rem ║   Permission is hereby granted, free of charge, to any person obtaining            ║
+Rem ║   a copy of this software and associated documentation files (the &quot;Software&quot;),     ║
+Rem ║   to deal in the Software without restriction, including without limitation        ║
+Rem ║   the rights to use, copy, modify, merge, publish, distribute, sublicense,         ║
+Rem ║   and/or sell copies of the Software, and to permit persons to whom the Software   ║
+Rem ║   is furnished to do so, subject to the following conditions:                      ║
+Rem ║                                                                                    ║
+Rem ║   The above copyright notice and this permission notice shall be included in       ║
+Rem ║   all copies or substantial portions of the Software.                              ║
+Rem ║                                                                                    ║
+Rem ║   THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,                  ║
+Rem ║   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES                  ║
+Rem ║   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.        ║
+Rem ║   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY             ║
+Rem ║   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,             ║
+Rem ║   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE       ║
+Rem ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
+Rem ║                                                                                    ║
+Rem ╚════════════════════════════════════════════════════════════════════════════════════╝
+
+Sub Main
+
+    Rem Ask the user for a POST data
+    sValue = InputBox(&quot;Please enter a POST data&quot;, _
+                      &quot;POST request example&quot;)
+    Rem User clicked Cancel
+    if sValue = &quot;&quot; then
+        exit sub
+    endif
+
+    sKey = &quot;Key1&quot;
+
+    Rem First we need to create the UNO OAuth2Service
+    oauth2 = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
+
+    Rem To execute an HTTP request we first need a HTTP Request parameter
+    parameter = oauth2.getRequestParameter(&quot;httpbin&quot;)
+
+    Rem Default Requests method is GET and must be changed
+    parameter.Method = &quot;POST&quot;
+
+    parameter.Url = &quot;https://httpbin.org/post&quot;
+
+    Rem Default authentication is OAuth2 but can be disabled with:
+    parameter.NoAuth = true
+
+    Rem We set the POST application/x-www-form-urlencoded data:
+    parameter.setForm(sKey, sValue)
+
+    Rem To obtain the HTTP response we use the execute() method
+    Rem of the OAuth2Service service with the HTTP parameter as argument
+    response = oauth2.execute(parameter)
+
+    if response.Ok then
+        Rem Normally if response content type is application/x-www-form-urlencoded, to access key/value pair we do:
+        Rem sValue = response.getForm().getString(sKey)
+        Rem But we use httpbin and all response have application/json content type, so we do:
+        sText = &quot;Your POST data is: &quot; + response.getJson().getStructure(&quot;form&quot;).getString(sKey)
+    else
+        sText = response.Text
+    endif
+
+    Rem When it is finished we have to close the HTTP response
+    response.close()
+
+    Msgbox sText
+
+End Sub
+
+</script:module>

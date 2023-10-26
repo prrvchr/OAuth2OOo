@@ -79,6 +79,7 @@ import json
 # FIXME: then we cannot import JSONDecoderError it is not yet available
 # from requests.exceptions import JSONDecodeError
 from json.decoder import JSONDecodeError
+from urllib.parse import parse_qs
 import traceback
 
 
@@ -231,7 +232,6 @@ class RequestResponse(unohelper.Base,
         self._ctx = ctx
         self._parameter = parameter
         self._response = response
-        print("RequestResponse.__init__() 1")
 
     @property
     def Parameter(self):
@@ -300,11 +300,19 @@ class RequestResponse(unohelper.Base,
     def getHeader(self, key):
         return self._response.headers.get(key, '')
 
+    def getForm(self):
+        try:
+            data = parse_qs(self._response.content, encoding=self._response.encoding)
+        except ValueError as e:
+            raiseJSONDecodeException(self._ctx, self, 'RequestResponse', 'getForm()', self._parameter.Name, 105, self._response)
+        else:
+            return getJsonStructure(data)
+
     def getJson(self):
         try:
             data = self._response.json()
         except JSONDecodeError as e:
-            raiseJSONDecodeException(self._ctx, self, 'RequestResponse', 'raiseForStatus()', self._parameter.Name, 105, self._response)
+            raiseJSONDecodeException(self._ctx, self, 'RequestResponse', 'getJson()', self._parameter.Name, 105, self._response)
         else:
             return getJsonStructure(data)
 

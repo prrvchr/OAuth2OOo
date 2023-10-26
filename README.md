@@ -4,7 +4,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][3] and [Data Protection Policy][4].**
 
-# version [1.1.1][5]
+# version [1.1.2][5]
 
 ## Introduction:
 
@@ -54,7 +54,7 @@ ___
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** extension version 1.1.1.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** extension version 1.1.2.
 
 - Restart LibreOffice / OpenOffice after installation.
 
@@ -259,7 +259,13 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
 - Fixed an issue in [the implementation][72] of the com.sun.star.rest.XParameter interface not allowing to create empty JSON objects (ie: "Object": {} ) as requested by the Microsoft Graph API.
 
-### What remains to be done for version 1.1.1:
+### What has been done for version 1.1.2:
+
+- Modification of the idl files: [XRequestParameter.idl][57] and [XRequestResponse.idl][58] and the underlying python implementations: [requestparameter.py][72] and [requestresponse.py][73] in order to make it possible **POST** requests with **application/x-www-form-urlencoded** encoding.
+- 3 macros in Basic: `ChatGPTRequest`, `HTTPGetRequest` and `HTTPPostRequest` are available in: **Tools -> Macros -> Run Macros... -> My Macros -> OAuth2OOo**. Be careful, these macros **will not work if no document is open** (I don't know why?)...
+
+
+### What remains to be done for version 1.1.2:
 
 - Add new language for internationalization...
 

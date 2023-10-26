@@ -54,6 +54,7 @@ class RequestParameter(unohelper.Base,
         self._url = ''
         self._headers = {}
         self._query = {}
+        self._forms = {}
         self._json = {}
         self._data = uno.ByteSequence(b'')
         self._text = ''
@@ -235,6 +236,9 @@ class RequestParameter(unohelper.Base,
     def setHeader(self, key, value):
         self._headers[key] = value
 
+    def setForm(self, key, value):
+        self._forms[key] = value
+
     def setJson(self, path, value):
         keys = path.split(self._sep)
         if keys:
@@ -269,7 +273,9 @@ class RequestParameter(unohelper.Base,
             if self._type & QUERY == QUERY:
                 data.update(nextdata)
             kwargs['params'] = data
-        if self._json or self._type & JSON == JSON:
+        if self._forms:
+            kwargs['data'] = self._forms
+        elif self._json or self._type & JSON == JSON:
             if self._type & JSON == JSON:
                 data = nextdata
             else:

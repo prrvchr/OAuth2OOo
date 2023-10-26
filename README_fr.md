@@ -4,7 +4,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][3] et à notre [Politique de protection des données][4].**
 
-# version [1.1.1][5]
+# version [1.1.2][5]
 
 ## Introduction:
 
@@ -54,7 +54,7 @@ ___
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.1.1.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.1.2.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -259,7 +259,12 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 
 - Correction d'un problème dans [l'implémentation][72] de l'interface com.sun.star.rest.XParameter ne permettant pas de créer des objets JSON vides (ie : "Object": {} ) comme demandé par l'API Microsoft Graph.
 
-### Que reste-t-il à faire pour la version 1.1.1:
+### Ce qui a été fait pour la version 1.1.2:
+
+- Modification des fichiers idl: [XRequestParameter.idl][57] et [XRequestResponse.idl][58] et des implementations python sous jacente: [requestparameter.py][72] et [requestresponse.py][73] afin de rendre possible les requêtes **POST** avec l'encodage **application/x-www-form-urlencoded**.
+- 3 macros en Basic: `ChatGPTRequest`, `HTTPGetRequest` et `HTTPPostRequest` sont disponible dans: **Outils -> Macros -> Exécuter la macro... -> Mes macros -> OAuth2OOo**. Attention, ces macros **ne fonctionneront pas si aucun document n'est ouvert** (je ne sais pas pourquoi?)...
+
+### Que reste-t-il à faire pour la version 1.1.2:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -337,3 +342,4 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 [70]: <https://pypi.org/project/webdriver-manager/3.8.6/>
 [71]: <https://developer.mozilla.org/en-US/docs/Web/WebDriver>
 [72]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestparameter.py>
+[73]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestresponse.py>
