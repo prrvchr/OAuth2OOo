@@ -257,7 +257,7 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 
 ### Ce qui a été fait pour la version 1.1.1:
 
-- Correction d'un problème dans [l'implémentation][72] de l'interface com.sun.star.rest.XParameter ne permettant pas de créer des objets JSON vides (ie : "Object": {} ) comme demandé par l'API Microsoft Graph.
+- Correction d'un problème dans [l'implémentation][72] de l'interface [com.sun.star.rest.XRequestParameter][57] ne permettant pas de créer des objets JSON vides (ie : "Object": {} ) comme demandé par l'API Microsoft Graph.
 
 ### Ce qui a été fait pour la version 1.1.2:
 

@@ -257,7 +257,7 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
 ### What has been done for version 1.1.1:
 
-- Fixed an issue in [the implementation][72] of the com.sun.star.rest.XParameter interface not allowing to create empty JSON objects (ie: "Object": {} ) as requested by the Microsoft Graph API.
+- Fixed an issue in [the implementation][72] of the [com.sun.star.rest.XRequestParameter][57] interface not allowing to create empty JSON objects (ie: "Object": {} ) as requested by the Microsoft Graph API.
 
 ### What has been done for version 1.1.2:
 
