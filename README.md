@@ -347,4 +347,4 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 [72]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestparameter.py>
 [73]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestresponse.py>
 [74]: <https://github.com/prrvchr/OAuth2OOo/actions/workflows/dev.yml>
-[75]: <https://fluidattacks.com/>
+[75]: <https://github.com/fluidattacks>
