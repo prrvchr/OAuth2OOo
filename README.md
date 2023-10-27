@@ -267,6 +267,8 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
 - From now on, with each push, a [workflow perform a scan][74] on the code with [Fluid Attacks][75]. This was put in place to meet the re-validation requirements of the OAuth2OOo extension with Google.
 
+- For the same reasons, the [Data Protection Policy][4] has been modified in order to specify the [Nature and scope rights over your data][76].
+
 ### What remains to be done for version 1.1.2:
 
 - Add new language for internationalization...
@@ -348,3 +350,4 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 [73]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestresponse.py>
 [74]: <https://github.com/prrvchr/OAuth2OOo/actions/workflows/dev.yml>
 [75]: <https://github.com/fluidattacks>
+[76]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>

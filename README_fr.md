@@ -267,6 +267,8 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 
 - Désormais, à chaque push, un [workflow effectue un scan][74] du code avec [Fluid Attacks][75]. Ceci a été mis en place pour répondre aux exigences de re-validation de l'extension OAuth2OOo auprès de Google.
 
+- Pour les mêmes raisons, la [Politique de Protection des Données][4] a été modifiée afin de préciser la [Nature et l'étendue des droits sur vos données][76].
+
 ### Que reste-t-il à faire pour la version 1.1.2:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
@@ -348,3 +350,4 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 [73]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestresponse.py>
 [74]: <https://github.com/prrvchr/OAuth2OOo/actions/workflows/dev.yml>
 [75]: <https://github.com/fluidattacks>
+[76]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-vos-données>
