@@ -262,7 +262,9 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 ### What has been done for version 1.1.2:
 
 - Modification of the idl files: [XRequestParameter.idl][57] and [XRequestResponse.idl][58] and the underlying python implementations: [requestparameter.py][72] and [requestresponse.py][73] in order to make it possible **POST** requests with **application/x-www-form-urlencoded** encoding.
+
 - 3 macros in Basic: `ChatGPTRequest`, `HTTPGetRequest` and `HTTPPostRequest` are available in: **Tools -> Macros -> Run Macros... -> My Macros -> OAuth2OOo**. Be careful, these macros **will not work if no document is open** (I don't know why?)...
+
 - From now on, with each push, a [workflow perform a scan][74] on the code with [Fluid Attacks][75]. This was put in place to meet the re-validation requirements of the OAuth2OOo extension with Google.
 
 ### What remains to be done for version 1.1.2:
