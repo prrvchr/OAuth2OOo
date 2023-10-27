@@ -261,13 +261,13 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 
 ### Ce qui a été fait pour la version 1.1.2:
 
-- Modification des fichiers idl: [XRequestParameter.idl][57] et [XRequestResponse.idl][58] et des implementations python sous jacente: [requestparameter.py][72] et [requestresponse.py][73] afin de rendre possible les requêtes **POST** avec l'encodage **application/x-www-form-urlencoded**.
+- Modification des fichiers idl: [XRequestParameter.idl][57] et [XRequestResponse.idl][58] et des implementations python sous jacente: [requestparameter.py][72] et [requestresponse.py][73] afin de rendre possible les requêtes **POST** avec l'encodage **application/x-www-form-urlencoded**. Voir [dysfonctionnement #13][74].
 
 - 3 macros en Basic: `ChatGPTRequest`, `HTTPGetRequest` et `HTTPPostRequest` sont disponible dans: **Outils -> Macros -> Exécuter la macro... -> Mes macros -> OAuth2OOo**. Attention, ces macros **ne fonctionneront pas si aucun document n'est ouvert** (je ne sais pas pourquoi?)...
 
-- Désormais, à chaque push, un [workflow effectue un scan][74] du code avec [Fluid Attacks][75]. Ceci a été mis en place pour suivre le [Cloud Application Security Assessment][76] (CASA) et répondre aux exigences de revalidation de l'extension OAuth2OOo avec Google.
+- Désormais, à chaque push, un [workflow effectue un scan][75] du code avec [Fluid Attacks][76]. Ceci a été mis en place pour suivre le [Cloud Application Security Assessment][77] (CASA) et répondre aux exigences de revalidation de l'extension OAuth2OOo avec Google.
 
-- Pour les mêmes raisons, la [Politique de Protection des Données][4] a été modifiée afin de préciser la [Nature et l'étendue des droits sur vos données][77].
+- Pour les mêmes raisons, la [Politique de Protection des Données][4] a été modifiée afin de préciser la [Nature et l'étendue des droits sur vos données][78].
 
 ### Que reste-t-il à faire pour la version 1.1.2:
 
@@ -348,7 +348,8 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 [71]: <https://developer.mozilla.org/en-US/docs/Web/WebDriver>
 [72]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestparameter.py>
 [73]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestresponse.py>
-[74]: <https://github.com/prrvchr/OAuth2OOo/actions/workflows/dev.yml>
-[75]: <https://github.com/fluidattacks>
-[76]: <https://appdefensealliance.dev/casa/tier-2/tier2-overview>
-[77]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-vos-données>
+[74]: <https://github.com/prrvchr/OAuth2OOo/issues/13>
+[75]: <https://github.com/prrvchr/OAuth2OOo/actions/workflows/dev.yml>
+[76]: <https://github.com/fluidattacks>
+[77]: <https://appdefensealliance.dev/casa/tier-2/tier2-overview>
+[78]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-vos-données>
