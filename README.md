@@ -265,9 +265,9 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
 - 3 macros in Basic: `ChatGPTRequest`, `HTTPGetRequest` and `HTTPPostRequest` are available in: **Tools -> Macros -> Run Macros... -> My Macros -> OAuth2OOo**. Be careful, these macros **will not work if no document is open** (I don't know why?)...
 
-- From now on, with each push, a [workflow perform a scan][74] on the code with [Fluid Attacks][75]. This was put in place to meet the re-validation requirements of the OAuth2OOo extension with Google.
+- From now on, with each push, a [workflow perform a scan][74] on the code with [Fluid Attacks][75]. This has been implemented to follow the [Cloud Application Security Assessment][76] (CASA) and meet the requirements for revalidation of the OAuth2OOo extension with Google.
 
-- For the same reasons, the [Data Protection Policy][4] has been modified in order to specify the [Nature and scope rights over your data][76].
+- For the same reasons, the [Data Protection Policy][4] has been modified in order to specify the [Nature and scope rights over your data][77].
 
 ### What remains to be done for version 1.1.2:
 
@@ -350,4 +350,5 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 [73]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestresponse.py>
 [74]: <https://github.com/prrvchr/OAuth2OOo/actions/workflows/dev.yml>
 [75]: <https://github.com/fluidattacks>
-[76]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
+[76]: <https://appdefensealliance.dev/casa/tier-2/tier2-overview>
+[77]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
