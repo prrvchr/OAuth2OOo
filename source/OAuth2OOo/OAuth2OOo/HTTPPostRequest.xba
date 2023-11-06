@@ -38,41 +38,39 @@ Sub Main
 
     sKey = &quot;Key1&quot;
 
-    Rem First we need to create the UNO OAuth2Service
-    oauth2 = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
+    Rem First we need to create the UNO OAuth2Service without OAuth2
+    oRequest = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
 
     Rem To execute an HTTP request we first need a HTTP Request parameter
-    parameter = oauth2.getRequestParameter(&quot;httpbin&quot;)
+    oParameter = oRequest.getRequestParameter(&quot;httpbin&quot;)
 
     Rem Default Requests method is GET and must be changed
-    parameter.Method = &quot;POST&quot;
+    oParameter.Method = &quot;POST&quot;
 
-    parameter.Url = &quot;https://httpbin.org/post&quot;
-
-    Rem Default authentication is OAuth2 but can be disabled with:
-    parameter.NoAuth = true
+    oParameter.Url = &quot;https://httpbin.org/post&quot;
 
     Rem We set the POST application/x-www-form-urlencoded data:
-    parameter.setForm(sKey, sValue)
+    oParameter.setForm(sKey, sValue)
 
     Rem To obtain the HTTP response we use the execute() method
     Rem of the OAuth2Service service with the HTTP parameter as argument
-    response = oauth2.execute(parameter)
+    oResponse = oRequest.execute(oParameter)
 
-    if response.Ok then
+    if oResponse.Ok then
         Rem Normally if response content type is application/x-www-form-urlencoded, to access key/value pair we do:
-        Rem sValue = response.getForm().getString(sKey)
+        Rem sValue = oResponse.getForm().getString(sKey)
         Rem But we use httpbin and all response have application/json content type, so we do:
-        sText = &quot;Your POST data is: &quot; + response.getJson().getStructure(&quot;form&quot;).getString(sKey)
+        sText = &quot;Your POST data is: &quot; + oResponse.getJson().getStructure(&quot;form&quot;).getString(sKey)
     else
-        sText = response.Text
+        sText = oResponse.Text
     endif
 
     Rem When it is finished we have to close the HTTP response
-    response.close()
+    oResponse.close()
 
     Msgbox sText
 
 End Sub
 
 </script:module>
+

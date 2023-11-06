@@ -40,7 +40,7 @@ from com.sun.star.task import XInteractionHandler2
 
 from oauth2 import UserView
 from oauth2 import UserHandler
-from oauth2 import OAuth2Model
+from oauth2 import HandlerModel
 
 from oauth2 import getAccessToken
 
@@ -59,7 +59,7 @@ class OAuth2Handler(unohelper.Base,
                     XInteractionHandler2):
     def __init__(self, ctx):
         self._ctx = ctx
-        self._model = OAuth2Model(ctx, True)
+        self._model = HandlerModel(ctx)
         self._parent = None
         self._dialog = None
 

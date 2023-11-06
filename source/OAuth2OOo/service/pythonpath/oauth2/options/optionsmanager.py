@@ -33,14 +33,17 @@ import unohelper
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
+from .optionsmodel import OptionsModel
 from .optionsview import OptionsView
 from .optionshandler import OptionsListener
 
-from ..oauth2model import OAuth2Model
 from ..logger import LogManager
 
 from ..unotool import createService
+from ..unotool import executeFrameDispatch
+from ..unotool import getDesktop
 from ..unotool import getExceptionMessage
+from ..unotool import getPropertyValueSet
 
 from ..oauth2 import getOAuth2UserName
 from ..oauth2 import g_oauth2
@@ -60,7 +63,7 @@ import traceback
 class OptionsManager(unohelper.Base):
     def __init__(self, ctx, window):
         self._ctx = ctx
-        self._model = OAuth2Model(ctx)
+        self._model = OptionsModel(ctx)
         self._view = OptionsView(window)
         connect, read, handler, urls = self._model.getOptionsDialogData()
         self._view.initView(connect, read, handler, urls)
@@ -165,12 +168,14 @@ class OptionsManager(unohelper.Base):
                 message = self._model.getProviderName(url)
                 user = getOAuth2UserName(self._ctx, self, url, message)
                 print("OptionsManager.connect() 1 %s" % user)
-            autoclose = self._view.getAutoClose()
-            service = createService(self._ctx, g_oauth2)
-            enabled = service.getAuthorization(url, user, autoclose, self._view.getParent())
-            service.dispose()
+            close = self._view.getAutoClose()
+            args = getPropertyValueSet({'Url': url, 'UserName': user, 'Close': close})
+            frame = getDesktop(self._ctx).getCurrentFrame()
+            if frame is not None:
+                executeFrameDispatch(self._ctx, frame, 'oauth2:wizard', args)
         except Exception as e:
             msg = "Error: %s - %s" % (e, traceback.format_exc())
+            print(msg)
             getLogger(self._ctx, g_errorlog).logp(SEVERE, 'OptionsManager', 'connect()', msg)
 
     def _getExceptionMsg(self, e):

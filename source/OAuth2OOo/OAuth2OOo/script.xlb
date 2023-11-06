@@ -29,4 +29,6 @@
   <library:element library:name="ChatGPTRequest"/>
   <library:element library:name="HTTPGetRequest"/>
   <library:element library:name="HTTPPostRequest"/>
+  <library:element library:name="GoogleAPIRequest"/>
+  <library:element library:name="GraphAPIRequest"/>
 </library:library>

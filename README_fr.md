@@ -4,7 +4,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][3] et à notre [Politique de protection des données][4].**
 
-# version [1.1.2][5]
+# version [1.2.0][5]
 
 ## Introduction:
 
@@ -54,7 +54,7 @@ ___
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.1.2.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.2.0.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -197,9 +197,9 @@ ___
     - Une fabrique de structures JSON est accessible via l'interface `getJsonBuilder()` de [XRequestParameter][57].
     - Un analyseur Json est renvoyé par l'interface `getJson()` de [XRequestResponse][58].
 
-**Cela rend les requêtes HTTP utilisant JSON facilement utilisable dans le langage Basic de LibreOffice.**
+**Cela rend les requêtes HTTP utilisant JSON facilement utilisable dans le langage BASIC de LibreOffice.**
 
-Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][62].
+Voir les macros [Requêtes HTTP sous BASIC][61] et [Requêtes ChatGPT en BASIC][62].
 
 ### Ce qui a été fait pour la version 1.0.1:
 
@@ -263,13 +263,24 @@ Voir les macros [Requêtes HTTP sous Basic][61] et [Requêtes ChatGPT en Basic][
 
 - Modification des fichiers idl: [XRequestParameter.idl][57] et [XRequestResponse.idl][58] et des implementations python sous jacente: [requestparameter.py][72] et [requestresponse.py][73] afin de rendre possible les requêtes **POST** avec l'encodage **application/x-www-form-urlencoded**. Voir [dysfonctionnement #13][74].
 
-- 3 macros en Basic: `ChatGPTRequest`, `HTTPGetRequest` et `HTTPPostRequest` sont disponible dans: **Outils -> Macros -> Exécuter la macro... -> Mes macros -> OAuth2OOo**. Attention, ces macros **ne fonctionneront pas si aucun document n'est ouvert** (je ne sais pas pourquoi?)...
+- 3 macros en BASIC: `ChatGPTRequest`, `HTTPGetRequest` et `HTTPPostRequest` sont disponible dans: **Outils -> Macros -> Exécuter la macro... -> Mes macros -> OAuth2OOo**. Attention, ces macros **ne fonctionneront pas si aucun document n'est ouvert** (je ne sais pas pourquoi?)...
 
 - Désormais, à chaque push, un [workflow effectue un scan][75] du code avec [Fluid Attacks][76]. Ceci a été mis en place pour suivre le [Cloud Application Security Assessment][77] (CASA) et répondre aux exigences de revalidation de l'extension OAuth2OOo avec Google.
 
 - Pour les mêmes raisons, la [Politique de Protection des Données][4] a été modifiée afin de préciser la [Nature et l'étendue des droits sur vos données][78].
 
-### Que reste-t-il à faire pour la version 1.1.2:
+### Ce qui a été fait pour la version 1.2.0:
+
+- Il existe désormais deux méthodes pour créer le service OAuth2Service qui sont :
+  - `create()` sans paramètre, renvoie une instance du service.
+  - `createWithOAuth2([in] string sUrl, [in] string sUser)` avec une Url et l'adresse de l'utilisateur, renvoie une instance du service avec le protocole OAuth2.  
+    Dans sa deuxième forme, l'assistant d'autorisation OAuth2 (Wizard) se lancera automatiquement si l'étendue des droits de l'Url n'a pas encore été accordée par l'utilisateur (ie : première connexion).  
+    Si tel est le cas et que l'assistant est abandonné, une valeur nulle sera renvoyée à la place du service demandé.
+
+- Deux macros BASIC: `GoogleAPIRequest` et `GraphAPIRequest` permettent d'effectuer des requêtes HTTP sur les API de Google Contact et Microsoft Graph.  
+  Le protocole OAuth2 indispensable à l'utilisation de ces API est intégré de manière automatique et transparente aux requêtes HTTP. Vous n'aurez pas à vous en soucier.
+
+### Que reste-t-il à faire pour la version 1.2.0:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 

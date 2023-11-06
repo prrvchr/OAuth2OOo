@@ -41,54 +41,52 @@ Sub Main
     sQuery = &quot;How to make HTTP requests in Basic in LibreOffice?&quot;
 
     Rem First we need to create the OAuth2Service
-    oauth2 = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
+    oRequest = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
     
     Rem To execute an HTTP request we first need a HTTP Request parameter
-    parameter = oauth2.getRequestParameter(&quot;ChatGPT&quot;)
+    oParameter = oRequest.getRequestParameter(&quot;ChatGPT&quot;)
     
     Rem The HTTP method needed is POST
-    parameter.Method = &quot;POST&quot;
+    oParameter.Method = &quot;POST&quot;
     
-    parameter.Url = &quot;https://api.openai.com/v1/chat/completions&quot;
-    
-    Rem Default Authentication is OAuth2 but can be disabled with
-    parameter.NoAuth = true
+    oParameter.Url = &quot;https://api.openai.com/v1/chat/completions&quot;
     
     Rem You need to put your API key in the HTTP Request Headers Authorization
     apikey = &quot;Bearer &quot; + sKey
-    parameter.setHeader(&quot;Authorization&quot;, apikey)
+    oParameter.setHeader(&quot;Authorization&quot;, apikey)
     
     Rem We need to create the Request Json Body needed by ChatGPT API call: https://platform.openai.com/docs/guides/gpt/chat-completions-api
-    builder = parameter.getJsonBuilder()
-    json = builder.createObject()_
-                  .addString(&quot;model&quot;, &quot;gpt-3.5-turbo&quot;)_
-                  .addArray(&quot;messages&quot;, builder.createArray() _
-                                               .addObject(builder.createObject() _
-                                                                 .addString(&quot;role&quot;, &quot;system&quot;) _
-                                                                 .addString(&quot;content&quot;, &quot;You are a helpful assistant.&quot;)) _
-                                               .addObject(builder.createObject() _
-                                                                 .addString(&quot;role&quot;, &quot;user&quot;) _
-                                                                 .addString(&quot;content&quot;, sQuery))) _
-                  .build()
+    oBuilder = oParameter.getJsonBuilder()
+    oJson = oBuilder.createObject()_
+                    .addString(&quot;model&quot;, &quot;gpt-3.5-turbo&quot;)_
+                    .addArray(&quot;messages&quot;, oBuilder.createArray() _
+                                                  .addObject(oBuilder.createObject() _
+                                                                     .addString(&quot;role&quot;, &quot;system&quot;) _
+                                                                     .addString(&quot;content&quot;, &quot;You are a helpful assistant.&quot;)) _
+                                                  .addObject(oBuilder.createObject() _
+                                                                     .addString(&quot;role&quot;, &quot;user&quot;) _
+                                                                     .addString(&quot;content&quot;, sQuery))) _
+                    .build()
 
     Rem We assign the Json data to the HTTP Request
-    parameter.setJsonStructure(json)
+    oParameter.setJsonStructure(json)
 
     Rem To obtain the HTTP response we use the execute() method
     Rem of the OAuth2Service service with the HTTP parameter as argument
-    response = oauth2.execute(parameter)
+    oResponse = oRequest.execute(oParameter)
 
-    if response.Ok then
-        sText = response.getJson().getStructure(&quot;choices&quot;).getStructure(0).getStructure(&quot;message&quot;).getString(&quot;content&quot;)
+    if oResponse.Ok then
+        sText = oResponse.getJson().getStructure(&quot;choices&quot;).getStructure(0).getStructure(&quot;message&quot;).getString(&quot;content&quot;)
     else
-        sText = response.Text
+        sText = oResponse.Text
     endif
 
     Rem When it is finished we have to close the HTTP response
-    response.close()
+    oResponse.close()
 
     Msgbox sText
 
 End Sub
 
 </script:module>
+

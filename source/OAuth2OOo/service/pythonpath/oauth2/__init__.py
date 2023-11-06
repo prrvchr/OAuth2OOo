@@ -29,6 +29,12 @@
 
 from .options import OptionsManager
 
+from .model import HandlerModel
+from .model import OAuth2Model
+
+
+from .oauth2dispatch import OAuth2Dispatch
+
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_oauth2
@@ -37,10 +43,12 @@ from .configuration import g_errorlog
 from .configuration import g_basename
 
 from .unotool import createService
+from .unotool import executeDispatch
 from .unotool import getConfiguration
 from .unotool import getCurrentLocale
 from .unotool import getDialog
 from .unotool import getParentWindow
+from .unotool import getPropertyValueSet
 from .unotool import getResourceLocation
 from .unotool import getStringResource
 from .unotool import getSimpleFile
@@ -49,8 +57,6 @@ from .dialog import UserHandler
 from .dialog import UserView
 
 from .logger import getLogger
-
-from .oauth2model import OAuth2Model
 
 from .request import download
 from .request import getInputStream
@@ -82,4 +88,5 @@ from .oauth2 import InteractionRequest
 from .oauth2 import getOAuth2UserName
 
 from .oauth2helper import getAccessToken
-from .oauth2helper import showOAuth2Wizard
+from .oauth2helper import isAuthorized
+

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="GoogleAPIRequest" script:language="StarBasic">
+
+Rem ╔════════════════════════════════════════════════════════════════════════════════════╗
+Rem ║                                                                                    ║
+Rem ║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
+Rem ║                                                                                    ║
+Rem ║   Permission is hereby granted, free of charge, to any person obtaining            ║
+Rem ║   a copy of this software and associated documentation files (the &quot;Software&quot;),     ║
+Rem ║   to deal in the Software without restriction, including without limitation        ║
+Rem ║   the rights to use, copy, modify, merge, publish, distribute, sublicense,         ║
+Rem ║   and/or sell copies of the Software, and to permit persons to whom the Software   ║
+Rem ║   is furnished to do so, subject to the following conditions:                      ║
+Rem ║                                                                                    ║
+Rem ║   The above copyright notice and this permission notice shall be included in       ║
+Rem ║   all copies or substantial portions of the Software.                              ║
+Rem ║                                                                                    ║
+Rem ║   THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,                  ║
+Rem ║   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES                  ║
+Rem ║   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.        ║
+Rem ║   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY             ║
+Rem ║   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,             ║
+Rem ║   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE       ║
+Rem ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
+Rem ║                                                                                    ║
+Rem ╚════════════════════════════════════════════════════════════════════════════════════╝
+
+Sub Main
+
+    Rem Ask the user for their Google account
+    sUser = InputBox(&quot;Please enter your Google account&quot;, _
+                     &quot;Google API example&quot;)
+    Rem User clicked Cancel
+    if sUser = &quot;&quot; then
+        exit sub
+    endif
+
+    Rem Ask the user for their Query string
+    sQuery = InputBox(&quot;Please enter the query search string&quot;, _
+                      &quot;Google API example&quot;)
+    Rem User clicked Cancel
+    if sQuery = &quot;&quot; then
+        exit sub
+    endif
+
+    Rem To have access to Google Contact data we need to use the: https://www.googleapis.com/auth/contacts Google scope.
+    Rem We use the Url: people.googleapis.com who is already registered in the LibreOffice configuration for with scope.
+    sUrl = &quot;people.googleapis.com&quot;
+
+    Rem First we need to create the UNO OAuth2Service with the OAuth2 protocol support
+    Rem (ie: with an Url and a User email address)
+    oRequest = CreateUnoServiceWithArguments(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;, Array(sUrl, sUser))
+    Rem User canceled OAuth2 Wizard.
+    if isNull(oRequest) then
+        exit sub
+    endif
+
+    Rem To execute an HTTP request we first need a HTTP Request parameter
+    oParameter = oRequest.getRequestParameter(&quot;Google API&quot;)
+
+    Rem Default Requests method is already GET
+    
+    Rem We use the method: people.searchContacts
+    oParameter.Url = &quot;https://people.googleapis.com/v1/people:searchContacts&quot;
+
+    Rem Before searching, we should send a warmup request with an empty query to update the cache.
+    oParameter.setQuery(&quot;query&quot;, &quot;&quot;)
+    oResponse = oRequest.execute(oParameter)
+
+    Rem Now we can set the GET parameters:
+    oParameter.setQuery(&quot;query&quot;, sQuery)
+    oParameter.setQuery(&quot;readMask&quot;, &quot;names,phoneNumbers&quot;)
+
+    Rem To obtain the HTTP response we use the execute() method
+    Rem of the OAuth2Service service with the HTTP parameter as argument
+    oResponse = oRequest.execute(oParameter)
+
+    if oResponse.Ok then
+        sText = getFirstResult(oResponse, sQuery)
+    else
+        sText = &quot;ERROR: &quot; &amp; oResponse.Text
+    endif
+
+    Rem When it is finished we have to close the HTTP response
+    oResponse.close()
+
+    Msgbox sText
+
+End Sub
+
+Function getFirstResult(oResponse as Variant, sQuery as String) as String
+    sResult = sQuery &amp; &quot;: Not found...&quot;
+    oResults = oResponse.getJson().getStructure(&quot;results&quot;)
+    if oResults.Count &gt; 0 then
+        oPerson = oResults.getStructure(0).getStructure(&quot;person&quot;)
+        oNames = oPerson.getStructure(&quot;names&quot;)
+        if oNames.Count &gt; 0 then
+            sResult = &quot;Name: &quot; + oNames.getStructure(0).getString(&quot;displayName&quot;)
+        endif
+        oPhones = oPerson.getStructure(&quot;phoneNumbers&quot;)
+        if oPhones.Count &gt; 0 then
+            sResult = sResult + chr(13) + &quot;Phone: &quot; + oPhones.getStructure(0).getString(&quot;value&quot;)
+        endif
+    endif
+    getFirstResult = sResult
+End Function
+
+</script:module>
+

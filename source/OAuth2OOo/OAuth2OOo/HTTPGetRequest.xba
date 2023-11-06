@@ -28,35 +28,32 @@ Rem ╚════════════════════════�
 
 Sub Main
 
-    Rem First we need to create the UNO OAuth2Service
-    oauth2 = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
+    Rem First we need to create the UNO OAuth2Service without OAuth2
+    oRequest = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
 
     Rem To execute an HTTP request we first need a HTTP Request parameter
-    parameter = oauth2.getRequestParameter(&quot;httpbin&quot;)
+    oParameter = oRequest.getRequestParameter(&quot;httpbin&quot;)
 
-    Rem Default Requests method is GET but can be changed (ie: parameter.Method = &quot;PUT&quot;)
+    Rem Default Requests method is GET but can be changed (ie: oParameter.Method = &quot;PUT&quot;)
 
-    parameter.Url = &quot;https://httpbin.org/ip&quot;
-
-
-    Rem Default authentication is OAuth2 but can be disabled with:
-    parameter.NoAuth = true
+    oParameter.Url = &quot;https://httpbin.org/ip&quot;
 
     Rem To obtain the HTTP response we use the execute() method
     Rem of the OAuth2Service service with the HTTP parameter as argument
-    response = oauth2.execute(parameter)
+    oResponse = oRequest.execute(oParameter)
 
-    if response.Ok then
-        sText = &quot;Your IP address is: &quot; + response.getJson().getString(&quot;origin&quot;)
+    if oResponse.Ok then
+        sText = &quot;Your IP address is: &quot; + oResponse.getJson().getString(&quot;origin&quot;)
     else
-        sText = response.Text
+        sText = oResponse.Text
     endif
 
     Rem When it is finished we have to close the HTTP response
-    response.close()
+    oResponse.close()
 
     Msgbox sText
 
 End Sub
 
 </script:module>
+

@@ -124,11 +124,8 @@ def getKwArgs(parameter, stream=False):
 
 def getResponse(ctx, source, session, cls, mtd, name, method, url, timeout, kwargs):
     response = None
-    cls, mtd = 'OAuth2Service', 'executeRequest()'
-    print("Request.executeRequest() 1")
     try:
         response = session.request(method, url, timeout=timeout, **kwargs)
-        print("Request.executeRequest() 2")
     except URLRequired as e:
         error = URLRequiredException()
         error.Context = source
@@ -176,7 +173,6 @@ def getResponse(ctx, source, session, cls, mtd, name, method, url, timeout, kwar
         text = '' if response is None else response.text
         error.Message = getExceptionMessage(ctx, cls, mtd, 107, name, error.Url, text)
         raise error
-    print("Request.executeRequest() 3")
     return response
 
 

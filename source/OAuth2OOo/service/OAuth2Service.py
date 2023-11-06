@@ -36,45 +36,34 @@ from com.sun.star.lang import XServiceInfo
 from com.sun.star.auth import XOAuth2Service
 from com.sun.star.auth import RefreshTokenException
 
-from com.sun.star.rest import RequestException
-
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
 from com.sun.star.ucb.ConnectionMode import OFFLINE
 from com.sun.star.ucb.ConnectionMode import ONLINE
 
-from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
-from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL
-
-from com.sun.star.frame import XDispatchResultListener
-from com.sun.star.frame.FrameSearchFlag import GLOBAL
-from com.sun.star.frame.DispatchResultState import SUCCESS
-
-from com.sun.star.uno import Exception as UnoException
-from com.sun.star.auth import OAuth2Request
-
-from oauth2 import getAccessToken
-from oauth2 import getParentWindow
-from oauth2 import getSessionMode
-from oauth2 import showOAuth2Wizard
-
 from oauth2 import RequestParameter
+from oauth2 import OAuth2Model
+from oauth2 import OAuth2OOo
+
+from oauth2 import executeDispatch
+from oauth2 import getConfiguration
+from oauth2 import isAuthorized
+from oauth2 import getPropertyValueSet
+
+from oauth2 import getSessionMode
 
 from oauth2 import getRequestResponse
 from oauth2 import getInputStream
-from oauth2 import getSimpleFile
 from oauth2 import download
 from oauth2 import upload
 
 from oauth2 import getLogger
 
+from oauth2 import g_identifier
 from oauth2 import g_oauth2
 from oauth2 import g_defaultlog
 from oauth2 import g_basename
-
-from oauth2 import OAuth2Model
-from oauth2 import OAuth2OOo
 
 import requests
 import traceback
@@ -88,16 +77,30 @@ class OAuth2Service(unohelper.Base,
                     XComponent,
                     XServiceInfo,
                     XOAuth2Service):
-    def __init__(self, ctx):
-        print("OAuth2Service.__init__() 1")
+    # FIXME: We should be able to return None if the user is not
+    # FIXME: authorized and the OAuth2 Wizard has been canceled.
+    def __new__(cls, ctx, url='', user=''):
+        if url and user:
+            config = getConfiguration(ctx, g_identifier)
+            urls = config.getByName('Urls')
+            scopes = config.getByName('Scopes')
+            providers = config.getByName('Providers')
+            if not isAuthorized(urls, scopes, providers, url, user):
+                # FIXME: The Url and User name must not be able to be changed (ie: ReadOnly)
+                args = {'Url': url, 'UserName': user, 'ReadOnly': True}
+                executeDispatch(ctx, 'oauth2:wizard', getPropertyValueSet(args))
+                # The OAuth2 Wizard has been canceled
+                if not isAuthorized(urls, scopes, providers, url, user):
+                    return None
+        return super(OAuth2Service, cls).__new__(cls)
+
+    def __init__(self, ctx, url='', user=''):
         self._ctx = ctx
-        self._result = None
-        self._model = OAuth2Model(ctx, True)
+        self._model = OAuth2Model(ctx, url, user)
         self._session = self._getSession()
         self._listeners = []
         self._mode = OFFLINE
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
-        print("OAuth2Service.__init__() 2")
 
     @property
     def ResourceUrl(self):
@@ -113,44 +116,29 @@ class OAuth2Service(unohelper.Base,
         return self._model.Timeout
 
     # XOAuth2Service
-    def isOnLine(self):
-        return self._mode != OFFLINE
-    def isOffLine(self, host):
-        self._mode = getSessionMode(self._ctx, host)
-        return self._mode != ONLINE
-
     def unquoteUrl(self, url):
         return requests.utils.unquote(url)
-
-    def initializeUrl(self, url):
-        return self._model.initializeUrl(url)
-
-    def initializeSession(self, url, user):
-        return self._model.initializeSession(url, user)
 
     def getSessionMode(self, host):
         return getSessionMode(self._ctx, host)
 
-    def getAuthorization(self, url, user, close=True, parent=None):
-        authorized = False
-        msg = "Request Authorization ... "
-        self._model.initialize(url, user, close)
-        state, result = showOAuth2Wizard(self._ctx, self._model, parent)
-        if state == SUCCESS:
-            url, user, token = result
-            authorized = self.initializeSession(url, user)
-        msg += "Authorization has been granted..." if authorized else "Authorization was not granted..."
-        self._logger.logp(INFO, 'OAuth2Service', 'getAuthorization()', msg)
-        return authorized
-
     def getToken(self, format=''):
-        try:
-            token = getAccessToken(self._ctx, self._model, getParentWindow(self._ctx))
-        except RefreshTokenException as e:
-            e.Context = self
-            raise e
-        if format:
-            token = format % token
+        token = ''
+        if self._model.IsOAuth2:
+            try:
+                if not self._model.isAuthorized():
+                    args = {'Url': self._model.Url, 'UserName': self._model.User, 'ReadOnly': True}
+                    executeDispatch(self._ctx, 'oauth2:wizard', getPropertyValueSet(args))
+                    token = self._model.getToken()
+                elif self._model.isAccessTokenExpired():
+                    token = self._model.getRefreshedToken(self)
+                else:
+                    token = self._model.getToken()
+            except RefreshTokenException as e:
+                e.Context = self
+                raise e
+            if format:
+                token = format % token
         return token
 
     def getRequestParameter(self, name):
@@ -171,11 +159,11 @@ class OAuth2Service(unohelper.Base,
     def upload(self, parameter, url, chunk, retry, delay):
         return upload(self._ctx, self, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
-
     # Private method
     def _getSession(self):
         session = requests.Session()
-        session.auth = OAuth2OOo(self)
+        if self._model.IsOAuth2:
+            session.auth = OAuth2OOo(self)
         session.codes = requests.codes
         return session
 

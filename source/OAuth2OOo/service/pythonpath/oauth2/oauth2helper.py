@@ -29,60 +29,33 @@
 
 import uno
 
-from com.sun.star.frame.DispatchResultState import SUCCESS
-from com.sun.star.frame.DispatchResultState import FAILURE
-
-from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
-
-from .wizard import Wizard
-from .wizard import WizardController
-
-from .unotool import createService
-from .unotool import getConfiguration
-
-from .configuration import g_identifier
-from .configuration import g_wizard_page
-from .configuration import g_wizard_paths
-
+import validators
+from requests import Session
 import traceback
 
+
+def isEmailValid(email):
+    if validators.email(email):
+        return True
+    return False
+
+# Get the Provider name from an Url
+def getProviderName(config, url):
+    provider = ''
+    if config.getByName('Urls').hasByName(url):
+        scope = config.getByName('Urls').getByName(url).getByName('Scope')
+        if config.getByName('Scopes').hasByName(scope):
+            provider = config.getByName('Scopes').getByName(scope).getByName('Provider')
+    return provider
 
 # Get the OAuth2 Token, show Wizard or refresh Token if needed
 def getAccessToken(ctx, model, parent):
     token = ''
-    if not model.isAuthorized():
-        state, result = showOAuth2Wizard(ctx, model, parent)
-        if state == SUCCESS:
-            url, user, token = result
-    elif model.isAccessTokenExpired():
+    if model.isAccessTokenExpired():
         token = model.getRefreshedToken()
     else:
         token = model.getToken()
     return token
-
-# Show the OAuth2OOo Wizard
-def showOAuth2Wizard(ctx, model, parent):
-    state = FAILURE
-    result = ()
-    config = getConfiguration(ctx, g_identifier)
-    unowizard = config.getByName('UnoWizard')
-    config.dispose()
-    if unowizard:
-        wizard = createService(ctx, 'com.sun.star.ui.dialogs.Wizard')
-    else:
-        wizard = Wizard(ctx, g_wizard_page, True, parent)
-    controller = WizardController(ctx, wizard, model)
-    if unowizard:
-        arguments = ((uno.Any('[][]short', g_wizard_paths), controller), )
-        uno.invoke(wizard, 'initialize', arguments)
-    else:
-        arguments = (g_wizard_paths, controller)
-        wizard.initialize(arguments)
-    if wizard.execute() == OK:
-        state = SUCCESS
-        result = (controller.Url, controller.User, controller.Token)
-    controller.dispose()
-    return state, result
 
 # Get OAuth2 error status as an error number with default to 200
 def getOAuth2ErrorCode(error):
@@ -94,4 +67,25 @@ def getOAuth2ErrorCode(error):
               'server_error': 206,
               'temporarily_unavailable': 207}
     return errors.get(error, 200)
+
+def isAuthorized(urls, scopes, providers, url, user):
+    provider = None
+    if urls.hasByName(url):
+        scope = urls.getByName(url).getByName('Scope')
+        if scopes.hasByName(scope):
+            provider = scopes.getByName(scope).getByName('Provider')
+            return isUserAuthorized(scopes, providers, scope, provider, user)
+    return False
+
+def isUserAuthorized(scopes, providers, scope, provider, user):
+    if providers.hasByName(provider):
+        users = providers.getByName(provider).getByName('Users')
+        if users.hasByName(user):
+            values = users.getByName(user).getByName('Scopes')
+            if scopes.hasByName(scope):
+                for s in scopes.getByName(scope).getByName('Values'):
+                    if s not in values:
+                        return False
+                return True
+    return False
 

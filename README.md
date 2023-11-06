@@ -4,7 +4,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][3] and [Data Protection Policy][4].**
 
-# version [1.1.2][5]
+# version [1.2.0][5]
 
 ## Introduction:
 
@@ -54,7 +54,7 @@ ___
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** extension version 1.1.2.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** extension version 1.2.0.
 
 - Restart LibreOffice / OpenOffice after installation.
 
@@ -197,9 +197,9 @@ ___
     - A factory of JSON structures is accessible via the `getJsonBuilder()` interface of [XRequestParameter][57].
     - A Json parser is returned by the `getJson()` interface of [XRequestResponse][58].
 
-**This makes HTTP requests using JSON easily usable in the Basic language of LibreOffice.**
+**This makes HTTP requests using JSON easily usable in the BASIC language of LibreOffice.**
 
-See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
+See the macros [HTTP requests in BASIC][61] and [ChatGPT requests in BASIC][62].
 
 ### What has been done for version 1.0.1:
 
@@ -263,13 +263,24 @@ See the macros [HTTP requests in Basic][61] and [ChatGPT requests in Basic][62].
 
 - Modification of the idl files: [XRequestParameter.idl][57] and [XRequestResponse.idl][58] and the underlying python implementations: [requestparameter.py][72] and [requestresponse.py][73] in order to make it possible **POST** requests with **application/x-www-form-urlencoded** encoding. See [issue #13][74].
 
-- 3 macros in Basic: `ChatGPTRequest`, `HTTPGetRequest` and `HTTPPostRequest` are available in: **Tools -> Macros -> Run Macros... -> My Macros -> OAuth2OOo**. Be careful, these macros **will not work if no document is open** (I don't know why?)...
+- 3 macros in BASIC: `ChatGPTRequest`, `HTTPGetRequest` and `HTTPPostRequest` are available in: **Tools -> Macros -> Run Macros... -> My Macros -> OAuth2OOo**. Be careful, these macros **will not work if no document is open** (I don't know why?)...
 
 - From now on, with each push, a [workflow perform a scan][75] on the code with [Fluid Attacks][76]. This has been implemented to follow the [Cloud Application Security Assessment][77] (CASA) and meet the requirements for revalidation of the OAuth2OOo extension with Google.
 
 - For the same reasons, the [Data Protection Policy][4] has been modified in order to specify the [Nature and scope rights over your data][78].
 
-### What remains to be done for version 1.1.2:
+### What has been done for version 1.2.0:
+
+- There are now two methods of creating the OAuth2Service service which are:
+  - `create()` without parameter, returns an instance of the service.
+  - `createWithOAuth2([in] string sUrl, [in] string sUser)` with an Url and the user's address, returns an instance of the service with the OAuth2 protocol.  
+    In its second form, the OAuth2 authorization Wizard will launch automatically if the scope of the Url rights has not yet been granted by the user (ie: first connection).  
+    If this is the case and the Wizard is aborted then a null value will be returned instead of the requested service.
+
+- Two BASIC macros: `GoogleAPIRequest` and `GraphAPIRequest` allow you to make HTTP requests on the Google Contact and Microsoft Graph APIs.  
+  The OAuth2 protocol essential for the use of these APIs is integrated automatically and transparently into HTTP requests. You won't have to worry about it.
+
+### What remains to be done for version 1.2.0:
 
 - Add new language for internationalization...
 
