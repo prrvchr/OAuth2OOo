@@ -44,8 +44,8 @@ Sub Main
         exit sub
     endif
 
-    Rem To have access to Microsoft Contact data we need to use the: https://www.googleapis.com/auth/contacts Microsoft scope.
-    Rem We use the Url: people.googleapis.com who is already registered in the LibreOffice configuration for with scope.
+    Rem To have access to Microsoft Contact data we need to use the: MailboxSettings.Read Contacts.Read Microsoft scopes.
+    Rem We use the Url: graph.microsoft.com who is already registered in the LibreOffice configuration for these scopes.
     sUrl = &quot;graph.microsoft.com&quot;
 
     Rem First we need to create the UNO OAuth2Service with the OAuth2 protocol support
