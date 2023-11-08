@@ -54,7 +54,7 @@ ___
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.2.1. ![Nombre de téléchargements][0]  
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version [![Version][0]][18]  
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -290,7 +290,7 @@ Voir les macros [Requêtes HTTP sous BASIC][61] et [Requêtes ChatGPT en BASIC][
 
 - Tout ce qui est bienvenu...
 
-[0]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/v1.2.1/total?label=Nombre%20de%20t%C3%A9l%C3%A9chargements>
+[0]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/v1.2.1/total?label=v1.2.1>
 [1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg>
 [2]: <https://prrvchr.github.io/OAuth2OOo>
 [3]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
