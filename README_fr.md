@@ -4,7 +4,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][3] et à notre [Politique de protection des données][4].**
 
-# version [1.2.0][5]
+# version [1.2.1][5]
 
 ## Introduction:
 
@@ -54,7 +54,7 @@ ___
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.2.0.
+- Installer l'extension ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** version 1.2.1.
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
@@ -271,7 +271,7 @@ Voir les macros [Requêtes HTTP sous BASIC][61] et [Requêtes ChatGPT en BASIC][
 
 ### Ce qui a été fait pour la version 1.2.0:
 
-- Il existe désormais deux méthodes pour créer le service OAuth2Service qui sont :
+- Il existe désormais deux méthodes pour créer le service [OAuth2Service][79] qui sont :
   - `create()` sans paramètre, renvoie une instance du service.
   - `createWithOAuth2([in] string sUrl, [in] string sUser)` avec une Url et l'adresse de l'utilisateur, renvoie une instance du service avec le protocole OAuth2.  
     Dans sa deuxième forme, l'assistant d'autorisation OAuth2 (Wizard) se lancera automatiquement si l'étendue des droits de l'Url n'a pas encore été accordée par l'utilisateur (ie : première connexion).  
@@ -280,7 +280,11 @@ Voir les macros [Requêtes HTTP sous BASIC][61] et [Requêtes ChatGPT en BASIC][
 - Deux macros BASIC: `GoogleAPIRequest` et `GraphAPIRequest` permettent d'effectuer des requêtes HTTP sur les API de Google Contact et Microsoft Graph.  
   Le protocole OAuth2 indispensable à l'utilisation de ces API est intégré de manière automatique et transparente aux requêtes HTTP. Vous n'aurez pas à vous en soucier.
 
-### Que reste-t-il à faire pour la version 1.2.0:
+### Ce qui a été fait pour la version 1.2.1:
+
+- Ajout d'une nouvelle méthode `isAuthorized()` à l'interface [XOAuth2Service][45] prise en charge par le service [OAuth2Service][79]. Cette méthode permet de lancer l'assistant de configuration OAuth2 si l'utilisateur n'est pas autorisé.
+
+### Que reste-t-il à faire pour la version 1.2.1:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -303,7 +307,7 @@ Voir les macros [Requêtes HTTP sous BASIC][61] et [Requêtes ChatGPT en BASIC][
 [15]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/lxml>
 [16]: <https://pypi.org/project/lxml/4.9.2/#files>
 [17]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
-[18]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
+[18]: <https://github.com/prrvchr/OAuth2OOo/releases/download/v1.2.1/OAuth2OOo.oxt>
 [19]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [20]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
@@ -364,3 +368,4 @@ Voir les macros [Requêtes HTTP sous BASIC][61] et [Requêtes ChatGPT en BASIC][
 [76]: <https://github.com/fluidattacks>
 [77]: <https://appdefensealliance.dev/casa/tier-2/tier2-overview>
 [78]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr#nature-et-étendue-des-droits-sur-vos-données>
+[79]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/OAuth2Service.idl>

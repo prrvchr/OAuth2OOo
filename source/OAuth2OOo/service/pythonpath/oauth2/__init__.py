@@ -87,6 +87,5 @@ from .oauth2 import NoOAuth2
 from .oauth2 import InteractionRequest
 from .oauth2 import getOAuth2UserName
 
-from .oauth2helper import getAccessToken
 from .oauth2helper import isAuthorized
 

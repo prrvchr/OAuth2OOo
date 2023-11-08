@@ -67,7 +67,7 @@ class WizardController(unohelper.Base,
         return self._model.Url
     @property
     def Token(self):
-        return self._model.getToken()
+        return self._model.getAccessToken(self._wizard)
 
     def dispose(self):
         self._model.dispose()

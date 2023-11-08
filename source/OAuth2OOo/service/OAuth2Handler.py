@@ -42,8 +42,6 @@ from oauth2 import UserView
 from oauth2 import UserHandler
 from oauth2 import HandlerModel
 
-from oauth2 import getAccessToken
-
 from oauth2 import g_identifier
 
 import traceback
@@ -90,10 +88,12 @@ class OAuth2Handler(unohelper.Base,
 
     def _getToken(self, interaction, url, user, format):
         token = ''
-        status = 1
+        status = 0
         self._model.initialize(url, user)
         try:
-            token = getAccessToken(self._ctx, self._model, self._parent)
+            if self._isAuthorized():
+                token = self._model.getAccessToken(self)
+                status = 1
         except RefreshTokenException:
             status = 0
         continuation = interaction.getContinuations()[status]
@@ -103,6 +103,11 @@ class OAuth2Handler(unohelper.Base,
             continuation.setToken(token)
         continuation.select()
         return status == 1
+
+    def _isAuthorized(self):
+        if self._model.isOAuth2():
+            return self._model.isAuthorized()
+        return False
 
     def _showUserDialog(self, interaction, url, message):
         title, label = self._model.getUserData(url, message)

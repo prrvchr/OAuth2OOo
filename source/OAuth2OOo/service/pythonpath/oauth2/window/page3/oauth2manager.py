@@ -71,7 +71,7 @@ class OAuth2Manager(unohelper.Base,
         return True
 
     def canAdvance(self):
-        return self._model.isAuthorized()
+        return self._model.hasAuthorization()
 
 # XComponent
     def dispose(self):

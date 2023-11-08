@@ -50,10 +50,6 @@ class OAuth2Model(TokenModel):
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
 
     @property
-    def IsOAuth2(self):
-        return self._user and self._url
-
-    @property
     def User(self):
         return self._user
 

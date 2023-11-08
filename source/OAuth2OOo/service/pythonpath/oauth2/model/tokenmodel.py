@@ -41,7 +41,9 @@ from ..requestresponse import getResponse
 
 from ..oauth2helper import isUserAuthorized
 
+from ..unotool import executeDispatch
 from ..unotool import generateUuid
+from ..unotool import getPropertyValueSet
 
 from ..configuration import g_identifier
 from ..configuration import g_refresh_overlap
@@ -58,55 +60,44 @@ class TokenModel(BaseModel):
         if url and user:
             self.initialize(url, user)
         else:
-            self._url = url
-            self._user = user
+            self._isoauth2 = False
+            self._url = self._user = ''
             self._scope = self._provider = ''
 
 # TokenModel setter methods
     def initialize(self, url, user):
+        self._isoauth2 = True
         self._url = url
         self._user = user
         self._scope, self._provider = self._getUrlData(url)
 
 # TokenModel getter methods
-    def isAuthorized(self):
-        scopes = self._config.getByName('Scopes')
-        providers = self._config.getByName('Providers')
-        return isUserAuthorized(scopes, providers, self._scope, self._provider, self._user)
+    def isOAuth2(self):
+        return self._isoauth2
 
-    def isAccessTokenExpired(self):
-        providers = self._config.getByName('Providers')
-        if providers.hasByName(self._provider):
-            provider = providers.getByName(self._provider)
-            users = provider.getByName('Users')
-            if users.hasByName(self._user):
-                user = users.getByName(self._user)
-                if user.getByName('NeverExpires'):
-                    return False
-                now = int(time.time())
-                expire = max(0, user.getByName('TimeStamp') - now)
-                return expire < g_refresh_overlap
+    def isAuthorized(self):
+        if not self.hasAuthorization():
+            args = {'Url': self._url, 'UserName': self._user, 'ReadOnly': True}
+            executeDispatch(self._ctx, 'oauth2:wizard', getPropertyValueSet(args))
+            return self.hasAuthorization()
         return True
 
-    def getRefreshedToken(self, source):
-        providers = self._config.getByName('Providers')
-        if providers.hasByName(self._provider):
-            provider = providers.getByName(self._provider)
-            users = provider.getByName('Users')
-            if users.hasByName(self._user):
-                user = users.getByName(self._user)
-                self._refreshToken(source, provider, user, False)
-                return user.getByName('AccessToken')
-        return None
+    def hasAuthorization(self):
+        if self._isoauth2:
+            scopes = self._config.getByName('Scopes')
+            providers = self._config.getByName('Providers')
+            return isUserAuthorized(scopes, providers, self._scope, self._provider, self._user)
+        return True
 
-    def getToken(self):
-        providers = self._config.getByName('Providers')
-        if providers.hasByName(self._provider):
-            provider = providers.getByName(self._provider)
-            users = provider.getByName('Users')
-            if users.hasByName(self._user):
-                user = users.getByName(self._user)
-                return user.getByName('AccessToken')
+    def getAccessToken(self, source):
+        token = ''
+        if self._isoauth2:
+            providers = self._config.getByName('Providers')
+            if self._isAccessTokenExpired(providers):
+                token = self._getRefreshedToken(source, providers, self._user)
+            else:
+                token = self._getAccessToken(providers)
+        return token
 
 # TokenModel private methods
     def _getUrlData(self, url):
@@ -119,7 +110,38 @@ class TokenModel(BaseModel):
                 provider = scopes.getByName(scope).getByName('Provider')
         return scope, provider
 
-    def _refreshToken(self, source, provider, user, multiline):
+    def _isAccessTokenExpired(self, providers):
+        if providers.hasByName(self._provider):
+            provider = providers.getByName(self._provider)
+            users = provider.getByName('Users')
+            if users.hasByName(self._user):
+                user = users.getByName(self._user)
+                if user.getByName('NeverExpires'):
+                    return False
+                now = int(time.time())
+                expire = max(0, user.getByName('TimeStamp') - now)
+                return expire < g_refresh_overlap
+        return True
+
+    def _getRefreshedToken(self, source, providers):
+        if providers.hasByName(self._provider):
+            provider = providers.getByName(self._provider)
+            users = provider.getByName('Users')
+            if users.hasByName(self._user):
+                user = users.getByName(self._user)
+                self._refreshToken(source, provider, user)
+                return user.getByName('AccessToken')
+        return None
+
+    def _getAccessToken(self, providers):
+        if providers.hasByName(self._provider):
+            provider = providers.getByName(self._provider)
+            users = provider.getByName('Users')
+            if users.hasByName(self._user):
+                user = users.getByName(self._user)
+                return user.getByName('AccessToken')
+
+    def _refreshToken(self, source, provider, user):
         session = requests.Session()
         url = provider.getByName('TokenUrl')
         data = self._getRefreshParameters(user, provider)

@@ -97,7 +97,7 @@ class OAuth2Service(unohelper.Base,
     def __init__(self, ctx, url='', user=''):
         self._ctx = ctx
         self._model = OAuth2Model(ctx, url, user)
-        self._session = self._getSession()
+        self._session = self._getSession(url)
         self._listeners = []
         self._mode = OFFLINE
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
@@ -122,23 +122,20 @@ class OAuth2Service(unohelper.Base,
     def getSessionMode(self, host):
         return getSessionMode(self._ctx, host)
 
+    def isAuthorized(self):
+        if self._model.isOAuth2():
+            return self._model.isAuthorized()
+        return False
+
     def getToken(self, format=''):
         token = ''
-        if self._model.IsOAuth2:
-            try:
-                if not self._model.isAuthorized():
-                    args = {'Url': self._model.Url, 'UserName': self._model.User, 'ReadOnly': True}
-                    executeDispatch(self._ctx, 'oauth2:wizard', getPropertyValueSet(args))
-                    token = self._model.getToken()
-                elif self._model.isAccessTokenExpired():
-                    token = self._model.getRefreshedToken(self)
-                else:
-                    token = self._model.getToken()
-            except RefreshTokenException as e:
-                e.Context = self
-                raise e
+        if self.isAuthorized():
+            token = self._model.getAccessToken(self)
             if format:
-                token = format % token
+                try:
+                    token = format % token
+                except:
+                    pass
         return token
 
     def getRequestParameter(self, name):
@@ -160,9 +157,9 @@ class OAuth2Service(unohelper.Base,
         return upload(self._ctx, self, self._logger, self._session, parameter, url, self.Timeout, chunk, retry, delay)
 
     # Private method
-    def _getSession(self):
+    def _getSession(self, url):
         session = requests.Session()
-        if self._model.IsOAuth2:
+        if url:
             session.auth = OAuth2OOo(self)
         session.codes = requests.codes
         return session

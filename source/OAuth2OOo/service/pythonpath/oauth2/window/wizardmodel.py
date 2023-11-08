@@ -457,7 +457,7 @@ class WizardModel(TokenModel):
     def refreshToken(self, source):
         provider = self._config.getByName('Providers').getByName(self._provider)
         user = provider.getByName('Users').getByName(self._user)
-        return self._refreshToken(source, provider, user, True)
+        self._refreshToken(source, provider, user)
 
     def deleteUser(self):
         providers = self._config.getByName('Providers')

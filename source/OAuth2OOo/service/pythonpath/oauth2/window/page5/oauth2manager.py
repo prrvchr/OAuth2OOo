@@ -31,6 +31,8 @@ import unohelper
 
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 
+from com.sun.star.uno import Exception as UnoException
+
 from com.sun.star.ui.dialogs import XWizardPage
 
 from .oauth2handler import WindowHandler
@@ -93,12 +95,13 @@ class OAuth2Manager(unohelper.Base,
         dialog.dispose()
 
     def refreshToken(self):
-        error = self._model.refreshToken(self._wizard)
-        if error is None:
-            self._view.setToken(*self._model.getUserTokenData())
-        else:
-            self._view.showError(error)
+        try:
+            self._model.refreshToken(self._wizard)
+        except UnoException as e:
+            self._view.showError(e.Message)
             self._wizard.updateTravelUI()
+        else:
+            self._view.setToken(*self._model.getUserTokenData())
 
     def _getPropertySetInfo(self):
         properties = {}

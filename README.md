@@ -4,7 +4,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][3] and [Data Protection Policy][4].**
 
-# version [1.2.0][5]
+# version [1.2.1][5]
 
 ## Introduction:
 
@@ -54,7 +54,7 @@ ___
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** extension version 1.2.0.
+- Install the ![OAuth2OOo logo][1] **[OAuth2OOo.oxt][18]** extension version 1.2.1.
 
 - Restart LibreOffice / OpenOffice after installation.
 
@@ -271,7 +271,7 @@ See the macros [HTTP requests in BASIC][61] and [ChatGPT requests in BASIC][62].
 
 ### What has been done for version 1.2.0:
 
-- There are now two methods of creating the OAuth2Service service which are:
+- There are now two methods of creating the [OAuth2Service][79] service which are:
   - `create()` without parameter, returns an instance of the service.
   - `createWithOAuth2([in] string sUrl, [in] string sUser)` with an Url and the user's address, returns an instance of the service with the OAuth2 protocol.  
     In its second form, the OAuth2 authorization Wizard will launch automatically if the scope of the Url rights has not yet been granted by the user (ie: first connection).  
@@ -280,7 +280,11 @@ See the macros [HTTP requests in BASIC][61] and [ChatGPT requests in BASIC][62].
 - Two BASIC macros: `GoogleAPIRequest` and `GraphAPIRequest` allow you to make HTTP requests on the Google Contact and Microsoft Graph APIs.  
   The OAuth2 protocol essential for the use of these APIs is integrated automatically and transparently into HTTP requests. You won't have to worry about it.
 
-### What remains to be done for version 1.2.0:
+### What has been done for version 1.2.1:
+
+- Added a new method `isAuthorized()` to the [XOAuth2Service][45] interface supported by the [OAuth2Service][79] service. This method allows you to launch the OAuth2 configuration Wizard if the user is not authorized.
+
+### What remains to be done for version 1.2.1:
 
 - Add new language for internationalization...
 
@@ -303,7 +307,7 @@ See the macros [HTTP requests in BASIC][61] and [ChatGPT requests in BASIC][62].
 [15]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/lxml>
 [16]: <https://pypi.org/project/lxml/4.9.2/#files>
 [17]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
-[18]: <https://github.com/prrvchr/OAuth2OOo/raw/master/OAuth2OOo.oxt>
+[18]: <https://github.com/prrvchr/OAuth2OOo/releases/download/v1.2.1/OAuth2OOo.oxt>
 [19]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
 [20]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
 [21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
@@ -364,3 +368,4 @@ See the macros [HTTP requests in BASIC][61] and [ChatGPT requests in BASIC][62].
 [76]: <https://github.com/fluidattacks>
 [77]: <https://appdefensealliance.dev/casa/tier-2/tier2-overview>
 [78]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
+[79]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/OAuth2Service.idl>

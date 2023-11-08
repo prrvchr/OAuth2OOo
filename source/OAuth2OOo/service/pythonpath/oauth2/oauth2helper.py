@@ -48,15 +48,6 @@ def getProviderName(config, url):
             provider = config.getByName('Scopes').getByName(scope).getByName('Provider')
     return provider
 
-# Get the OAuth2 Token, show Wizard or refresh Token if needed
-def getAccessToken(ctx, model, parent):
-    token = ''
-    if model.isAccessTokenExpired():
-        token = model.getRefreshedToken()
-    else:
-        token = model.getToken()
-    return token
-
 # Get OAuth2 error status as an error number with default to 200
 def getOAuth2ErrorCode(error):
     errors = {'access_denied': 201,
@@ -69,7 +60,6 @@ def getOAuth2ErrorCode(error):
     return errors.get(error, 200)
 
 def isAuthorized(urls, scopes, providers, url, user):
-    provider = None
     if urls.hasByName(url):
         scope = urls.getByName(url).getByName('Scope')
         if scopes.hasByName(scope):
