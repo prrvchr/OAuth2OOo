@@ -30,6 +30,16 @@
     <identifier value="io.github.prrvchr.OAuth2OOo" />
     <version value="1.2.1" /> 
     <update-download>
-        <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/download/v1.2.1/OAuth2OOo.oxt" />
+        <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt" />
     </update-download>
+    <dependencies xmlns:dep="http://openoffice.org/extensions/description/2006">
+        <dep:OpenOffice.org-minimal-version value="4.0" dep:name="OpenOffice.org 4.0"/>
+    </dependencies>
+    <publisher>
+        <name xlink:href="https://github.com/prrvchr/OAuth2OOo" lang="en">OAuth2OOo</name>
+    </publisher>
+    <release-notes>
+        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/#historical" lang="en" />
+        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr#historique" lang="fr" />
+    </release-notes>
 </description>

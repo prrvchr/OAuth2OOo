@@ -290,7 +290,7 @@ Voir les macros [Requêtes HTTP sous BASIC][61] et [Requêtes ChatGPT en BASIC][
 
 - Tout ce qui est bienvenu...
 
-[0]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/v1.2.1/total?label=v1.2.1>
+[0]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.2.1>
 [1]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg>
 [2]: <https://prrvchr.github.io/OAuth2OOo>
 [3]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
@@ -308,7 +308,7 @@ Voir les macros [Requêtes HTTP sous BASIC][61] et [Requêtes ChatGPT en BASIC][
 [15]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/lxml>
 [16]: <https://pypi.org/project/lxml/4.9.2/#files>
 [17]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
-[18]: <https://github.com/prrvchr/OAuth2OOo/releases/download/v1.2.1/OAuth2OOo.oxt>
+[18]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
 [19]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [20]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
