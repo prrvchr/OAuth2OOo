@@ -56,7 +56,7 @@ ___
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- Installer l'extension ![OAuth2OOo logo][17] **[OAuth2OOo.oxt][18]** version [![Version][19]][18]
+- Installer l'extension ![OAuth2OOo logo][17] **[OAuth2OOo.oxt][18]** [![Version][19]][18]
 
 - Redémarrez LibreOffice / OpenOffice après l'installation.
 
