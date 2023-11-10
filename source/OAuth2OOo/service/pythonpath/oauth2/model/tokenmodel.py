@@ -94,7 +94,7 @@ class TokenModel(BaseModel):
         if self._isoauth2:
             providers = self._config.getByName('Providers')
             if self._isAccessTokenExpired(providers):
-                token = self._getRefreshedToken(source, providers, self._user)
+                token = self._getRefreshedToken(source, providers)
             else:
                 token = self._getAccessToken(providers)
         return token
