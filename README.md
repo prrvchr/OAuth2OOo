@@ -81,9 +81,9 @@ ___
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- Install the ![OAuth2OOo logo][17] **[OAuth2OOo.oxt][18]** extension [![Version][19]][18]
+- ![OAuth2OOo logo][17] Install **[OAuth2OOo.oxt][18]** extension [![Version][19]][18]
 
-- Restart LibreOffice / OpenOffice after installation.
+Restart LibreOffice / OpenOffice after installation.
 
 ___
 
