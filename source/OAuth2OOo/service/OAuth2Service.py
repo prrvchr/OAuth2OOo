@@ -125,7 +125,7 @@ class OAuth2Service(unohelper.Base,
     def isAuthorized(self):
         if self._model.isOAuth2():
             return self._model.isAuthorized()
-        return False
+        return True
 
     def getToken(self, format=''):
         token = ''
