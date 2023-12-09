@@ -43,14 +43,11 @@ from ..dbconfig import g_dotcode
 
 from ..unotool import getConnectionMode
 
-from ..oauth2 import getRequest
-from ..oauth2 import g_service
-
 import traceback
 
 
-class User(unohelper.Base):
-    def __init__(self, ctx, database, provider, scheme, server, name, pwd=''):
+class User(object):
+    def __init__(self, ctx, source, database, provider, scheme, server, name, pwd=''):
         self._ctx = ctx
         self._password = pwd
         self._sessions = []
@@ -58,16 +55,22 @@ class User(unohelper.Base):
         new = self._metadata is None
         cls, mtd = 'User', '__init__()'
         if not new:
-            request = getRequest(ctx, server, name)
+            print("User.__init__() 1")
+            request = provider.getRequest(server, name)
             if request is None:
-                raise getSqlException(ctx, self, 1002, 1105, cls, mtd, name)
+                raise getSqlException(ctx, source, 1002, 1105, cls, mtd, name)
         else:
+            print("User.__init__() 2")
             if self._isOffLine(server):
-                raise getSqlException(ctx, self, 1004, 1108, cls, mtd, name)
-            request = getRequest(ctx, server, name)
+                raise getSqlException(ctx, source, 1004, 1108, cls, mtd, name)
+            print("User.__init__() 3")
+            request = provider.getRequest(server, name)
             if request is None:
-                raise getSqlException(ctx, self, 1002, 1105, cls, mtd, name)
-            self._metadata, books = self._getUserData(cls, mtd, database, provider, request, scheme, server, name, pwd)
+                print("User.__init__() 4")
+                raise getSqlException(ctx, source, 1002, 1105, cls, mtd, name)
+            self._metadata, books = self._getUserData(ctx, source, cls, mtd, database,
+                                                      provider, request, scheme, server, name, pwd)
+            print("User.__init__() 5")
             database.createUser(self.getSchema(), self.Id, name, '')
         self.Request = request
         self._books = Books(ctx, books, new)
@@ -134,10 +137,10 @@ class User(unohelper.Base):
     def getBooks(self):
         return self._books.getBooks()
 
-    def _getUserData(self, cls, mtd, database, provider, request, scheme, server, name, pwd):
+    def _getUserData(self, ctx, source, cls, mtd, database, provider, request, scheme, server, name, pwd):
         data = provider.insertUser(database, request, scheme, server, name, pwd)
         if data is None:
-            raise getSqlException(self._ctx, self, 1006, 1107, cls, mtd, name)
+            raise getSqlException(ctx, source, 1006, 1107, cls, mtd, name)
         return data
 
     def _isOffLine(self, server):
