@@ -68,24 +68,19 @@ class DataSource(object):
         if name in self._users:
             user = self._users.get(name)
             user.removeSession(self._database.getSessionId(connection))
-            print("DataSource.closeConnection() 1: %s - %s" % (len(self._users), name))
         if not self._hasSession():
             self._replicator.stop()
-        print("DataSource.closeConnection() 2")
 
 # Procedures called by Driver
     def getConnection(self, source, scheme, server, account, password):
         uri = self._provider.getUserUri(server, account)
-        print("DataSource.getConnection() 1")
         if uri in self._maps:
-            print("DataSource.getConnection() 2")
             name = self._maps.get(uri)
             user = self._users.get(name)
             if not user.Request.isAuthorized():
                 cls, mtd = 'DataSource', 'getConnection()'
                 raise getSqlException(self._ctx, source, 1002, 1105, cls, mtd, name)
         else:
-            print("DataSource.getConnection() 3")
             user = User(self._ctx, source, self._database,
                         self._provider, scheme, server, account, password)
             name = user.getName()
