@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][4] et à notre [Politique de protection des données][5].**
 
-# version [1.2.2][6]
+# version [1.2.3][6]
 
 ## Introduction:
 
@@ -345,7 +345,7 @@ Voir les macros [Requêtes HTTP sous BASIC][64] et [Requêtes ChatGPT en BASIC][
 [18]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
 [19]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [20]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[21]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.2.2#right>
+[21]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.2.3#right>
 [22]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [23]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [24]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
