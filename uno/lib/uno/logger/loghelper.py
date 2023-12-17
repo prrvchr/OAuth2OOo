@@ -39,6 +39,7 @@ from com.sun.star.logging.LogLevel import OFF
 
 from .loggerpool import LoggerPool
 
+from ..unotool import checkVersion
 from ..unotool import createService
 from ..unotool import getConfiguration
 from ..unotool import getFileSequence
@@ -54,6 +55,8 @@ from ..configuration import g_resource
 from ..configuration import g_defaultlog
 from ..configuration import g_basename
 
+import importlib
+import os, sys
 import traceback
 
 
@@ -163,8 +166,27 @@ class LogController(LogWrapper):
             self._logger.removeModifyListener(self._listener)
 
     def logInfos(self, level, infos, clazz, method):
-        for resource, info in infos.items():
-            msg = self._resolver.resolveString(resource) % info
+        msg = self._resolver.resolveString(111) % ' '.join(sys.version.split())
+        self._logger.logp(level, clazz, method, msg)
+        msg = self._resolver.resolveString(112) % os.pathsep.join(sys.path)
+        self._logger.logp(level, clazz, method, msg)
+        for name, info in infos.items():
+            try:
+                mod = importlib.import_module(name)
+            except Exception as e:
+                msg = self._resolver.resolveString(113) % (name, e, traceback.format_exc())
+            else:
+                minimum = info[1]
+                file = getattr(mod, '__file__')
+                if hasattr(mod, info[0]):
+                    version = getattr(mod, info[0])
+                    if minimum is None or checkVersion(version, minimum):
+                        msg = self._resolver.resolveString(114) % (name, version, file)
+                    else:
+                        msg = self._resolver.resolveString(115) % (name, version, file, minimum)
+                else:
+                    modattr = ', '.join(dir(mod).keys())
+                    msg = self._resolver.resolveString(116) % (name, file, modattr)
             self._logger.logp(level, clazz, method, msg)
 
     def clearLogger(self):

@@ -42,12 +42,13 @@ from js2xml.utils.objects import make
 from parsel import Selector
 from lxml import etree
 from jsonpath_ng import parse
-import json
-from six import string_types, text_type
 import extruct
 from w3lib.html import get_base_url
 #from rdflib.plugin import register, Serializer
 #register('json-ld', Serializer, 'rdflib_jsonld.serializer', 'JsonLDSerializer')
+
+import json
+from six import string_types, text_type
 from collections import OrderedDict
 import traceback
 

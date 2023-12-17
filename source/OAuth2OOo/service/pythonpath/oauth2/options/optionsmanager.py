@@ -87,77 +87,21 @@ class OptionsManager(unohelper.Base):
 
     def _getInfos(self):
         infos = OrderedDict()
-        version  = ' '.join(sys.version.split())
-        infos[111] = version
-        path = os.pathsep.join(sys.path)
-        infos[112] = path
-        # Required modules for Requests
-        try:
-            import six
-        except Exception as e:
-            infos[120] = self._getExceptionMsg(e)
-        else:
-            infos[121] = six.__version__, six.__file__
-        try:
-            import ssl
-        except Exception as e:
-            infos[122] = self._getExceptionMsg(e)
-        else:
-            infos[123] = ssl.OPENSSL_VERSION, ssl.__file__
-        try:
-            import idna
-        except Exception as e:
-            infos[124] = self._getExceptionMsg(e)
-        else:
-            infos[125] = idna.__version__, idna.__file__
-        try:
-            import charset_normalizer
-        except Exception as e:
-            infos[126] = self._getExceptionMsg(e)
-        else:
-            infos[127] = charset_normalizer.__version__, charset_normalizer.__file__
-        try:
-            import certifi
-        except Exception as e:
-            infos[128] = self._getExceptionMsg(e)
-        else:
-            infos[129] = certifi.__version__, certifi.__file__
-        try:
-            import urllib3
-        except Exception as e:
-            infos[130] = self._getExceptionMsg(e)
-        else:
-            infos[131] = urllib3.__version__, urllib3.__file__
-        try:
-            import requests
-        except Exception as e:
-            infos[132] = self._getExceptionMsg(e)
-        else:
-            infos[133] = requests.__version__, requests.__file__
-        try:
-            import lxml
-        except Exception as e:
-            infos[134] = self._getExceptionMsg(e)
-        else:
-            infos[135] = lxml.__version__, lxml.__file__
-        try:
-            import ijson
-        except Exception as e:
-            infos[136] = self._getExceptionMsg(e)
-        else:
-            infos[137] = ijson.__version__, ijson.__file__
-        try:
-            import selenium
-        except Exception as e:
-            infos[138] = self._getExceptionMsg(e)
-        else:
-            infos[139] = selenium.__version__, selenium.__file__
-        try:
-            import webdriver_manager
-        except Exception as e:
-            infos[140] = self._getExceptionMsg(e)
-        else:
-            infos[141] = webdriver_manager.__version__, webdriver_manager.__file__
+        infos['six'] =                ('__version__',     '1.16.0')
+        infos['ssl'] =                ('OPENSSL_VERSION', None)
+        infos['idna'] =               ('__version__',     '3.4')
+        infos['charset_normalizer'] = ('__version__',     '3.1.0')
+        infos['certifi'] =            ('__version__',     '2023.05.07')
+        infos['urllib3'] =            ('__version__',     '2.0.3')
+        infos['requests'] =           ('__version__',     '2.31.0')
+        infos['lxml'] =               ('__version__',     '4.9.2')
+        infos['ijson'] =              ('__version__',     '3.2.2')
+        infos['selenium'] =           ('__version__',     '4.10.0')
+        infos['webdriver_manager'] =  ('__version__',     '3.8.6')
+        infos['rdflib'] =             ('__version__',     '7.0.0')
+        infos['pyRdfa'] =             ('__version__',     '3.5.3')
+        infos['parsel'] =             ('__version__',     '1.8.1')
+        infos['cssselect'] =          ('__version__',     '1.2.0')
         return infos
 
     def connect(self):
