@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][4] et à notre [Politique de protection des données][5].**
 
-# version [1.2.3][6]
+# version [1.2.4][6]
 
 ## Introduction:
 
@@ -319,7 +319,15 @@ Voir les macros [Requêtes HTTP sous BASIC][64] et [Requêtes ChatGPT en BASIC][
 
 - Correction d'une erreur lors de l'actualisation des jetons OAuth2.
 
-### Que reste-t-il à faire pour la version 1.2.2:
+### Ce qui a été fait pour la version 1.2.3:
+
+- Correction d'une erreur sur isAuthorized() du OAuth2Service.
+
+### Ce qui a été fait pour la version 1.2.4:
+
+- Mise à jour des paquets python embarqués.
+
+### Que reste-t-il à faire pour la version 1.2.4:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -345,7 +353,7 @@ Voir les macros [Requêtes HTTP sous BASIC][64] et [Requêtes ChatGPT en BASIC][
 [18]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
 [19]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [20]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[21]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.2.3#right>
+[21]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.2.4#right>
 [22]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [23]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [24]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>

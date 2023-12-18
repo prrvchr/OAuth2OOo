@@ -176,17 +176,22 @@ class LogController(LogWrapper):
             except Exception as e:
                 msg = self._resolver.resolveString(113) % (name, e, traceback.format_exc())
             else:
-                minimum = info[1]
-                file = getattr(mod, '__file__')
-                if hasattr(mod, info[0]):
-                    version = getattr(mod, info[0])
+                attr, minimum = info
+                unknown = '<unknown>'
+                path = getattr(mod, '__file__', unknown)
+                if not path:
+                    path = unknown
+                if attr is None:
+                    msg = self._resolver.resolveString(114) % (name, minimum, path)
+                elif hasattr(mod, attr):
+                    version = getattr(mod, attr)
                     if minimum is None or checkVersion(version, minimum):
-                        msg = self._resolver.resolveString(114) % (name, version, file)
+                        msg = self._resolver.resolveString(114) % (name, version, path)
                     else:
-                        msg = self._resolver.resolveString(115) % (name, version, file, minimum)
+                        msg = self._resolver.resolveString(115) % (name, version, path, minimum)
                 else:
-                    modattr = ', '.join(dir(mod).keys())
-                    msg = self._resolver.resolveString(116) % (name, file, modattr)
+                    modattr = ', '.join(dir(mod))
+                    msg = self._resolver.resolveString(116) % (name, path, modattr)
             self._logger.logp(level, clazz, method, msg)
 
     def clearLogger(self):
