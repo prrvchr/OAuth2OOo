@@ -42,7 +42,7 @@ soupsieve==2.4.1
 tqdm==4.65.0
 trio==0.22.1
 trio_websocket==0.10.3
-urllib3==2.0.3
+urllib3==2.1.0
 validators==0.20.0
 w3lib==2.1.1
 webdriver_manager==3.8.6
