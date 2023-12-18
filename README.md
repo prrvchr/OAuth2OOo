@@ -58,7 +58,7 @@ Some of these libraries embed binary files which depend on:
 - Operating system (Linux, Windows, Macos, etc...)
 - The architecture of your computer (i386, adm x64, arm64, ppc, etc...)
 
-Three libraries or **Python packages** depend on your system and have the following embedded binaries:
+Four libraries or **Python packages** depend on your system and have the following embedded binaries:
 - [Binaries][12] for package [charset-normalizer][13] version 3.1.0.
 - [Binaries][14] for package [ijson][15] version 3.2.2.
 - [Binaries][16] for package [lxml][17] version 4.9.2.
@@ -67,9 +67,9 @@ Three libraries or **Python packages** depend on your system and have the follow
 For all these reasons:
 - If you are **on Windows all the different necessary binaries come with the OAuth2OOo extension**.
 - If you are **on Linux x86_64 necessary binaries for Python version 3.10 come with the OAuth2OOo extension**.
-- **For all other possible configuration combinations, if they are not already present, you will need to install these 3 python packages**.  
+- **For all other possible configuration combinations, if they are not already present, you will need to install these 4 python packages**.  
 In their absence, an error should appear when installing the OAuthOOo extension while importing the lxml package.
-This error can be corrected by installing, usually with the help of [pip][20], the 3 Python packages required by your configuration.
+This error can be corrected by installing, usually with the help of [pip][20], the 4 Python packages required by your configuration.
 
 If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.
 To install the Mozilla PPA please type the command:

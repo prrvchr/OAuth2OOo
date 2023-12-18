@@ -58,7 +58,7 @@ Certaines de ces librairies embarquent des fichiers binaires qui dépendent:
 - Du système d'exploitation (Linux, Windows, Macos, etc...)
 - De l'architecture de votre ordinateur (i386, adm x64, arm64, ppc, etc...)
 
-Trois bibliothèques ou **paquets Python** dépendent de votre système et ont les fichiers binaires embarqués suivant:
+Quatre bibliothèques ou **paquets Python** dépendent de votre système et ont les fichiers binaires embarqués suivant:
 - [Fichiers binaires][12] pour le paquet [charset-normalizer][13] version 3.1.0.
 - [Fichiers binaires][14] pour le paquet [ijson] [15] version 3.2.2.
 - [Fichiers binaires][16] pour le paquet [lxml] [17] version 4.9.2.
@@ -67,9 +67,9 @@ Trois bibliothèques ou **paquets Python** dépendent de votre système et ont l
 Pour toutes ces raisons:
 - Si vous êtes **sous Windows tous les différents binaires nécessaires sont livrés avec l'extension OAuth2OOo**.
 - Si vous êtes **sur Linux x86_64 les binaires nécessaires pour Python version 3.10 sont livrés avec l'extension OAuth2OOo**.
-- **Pour toutes les autres combinaisons de configuration possibles, si ils ne sont pas déjà présents, vous devrez installer ces 3 paquets python**.  
+- **Pour toutes les autres combinaisons de configuration possibles, si ils ne sont pas déjà présents, vous devrez installer ces 4 paquets python**.  
 En leur absence, une erreur devrait apparaître lors de l'installation de l'extension OAuthOOo lors de l'importation du package lxml.
-Cette erreur peut être corrigée en installant, généralement à l'aide de [pip][20], les 3 paquets Python requis par votre configuration.
+Cette erreur peut être corrigée en installant, généralement à l'aide de [pip][20], les 4 paquets Python requis par votre configuration.
 
 Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.
 Pour installer le PPA de Mozilla veuillez taper la commande:
