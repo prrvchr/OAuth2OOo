@@ -32,7 +32,7 @@ _json_serializer_name	= "my-json-ld"
 try:
     from cStringIO import StringIO
 except ImportError:
-    from io import StringIO
+    from StringIO import StringIO
 
 	
 #########################################################################################################
