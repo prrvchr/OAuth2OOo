@@ -78,7 +78,7 @@ class OAuth2Service(unohelper.Base,
                     XServiceInfo,
                     XOAuth2Service):
     # FIXME: We should be able to return None if the user is not
-    # FIXME: authorized and the OAuth2 Wizard has been canceled.
+    # FIXME: authorized and/or the OAuth2 Wizard has been canceled.
     def __new__(cls, ctx, url='', user=''):
         if url and user:
             config = getConfiguration(ctx, g_identifier)

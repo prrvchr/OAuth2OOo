@@ -42,29 +42,26 @@ class OptionsModel(BaseModel):
         super(OptionsModel, self).__init__(ctx)
 
     @property
-    def ConnectTimeout(self):
+    def _ConnectTimeout(self):
         return self._config.getByName('ConnectTimeout')
-    @ConnectTimeout.setter
-    def ConnectTimeout(self, timeout):
-        self._config.replaceByName('ConnectTimeout', timeout)
-
     @property
-    def ReadTimeout(self):
+    def _ReadTimeout(self):
         return self._config.getByName('ReadTimeout')
-    @ReadTimeout.setter
-    def ReadTimeout(self, timeout):
-        self._config.replaceByName('ReadTimeout', timeout)
-
     @property
-    def HandlerTimeout(self):
+    def _HandlerTimeout(self):
         return self._config.getByName('HandlerTimeout')
-    @HandlerTimeout.setter
-    def HandlerTimeout(self, timeout):
-        self._config.replaceByName('HandlerTimeout', timeout)
 
-    def getOptionsDialogData(self):
-        return self.ConnectTimeout, self.ReadTimeout, self.HandlerTimeout, self.UrlList
+    def getOptionsData(self):
+        return self._ConnectTimeout, self._ReadTimeout, self._HandlerTimeout, self.UrlList
 
     def getProviderName(self, url):
         return getProviderName(self._config, url)
+
+    def setOptionsData(self, connect, read, handler):
+        if connect != self._ConnectTimeout:
+            self._config.replaceByName('ConnectTimeout', connect)
+        if read != self._ReadTimeout:
+            self._config.replaceByName('ReadTimeout', read)
+        if handler != self._HandlerTimeout:
+            self._config.replaceByName('HandlerTimeout', handler)
 

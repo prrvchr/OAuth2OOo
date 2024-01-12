@@ -29,7 +29,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][4] and [Data Protection Policy][5].**
 
-# version [1.2.4][6]
+# version [1.3.0][6]
 
 ## Introduction:
 
@@ -52,28 +52,25 @@ In order to take advantage of the latest versions of the Python libraries used i
 This means that **OAuth2OOo no longer supports OpenOffice and LibreOffice 6.x on Windows since version 1.1.0**.
 I can only advise you **to migrate to LibreOffice 7.x**.
 
-To offer you all these new services in LibreOffice, the OAuth2OOo extension uses many Python libraries.
-Some of these libraries embed binary files which depend on:
-- Python version (between 3.8 and 3.11 included)
-- Operating system (Linux, Windows, Macos, etc...)
-- The architecture of your computer (i386, adm x64, arm64, ppc, etc...)
+- If you are **on Windows** you must use **LibreOffice version 7.x minimum**.
 
-Four libraries or **Python packages** depend on your system and have the following embedded binaries:
-- [Binaries][12] for package [charset-normalizer][13] version 3.1.0.
-- [Binaries][14] for package [ijson][15] version 3.2.2.
-- [Binaries][16] for package [lxml][17] version 4.9.2.
-- [Binaries][18] for package [cffi][19] version 1.16.0.
+- If you are **on Linux with Python version 3.10** you must use **LibreOffice version 6.x or higher** (LibreOffice version 7.x is strongly recommended).
 
-For all these reasons:
-- If you are **on Windows all the different necessary binaries come with the OAuth2OOo extension**.
-- If you are **on Linux x86_64 necessary binaries for Python version 3.10 come with the OAuth2OOo extension**.
-- **For all other possible configuration combinations, if they are not already present, you will need to install these 4 python packages**.  
-In their absence, an error should appear when installing the OAuthOOo extension while importing the lxml package.
-This error can be corrected by installing, usually with the help of [pip][20], the 4 Python packages required by your configuration.
+- If you are **on Linux with Python other than version 3.10** or **on macOS whatever the version of Python**, you need:
+   - Make sure your version of Python is 3.8 minimum.
+   - Download the file [requirements.txt][12].
+   - Install using [pip][13], the Python packages necessary for the extension with the command:  
+     `pip install requirements.txt`
 
-If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.
-To install the Mozilla PPA please type the command:
-- `sudo add-apt-repository ppa:mozillateam/ppa`
+**On Linux and macOS the packages** used by the extension, if already installed, may come from the system and therefore **may not be up to date**.  
+To ensure that your Python packages are up to date it is recommended to use the **System Info** option in the Extension Options accessible by:  
+**Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System info**  
+If outdated packages appear, you can update them with the command:  
+`pip install package_name`
+
+If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.  
+To install the Mozilla PPA please type the command:  
+`sudo add-apt-repository ppa:mozillateam/ppa`
 
 ___
 
@@ -328,7 +325,16 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 
 - Updated embedded python packages.
 
-### What remains to be done for version 1.2.4:
+### What has been done for version 1.3.0:
+
+- Using the new version 3.6.2 of [pyRdfa3][85].
+- All Python packages necessary for the extension are now recorded in a [requirements.txt][12] file following [PEP 508][86].
+- Now if you are not on Windows then the Python packages necessary for the extension can be easily installed with the command:  
+  `pip install requirements.txt`
+- Simplification of the [Requirement][87] section.
+- Many fixes...
+
+### What remains to be done for version 1.3.0:
 
 - Add new language for internationalization...
 
@@ -345,18 +351,11 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 [9]: <https://www.openoffice.org/download/index.html>
 [10]: <https://github.com/prrvchr/OAuth2OOo>
 [11]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/charset_normalizer>
-[13]: <https://pypi.org/project/charset-normalizer/3.1.0/#files>
-[14]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/ijson/backends>
-[15]: <https://pypi.org/project/ijson/3.2.2/#files>
-[16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/lxml>
-[17]: <https://pypi.org/project/lxml/4.9.2/#files>
-[18]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/python/cffi>
-[19]: <https://pypi.org/project/cffi/1.16.0/#files>
-[20]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
+[12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/requirements.txt>
+[13]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
 [21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [22]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[23]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.2.4#right>
+[23]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.0#right>
 [24]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
 [25]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
@@ -418,3 +417,6 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 [82]: <https://appdefensealliance.dev/casa/tier-2/tier2-overview>
 [83]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en#nature-and-scope-rights-over-your-data>
 [84]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/OAuth2Service.idl>
+[85]: <https://github.com/prrvchr/pyrdfa3>
+[86]: <https://peps.python.org/pep-0508/>
+[87]: <https://prrvchr.github.io/OAuth2OOo/#requirement>

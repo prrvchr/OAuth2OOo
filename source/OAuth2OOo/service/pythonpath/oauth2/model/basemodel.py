@@ -55,4 +55,6 @@ class BaseModel(unohelper.Base):
     def commit(self):
         if self._config.hasPendingChanges():
             self._config.commitChanges()
+            return True
+        return False
 

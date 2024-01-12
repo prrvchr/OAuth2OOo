@@ -37,25 +37,26 @@ from com.sun.star.lang import XServiceInfo
 
 from oauth2 import OptionsManager
 
+from oauth2 import getLogger
+
 from oauth2 import g_identifier
-from oauth2 import g_errorlog
+from oauth2 import g_defaultlog
 from oauth2 import g_basename
 
 import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = '%s.OptionsHandler' % g_identifier
+g_ImplementationName = f'{g_identifier}.OptionsHandler'
 
 
 class OptionsHandler(unohelper.Base,
                      XServiceInfo,
                      XContainerWindowEventHandler):
     def __init__(self, ctx):
-        print("OptionsHandler.__init__() 1")
         self._ctx = ctx
         self._manager = None
-        print("OptionsHandler.__init__() 2")
+        self._logger = getLogger(ctx, g_defaultlog, g_basename)
 
     # XContainerWindowEventHandler
     def callHandlerMethod(self, window, event, method):
@@ -63,7 +64,7 @@ class OptionsHandler(unohelper.Base,
             handled = False
             if method == 'external_event':
                 if event == 'initialize':
-                    self._manager = OptionsManager(self._ctx, window)
+                    self._manager = OptionsManager(self._ctx, window, self._logger)
                     handled = True
                 elif event == 'ok':
                     self._manager.saveSetting()
@@ -76,8 +77,7 @@ class OptionsHandler(unohelper.Base,
                 handled = True
             return handled
         except Exception as e:
-            logger = getLogger(self._ctx, g_errorlog, g_basename)
-            logger.logprb(SEVERE, 'OptionsHandler', 'callHandlerMethod()', 141, e, traceback.format_exc())
+            self._logger.logprb(SEVERE, 'OptionsHandler', 'callHandlerMethod()', 141, e, traceback.format_exc())
 
     def getSupportedMethodNames(self):
         return ('external_event',
@@ -95,5 +95,4 @@ class OptionsHandler(unohelper.Base,
 g_ImplementationHelper.addImplementation(OptionsHandler,                            # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                         (g_ImplementationName,))                    # List of implemented services
-
 

@@ -50,20 +50,24 @@ class OptionsView(unohelper.Base):
     def getParent(self):
         return self._dialog.getPeer()
 
-    def getConnectTimeout(self):
-        return int(self._getConnectTimeout().getValue())
-
-    def getReadTimeout(self):
-        return int(self._getReadTimeout().getValue())
-
-    def getHandlerTimeout(self):
-        return int(self._getHandlerTimeout().getValue())
-
     def getUrl(self):
         return self._getUrls().SelectedText
 
     def getAutoClose(self):
         return bool(self._getAutoClose().State)
+
+    def getViewData(self):
+        return self._getConnect(), self._getRead(), self._getHandler()
+
+# OptionsView private getter methods
+    def _getConnect(self):
+        return int(self._getConnectTimeout().getValue())
+
+    def _getRead(self):
+        return int(self._getReadTimeout().getValue())
+
+    def _getHandler(self):
+        return int(self._getHandlerTimeout().getValue())
 
 # OptionsView private getter control methods
     def _getUrls(self):
