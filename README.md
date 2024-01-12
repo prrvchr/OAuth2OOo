@@ -52,6 +52,8 @@ In order to take advantage of the latest versions of the Python libraries used i
 This means that **OAuth2OOo no longer supports OpenOffice and LibreOffice 6.x on Windows since version 1.1.0**.
 I can only advise you **to migrate to LibreOffice 7.x**.
 
+The requirement depend on the platform on which the extension is installed:
+
 - If you are **on Windows** you must use **LibreOffice version 7.x minimum**.
 
 - If you are **on Linux with Python version 3.10** you must use **LibreOffice version 6.x or higher** (LibreOffice version 7.x is strongly recommended).
