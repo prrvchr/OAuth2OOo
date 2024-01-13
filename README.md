@@ -65,10 +65,10 @@ The requirement depend on the platform on which the extension is installed:
      `pip install requirements.txt`
 
 **On Linux and macOS the packages** used by the extension, if already installed, may come from the system and therefore **may not be up to date**.  
-To ensure that your Python packages are up to date it is recommended to use the **System Info** option in the Extension Options accessible by:  
-**Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System info**  
+To ensure that your Python packages are up to date it is recommended to use the **System Info** option in the extension Options accessible by:  
+**Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System Info**  
 If outdated packages appear, you can update them with the command:  
-`pip install package_name`
+`pip install --upgrade <package-name>`
 
 If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.  
 To install the Mozilla PPA please type the command:  
@@ -76,14 +76,17 @@ To install the Mozilla PPA please type the command:
 
 ___
 
-## Install:
+## Installation:
 
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
 - ![OAuth2OOo logo][21] Install **[OAuth2OOo.oxt][22]** extension [![Version][23]][22]
 
-Restart LibreOffice / OpenOffice after installation.
+Restart LibreOffice after installation.
+
+**On Windows, restarting LibreOffice may not be enough.**  
+To ensure that LibreOffice restarts correctly, use the Windows Task Manager to verify that no LibreOffice services are visible after LibreOffice is shut down.
 
 ___
 

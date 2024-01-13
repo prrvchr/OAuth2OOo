@@ -67,8 +67,8 @@ Les prérequis dépendent de la plateforme sur laquelle l'extension est install�
 **Sous Linux et macOS les paquets** utilisés par l'extension, peuvent s'il sont déja installé provenir du système et donc, **peuvent ne pas être à jour**.  
 Afin de s'assurer que vos paquets Python sont à jour il est recommandé d'utiliser l'option **Info système** dans les Options de l'extension accessible par:  
 **Outils -> Options -> Internet -> Protocole OAuth2 -> Voir journal -> Info système**  
-Si des packages obsolètes apparaissent, vous pouvez les mettre à jour avec la commande:  
-`pip install nom_du_paquet`
+Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec la commande:  
+`pip install --upgrade <package-name>`
 
 Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.  
 Pour installer le PPA de Mozilla veuillez taper la commande:  
@@ -83,7 +83,10 @@ Si nécessaire, renommez-le avant de l'installer.
 
 - ![OAuth2OOo logo][21] Installer l'extension **[OAuth2OOo.oxt][22]** [![Version][23]][22]
 
-Redémarrez LibreOffice / OpenOffice après l'installation.
+Redémarrez LibreOffice après l'installation.
+
+**Sous Windows, redémarrer LibreOffice peut ne pas suffire.**  
+Pour vous assurer que LibreOffice redémarre correctement, utilisez le Gestionnaire de tâche de Windows pour vérifier qu'aucun service LibreOffice n'est visible après l'arrêt de LibreOffice.
 
 ___
 
