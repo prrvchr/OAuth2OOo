@@ -63,12 +63,15 @@ Les prérequis dépendent de la plateforme sur laquelle l'extension est install�
   - Télécharger le fichier [requirements.txt][12].
   - Installer à l'aide de [pip][13], les paquets Python nécessaires à l'extension avec la commande:  
     `pip install requirements.txt`
+  - Installer l'extension sous LibreOffice version 6.x ou supérieure.
 
 **Sous Linux et macOS les paquets** utilisés par l'extension, peuvent s'il sont déja installé provenir du système et donc, **peuvent ne pas être à jour**.  
 Afin de s'assurer que vos paquets Python sont à jour il est recommandé d'utiliser l'option **Info système** dans les Options de l'extension accessible par:  
 **Outils -> Options -> Internet -> Protocole OAuth2 -> Voir journal -> Info système**  
 Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec la commande:  
 `pip install --upgrade <package-name>`
+
+Pour plus d'information voir: [Ce qui a été fait pour la version 1.3.0][14].
 
 Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.  
 Pour installer le PPA de Mozilla veuillez taper la commande:  
@@ -333,8 +336,8 @@ Voir les macros [Requêtes HTTP sous BASIC][66] et [Requêtes ChatGPT en BASIC][
 ### Ce qui a été fait pour la version 1.3.0:
 
 - Utilisation de la nouvelle version 3.6.2 de [pyRdfa3][85].
-- Tous les packages Python nécessaires à l'extension sont désormais enregistrés dans un fichier [requirements.txt][12] suivant la [PEP 508][86].
-- Désormais si vous n'êtes pas sous Windows alors les packages Python nécessaires à l'extension peuvent être facilement installés avec la commande:  
+- Tous les paquets Python nécessaires à l'extension sont désormais enregistrés dans un fichier [requirements.txt][12] suivant la [PEP 508][86].
+- Désormais si vous n'êtes pas sous Windows alors les paquets Python nécessaires à l'extension peuvent être facilement installés avec la commande:  
   `pip install requirements.txt`
 - Simplification de la section [Prérequis][87].
 - De nombreuses corrections...
@@ -358,6 +361,7 @@ Voir les macros [Requêtes HTTP sous BASIC][66] et [Requêtes ChatGPT en BASIC][
 [11]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
 [12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/requirements.txt>
 [13]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
+[14]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-130>
 [21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [22]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
 [23]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.0#right>
