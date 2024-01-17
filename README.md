@@ -35,8 +35,9 @@
 
 **OAuth2OOo** is part of a [Suite][7] of [LibreOffice][8] ~~and/or [OpenOffice][9]~~ extensions allowing to offer you innovative services in these office suites.
 
-This extension is the implementation of the [OAuth 2.0 protocol][10]. Protocol allowing you to obtain your consent so that an application can access your data present at the GAFA.  
-It also allows **executing HTTP requests in BASIC** and provides the following macros as an example:
+This extension is the implementation of the [OAuth 2.0 protocol][10]. Protocol allowing you to obtain your consent so that an application can access your data present at the GAFA.
+
+It allows **executing HTTP requests in BASIC** and provides the following macros as an example:
 - [HTTPGetRequest][11]
 - [HTTPPostRequest][12]
 - [ChatGPTRequest][13]
@@ -46,10 +47,18 @@ It also allows **executing HTTP requests in BASIC** and provides the following m
 If you open a document beforehand, you can launch them by:  
 **Tools -> Macros -> Run Macro... -> My Macros -> OAuth2OOo -> `macro-name` -> Main -> Run**
 
+It also allows **grabbing internet data in a Calc sheet**. See the following Calc files as an example:
+- [LDLC MacBook Pro.ods][16]
+- [LDLC Asus Zenbook.ods][17]
+
+And finally, it allows you to **drive Firefox using a Calc file** (or any other browser supported by [Selenium][18]). See the following files:
+- [Page Jaunes (Windows).ods][19]
+- [Page Jaunes (Linux).ods][20]
+
 Being free software I encourage you:
-- To duplicate its [source code][16].
+- To duplicate its [source code][21].
 - To make changes, corrections, improvements.
-- To open [issue][17] if needed.
+- To open [issue][22] if needed.
 
 In short, to participate in the development of this extension.
 Because it is together that we can make Free Software smarter.
@@ -70,8 +79,8 @@ The requirement depend on the platform on which the extension is installed:
 
 - If you are **on Linux with Python other than version 3.10** or **on macOS whatever the version of Python**, you need:
   - Make sure your version of Python is 3.8 minimum.
-  - Download the file [requirements.txt][18].
-  - Install using [pip][19], the Python packages necessary for the extension with the command:  
+  - Download the file [requirements.txt][23].
+  - Install using [pip][24], the Python packages necessary for the extension with the command:  
     `pip install requirements.txt`
   - Install the extension under LibreOffice version 6.x or higher.
 
@@ -81,7 +90,7 @@ To ensure that your Python packages are up to date it is recommended to use the 
 If outdated packages appear, you can update them with the command:  
 `pip install --upgrade <package-name>`
 
-For more information see: [What has been done for version 1.3.0][20].
+For more information see: [What has been done for version 1.3.0][25].
 
 If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.  
 To install the Mozilla PPA please type the command:  
@@ -94,7 +103,7 @@ ___
 It seems important that the file was not renamed when it was downloaded.
 If necessary, rename it before installing it.
 
-- ![OAuth2OOo logo][21] Install **[OAuth2OOo.oxt][22]** extension [![Version][23]][22]
+- ![OAuth2OOo logo][26] Install **[OAuth2OOo.oxt][27]** extension [![Version][28]][27]
 
 Restart LibreOffice after installation.
 
@@ -136,21 +145,21 @@ ___
 
 ## Uno OAuth2.0 API for LibreOffice.
 
-![OAuth2OOo Wizard Page1 screenshot][24]
+![OAuth2OOo Wizard Page1 screenshot][29]
 
-![OAuth2OOo Wizard Page2 screenshot][25]
+![OAuth2OOo Wizard Page2 screenshot][30]
 
-![OAuth2OOo Wizard Page3 screenshot][26]
+![OAuth2OOo Wizard Page3 screenshot][31]
 
-![OAuth2OOo Browser Page1 screenshot][27]
+![OAuth2OOo Browser Page1 screenshot][32]
 
-![OAuth2OOo Browser Page2 screenshot][28]
+![OAuth2OOo Browser Page2 screenshot][33]
 
-![OAuth2OOo Browser Page3 screenshot][29]
+![OAuth2OOo Browser Page3 screenshot][34]
 
-![OAuth2OOo Browser Page4 screenshot][30]
+![OAuth2OOo Browser Page4 screenshot][35]
 
-![OAuth2OOo Wizard Page4 screenshot][31]
+![OAuth2OOo Wizard Page4 screenshot][36]
 
 The OAuth2 protocol allows access to server resources, after accepting the connection authorization, by exchanging tokens.
 
@@ -168,10 +177,10 @@ ___
 
 * LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Python version 3.8.15 (under Lubuntu 22.04 / VirtualBox 6.1.38)
 
-* **Does not work with OpenOffice** see [bug 128569][32]. Having no solution, I encourage you to install **LibreOffice**.
+* **Does not work with OpenOffice** see [bug 128569][37]. Having no solution, I encourage you to install **LibreOffice**.
 
 I encourage you in case of problem :confused:  
-to create an [issue][11]  
+to create an [issue][22]  
 I will try to solve it :smile:
 
 ___
@@ -180,9 +189,9 @@ ___
 
 ### What has been done for version 0.0.5:
 
-- Writing of a new [XWizard][33] interface in order to replace the Wizard service which became defective with version 6.4.x and 7.x of LibreOffice (see [bug 132110][34]).
+- Writing of a new [XWizard][38] interface in order to replace the Wizard service which became defective with version 6.4.x and 7.x of LibreOffice (see [bug 132110][39]).
 
-    This new interface also fixes [bug 132661][35] and [bug 132666][36] and allows access to versions 6.4.x and 7.x of LibreOffice...
+    This new interface also fixes [bug 132661][40] and [bug 132666][41] and allows access to versions 6.4.x and 7.x of LibreOffice...
 
     In addition this new XWizard adds new functionality such as:
 
@@ -195,28 +204,28 @@ ___
 
 ### What has been done for version 0.0.6:
 
-- Rewrite of the OAuth2 wizard trying to follow the [MVA model][37] as best as possible. This wizard is made up of 5 pages inheriting from the UNO [XWizardPage][38] interface:
+- Rewrite of the OAuth2 wizard trying to follow the [MVA model][42] as best as possible. This wizard is made up of 5 pages inheriting from the UNO [XWizardPage][43] interface:
 
-    - Page 1: [Adapter][39] and [View][40]
-    - Page 2: [Adapter][41] and [View][42]
-    - Page 3: [Adapter][43] and [View][44]
-    - Page 4: [Adapter][45] and [View][46]
-    - Page 5: [Adapter][47] and [View][48]
+    - Page 1: [Adapter][44] and [View][45]
+    - Page 2: [Adapter][46] and [View][47]
+    - Page 3: [Adapter][48] and [View][49]
+    - Page 4: [Adapter][50] and [View][51]
+    - Page 5: [Adapter][52] and [View][53]
 
 - Rewrite of the three UNO services provided by the OAuth2OOo extension in three separate files:
 
-    - The [OAuth2Service][49] service implementing the interface described in the [XOAuth2Service][50] IDL file.
-    - The [OAuth2Dispacher][51] service implementing the UNO interface [XDispatchProvider][52].
-    - The [OAuth2Handler][53] service implementing the UNO interface [XInteractionHandler2][54].
+    - The [OAuth2Service][54] service implementing the interface described in the [XOAuth2Service][55] IDL file.
+    - The [OAuth2Dispacher][56] service implementing the UNO interface [XDispatchProvider][57].
+    - The [OAuth2Handler][58] service implementing the UNO interface [XInteractionHandler2][59].
 
 - Rewrite of the options dialog accessible by **Tools -> Options -> Internet -> Protocol OAuth2**. This dialog is composed of two windows:
 
-    - The logging window: [Adapter][55] and [View][56].
-    - The OAuth2OOo extension configuration options window: [Adapter][57] and [View][58].
+    - The logging window: [Adapter][60] and [View][61].
+    - The OAuth2OOo extension configuration options window: [Adapter][62] and [View][63].
 
-- Rewrite a single data model: [OAuth2Model][59] managing wizard, services and options dialog.
+- Rewrite a single data model: [OAuth2Model][64] managing wizard, services and options dialog.
 
-- Google loopback flow error has been fixed. See [Issue #10][60]
+- Google loopback flow error has been fixed. See [Issue #10][65]
 
 - Use for Dropbox their new OAuth2 API with expirable tokens.
 
@@ -224,10 +233,10 @@ ___
 
 ### What has been done for version 1.0.0:
 
-- Porting Python API [Requests][61] to LibreOffice / OpenOffice UNO API. Two UNO interfaces are accessible:
+- Porting Python API [Requests][66] to LibreOffice / OpenOffice UNO API. Two UNO interfaces are accessible:
 
-    - HTTP request parameters: [com.sun.star.rest.XRequestParameter.idl][62]
-    - The response to the HTTP request: [com.sun.star.rest.XRequestResponse.idl][63]  
+    - HTTP request parameters: [com.sun.star.rest.XRequestParameter.idl][67]
+    - The response to the HTTP request: [com.sun.star.rest.XRequestResponse.idl][68]  
 
     The XRequestParameter interface supports sync token handling as well as HTTP request paging, as used in the HTTP Rest APIs
 
@@ -239,23 +248,21 @@ ___
     - `XRequestParameter.DataSink` to set an input stream.
     - `XRequestResponse.getInputStream()` to get an input stream.
 
-- Porting Java API [javax.json][64] to LibreOffice / OpenOffice UNO API as defined in idl files: [com.sun.star.json.*][65]
+- Porting Java API [javax.json][69] to LibreOffice / OpenOffice UNO API as defined in idl files: [com.sun.star.json.*][70]
 
-    - A factory of JSON structures is accessible via the `getJsonBuilder()` interface of [XRequestParameter][62].
-    - A Json parser is returned by the `getJson()` interface of [XRequestResponse][63].
+    - A factory of JSON structures is accessible via the `getJsonBuilder()` interface of [XRequestParameter][67].
+    - A Json parser is returned by the `getJson()` interface of [XRequestResponse][68].
 
 **This makes HTTP requests using JSON easily usable in the BASIC language of LibreOffice.**
-
-See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 
 ### What has been done for version 1.0.1:
 
 - Writing of 15 functions in Calc AddIns as described in the following files:
 
-    - The file [OAuth2Plugin.idl][68] which declares new interfaces to UNO.
-    - The file [CalcAddIns.xcu][69] which makes available these new interfaces in the list of Calc functions.
-    - The file [OAuth2Plugin.py][70] which is the implementation of the UNO service `com.sun.star.auth.Oauth2Plugin` providing these new interfaces.
-    - The file [plugin.py][71] which is the library implementing the interfaces of this new UNO service.
+    - The file [OAuth2Plugin.idl][71] which declares new interfaces to UNO.
+    - The file [CalcAddIns.xcu][72] which makes available these new interfaces in the list of Calc functions.
+    - The file [OAuth2Plugin.py][73] which is the implementation of the UNO service `com.sun.star.auth.Oauth2Plugin` providing these new interfaces.
+    - The file [plugin.py][74] which is the library implementing the interfaces of this new UNO service.
 
 - These 4 new files give access to **15 new Calc formulas** which are:
 
@@ -275,16 +282,11 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
     - `FLATTENJSON(DATA,TYPENAME,PATH,SEPARATOR)`
     - `SPLITJSON(DATA,TYPENAME,PATH,SEPARATOR)`
 
-- A good example is better than a long speech, so I invite you to download two Calc sheets allowing you to very easily recover HTML micro data from any Web site.
-
-    - [LDLC Home.ods][72]
-    - [LDLC poducts.ods][73]
-
 ### What has been done for version 1.1.0:
 
 - **End of support for Python 2.x and therefore for OpenOffice**.
 
-- Integration of [Selenium][74] version 4.10 in the extension in order to make **LibreOffice able to control a browser via Calc formulas** inserted in a spreadsheet.
+- Integration of [Selenium][18] version 4.10 in the extension in order to make **LibreOffice able to control a browser via Calc formulas** inserted in a spreadsheet.
 
 - Use of [webdriver_manager][75] version 3.8.6 to automate the installation of the browser's [WebDriver][76].
 
@@ -304,11 +306,11 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 
 ### What has been done for version 1.1.1:
 
-- Fixed an issue in [the implementation][77] of the [com.sun.star.rest.XRequestParameter][62] interface not allowing to create empty JSON objects (ie: "Object": {} ) as requested by the Microsoft Graph API.
+- Fixed an issue in [the implementation][77] of the [com.sun.star.rest.XRequestParameter][67] interface not allowing to create empty JSON objects (ie: "Object": {} ) as requested by the Microsoft Graph API.
 
 ### What has been done for version 1.1.2:
 
-- Modification of the idl files: [XRequestParameter.idl][62] and [XRequestResponse.idl][63] and the underlying python implementations: [requestparameter.py][77] and [requestresponse.py][78] in order to make it possible **POST** requests with **application/x-www-form-urlencoded** encoding. See [issue #13][79].
+- Modification of the idl files: [XRequestParameter.idl][67] and [XRequestResponse.idl][68] and the underlying python implementations: [requestparameter.py][77] and [requestresponse.py][78] in order to make it possible **POST** requests with **application/x-www-form-urlencoded** encoding. See [issue #13][79].
 
 - 3 macros in BASIC: `ChatGPTRequest`, `HTTPGetRequest` and `HTTPPostRequest` are available in: **Tools -> Macros -> Run Macros... -> My Macros -> OAuth2OOo**. Be careful, these macros **will not work if no document is open** (I don't know why?)...
 
@@ -329,7 +331,7 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 
 ### What has been done for version 1.2.1:
 
-- Added a new method `isAuthorized()` to the [XOAuth2Service][49] interface supported by the [OAuth2Service][84] service. This method allows you to launch the OAuth2 configuration Wizard if the user is not authorized.
+- Added a new method `isAuthorized()` to the [XOAuth2Service][55] interface supported by the [OAuth2Service][84] service. This method allows you to launch the OAuth2 configuration Wizard if the user is not authorized.
 
 ### What has been done for version 1.2.2:
 
@@ -346,7 +348,7 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 ### What has been done for version 1.3.0:
 
 - Using the new version 3.6.2 of [pyRdfa3][85].
-- All Python packages necessary for the extension are now recorded in a [requirements.txt][12] file following [PEP 508][86].
+- All Python packages necessary for the extension are now recorded in a [requirements.txt][23] file following [PEP 508][86].
 - Now if you are not on Windows then the Python packages necessary for the extension can be easily installed with the command:  
   `pip install requirements.txt`
 - Simplification of the [Requirement][87] section.
@@ -373,65 +375,65 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 [13]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/ChatGPTRequest.xba>
 [14]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GoogleAPIRequest.xba>
 [15]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GraphAPIRequest.xba>
-[16]: <https://github.com/prrvchr/OAuth2OOo>
-[17]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[18]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/requirements.txt>
-[19]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
-[20]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-130>
-[21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
-[22]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[23]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.0#right>
-[24]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
-[25]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
-[26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
-[27]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>
-[28]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5.png>
-[29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6.png>
-[30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7.png>
-[31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8.png>
-[32]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
-[33]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/wizard/wizard.py>
-[34]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132110>
-[35]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
-[36]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
-[37]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
-[38]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/ui/dialogs/XWizardPage.html>
-[39]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2manager.py>
-[40]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2view.py>
-[41]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page2/oauth2manager.py>
-[42]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page2/oauth2view.py>
-[43]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page3/oauth2manager.py>
-[44]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page3/oauth2view.py>
-[45]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page4/oauth2manager.py>
-[46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page4/oauth2view.py>
-[47]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page5/oauth2manager.py>
-[48]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page5/oauth2view.py>
-[49]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Service.py>
-[50]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
-[51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Dispatcher.py>
-[52]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/frame/XDispatchProvider.html>
-[53]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Handler.py>
-[54]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/task/XInteractionHandler2.html>
-[55]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logmanager.py>
-[56]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logview.py>
-[57]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsmanager.py>
-[58]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
-[59]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
-[60]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
-[61]: <https://pypi.org/project/requests/2.31.0/>
-[62]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
-[63]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
-[64]: <https://javadoc.io/static/javax.json/javax.json-api/1.1.4/index.html?overview-summary.html>
-[65]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/json>
-[66]: <https://forum.openoffice.org/en/forum/viewtopic.php?t=110092>
-[67]: <https://forum.openoffice.org/en/forum/viewtopic.php?t=110118>
-[68]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Plugin.idl>
-[69]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/CalcAddIns.xcu>
-[70]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Plugin.py>
-[71]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/plugin.py>
-[72]: <https://forum.openoffice.org/en/forum/download/file.php?id=47297>
-[73]: <https://forum.openoffice.org/en/forum/download/file.php?id=47301>
-[74]: <https://pypi.org/project/selenium/4.10/>
+[16]: <https://github.com/prrvchr/OAuth2OOo/tree/master/LDLC%20MacBook%20Pro.ods>
+[17]: <https://github.com/prrvchr/OAuth2OOo/tree/master/LDLC%20Asus%20Zenbook.ods>
+[18]: <https://pypi.org/project/selenium/4.16.0/>
+[19]: <https://github.com/prrvchr/OAuth2OOo/tree/master/Page%20Jaunes%20Windows.ods>
+[20]: <https://github.com/prrvchr/OAuth2OOo/tree/master/Page%20Jaunes%20Linux.ods>
+[21]: <https://github.com/prrvchr/OAuth2OOo>
+[22]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
+[23]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/requirements.txt>
+[24]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
+[25]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-130>
+[26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
+[27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.0#right>
+[29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
+[30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
+[31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
+[32]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>
+[33]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5.png>
+[34]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6.png>
+[35]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7.png>
+[36]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8.png>
+[37]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
+[38]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/wizard/wizard.py>
+[39]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132110>
+[40]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132661>
+[41]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
+[42]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
+[43]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/ui/dialogs/XWizardPage.html>
+[44]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2manager.py>
+[45]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page1/oauth2view.py>
+[46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page2/oauth2manager.py>
+[47]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page2/oauth2view.py>
+[48]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page3/oauth2manager.py>
+[49]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page3/oauth2view.py>
+[50]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page4/oauth2manager.py>
+[51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page4/oauth2view.py>
+[52]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page5/oauth2manager.py>
+[53]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/wizard/page5/oauth2view.py>
+[54]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Service.py>
+[55]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
+[56]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Dispatcher.py>
+[57]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/frame/XDispatchProvider.html>
+[58]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Handler.py>
+[59]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/task/XInteractionHandler2.html>
+[60]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logmanager.py>
+[61]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logview.py>
+[62]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsmanager.py>
+[63]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
+[64]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
+[65]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
+[66]: <https://pypi.org/project/requests/2.31.0/>
+[67]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
+[68]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
+[69]: <https://javadoc.io/static/javax.json/javax.json-api/1.1.4/index.html?overview-summary.html>
+[70]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/json>
+[71]: <https://github.com/prrvchr/OAuth2OOo/tree/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Plugin.idl>
+[72]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/CalcAddIns.xcu>
+[73]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Plugin.py>
+[74]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/plugin.py>
 [75]: <https://pypi.org/project/webdriver-manager/3.8.6/>
 [76]: <https://developer.mozilla.org/en-US/docs/Web/WebDriver>
 [77]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestparameter.py>
