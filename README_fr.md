@@ -33,15 +33,16 @@
 
 ## Introduction:
 
-**OAuth2OOo** fait partie d'une [Suite][7] d'extensions [LibreOffice][8] ~~et/ou [OpenOffice][9]~~ permettant de vous offrir des services inovants dans ces suites bureautique.  
+**OAuth2OOo** fait partie d'une [Suite][7] d'extensions [LibreOffice][8] ~~et/ou [OpenOffice][9]~~ permettant de vous offrir des services inovants dans ces suites bureautique.
 
 Cette extension est l'implémentation du protocole OAuth 2.0. Protocole permettant d'obtenir votre consentement pour qu'une application puisse accéder à vos données présentes chez les GAFA.  
-Elle permet également d'exécuter des requêtes HTTP en BASIC et fournit les macros suivantes à titre d'exemple:
+Elle permet également d'**exécuter des requêtes HTTP en BASIC** et fournit les macros suivantes à titre d'exemple:
 - [HTTPGetRequest][10]
 - [HTTPPostRequest][11]
 - [ChatGPTRequest][12]
 - [GoogleAPIRequest][13]
 - [GraphAPIRequest][14]
+
 Si au préalable vous ouvrez un document, vous pouvez les lancer par:  
 **Outils -> Macros -> Exécuter la macro... -> Mes macros -> OAuth2OOo -> <nom-macro> -> Main -> Exécuter**
 
