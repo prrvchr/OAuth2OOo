@@ -34,12 +34,21 @@
 ## Introduction:
 
 **OAuth2OOo** is part of a [Suite][7] of [LibreOffice][8] ~~and/or [OpenOffice][9]~~ extensions allowing to offer you innovative services in these office suites.  
-This extension is the implementation of the OAuth 2.0 protocol. Protocol allowing you to obtain your consent so that an application can access your data present at the GAFA.
+
+This extension is the implementation of the OAuth 2.0 protocol. Protocol allowing you to obtain your consent so that an application can access your data present at the GAFA.  
+It also allows executing HTTP requests in BASIC and provides the following macros as an example:
+- [HTTPGetRequest][10]
+- [HTTPPostRequest][11]
+- [ChatGPTRequest][12]
+- [GoogleAPIRequest][13]
+- [GraphAPIRequest][14]
+If you open a document beforehand, you can launch them by:  
+**Tools -> Macros -> Run Macro... -> My Macros -> OAuth2OOo -> <macro-name> -> Main -> Run**
 
 Being free software I encourage you:
-- To duplicate its [source code][10].
+- To duplicate its [source code][15].
 - To make changes, corrections, improvements.
-- To open [issue][11] if needed.
+- To open [issue][16] if needed.
 
 In short, to participate in the development of this extension.
 Because it is together that we can make Free Software smarter.
@@ -60,8 +69,8 @@ The requirement depend on the platform on which the extension is installed:
 
 - If you are **on Linux with Python other than version 3.10** or **on macOS whatever the version of Python**, you need:
   - Make sure your version of Python is 3.8 minimum.
-  - Download the file [requirements.txt][12].
-  - Install using [pip][13], the Python packages necessary for the extension with the command:  
+  - Download the file [requirements.txt][17].
+  - Install using [pip][18], the Python packages necessary for the extension with the command:  
     `pip install requirements.txt`
   - Install the extension under LibreOffice version 6.x or higher.
 
@@ -71,7 +80,7 @@ To ensure that your Python packages are up to date it is recommended to use the 
 If outdated packages appear, you can update them with the command:  
 `pip install --upgrade <package-name>`
 
-For more information see: [What has been done for version 1.3.0][14].
+For more information see: [What has been done for version 1.3.0][19].
 
 If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.  
 To install the Mozilla PPA please type the command:  
@@ -357,11 +366,16 @@ See the macros [HTTP requests in BASIC][66] and [ChatGPT requests in BASIC][67].
 [7]: <https://prrvchr.github.io>
 [8]: <https://www.libreoffice.org/download/download/>
 [9]: <https://www.openoffice.org/download/index.html>
-[10]: <https://github.com/prrvchr/OAuth2OOo>
-[11]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/requirements.txt>
-[13]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
-[14]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-130>
+[10]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/HTTPGetRequest.xba>
+[11]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/HTTPPostRequest.xba>
+[12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/ChatGPTRequest.xba>
+[13]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GoogleAPIRequest.xba>
+[14]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GraphAPIRequest.xba>
+[15]: <https://github.com/prrvchr/OAuth2OOo>
+[16]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
+[17]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/requirements.txt>
+[18]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
+[19]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-130>
 [21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [22]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
 [23]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.0#right>

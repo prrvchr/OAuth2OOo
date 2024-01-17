@@ -34,12 +34,21 @@
 ## Introduction:
 
 **OAuth2OOo** fait partie d'une [Suite][7] d'extensions [LibreOffice][8] ~~et/ou [OpenOffice][9]~~ permettant de vous offrir des services inovants dans ces suites bureautique.  
-Cette extension est l'implémentation du protocole OAuth 2.0. Protocole permettant d'obtenir votre consentement pour qu'une application puisse accéder à vos données présentes chez les GAFA.
+
+Cette extension est l'implémentation du protocole OAuth 2.0. Protocole permettant d'obtenir votre consentement pour qu'une application puisse accéder à vos données présentes chez les GAFA.  
+Elle permet également d'exécuter des requêtes HTTP en BASIC et fournit les macros suivantes à titre d'exemple:
+- [HTTPGetRequest][10]
+- [HTTPPostRequest][11]
+- [ChatGPTRequest][12]
+- [GoogleAPIRequest][13]
+- [GraphAPIRequest][14]
+Si au préalable vous ouvrez un document, vous pouvez les lancer par:  
+**Outils -> Macros -> Exécuter la macro... -> Mes macros -> OAuth2OOo -> <nom-macro> -> Main -> Exécuter**
 
 Etant un logiciel libre je vous encourage:
-- A dupliquer son [code source][10].
+- A dupliquer son [code source][15].
 - A apporter des modifications, des corrections, des ameliorations.
-- D'ouvrir un [dysfonctionnement][11] si nécessaire.
+- D'ouvrir un [dysfonctionnement][16] si nécessaire.
 
 Bref, à participer au developpement de cette extension.
 Car c'est ensemble que nous pouvons rendre le Logiciel Libre plus intelligent.
@@ -60,8 +69,8 @@ Les prérequis dépendent de la plateforme sur laquelle l'extension est install�
 
 - Si vous êtes **sous Linux avec Python autre que la version 3.10** ou **sous macOS quelque soit la version de Python**, il vous faut:
   - Vous assurez que votre version de Python est 3.8 minimum.
-  - Télécharger le fichier [requirements.txt][12].
-  - Installer à l'aide de [pip][13], les paquets Python nécessaires à l'extension avec la commande:  
+  - Télécharger le fichier [requirements.txt][17].
+  - Installer à l'aide de [pip][18], les paquets Python nécessaires à l'extension avec la commande:  
     `pip install requirements.txt`
   - Installer l'extension sous LibreOffice version 6.x ou supérieure.
 
@@ -71,7 +80,7 @@ Afin de s'assurer que vos paquets Python sont à jour il est recommandé d'utili
 Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec la commande:  
 `pip install --upgrade <package-name>`
 
-Pour plus d'information voir: [Ce qui a été fait pour la version 1.3.0][14].
+Pour plus d'information voir: [Ce qui a été fait pour la version 1.3.0][19].
 
 Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.  
 Pour installer le PPA de Mozilla veuillez taper la commande:  
@@ -357,11 +366,16 @@ Voir les macros [Requêtes HTTP sous BASIC][66] et [Requêtes ChatGPT en BASIC][
 [7]: <https://prrvchr.github.io/README_fr>
 [8]: <https://fr.libreoffice.org/download/telecharger-libreoffice/>
 [9]: <https://www.openoffice.org/fr/Telecharger/>
-[10]: <https://github.com/prrvchr/OAuth2OOo>
-[11]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/requirements.txt>
-[13]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
-[14]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-130>
+[10]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/HTTPGetRequest.xba>
+[11]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/HTTPPostRequest.xba>
+[12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/ChatGPTRequest.xba>
+[13]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GoogleAPIRequest.xba>
+[14]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GraphAPIRequest.xba>
+[15]: <https://github.com/prrvchr/OAuth2OOo>
+[16]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
+[17]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/requirements.txt>
+[18]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
+[19]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-130>
 [21]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [22]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
 [23]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.0#right>
