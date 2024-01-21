@@ -27,14 +27,58 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-# jdbcDriverOOo general configuration
-g_extension = 'jdbcDriverOOo'
-g_identifier = 'io.github.prrvchr.%s' % g_extension
-g_service = '%s.Driver' % g_identifier
-g_version = '1.1.0'
+from com.sun.star.sdbc import SQLException
 
-# jdbcDriverOOo resource strings files and folder
-g_resource = 'resource'
-g_basename = 'Driver'
-g_defaultlog = 'jdbcDriverLogger'
-g_errorlog = 'jdbcDriverError'
+from .database import DataBase
+
+from .datasource import DataSource
+
+from .cardtool import getLogException
+
+from .dbtool import getConnectionUrl
+
+from .unotool import checkVersion
+from .unotool import getExtensionVersion
+
+from .oauth2 import getOAuth2Version
+from .oauth2 import g_extension as g_oauth2ext
+from .oauth2 import g_version as g_oauth2ver
+
+from .jdbcdriver import g_extension as g_jdbcext
+from .jdbcdriver import g_identifier as g_jdbcid
+from .jdbcdriver import g_version as g_jdbcver
+
+from .configuration import g_extension
+from .configuration import g_host
+
+from .dbconfig import g_folder
+from .dbconfig import g_version
+
+import traceback
+
+
+def getDataSource(ctx, logger, source, cls, mtd):
+    oauth2 = getOAuth2Version(ctx)
+    driver = getExtensionVersion(ctx, g_jdbcid)
+    if oauth2 is None:
+        raise getLogException(logger, source, 1003, 1121, cls, mtd, g_oauth2ext, g_extension)
+    elif not checkVersion(oauth2, g_oauth2ver):
+        raise getLogException(logger, source, 1003, 1122, cls, mtd, g_oauth2ext, g_oauth2ver)
+    elif driver is None:
+        raise getLogException(logger, source, 1003, 1121, cls, mtd, g_jdbcext, g_extension)
+    elif not checkVersion(driver, g_jdbcver):
+        raise getLogException(logger, source, 1003, 1122, cls, mtd, g_jdbcext, g_jdbcver)
+    else:
+        path = g_folder + '/' + g_host
+        url = getConnectionUrl(ctx, path)
+        try:
+            database = DataBase(ctx, url)
+        except SQLException as e:
+            raise getLogException(logger, source, 1005, 1123, cls, mtd, url, e.Message)
+        else:
+            if not database.isUptoDate():
+                raise getLogException(logger, source, 1005, 1124, cls, mtd, database.Version, g_version)
+            else:
+                return DataSource(ctx, database)
+    return None
+
