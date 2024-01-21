@@ -264,7 +264,7 @@ class RequestResponse(unohelper.Base,
         return uno.ByteSequence(self._response.content)
     @property
     def Headers(self):
-        return json.dump(self._response.headers)
+        return json.dumps(self._response.headers)
     @property
     def History(self):
         return tuple(ResquestResponse(self._ctx, self._parameter, r) for r in self._response.history)
