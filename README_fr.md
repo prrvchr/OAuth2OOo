@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][4] et à notre [Politique de protection des données][5].**
 
-# version [1.3.0][6]
+# version [1.3.1][6]
 
 ## Introduction:
 
@@ -354,7 +354,12 @@ ___
 - Simplification de la section [Prérequis][87].
 - De nombreuses corrections...
 
-### Que reste-t-il à faire pour la version 1.3.0:
+### Ce qui a été fait pour la version 1.3.1:
+
+- Correction de la propriété `Headers` dans l'[implémentation][78] de l'interface UNO [XRequestResponse][68] permettant d'obtenir les en-têtes d'une réponse HTTP.
+- De nombreuses corrections...
+
+### Que reste-t-il à faire pour la version 1.3.1:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -387,7 +392,7 @@ ___
 [25]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-130>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.0#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.1#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
