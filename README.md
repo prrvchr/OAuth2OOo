@@ -107,8 +107,10 @@ If necessary, rename it before installing it.
 
 Restart LibreOffice after installation.
 
-**On Windows, restarting LibreOffice may not be enough.**  
-To ensure that LibreOffice restarts correctly, use the Windows Task Manager to verify that no LibreOffice services are visible after LibreOffice is shut down.
+Restart LibreOffice after installation.  
+**Be careful, restarting LibreOffice may not be enough.**
+- **On Windows** to ensure that LibreOffice restarts correctly, use Windows Task Manager to verify that no LibreOffice services are visible after LibreOffice shuts down (and kill it if so).
+- **Under Linux or macOS** you can also ensure that LibreOffice restarts correctly, by launching it from a terminal with the command `soffice` and using the key combination `Ctrl + C` if after stopping LibreOffice, the terminal is not active (no command prompt).
 
 ___
 
