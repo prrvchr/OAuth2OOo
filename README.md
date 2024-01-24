@@ -100,7 +100,7 @@ ___
 
 ## Installation:
 
-It seems important that the file was not renamed when it was downloaded.
+It seems important that the file was not renamed when it was downloaded.  
 If necessary, rename it before installing it.
 
 - ![OAuth2OOo logo][26] Install **[OAuth2OOo.oxt][27]** extension [![Version][28]][27]
