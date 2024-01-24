@@ -105,8 +105,6 @@ If necessary, rename it before installing it.
 
 - ![OAuth2OOo logo][26] Install **[OAuth2OOo.oxt][27]** extension [![Version][28]][27]
 
-Restart LibreOffice after installation.
-
 Restart LibreOffice after installation.  
 **Be careful, restarting LibreOffice may not be enough.**
 - **On Windows** to ensure that LibreOffice restarts correctly, use Windows Task Manager to verify that no LibreOffice services are visible after LibreOffice shuts down (and kill it if so).
