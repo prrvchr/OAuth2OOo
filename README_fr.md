@@ -71,13 +71,13 @@ Afin de profiter des dernières versions des bibliothèques Python utilisées da
 Cela signifie que **OAuth2OOo ne supporte plus OpenOffice et LibreOffice 6.x sous Windows depuis sa version 1.1.0**.
 Je ne peux que vous conseiller **de migrer vers LibreOffice 7.x**.
 
-Les prérequis dépendent de la plateforme sur laquelle l'extension est installée:
+Les prérequis dépendent de la **plateforme (architecture)** sur laquelle l'extension est installée:
 
-- Si vous êtes **sous Windows** vous devez utiliser **LibreOffice version 7.x minimum**.
+- Si vous êtes **sous Windows (win32 or win_amd64)** vous devez utiliser **LibreOffice version 7.x minimum**.
 
-- Si vous êtes **sous Linux avec Python version 3.10** vous devez utiliser **LibreOffice version 6.x ou supérieure** (LibreOffice version 7.x est fortement recommandé).
+- Si vous êtes **sous Linux (x86_64) avec Python version 3.10** vous devez utiliser **LibreOffice version 6.x ou supérieure** (LibreOffice version 7.x est fortement recommandé).
 
-- Si vous êtes **sous Linux avec Python autre que la version 3.10** ou **sous macOS quelque soit la version de Python**, il vous faut:
+- Pour toutes les autres **plateformes / architectures (Linux, macOS... / aarch64, arm64...) ou version de Python**, vous devez:
   - Vous assurez que votre version de Python est 3.8 minimum.
   - Télécharger le fichier [requirements.txt][23].
   - Installer à l'aide de [pip][24], les paquets Python nécessaires à l'extension avec la commande:  
