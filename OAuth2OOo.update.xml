@@ -36,7 +36,7 @@
         <dep:OpenOffice.org-minimal-version value="4.1" dep:name="OpenOffice.org 4.1"/>
     </dependencies>
     <publisher>
-        <name xlink:href="https://prrvchr.github.io/prrvchr/OAuth2OOo/" lang="en">OAuth2OOo</name>
+        <name xlink:href="https://prrvchr.github.io/OAuth2OOo/" lang="en">OAuth2OOo</name>
         <name xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr" lang="fr">OAuth2OOo</name>
     </publisher>
     <release-notes>
