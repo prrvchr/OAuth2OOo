@@ -19,11 +19,11 @@ ijson==3.2.3
 isodate==0.6.1
 jmespath==1.0.1
 js2xml==0.5.0
-jstyleson==0.0.2
 jsonpath_ng==1.6.0
+jstyleson==0.0.2
 lxml==5.1.0
 mf2py==2.0.1
-outcome==1.3.0
+outcome==1.3.0.post0
 packaging==23.2
 parsel==1.8.1
 ply==3.11

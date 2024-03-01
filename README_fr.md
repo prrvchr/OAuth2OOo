@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][4] et à notre [Politique de protection des données][5].**
 
-# version [1.3.1][6]
+# version [1.3.2][6]
 
 ## Introduction:
 
@@ -359,6 +359,11 @@ ___
 - Correction de la propriété `Headers` dans l'[implémentation][78] de l'interface UNO [XRequestResponse][68] permettant d'obtenir les en-têtes d'une réponse HTTP.
 - De nombreuses corrections...
 
+### Ce qui a été fait pour la version 1.3.2:
+
+- Intégration des binaires Python 3.8 pour Linux x86_64 et Darwin x86_64, afin d'être compatible avec la version de LibreOffice 24.2.x sous Linux, pour les packages ijson, lxml et cffi.
+- Ouverture du dysfonctionnement [#159988][88] pour impossibilité d'importer des bibliothèques Python contenant des fichiers binaires avec LibreOffice 24.2.x sous Linux.
+
 ### Que reste-t-il à faire pour la version 1.3.1:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
@@ -452,3 +457,4 @@ ___
 [85]: <https://github.com/prrvchr/pyrdfa3>
 [86]: <https://peps.python.org/pep-0508/>
 [87]: <https://prrvchr.github.io/OAuth2OOo/README_fr#pr%C3%A9requis>
+[88]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159988>
