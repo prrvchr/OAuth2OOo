@@ -361,7 +361,7 @@ ___
 
 ### Ce qui a été fait pour la version 1.3.2:
 
-- Intégration des binaires Python 3.8 pour Linux x86_64 et Darwin x86_64, afin d'être compatible avec la version de LibreOffice 24.2.x sous Linux, pour les packages ijson, lxml et cffi.
+- Intégration des binaires Python 3.8 pour Linux x86_64 et Darwin x86_64, afin d'être compatible avec la version de LibreOffice 24.2.x sous Linux, pour les packages `lxml`, `ijson`, `cffi` et `charset-normalizer`.
 - Ouverture du dysfonctionnement [#159988][88] pour impossibilité d'importer des bibliothèques Python contenant des fichiers binaires avec LibreOffice 24.2.x sous Linux.
 
 ### Que reste-t-il à faire pour la version 1.3.1:
