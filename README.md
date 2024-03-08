@@ -364,7 +364,11 @@ ___
 - Integration of Python 3.8 binaries for Linux x86_64 and Darwin x86_64, in order to be compatible with the version of LibreOffice 24.2.x for Linux, for the `lxml`, `ijson`, `cffi` and `charset-normalizer` packages.
 - Opening of issue [#159988][88] for the impossibility of importing Python libraries containing binary files with LibreOffice 24.2.x under Linux.
 
-### What remains to be done for version 1.3.2:
+### What has been done for version 1.3.3:
+
+- Implemented a workaround for issue [#159988][88] which may take time to resolve.
+
+### What remains to be done for version 1.3.3:
 
 - Add new language for internationalization...
 
