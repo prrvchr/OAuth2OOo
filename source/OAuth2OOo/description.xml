@@ -35,7 +35,7 @@
         <OpenOffice.org-minimal-version value="4.1" d:name="OpenOffice.org 4.1"/>
     </dependencies>
     <update-information>
-        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/OAuth2OOo.update.xml"/>
+        <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.update.xml"/>
     </update-information>
     <publisher>
         <name xlink:href="https://prrvchr.github.io/OAuth2OOo/" lang="en-US">OAuth2.0 for LibreOffice</name>
