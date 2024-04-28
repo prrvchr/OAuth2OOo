@@ -370,6 +370,7 @@ ___
 
 ### Ce qui a été fait pour la version 1.3.4:
 
+- Mise à jour du package [Python Idna][89] vers la version 3.7 afin de répondre à l'[alerte de vulnérabilité de sécurité][90].
 - Quelques corrections...
 
 ### Que reste-t-il à faire pour la version 1.3.4:
@@ -466,3 +467,5 @@ ___
 [86]: <https://peps.python.org/pep-0508/>
 [87]: <https://prrvchr.github.io/OAuth2OOo/README_fr#pr%C3%A9requis>
 [88]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159988>
+[89]: <https://pypi.org/project/idna/>
+[90]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/5>

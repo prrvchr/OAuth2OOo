@@ -14,7 +14,7 @@ extruct==0.16.0
 h11==0.14.0
 html_text==0.5.2
 html5lib==1.1
-idna==3.6
+idna==3.7
 ijson==3.2.3
 isodate==0.6.1
 jmespath==1.0.1
