@@ -4,7 +4,7 @@
 """
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
-║   Copyright (c) 2020-24 https://prrvchr.github.io                                  ║
+║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
 ║                                                                                    ║
 ║   Permission is hereby granted, free of charge, to any person obtaining            ║
 ║   a copy of this software and associated documentation files (the "Software"),     ║
@@ -27,14 +27,12 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-# jdbcDriverOOo general configuration
-g_extension = 'jdbcDriverOOo'
-g_identifier = 'io.github.prrvchr.%s' % g_extension
-g_service = '%s.Driver' % g_identifier
-g_version = '1.3.2'
+g_ucbseparator = '/'
+g_ucbprefix =    ' ~'
+g_ucbsuffix =    ''
 
-# jdbcDriverOOo resource strings files and folder
-g_resource = 'resource'
-g_basename = 'Driver'
-g_defaultlog = 'jdbcDriverLogger'
-g_errorlog = 'jdbcDriverError'
+g_ucboffice = 'application/vnd.oasis.opendocument'
+
+g_ucbfolder = 'application/vnd.sun.star.hierarchy-folder'
+g_ucbfile = 'application/vnd.sun.star.hierarchy-file'
+g_ucblink = 'application/vnd.sun.star.hierarchy-link'
