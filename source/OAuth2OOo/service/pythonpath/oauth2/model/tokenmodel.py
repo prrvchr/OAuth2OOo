@@ -151,7 +151,7 @@ class TokenModel(BaseModel):
         response = getResponse(self._ctx, source, session, cls, mtd, name,
                                'POST', url, self.Timeout, {'data': data})
         if not response.ok:
-            msg = '%s ERROR: %s' % (parameter.Name, response.text)
+            msg = '%s::%s ERROR: %s' % (cls, mtd, response.text)
             raise self._getRefreshTokenException(msg)
         refresh, access, never, expires = self._getTokenFromResponse(response, timestamp)
         response.close()
