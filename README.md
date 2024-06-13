@@ -29,7 +29,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][4] and [Data Protection Policy][5].**
 
-# version [1.3.4][6]
+# version [1.3.5][6]
 
 ## Introduction:
 
@@ -373,7 +373,14 @@ ___
 - Updated the [Python Idna][89] package to version 3.7 in order to respond to the [security vulnerability alert][90].
 - Some fixes...
 
-### What remains to be done for version 1.3.4:
+### What has been done for version 1.3.5:
+
+- Updated the [Python tqdm][91] package to version 4.66.4 in order to respond to the [security vulnerability alert][92].
+- Updated the [Python Requests][93] package to version 2.32.3 in order to respond to the [security vulnerability alert][94].
+- In order to avoid any conflict with the python [oauth2][95] package, the folder put in the python path by the extension has been renamed to oauth20. This should also resolve [issue #15][96].
+- Some fixes...
+
+### What remains to be done for version 1.3.5:
 
 - Add new language for internationalization...
 
@@ -384,7 +391,7 @@ ___
 [3]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_en>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
-[6]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-130>
+[6]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-135>
 [7]: <https://prrvchr.github.io>
 [8]: <https://www.libreoffice.org/download/download/>
 [9]: <https://www.openoffice.org/download/index.html>
@@ -469,3 +476,9 @@ ___
 [88]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159988>
 [89]: <https://pypi.org/project/idna/>
 [90]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/5>
+[91]: <https://pypi.org/project/tqdm/4.66.4/>
+[92]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/8>
+[93]: <https://pypi.org/project/requests/2.32.3/>
+[94]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/10>
+[95]: <https://pypi.org/project/oauth2/1.9.0.post1/>
+[96]: <https://github.com/prrvchr/OAuth2OOo/issues/15>

@@ -40,33 +40,33 @@ from com.sun.star.logging.LogLevel import SEVERE
 
 from com.sun.star.rest import RequestException
 
-from oauth2 import Browsers
+from oauth20 import Browsers
 
-from oauth2 import clickButton
-from oauth2 import sendKey
+from oauth20 import clickButton
+from oauth20 import sendKey
 
-from oauth2 import getResponse
-from oauth2 import raiseForStatus
+from oauth20 import getResponse
+from oauth20 import raiseForStatus
 
-from oauth2 import getConfiguration
-from oauth2 import getLogger
-from oauth2 import getResourceLocation
+from oauth20 import getConfiguration
+from oauth20 import getLogger
+from oauth20 import getResourceLocation
 
-from oauth2 import createService
+from oauth20 import createService
 
-from oauth2 import extract2Json
-from oauth2 import flattenJson
-from oauth2 import javaScript2Json
-from oauth2 import javaScript2Xml
-from oauth2 import parseData
-from oauth2 import parseJson
-from oauth2 import splitJson
-from oauth2 import xml2Json
+from oauth20 import extract2Json
+from oauth20 import flattenJson
+from oauth20 import javaScript2Json
+from oauth20 import javaScript2Xml
+from oauth20 import parseData
+from oauth20 import parseJson
+from oauth20 import splitJson
+from oauth20 import xml2Json
 
-from oauth2 import g_identifier
-from oauth2 import g_defaultlog
-from oauth2 import g_errorlog
-from oauth2 import g_basename
+from oauth20 import g_identifier
+from oauth20 import g_defaultlog
+from oauth20 import g_errorlog
+from oauth20 import g_basename
 
 import requests
 import json

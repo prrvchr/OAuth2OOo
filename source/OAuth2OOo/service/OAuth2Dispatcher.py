@@ -35,9 +35,9 @@ from com.sun.star.frame import XDispatchProvider
 from com.sun.star.lang import XInitialization
 from com.sun.star.lang import XServiceInfo
 
-from oauth2 import OAuth2Dispatch
+from oauth20 import OAuth2Dispatch
 
-from oauth2 import g_identifier
+from oauth20 import g_identifier
 
 import traceback
 

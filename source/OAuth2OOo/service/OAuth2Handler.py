@@ -38,11 +38,11 @@ from com.sun.star.lang import XServiceInfo
 from com.sun.star.lang import XInitialization
 from com.sun.star.task import XInteractionHandler2
 
-from oauth2 import UserView
-from oauth2 import UserHandler
-from oauth2 import HandlerModel
+from oauth20 import UserView
+from oauth20 import UserHandler
+from oauth20 import HandlerModel
 
-from oauth2 import g_identifier
+from oauth20 import g_identifier
 
 import traceback
 

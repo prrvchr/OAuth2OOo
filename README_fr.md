@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][4] et à notre [Politique de protection des données][5].**
 
-# version [1.3.4][6]
+# version [1.3.5][6]
 
 ## Introduction:
 
@@ -373,7 +373,14 @@ ___
 - Mise à jour du package [Python Idna][89] vers la version 3.7 afin de répondre à l'[alerte de vulnérabilité de sécurité][90].
 - Quelques corrections...
 
-### Que reste-t-il à faire pour la version 1.3.4:
+### Ce qui a été fait pour la version 1.3.5:
+
+- Mise à jour du package [Python tqdm][91] vers la version 4.66.4 afin de répondre à l'[alerte de vulnérabilité de sécurité][92].
+- Mise à jour du package [Python requests][93] vers la version 2.32.3 afin de répondre à l'[alerte de vulnérabilité de sécurité][94].
+- Afin d'éviter tout conflit avec le package python [oauth2][95], le dossier mis dans le chemin python par l'extension a été renommé oauth20. Cela devrait également résoudre le [dysfonctionnement n°10][96].
+- Quelques corrections...
+
+### Que reste-t-il à faire pour la version 1.3.5:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -384,7 +391,7 @@ ___
 [3]: <https://prrvchr.github.io/OAuth2OOo>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr>
-[6]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-été-fait-pour-la-version-130>
+[6]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-été-fait-pour-la-version-135>
 [7]: <https://prrvchr.github.io/README_fr>
 [8]: <https://fr.libreoffice.org/download/telecharger-libreoffice/>
 [9]: <https://www.openoffice.org/fr/Telecharger/>
@@ -469,3 +476,9 @@ ___
 [88]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159988>
 [89]: <https://pypi.org/project/idna/>
 [90]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/5>
+[91]: <https://pypi.org/project/tqdm/4.66.4/>
+[92]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/8>
+[93]: <https://pypi.org/project/requests/2.32.3/>
+[94]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/10>
+[95]: <https://pypi.org/project/oauth2/1.9.0.post1/>
+[96]: <https://github.com/prrvchr/OAuth2OOo/issues/15>

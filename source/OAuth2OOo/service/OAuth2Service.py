@@ -42,28 +42,28 @@ from com.sun.star.logging.LogLevel import SEVERE
 from com.sun.star.ucb.ConnectionMode import OFFLINE
 from com.sun.star.ucb.ConnectionMode import ONLINE
 
-from oauth2 import RequestParameter
-from oauth2 import OAuth2Model
-from oauth2 import OAuth2OOo
+from oauth20 import RequestParameter
+from oauth20 import OAuth2Model
+from oauth20 import OAuth2OOo
 
-from oauth2 import executeDispatch
-from oauth2 import getConfiguration
-from oauth2 import isAuthorized
-from oauth2 import getPropertyValueSet
+from oauth20 import executeDispatch
+from oauth20 import getConfiguration
+from oauth20 import isAuthorized
+from oauth20 import getPropertyValueSet
 
-from oauth2 import getSessionMode
+from oauth20 import getSessionMode
 
-from oauth2 import getRequestResponse
-from oauth2 import getInputStream
-from oauth2 import download
-from oauth2 import upload
+from oauth20 import getRequestResponse
+from oauth20 import getInputStream
+from oauth20 import download
+from oauth20 import upload
 
-from oauth2 import getLogger
+from oauth20 import getLogger
 
-from oauth2 import g_identifier
-from oauth2 import g_oauth2
-from oauth2 import g_defaultlog
-from oauth2 import g_basename
+from oauth20 import g_identifier
+from oauth20 import g_oauth2
+from oauth20 import g_defaultlog
+from oauth20 import g_basename
 
 import requests
 import traceback

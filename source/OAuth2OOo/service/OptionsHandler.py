@@ -35,13 +35,13 @@ from com.sun.star.logging.LogLevel import SEVERE
 from com.sun.star.awt import XContainerWindowEventHandler
 from com.sun.star.lang import XServiceInfo
 
-from oauth2 import OptionsManager
+from oauth20 import OptionsManager
 
-from oauth2 import getLogger
+from oauth20 import getLogger
 
-from oauth2 import g_identifier
-from oauth2 import g_defaultlog
-from oauth2 import g_basename
+from oauth20 import g_identifier
+from oauth20 import g_defaultlog
+from oauth20 import g_basename
 
 import traceback
 
