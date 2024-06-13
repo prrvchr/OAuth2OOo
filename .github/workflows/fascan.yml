@@ -12,15 +12,17 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
-      - uses: docker://ghcr.io/fluidattacks/makes/amd64
+      - name: Fluid-Attacks scan
+        uses: docker://ghcr.io/fluidattacks/makes/amd64
         with:
           args: m gitlab:fluidattacks/universe@trunk /skims scan ./_fascan.yml
 
-      # Commit all changed files back to the repository
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Apply Fluid Attacks changes to Fluid-Attacks-Results.csv
+      - name: Commit and push changes
+        run: |
+          git commit -am "Fluid-Attacks Results.csv commit"
+          git push
