@@ -413,7 +413,7 @@ ___
 [25]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-130>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.4#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.5#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
