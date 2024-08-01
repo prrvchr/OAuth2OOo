@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][4] et à notre [Politique de protection des données][5].**
 
-# version [1.3.5][6]
+# version [1.3.6][6]
 
 ## Introduction:
 
@@ -361,7 +361,7 @@ ___
 
 ### Ce qui a été fait pour la version 1.3.2:
 
-- Intégration des binaires Python 3.8 pour Linux x86_64 et Darwin x86_64, afin d'être compatible avec la version de LibreOffice 24.2.x sous Linux, pour les packages `lxml`, `ijson`, `cffi` et `charset-normalizer`.
+- Intégration des binaires Python 3.8 pour Linux x86_64 et Darwin x86_64, afin d'être compatible avec la version de LibreOffice 24.2.x sous Linux, pour les paquets `lxml`, `ijson`, `cffi` et `charset-normalizer`.
 - Ouverture du dysfonctionnement [#159988][88] pour impossibilité d'importer des bibliothèques Python contenant des fichiers binaires avec LibreOffice 24.2.x sous Linux.
 
 ### Ce qui a été fait pour la version 1.3.3:
@@ -370,17 +370,50 @@ ___
 
 ### Ce qui a été fait pour la version 1.3.4:
 
-- Mise à jour du package [Python Idna][89] vers la version 3.7 afin de répondre à l'[alerte de vulnérabilité de sécurité][90].
+- Mise à jour du paquet [Python Idna][89] vers la version 3.7 afin de répondre à l'[alerte de vulnérabilité de sécurité][90].
 - Quelques corrections...
 
 ### Ce qui a été fait pour la version 1.3.5:
 
-- Mise à jour du package [Python tqdm][91] vers la version 4.66.4 afin de répondre à l'[alerte de vulnérabilité de sécurité][92].
-- Mise à jour du package [Python requests][93] vers la version 2.32.3 afin de répondre à l'[alerte de vulnérabilité de sécurité][94].
-- Afin d'éviter tout conflit avec le package python [oauth2][95], le dossier mis dans le chemin python par l'extension a été renommé oauth20. Cela devrait également résoudre le [dysfonctionnement n°10][96].
+- Mise à jour du paquet [Python tqdm][91] vers la version 4.66.4 afin de répondre à l'[alerte de vulnérabilité de sécurité][92].
+- Mise à jour du paquet [Python requests][93] vers la version 2.32.3 afin de répondre à l'[alerte de vulnérabilité de sécurité][94].
+- Afin d'éviter tout conflit avec le paquet [Python oauth2][95], le dossier mis dans le chemin python par l'extension a été renommé `oauth20`. Cela devrait également résoudre le [dysfonctionnement n°10][96].
 - Quelques corrections...
 
-### Que reste-t-il à faire pour la version 1.3.5:
+### Ce qui a été fait pour la version 1.3.6:
+
+- Mise à jour du paquet [Python beautifulsoup][97] vers la version 4.12.3.
+- Mise à jour du paquet [Python certifi][98] vers la version 2024.7.4.
+- Ajout des fichiers binaires pour les version 3.9, 3.11 et 3.12 de Python/Manylinux pour le paquet [Python cffi][99] version 1.16.0.
+- Mise à jour du paquet [Python charset_normalizer][100] vers la version 3.3.2.
+- Mise à jour du paquet [Python exceptiongroup][101] vers la version 1.2.2.
+- Mise à jour du paquet [Python extruct][102] vers la version 0.17.0.
+- Mise à jour du paquet [Python html_text][103] vers la version 0.6.2.
+- Mise à jour du paquet [Python ijson][104] vers la version 3.3.0.
+- Mise à jour du paquet [Python jsonpath_ng][105] vers la version 1.6.1.
+- Mise à jour du paquet [Python lxml][106] vers la version 5.2.2.
+- Ajout du paquet [Python lxml-html-clean][107] version 0.2.0.
+- Mise à jour du paquet [Python packaging][108] vers la version 24.1.
+- Mise à jour du paquet [Python prasel][109] vers la version 1.9.1.
+- Mise à jour du paquet [Python pycparser][110] vers la version 2.22.
+- Mise à jour du paquet [Python pyparsing][111] vers la version 3.1.2.
+- Mise à jour du paquet [Python pyRdfa3][112] vers la version 3.6.4.
+- Mise à jour du paquet [Python python-dotenv][113] vers la version 1.0.1.
+- Mise à jour du paquet [Python selenium][114] vers la version 4.23.1.
+- Mise à jour du paquet [Python setuptools][115] vers la version 72.1.0 afin de répondre à l'[alerte de vulnérabilité de sécurité][116].
+- Mise à jour du paquet [Python sniffio][117] vers la version 1.3.1.
+- Mise à jour du paquet [Python trio][118] vers la version 0.26.0.
+- Ajout du paquet [Python typing-extensions][119] version 4.12.2.
+- Mise à jour du paquet [Python urllib3][120] vers la version 2.2.2.
+- Mise à jour du paquet [Python validators][121] vers la version 0.33.0.
+- Mise à jour du paquet [Python w3lib][122] vers la version 2.2.1.
+- Mise à jour du paquet [Python webdriver_manager][123] vers la version 4.0.2.
+- Ajout du paquet [Python websocket-client][124] version 1.8.0.
+La mise à jour de tous ces paquets Python devrait permettre d'utiliser Python 3.8, 3.9, 3.10, 3.11 et 3.12 sous l'architecture ManyLinux x86_64.
+Pour les architectures win32 et win_amd64, seule la version 3.8 de Python est prise en charge. Cela signifie, puisque Python est intégré à LibreOffice pour ces architectures, que seules les versions 7.x et 24.x de LibreOffice sont prises en charge.
+Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...), je vous conseille d'ouvrir un [dysfonctionnement][22] pour que je puisse ajouter les fichiers binaires manquants.
+
+### Que reste-t-il à faire pour la version 1.3.6:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -391,7 +424,7 @@ ___
 [3]: <https://prrvchr.github.io/OAuth2OOo>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr>
-[6]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-été-fait-pour-la-version-135>
+[6]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-été-fait-pour-la-version-136>
 [7]: <https://prrvchr.github.io/README_fr>
 [8]: <https://fr.libreoffice.org/download/telecharger-libreoffice/>
 [9]: <https://www.openoffice.org/fr/Telecharger/>
@@ -413,7 +446,7 @@ ___
 [25]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-130>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.5#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.6#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
@@ -482,3 +515,31 @@ ___
 [94]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/10>
 [95]: <https://pypi.org/project/oauth2/1.9.0.post1/>
 [96]: <https://github.com/prrvchr/OAuth2OOo/issues/15>
+[97]: <https://pypi.org/project/beautifulsoup4/>
+[98]: <https://pypi.org/project/certifi/>
+[99]: <https://pypi.org/project/cffi/>
+[100]: <https://pypi.org/project/charset-normalizer/>
+[101]: <https://pypi.org/project/exceptiongroup/>
+[102]: <https://pypi.org/project/extruct/>
+[103]: <https://pypi.org/project/html-text/>
+[104]: <https://pypi.org/project/ijson/>
+[105]: <https://pypi.org/project/jsonpath-ng/>
+[106]: <https://pypi.org/project/lxml/>
+[107]: <https://pypi.org/project/lxml-html-clean/>
+[108]: <https://pypi.org/project/packaging/>
+[109]: <https://pypi.org/project/parsel/>
+[110]: <https://pypi.org/project/pycparser/>
+[111]: <https://pypi.org/project/pyparsing/>
+[112]: <https://pypi.org/project/pyRdfa3/>
+[113]: <https://pypi.org/project/python-dotenv/>
+[114]: <https://pypi.org/project/selenium/>
+[115]: <https://pypi.org/project/setuptools/>
+[116]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/14>
+[117]: <https://pypi.org/project/sniffio/>
+[118]: <https://pypi.org/project/trio/>
+[119]: <https://pypi.org/project/typing-extensions/>
+[120]: <https://pypi.org/project/urllib3/>
+[121]: <https://pypi.org/project/validators/>
+[122]: <https://pypi.org/project/w3lib/>
+[123]: <https://pypi.org/project/webdriver-manager/>
+[124]: <https://pypi.org/project/websocket-client/>

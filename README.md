@@ -29,7 +29,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][4] and [Data Protection Policy][5].**
 
-# version [1.3.5][6]
+# version [1.3.6][6]
 
 ## Introduction:
 
@@ -377,10 +377,43 @@ ___
 
 - Updated the [Python tqdm][91] package to version 4.66.4 in order to respond to the [security vulnerability alert][92].
 - Updated the [Python Requests][93] package to version 2.32.3 in order to respond to the [security vulnerability alert][94].
-- In order to avoid any conflict with the python [oauth2][95] package, the folder put in the python path by the extension has been renamed to oauth20. This should also resolve [issue #15][96].
+- In order to avoid any conflict with the [Python oauth2][95] package, the folder put in the python path by the extension has been renamed to `oauth20`. This should also resolve [issue #15][96].
 - Some fixes...
 
-### What remains to be done for version 1.3.5:
+### What has been done for version 1.3.6:
+
+- Updated the [Python beautifulsoup][97] package to version 4.12.3.
+- Updated the [Python certifi][98] package to version 2024.7.4.
+- Added binaries for Python/Manylinux versions 3.9, 3.11 and 3.12 for package [Python cffi][99] version 1.16.0.
+- Updated the [Python charset_normalizer][100] package to version 3.3.2.
+- Updated the [Python exceptiongroup][101] package to version 1.2.2.
+- Updated the [Python extruct][102] package to version 0.17.0.
+- Updated the [Python html_text][103] package to version 0.6.2.
+- Updated the [Python ijson][104] package to version 3.3.0.
+- Updated the [Python jsonpath_ng][105] package to version 1.6.1.
+- Updated the [Python lxml][106] package to version 5.2.2.
+- Added package [Python lxml-html-clean][107] version 0.2.0.
+- Updated the [Python packaging][108] package to version 24.1.
+- Updated the [Python prasel][109] package to version 1.9.1.
+- Updated the [Python pycparser][110] package to version 2.22.
+- Updated the [Python pyparsing][111] package to version 3.1.2.
+- Updated the [Python pyRdfa3][112] package to version 3.6.4.
+- Updated the [Python python-dotenv][113] package to version 1.0.1.
+- Updated the [Python selenium][114] package to version 4.23.1.
+- Updated the [Python setuptools][115] package to version 72.1.0 in order to respond to the [security vulnerability alert][116].
+- Updated the [Python sniffio][117] package to version 1.3.1.
+- Updated the [Python trio][118] package to version 0.26.0.
+- Added package [Python typing-extensions][119] version 4.12.2.
+- Updated the [Python urllib3][120] package to version 2.2.2.
+- Updated the [Python validators][121] package to version 0.33.2.
+- Updated the [Python w3lib][122] package to version 2.2.1.
+- Updated the [Python webdriver_manager][123] package to version 4.0.2.
+- Added package [Python websocket-client][124] version 1.8.0.
+Updating all these Python packages should make it possible to use Python 3.8, 3.9, 3.10, 3.11 and 3.12 under ManyLinux x86_64 architecture.
+For win32 and win_amd64 architectures, only Python version 3.8 is supported. This means that since Python is embedded into LibreOffice for these architectures, only LibreOffice versions 7.x and 24.x are supported.
+If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advise you to open an [issue][22] so that I can add the missing binaries.
+
+### What remains to be done for version 1.3.6:
 
 - Add new language for internationalization...
 
@@ -391,7 +424,7 @@ ___
 [3]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_en>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
-[6]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-135>
+[6]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-136>
 [7]: <https://prrvchr.github.io>
 [8]: <https://www.libreoffice.org/download/download/>
 [9]: <https://www.openoffice.org/download/index.html>
@@ -413,7 +446,7 @@ ___
 [25]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-130>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.5#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.6#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
@@ -482,3 +515,31 @@ ___
 [94]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/10>
 [95]: <https://pypi.org/project/oauth2/1.9.0.post1/>
 [96]: <https://github.com/prrvchr/OAuth2OOo/issues/15>
+[97]: <https://pypi.org/project/beautifulsoup4/>
+[98]: <https://pypi.org/project/certifi/>
+[99]: <https://pypi.org/project/cffi/>
+[100]: <https://pypi.org/project/charset-normalizer/>
+[101]: <https://pypi.org/project/exceptiongroup/>
+[102]: <https://pypi.org/project/extruct/>
+[103]: <https://pypi.org/project/html-text/>
+[104]: <https://pypi.org/project/ijson/>
+[105]: <https://pypi.org/project/jsonpath-ng/>
+[106]: <https://pypi.org/project/lxml/>
+[107]: <https://pypi.org/project/lxml-html-clean/>
+[108]: <https://pypi.org/project/packaging/>
+[109]: <https://pypi.org/project/parsel/>
+[110]: <https://pypi.org/project/pycparser/>
+[111]: <https://pypi.org/project/pyparsing/>
+[112]: <https://pypi.org/project/pyRdfa3/>
+[113]: <https://pypi.org/project/python-dotenv/>
+[114]: <https://pypi.org/project/selenium/>
+[115]: <https://pypi.org/project/setuptools/>
+[116]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/14>
+[117]: <https://pypi.org/project/sniffio/>
+[118]: <https://pypi.org/project/trio/>
+[119]: <https://pypi.org/project/typing-extensions/>
+[120]: <https://pypi.org/project/urllib3/>
+[121]: <https://pypi.org/project/validators/>
+[122]: <https://pypi.org/project/w3lib/>
+[123]: <https://pypi.org/project/webdriver-manager/>
+[124]: <https://pypi.org/project/websocket-client/>
