@@ -75,7 +75,7 @@ The requirement depend on the **platform (architecture)** on which the extension
 
 - If you are **on Windows (win32 or win_amd64)** you must use **LibreOffice version 7.x minimum**.
 
-- If you are **on Linux (x86_64) with Python version 3.10** you must use **LibreOffice version 6.x or higher** (LibreOffice version 7.x is strongly recommended).
+- If you are **on Linux (x86_64) with a Python version from 3.8 to 3.12** you must use **LibreOffice version 6.x or higher** (LibreOffice version 7.x is strongly recommended).
 
 - For all other **platforms / architectures (Linux, macOS... / aarch64, arm64...) or Python version**, you need:
   - Make sure your version of Python is 3.8 minimum.

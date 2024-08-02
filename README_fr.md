@@ -75,7 +75,7 @@ Les prérequis dépendent de la **plateforme (architecture)** sur laquelle l'ext
 
 - Si vous êtes **sous Windows (win32 or win_amd64)** vous devez utiliser **LibreOffice version 7.x minimum**.
 
-- Si vous êtes **sous Linux (x86_64) avec Python version 3.10** vous devez utiliser **LibreOffice version 6.x ou supérieure** (LibreOffice version 7.x est fortement recommandé).
+- Si vous êtes **sous Linux (x86_64) avec une version Python de 3.8 à 3.12** vous devez utiliser **LibreOffice version 6.x ou supérieure** (LibreOffice version 7.x est fortement recommandée).
 
 - Pour toutes les autres **plateformes / architectures (Linux, macOS... / aarch64, arm64...) ou version de Python**, vous devez:
   - Vous assurez que votre version de Python est 3.8 minimum.
