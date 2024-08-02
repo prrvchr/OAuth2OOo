@@ -24,5 +24,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
+          git config --global user.email "prrvchr@gmail.com"
+          git config --global user.name "prrvchr"
           git commit -am "Fluid-Attacks Results.csv commit"
           git push

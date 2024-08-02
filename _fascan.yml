@@ -6,7 +6,7 @@ working_dir: .
 sast:
   include:
     - glob(source/OAuth2OOo/service/*.py)
-    - glob(source/OAuth2OOo/service/pythonpath/oauth2/*)
+    - glob(source/OAuth2OOo/service/pythonpath/oauth20/*)
 sca:
   include:
     - .
