@@ -385,10 +385,10 @@ ___
 - Updated the [Python beautifulsoup][97] package to version 4.12.3.
 - Updated the [Python certifi][98] package to version 2024.7.4.
 - Added binaries for Python/Manylinux versions 3.9, 3.11 and 3.12 for package [Python cffi][99] version 1.16.0.
-- Updated the [Python charset_normalizer][100] package to version 3.3.2.
+- Updated the [Python charset-normalizer][100] package to version 3.3.2.
 - Updated the [Python exceptiongroup][101] package to version 1.2.2.
 - Updated the [Python extruct][102] package to version 0.17.0.
-- Updated the [Python html_text][103] package to version 0.6.2.
+- Updated the [Python html-text][103] package to version 0.6.2.
 - Updated the [Python ijson][104] package to version 3.3.0.
 - Updated the [Python jsonpath_ng][105] package to version 1.6.1.
 - Updated the [Python lxml][106] package to version 5.2.2.
@@ -407,7 +407,7 @@ ___
 - Updated the [Python urllib3][120] package to version 2.2.2.
 - Updated the [Python validators][121] package to version 0.33.2.
 - Updated the [Python w3lib][122] package to version 2.2.1.
-- Updated the [Python webdriver_manager][123] package to version 4.0.2.
+- Updated the [Python webdriver-manager][123] package to version 4.0.2.
 - Added package [Python websocket-client][124] version 1.8.0.
 
 Updating all these Python packages should make it possible to use Python 3.8, 3.9, 3.10, 3.11 and 3.12 under ManyLinux x86_64 architecture.  

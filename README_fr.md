@@ -385,10 +385,10 @@ ___
 - Mise à jour du paquet [Python beautifulsoup][97] vers la version 4.12.3.
 - Mise à jour du paquet [Python certifi][98] vers la version 2024.7.4.
 - Ajout des fichiers binaires pour les version 3.9, 3.11 et 3.12 de Python/Manylinux pour le paquet [Python cffi][99] version 1.16.0.
-- Mise à jour du paquet [Python charset_normalizer][100] vers la version 3.3.2.
+- Mise à jour du paquet [Python charset-normalizer][100] vers la version 3.3.2.
 - Mise à jour du paquet [Python exceptiongroup][101] vers la version 1.2.2.
 - Mise à jour du paquet [Python extruct][102] vers la version 0.17.0.
-- Mise à jour du paquet [Python html_text][103] vers la version 0.6.2.
+- Mise à jour du paquet [Python html-text][103] vers la version 0.6.2.
 - Mise à jour du paquet [Python ijson][104] vers la version 3.3.0.
 - Mise à jour du paquet [Python jsonpath_ng][105] vers la version 1.6.1.
 - Mise à jour du paquet [Python lxml][106] vers la version 5.2.2.
@@ -407,7 +407,7 @@ ___
 - Mise à jour du paquet [Python urllib3][120] vers la version 2.2.2.
 - Mise à jour du paquet [Python validators][121] vers la version 0.33.0.
 - Mise à jour du paquet [Python w3lib][122] vers la version 2.2.1.
-- Mise à jour du paquet [Python webdriver_manager][123] vers la version 4.0.2.
+- Mise à jour du paquet [Python webdriver-manager][123] vers la version 4.0.2.
 - Ajout du paquet [Python websocket-client][124] version 1.8.0.
 
 La mise à jour de tous ces paquets Python devrait permettre d'utiliser Python 3.8, 3.9, 3.10, 3.11 et 3.12 sous l'architecture ManyLinux x86_64.  
