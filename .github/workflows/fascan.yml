@@ -26,5 +26,5 @@ jobs:
         run: |
           git config --global user.email "prrvchr@gmail.com"
           git config --global user.name "prrvchr"
-          git commit -am "Fluid-Attacks Results.csv commit"
+          git commit -am "Fluid-Attacks Results.csv commit" || exit 0
           git push
