@@ -409,8 +409,9 @@ ___
 - Updated the [Python w3lib][122] package to version 2.2.1.
 - Updated the [Python webdriver_manager][123] package to version 4.0.2.
 - Added package [Python websocket-client][124] version 1.8.0.
-Updating all these Python packages should make it possible to use Python 3.8, 3.9, 3.10, 3.11 and 3.12 under ManyLinux x86_64 architecture.
-For win32 and win_amd64 architectures, only Python version 3.8 is supported. This means that since Python is embedded into LibreOffice for these architectures, only LibreOffice versions 7.x and 24.x are supported.
+
+Updating all these Python packages should make it possible to use Python 3.8, 3.9, 3.10, 3.11 and 3.12 under ManyLinux x86_64 architecture.  
+For win32 and win_amd64 architectures, only Python version 3.8 is supported. This means that since Python is embedded into LibreOffice for these architectures, only LibreOffice versions 7.x and 24.x are supported.  
 If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advise you to open an [issue][22] so that I can add the missing binaries.
 
 ### What remains to be done for version 1.3.6:
