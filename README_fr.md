@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][4] et à notre [Politique de protection des données][5].**
 
-# version [1.3.6][6]
+# version [1.3.7][6]
 
 ## Introduction:
 
@@ -414,7 +414,19 @@ La mise à jour de tous ces paquets Python devrait permettre d'utiliser Python 3
 Pour les architectures win32 et win_amd64, seule la version 3.8 de Python est prise en charge. Cela signifie, puisque Python est intégré à LibreOffice pour ces architectures, que seules les versions 7.x et 24.x de LibreOffice sont prises en charge.  
 Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...), je vous conseille d'ouvrir un [dysfonctionnement][22] pour que je puisse ajouter les fichiers binaires manquants.
 
-### Que reste-t-il à faire pour la version 1.3.6:
+### Ce qui a été fait pour la version 1.3.7:
+
+- Mise à jour du paquet [Python attrs][125] vers la version 24.2.0.
+- Mise à jour du paquet [Python cffi][99] vers la version 1.17.0.
+- Mise à jour du paquet [Python idna][89] vers la version 3.8.
+- Mise à jour du paquet [Python lxml][106] vers la version 5.3.0.
+- Mise à jour du paquet [Python pyparsing][111] vers la version 3.1.4.
+- Mise à jour du paquet [Python setuptools][115] vers la version 73.0.1.
+- Mise à jour du paquet [Python soupsieve][126] vers la version 2.6.
+- Mise à jour du paquet [Python tqdm][91] vers la version 4.66.5.
+- Mise à jour du paquet [Python trio][118] vers la version 0.26.2.
+
+### Que reste-t-il à faire pour la version 1.3.7:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -425,7 +437,7 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 [3]: <https://prrvchr.github.io/OAuth2OOo>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr>
-[6]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-été-fait-pour-la-version-136>
+[6]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-été-fait-pour-la-version-137>
 [7]: <https://prrvchr.github.io/README_fr>
 [8]: <https://fr.libreoffice.org/download/telecharger-libreoffice/>
 [9]: <https://www.openoffice.org/fr/Telecharger/>
@@ -447,7 +459,7 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 [25]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-130>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.6#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.7#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
@@ -510,7 +522,7 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 [88]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159988>
 [89]: <https://pypi.org/project/idna/>
 [90]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/5>
-[91]: <https://pypi.org/project/tqdm/4.66.4/>
+[91]: <https://pypi.org/project/tqdm/>
 [92]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/8>
 [93]: <https://pypi.org/project/requests/2.32.3/>
 [94]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/10>
@@ -544,3 +556,5 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 [122]: <https://pypi.org/project/w3lib/>
 [123]: <https://pypi.org/project/webdriver-manager/>
 [124]: <https://pypi.org/project/websocket-client/>
+[125]: <https://pypi.org/project/attrs/>
+[126]: <https://pypi.org/project/soupsieve/>
