@@ -85,4 +85,3 @@ class OptionsView(unohelper.Base):
     def _getHandlerTimeout(self):
         return self._dialog.getControl('NumericField3')
 
-

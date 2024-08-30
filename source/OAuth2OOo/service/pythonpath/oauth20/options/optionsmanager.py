@@ -54,21 +54,19 @@ import traceback
 class OptionsManager(unohelper.Base):
     def __init__(self, ctx, window, logger):
         self._ctx = ctx
-        self._model = OptionsModel(ctx)
-        self._view = OptionsView(window)
-        connect, read, handler, urls = self._model.getOptionsData()
-        self._view.initView(connect, read, handler, urls)
-        self._logmanager = LogManager(ctx, window.Peer, 'requirements.txt', g_identifier, g_defaultlog)
-        window.addEventListener(OptionsListener(self))
         self._logger = logger
+        self._model = OptionsModel(ctx)
+        window.addEventListener(OptionsListener(self))
+        self._view = OptionsView(window)
+        self._view.initView(*self._model.getOptionsData())
+        self._logmanager = LogManager(ctx, window.getPeer(), 'requirements.txt', g_identifier, g_defaultlog)
         self._logger.logprb(INFO, 'OptionsManager', '__init__()', 151)
 
     def dispose(self):
         self._logmanager.dispose()
 
     def loadSetting(self):
-        connect, read, handler, urls = self._model.getOptionsData()
-        self._view.initView(connect, read, handler, urls)
+        self._view.initView(*self._model.getOptionsData())
         self._logmanager.loadSetting()
         self._logger.logprb(INFO, 'OptionsManager', 'loadSetting()', 161)
 

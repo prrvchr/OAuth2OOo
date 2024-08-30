@@ -425,6 +425,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - Updated the [Python soupsieve][126] package to version 2.6.
 - Updated the [Python tqdm][91] package to version 4.66.5.
 - Updated the [Python trio][118] package to version 0.26.2.
+- Logging accessible in extension options now displays correctly on Windows.
 
 ### What remains to be done for version 1.3.7:
 
