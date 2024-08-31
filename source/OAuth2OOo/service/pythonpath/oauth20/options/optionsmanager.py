@@ -4,7 +4,7 @@
 """
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
-║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
+║   Copyright (c) 2020-24 https://prrvchr.github.io                                  ║
 ║                                                                                    ║
 ║   Permission is hereby granted, free of charge, to any person obtaining            ║
 ║   a copy of this software and associated documentation files (the "Software"),     ║
@@ -27,7 +27,6 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
 
 from com.sun.star.logging.LogLevel import INFO
@@ -59,7 +58,7 @@ class OptionsManager(unohelper.Base):
         window.addEventListener(OptionsListener(self))
         self._view = OptionsView(window)
         self._view.initView(*self._model.getOptionsData())
-        self._logmanager = LogManager(ctx, window.getPeer(), 'requirements.txt', g_identifier, g_defaultlog)
+        self._logmanager = LogManager(ctx, window.getPeer(), 'requirements.txt', g_defaultlog)
         self._logger.logprb(INFO, 'OptionsManager', '__init__()', 151)
 
     def dispose(self):
