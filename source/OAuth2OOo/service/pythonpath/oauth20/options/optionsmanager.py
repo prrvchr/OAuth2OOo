@@ -57,15 +57,17 @@ class OptionsManager(unohelper.Base):
         self._model = OptionsModel(ctx)
         window.addEventListener(OptionsListener(self))
         self._view = OptionsView(window)
-        self._view.initView(*self._model.getOptionsData())
+        self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
         self._logmanager = LogManager(ctx, window.getPeer(), 'requirements.txt', g_defaultlog)
         self._logger.logprb(INFO, 'OptionsManager', '__init__()', 151)
+
+    _restart = False
 
     def dispose(self):
         self._logmanager.dispose()
 
     def loadSetting(self):
-        self._view.initView(*self._model.getOptionsData())
+        self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
         self._logmanager.loadSetting()
         self._logger.logprb(INFO, 'OptionsManager', 'loadSetting()', 161)
 
@@ -73,8 +75,10 @@ class OptionsManager(unohelper.Base):
         connect, read, handler = self._view.getViewData()
         self._model.setOptionsData(connect, read, handler)
         option = self._model.commit()
-        log = self._logmanager.saveSetting()
-        self._logger.logprb(INFO, 'OptionsManager', 'saveSetting()', 171, option, log)
+        if self._logmanager.saveSetting():
+            OptionsManager._restart = True
+            self._view.setRestart(True)
+        self._logger.logprb(INFO, 'OptionsManager', 'saveSetting()', 171, option, OptionsManager._restart)
 
     def connect(self):
         user = url = ''

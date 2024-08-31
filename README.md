@@ -426,6 +426,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - Updated the [Python tqdm][91] package to version 4.66.5.
 - Updated the [Python trio][118] package to version 0.26.2.
 - Logging accessible in extension options now displays correctly on Windows.
+- Changes to extension options that require a restart of LibreOffice will result in a message being displayed.
 
 ### What remains to be done for version 1.3.7:
 

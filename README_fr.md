@@ -426,6 +426,7 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 - Mise à jour du paquet [Python tqdm][91] vers la version 4.66.5.
 - Mise à jour du paquet [Python trio][118] vers la version 0.26.2.
 - La journalisation accessible dans les options de l’extension s’affiche désormais correctement sous Windows.
+- Les modifications apportées aux options d'extension, qui nécessitent un redémarrage de LibreOffice, entraîneront l'affichage d'un message.
 
 ### Que reste-t-il à faire pour la version 1.3.7:
 

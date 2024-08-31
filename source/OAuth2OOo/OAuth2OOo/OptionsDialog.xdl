@@ -44,6 +44,6 @@
       <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:Connect" script:language="UNO"/>
     </dlg:button>
     <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="11" dlg:left="165" dlg:top="160" dlg:width="85" dlg:height="15" dlg:help-text="&amp;OptionsDialog.CheckBox1.HelpText" dlg:value="&amp;OptionsDialog.CheckBox1.Label" dlg:valign="center" dlg:checked="false"/>
+    <dlg:text dlg:style-id="0" dlg:id="Label5" dlg:tab-index="12" dlg:left="10" dlg:top="185" dlg:width="240" dlg:height="15" dlg:help-text="&amp;OptionsDialog.Label5.HelpText" dlg:value="&amp;OptionsDialog.Label5.Label" dlg:align="center" dlg:valign="center"/>
   </dlg:bulletinboard>
-
 </dlg:window>

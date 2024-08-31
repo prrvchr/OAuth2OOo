@@ -41,12 +41,18 @@ class OptionsView(unohelper.Base):
     def __init__(self, dialog):
         self._dialog = dialog
 
-    def initView(self, connect, read, handler, urls):
+# OptionsView public setter methods
+    def initView(self, restart, connect, read, handler, urls):
         self._getConnectTimeout().setValue(connect)
         self._getReadTimeout().setValue(read)
         self._getHandlerTimeout().setValue(handler)
         self._getUrls().Model.StringItemList = urls
+        self.setRestart(restart)
 
+    def setRestart(self, enabled):
+        self._getRestart().setVisible(enabled)
+
+# OptionsView public getter methods
     def getParent(self):
         return self._dialog.getPeer()
 
@@ -84,4 +90,7 @@ class OptionsView(unohelper.Base):
 
     def _getHandlerTimeout(self):
         return self._dialog.getControl('NumericField3')
+
+    def _getRestart(self):
+        return self._dialog.getControl('Label5')
 
