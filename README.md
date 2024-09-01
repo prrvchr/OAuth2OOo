@@ -177,6 +177,8 @@ ___
 
 * LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Python version 3.8.15 (under Lubuntu 22.04 / VirtualBox 6.1.38)
 
+* LibreOffice 24.8.0.3 (x86_64) - Windows 10(x64) - Python version 3.9.19 (under Lubuntu 22.04 / VirtualBox 6.1.38)
+
 * **Does not work with OpenOffice** see [bug 128569][37]. Having no solution, I encourage you to install **LibreOffice**.
 
 I encourage you in case of problem :confused:  
@@ -427,6 +429,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - Updated the [Python trio][118] package to version 0.26.2.
 - Logging accessible in extension options now displays correctly on Windows.
 - Changes to extension options that require a restart of LibreOffice will result in a message being displayed.
+- To work with LibreOffice 24.8.x and Windows (32 and 64 bit), added binaries, for Python version 3.9 and win32 or win_adm64 architectures, to all Python packages included in the extension.
 
 ### What remains to be done for version 1.3.7:
 

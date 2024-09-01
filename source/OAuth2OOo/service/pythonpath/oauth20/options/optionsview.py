@@ -27,12 +27,7 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
-
-from ..unotool import getContainerWindow
-
-from ..configuration import g_extension
 
 import traceback
 

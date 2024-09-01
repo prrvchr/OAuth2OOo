@@ -43,8 +43,11 @@ from .page3 import OAuth2Manager as WizardPage3
 from .page4 import OAuth2Manager as WizardPage4
 from .page5 import OAuth2Manager as WizardPage5
 
+from ..unotool import getStringResource
+
 from ..logger import getLogger
 
+from ..configuration import g_identifier
 from ..configuration import g_defaultlog
 from ..configuration import g_basename
 
@@ -57,6 +60,7 @@ class WizardController(unohelper.Base,
         self._ctx = ctx
         self._wizard = wizard
         self._model = WizardModel(ctx, close, readonly, url, user)
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'WizardController')
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
 
     @property
@@ -75,35 +79,30 @@ class WizardController(unohelper.Base,
 
 # XWizardController
     def createPage(self, parent, pageid):
-        try:
-            print("WizardController.createPage() 1 PageId: %s" % pageid)
-            msg = "PageId: %s ..." % pageid
-            if pageid == 1:
-                page = WizardPage1(self._ctx, self._wizard, self._model, pageid, parent)
-            elif pageid == 2:
-                page = WizardPage2(self._ctx, self._wizard, self._model, pageid, parent)
-            elif pageid == 3:
-                page = WizardPage3(self._ctx, self._wizard, self._model, pageid, parent)
-            elif pageid == 4:
-                page = WizardPage4(self._ctx, self._wizard, self._model, pageid, parent)
-            elif pageid == 5:
-                page = WizardPage5(self._ctx, self._wizard, self._model, pageid, parent)
-            msg += " Done"
-            self._logger.logp(INFO, 'WizardController', 'createPage()', msg)
-            return page
-        except Exception as e:
-            msg = "Error: %s - %s" % (e, traceback.print_exc())
-            print(msg)
+        msg = "PageId: %s ..." % pageid
+        if pageid == 1:
+            page = WizardPage1(self._ctx, self._wizard, self._model, pageid, parent)
+        elif pageid == 2:
+            page = WizardPage2(self._ctx, self._wizard, self._model, pageid, parent)
+        elif pageid == 3:
+            page = WizardPage3(self._ctx, self._wizard, self._model, pageid, parent)
+        elif pageid == 4:
+            page = WizardPage4(self._ctx, self._wizard, self._model, pageid, parent)
+        elif pageid == 5:
+            page = WizardPage5(self._ctx, self._wizard, self._model, pageid, parent)
+        msg += " Done"
+        self._logger.logp(INFO, 'WizardController', 'createPage()', msg)
+        return page
 
     def getPageTitle(self, pageid):
-        return self._model.getPageStep(pageid)
+        return self._model.getPageStep(self._resolver, pageid)
 
     def canAdvance(self):
         return True
 
     def onActivatePage(self, pageid):
         msg = "PageId: %s..." % pageid
-        title = self._model.getPageTitle(pageid)
+        title = self._model.getPageTitle(self._resolver, pageid)
         self._wizard.setTitle(title)
         backward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.PREVIOUS')
         forward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.NEXT')

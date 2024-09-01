@@ -27,20 +27,18 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
 
 from ...unotool import getContainerWindow
-from ...configuration import g_extension
+
+from ...configuration import g_identifier
 
 import traceback
 
 
 class OAuth2View(unohelper.Base):
     def __init__(self, ctx, handler, parent):
-        print("OAuth2View.__init__() 1")
-        self._window = getContainerWindow(ctx, parent, handler, g_extension, 'PageWizard5')
-        print("OAuth2View.__init__() 2")
+        self._window = getContainerWindow(ctx, parent, handler, g_identifier, 'PageWizard5')
 
 # OAuth2View getter methods
     def getWindow(self):

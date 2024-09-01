@@ -37,7 +37,6 @@ from ..unotool import getStringResource
 from ..oauth2helper import getProviderName
 from ..oauth2helper import isEmailValid
 
-from ..configuration import g_extension
 from ..configuration import g_identifier
 
 import traceback
@@ -46,7 +45,7 @@ import traceback
 class HandlerModel(TokenModel):
     def __init__(self, ctx):
         super(TokenModel, self).__init__(ctx)
-        self._resolver = getStringResource(ctx, g_identifier, g_extension)
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'UserDialog')
         self._resources = {'UserTitle': 'UserDialog.Title',
                            'UserLabel': 'UserDialog.Label1.Label'}
 

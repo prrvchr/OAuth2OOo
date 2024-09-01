@@ -77,7 +77,7 @@ class WizardModel(TokenModel):
         self._urn = 'urn:ietf:wg:oauth:2.0:oob'
         self._watchdog = None
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
-        self._resolver = getStringResource(ctx, g_identifier, g_extension)
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'MessageBox')
         self._resources = {'Title': 'PageWizard%s.Title',
                            'Step': 'PageWizard%s.Step',
                            'UrlLabel': 'PageWizard1.Label4.Label',
@@ -131,13 +131,13 @@ class WizardModel(TokenModel):
     def getInitData(self):
         return self._user, self._url, self.UrlList, not self._readonly
 
-    def getProviderData(self, name):
+    def getProviderData(self, resolver, name):
         providers = self._config.getByName('Providers')
         if providers.hasByName(name):
             data = self._getProviderData(providers.getByName(name))
         else:
             data = self._getDefaultProviderData()
-        return self.getProviderTitle(name), data
+        return self.getProviderTitle(resolver, name), data
 
     def saveProviderData(self, name, clientid, clientsecret, authorizationurl, tokenurl,
                          authorizationparameters, tokenparameters, challenge, challengemethod,
@@ -161,8 +161,8 @@ class WizardModel(TokenModel):
         provider.replaceByName('RedirectPort', port)
         self.commit()
 
-    def getScopeData(self, name):
-        title = self.getScopeTitle(name)
+    def getScopeData(self, resolver, name):
+        title = self.getScopeTitle(resolver, name)
         scopes = self._config.getByName('Scopes')
         if scopes.hasByName(name):
             values = scopes.getByName(name).getByName('Values')
@@ -421,8 +421,8 @@ class WizardModel(TokenModel):
         provider = self._config.getByName('Providers').getByName(name)
         return self._registerToken(source, scopes, provider, user, code)
 
-    def getAuthorizationMessage(self, error):
-        return self.getAuthorizationErrorTitle(), self.getRequestErrorMessage(error)
+    def getAuthorizationMessage(self, resolver, error):
+        return self.getAuthorizationErrorTitle(resolver), self.getRequestErrorMessage(resolver, error)
 
 # WizardModel getter methods called by WizardPages 4
     def isCodeValid(self, code):
@@ -438,20 +438,20 @@ class WizardModel(TokenModel):
     def closeWizard(self):
         return self._close
 
-    def getTokenData(self):
-        label = self.getTokenLabel()
-        never, scopes, access, refresh, expires = self.getUserTokenData()
+    def getTokenData(self, resolver):
+        label = self.getTokenLabel(resolver)
+        never, scopes, access, refresh, expires = self.getUserTokenData(resolver)
         return label, never, scopes, access, refresh, expires
 
-    def getUserTokenData(self):
+    def getUserTokenData(self, resolver):
         users = self._config.getByName('Providers').getByName(self._provider).getByName('Users')
         user = users.getByName(self._user)
         scopes = user.getByName('Scopes')
-        refresh = user.getByName('RefreshToken') if user.hasByName('RefreshToken') else self.getTokenRefresh()
-        access = user.getByName('AccessToken') if user.hasByName('AccessToken') else self.getTokenAccess()
+        refresh = user.getByName('RefreshToken') if user.hasByName('RefreshToken') else self.getTokenRefresh(resolver)
+        access = user.getByName('AccessToken') if user.hasByName('AccessToken') else self.getTokenAccess(resolver)
         timestamp = user.getByName('TimeStamp')
         never = user.getByName('NeverExpires')
-        expires = self.getTokenExpires() if never else timestamp - int(time.time())
+        expires = self.getTokenExpires(resolver) if never else timestamp - int(time.time())
         return never, scopes, access, refresh, expires
 
     def refreshToken(self, source):
@@ -587,41 +587,41 @@ class WizardModel(TokenModel):
         self._saveRefreshedToken(user, refresh, access, never, timestamp)
 
 # WizardModel StringResource methods
-    def getPageStep(self, pageid):
+    def getPageStep(self, resolver, pageid):
         resource = self._resources.get('Step') % pageid
-        return self._resolver.resolveString(resource)
+        return resolver.resolveString(resource)
 
-    def getPageTitle(self, pageid):
+    def getPageTitle(self, resolver, pageid):
         resource = self._resources.get('Title') % pageid
-        return self._resolver.resolveString(resource)
+        return resolver.resolveString(resource)
 
-    def getUrlLabel(self, url):
+    def getUrlLabel(self, resolver, url):
         resource = self._resources.get('UrlLabel')
-        return self._resolver.resolveString(resource) % url
+        return resolver.resolveString(resource) % url
 
-    def getProviderTitle(self, name):
+    def getProviderTitle(self, resolver, name):
         resource = self._resources.get('ProviderTitle')
-        return self._resolver.resolveString(resource) % name
+        return resolver.resolveString(resource) % name
 
-    def getScopeTitle(self, name):
+    def getScopeTitle(self, resolver, name):
         resource = self._resources.get('ScopeTitle')
-        return self._resolver.resolveString(resource) % name
+        return resolver.resolveString(resource) % name
 
-    def getTokenLabel(self):
+    def getTokenLabel(self, resolver):
         resource = self._resources.get('TokenLabel')
-        return self._resolver.resolveString(resource) % (self._provider, self._user)
+        return resolver.resolveString(resource) % (self._provider, self._user)
 
-    def getTokenAccess(self):
+    def getTokenAccess(self, resolver):
         resource = self._resources.get('TokenAccess')
-        return self._resolver.resolveString(resource)
+        return resolver.resolveString(resource)
 
-    def getTokenRefresh(self):
+    def getTokenRefresh(self, resolver):
         resource = self._resources.get('TokenRefresh')
-        return self._resolver.resolveString(resource)
+        return resolver.resolveString(resource)
 
-    def getTokenExpires(self):
+    def getTokenExpires(self, resolver):
         resource = self._resources.get('TokenExpires')
-        return self._resolver.resolveString(resource)
+        return resolver.resolveString(resource)
 
     def getDialogTitle(self):
         resource = self._resources.get('DialogTitle')
@@ -631,15 +631,15 @@ class WizardModel(TokenModel):
         resource = self._resources.get('DialogMessage')
         return self._resolver.resolveString(resource)
 
-    def getAuthorizationErrorTitle(self):
+    def getAuthorizationErrorTitle(self, resolver):
         resource = self._resources.get('AuthorizationError')
-        return self._resolver.resolveString(resource)
+        return resolver.resolveString(resource)
 
-    def getTokenErrorTitle(self):
+    def getTokenErrorTitle(self, resolver):
         resource = self._resources.get('TokenError')
-        return self._resolver.resolveString(resource)
+        return resolver.resolveString(resource)
 
-    def getRequestErrorMessage(self, error):
+    def getRequestErrorMessage(self, resolver, error):
         resource = self._resources.get('RequestMessage')
-        return self._resolver.resolveString(resource % error)
+        return resolver.resolveString(resource % error)
 

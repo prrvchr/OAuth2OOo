@@ -43,6 +43,9 @@ from ...unolib import PropertySet
 
 from ...unotool import createMessageBox
 from ...unotool import getProperty
+from ...unotool import getStringResource
+
+from ...configuration import g_identifier
 
 import traceback
 
@@ -56,6 +59,7 @@ class OAuth2Manager(unohelper.Base,
         self._model = model
         self._pageid = pageid
         self._view = OAuth2View(ctx, WindowHandler(self), parent)
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'PageWizard5')
 
 # XWizardPage
     @property
@@ -66,7 +70,7 @@ class OAuth2Manager(unohelper.Base,
         return self._view.getWindow()
 
     def activatePage(self):
-        self._view.initView(*self._model.getTokenData())
+        self._view.initView(*self._model.getTokenData(self._resolver))
         self._wizard.activatePath(2, True)
 
     def commitPage(self, reason):
@@ -85,7 +89,7 @@ class OAuth2Manager(unohelper.Base,
 
 # OAuth2Manager setter methods
     def updateToken(self):
-        self._view.setToken(*self._model.getUserTokenData())
+        self._view.setToken(*self._model.getUserTokenData(self._resolver))
 
     def deleteUser(self):
         dialog = createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
@@ -101,7 +105,7 @@ class OAuth2Manager(unohelper.Base,
             self._view.showError(e.Message)
             self._wizard.updateTravelUI()
         else:
-            self._view.setToken(*self._model.getUserTokenData())
+            self._view.setToken(*self._model.getUserTokenData(self._resolver))
 
     def _getPropertySetInfo(self):
         properties = {}

@@ -32,13 +32,13 @@ import unohelper
 
 from ....unotool import getDialog
 
-from ....configuration import g_extension
+from ....configuration import g_identifier
 
 import traceback
 
 class ScopeView(unohelper.Base):
     def __init__(self, ctx, handler, parent, title, scopes):
-        self._dialog = getDialog(ctx, g_extension, 'ScopeDialog', handler, parent)
+        self._dialog = getDialog(ctx, g_identifier, 'ScopeDialog', handler, parent)
         self._dialog.setTitle(title)
         self._getScopes().Model.StringItemList = scopes
         self._updateOk()

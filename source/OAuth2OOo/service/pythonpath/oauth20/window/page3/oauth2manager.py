@@ -39,6 +39,9 @@ from ...unolib import PropertySet
 
 from ...unotool import executeShell
 from ...unotool import getProperty
+from ...unotool import getStringResource
+
+from ...configuration import g_identifier
 
 import traceback
 
@@ -52,6 +55,7 @@ class OAuth2Manager(unohelper.Base,
         self._model = model
         self._pageid = pageid
         self._view = OAuth2View(ctx, parent, model.HandlerTimeout)
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'PageWizard3')
 
 # XWizardPage
     @property
@@ -96,9 +100,9 @@ class OAuth2Manager(unohelper.Base,
                     # FIXME: Cannot Wizard.travelNext() on OpenOffice
                     self._wizard.travelNext()
             else:
-                self._view.showError(self._model.getTokenErrorTitle(), error)
+                self._view.showError(self._model.getTokenErrorTitle(self._resolver), error)
         else:
-            self._view.showError(*self._model.getAuthorizationMessage(error))
+            self._view.showError(*self._model.getAuthorizationMessage(self._resolver, error))
 
     def _getPropertySetInfo(self):
         properties = {}

@@ -27,18 +27,18 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
 
 from ...unotool import getContainerWindow
-from ...configuration import g_extension
+
+from ...configuration import g_identifier
 
 import traceback
 
 
 class OAuth2View(unohelper.Base):
     def __init__(self, ctx, parent, timeout):
-        self._window = getContainerWindow(ctx, parent, None, g_extension, 'PageWizard3')
+        self._window = getContainerWindow(ctx, parent, None, g_identifier, 'PageWizard3')
         self._getProgessBar().setRange(0, timeout)
 
 # OAuth2View getter methods

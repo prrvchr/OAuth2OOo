@@ -177,6 +177,8 @@ ___
 
 * LibreOffice 7.4.3.2(x64) - Windows 10(x64) - Python version 3.8.15 (sous Lubuntu 22.04 / VirtualBox 6.1.38)
 
+* LibreOffice 24.8.0.3 (X86_64) - Windows 10(x64) - Python version 3.9.19 (sous Lubuntu 22.04 / VirtualBox 6.1.38)
+
 * **Ne fonctionne pas avec OpenOffice** voir [dysfonctionnement 128569][37]. N'ayant aucune solution, je vous encourrage d'installer **LibreOffice**.
 
 Je vous encourage en cas de problème :confused:  
@@ -426,7 +428,8 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 - Mise à jour du paquet [Python tqdm][91] vers la version 4.66.5.
 - Mise à jour du paquet [Python trio][118] vers la version 0.26.2.
 - La journalisation accessible dans les options de l’extension s’affiche désormais correctement sous Windows.
-- Les modifications apportées aux options d'extension, qui nécessitent un redémarrage de LibreOffice, entraîneront l'affichage d'un message.
+- Les modifications apportées aux options de l'extension, qui nécessitent un redémarrage de LibreOffice, entraîneront l'affichage d'un message.
+- Afin de fonctionner avec LibreOffice 24.8.x pour Windows (32 et 64 bits), ajout des fichiers binaires, pour Python version 3.9 et les architectures win32 ou win_adm64, à tous les paquets Python inclus dans l'extension.
 
 ### Que reste-t-il à faire pour la version 1.3.7:
 

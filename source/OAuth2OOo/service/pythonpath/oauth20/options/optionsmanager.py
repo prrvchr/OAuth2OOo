@@ -96,5 +96,6 @@ class OptionsManager(unohelper.Base):
             else:
                 self._logger.logprb(INFO, 'OptionsManager', 'connect()', 182, user, url)
         except Exception as e:
+            print("OptionsManager.connect() ERROR: %s - %s" % (e, traceback.format_exc()))
             self._logger.logprb(SEVERE, 'OptionsManager', 'connect()', 183, user, url, e, traceback.format_exc())
 

@@ -48,7 +48,7 @@
             <value xml:lang="fr-FR">Protocole OAuth2</value>
           </prop>
           <prop oor:name="OptionsPage">
-            <value>%origin%/OAuth2OOo/OptionsDialog.xdl</value>
+            <value>%origin%/dialogs/OptionsDialog.xdl</value>
           </prop>
           <prop oor:name="EventHandlerService">
             <value>io.github.prrvchr.OAuth2OOo.OptionsHandler</value>

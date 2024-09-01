@@ -48,6 +48,9 @@ from ...unolib import PropertySet
 
 from ...unotool import createMessageBox
 from ...unotool import getProperty
+from ...unotool import getStringResource
+
+from ...configuration import g_identifier
 
 import traceback
 
@@ -62,6 +65,7 @@ class OAuth2Manager(unohelper.Base,
         self._model = model
         self._pageid = pageid
         self._view = OAuth2View(ctx, WindowHandler(self), parent)
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'PageWizard1')
         self._view.initView(*self._model.getInitData())
 
 # XWizardPage
@@ -102,7 +106,7 @@ class OAuth2Manager(unohelper.Base,
         # TODO: Add URL button must be enabled after setting the Scope
         self._view.enableAddUrl(False)
         self._view.setProviders(*self._model.getUrlData(url))
-        self._view.setUrlLabel(self._model.getUrlLabel(url))
+        self._view.setUrlLabel(self._model.getUrlLabel(self._resolver, url))
         self._setActivePath()
         self._view.setUrlFocus()
 
@@ -217,7 +221,7 @@ class OAuth2Manager(unohelper.Base,
 
     def _showProvider(self, new):
         provider = self._view.getProvider()
-        title, data = self._model.getProviderData(provider)
+        title, data = self._model.getProviderData(self._resolver, provider)
         self._dialog = ProviderView(self._ctx, ProviderHandler(self), self._view.getWindow().Peer, title)
         self._dialog.initDialog(*data)
         if self._dialog.execute() == OK:
@@ -232,7 +236,7 @@ class OAuth2Manager(unohelper.Base,
     def _showScope(self, new):
         scope = self._view.getScope()
         provider = self._view.getProvider()
-        data = self._model.getScopeData(scope)
+        data = self._model.getScopeData(self._resolver, scope)
         self._dialog = ScopeView(self._ctx, ScopeHandler(self), self._view.getWindow().Peer, *data)
         if self._dialog.execute() == OK:
             self._model.saveScopeData(scope, provider, self._dialog.getScopeValues())
