@@ -1,6 +1,6 @@
 # .github/workflows/fascan.yml
 name: Fluid Attacks Scan
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 jobs:
   machineStandalone:
     name: machineStandalone job
