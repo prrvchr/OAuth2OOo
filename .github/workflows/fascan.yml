@@ -12,6 +12,11 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
       - name: Fluid-Attacks scan
         id: scan
         continue-on-error: true
