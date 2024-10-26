@@ -172,8 +172,16 @@ class Driver(unohelper.Base,
 
     def _getConnectionInfo(self, infos):
         document = storage = url = None
-        service = getConfiguration(self._ctx, g_identifier).getByName('ConnectionService')
-        newinfos = {'Url': g_url, 'ConnectionService': service}
+        config = getConfiguration(self._ctx, g_identifier)
+        level = config.getByName('ApiLevel')
+        system = config.getByName('ShowSystemTable')
+        bookmark = config.getByName('UseBookmark')
+        mode = config.getByName('SQLMode')
+        newinfos = {'Url': g_url,
+                    'ApiLevel': level,
+                    'ShowSystemTable': system,
+                    'UseBookmark': bookmark,
+                    'SQLMode': mode}
         if g_user:
             newinfos['user'] = g_user
         if g_driver:

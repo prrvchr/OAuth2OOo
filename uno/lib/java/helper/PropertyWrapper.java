@@ -1,7 +1,4 @@
-#!
-# -*- coding: utf-8 -*-
-
-"""
+/*
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
 ║   Copyright (c) 2020-24 https://prrvchr.github.io                                  ║
@@ -25,17 +22,59 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
-"""
+*/
+package io.github.prrvchr.uno.helper;
 
-from .dialog import LogManager
-from .dialog import LoggerListener
+import com.sun.star.uno.Type;
 
-from .logger import Logger
+import io.github.prrvchr.uno.helper.PropertySetAdapter.PropertyGetter;
+import io.github.prrvchr.uno.helper.PropertySetAdapter.PropertySetter;
 
-from .loggerpool import LoggerPool
 
-from .loghandler import RollerHandler
+public class PropertyWrapper
+{
 
-from .loghelper import getLogger
+    private final Type m_type;
+    private final short m_attributes;
+    private final PropertyGetter m_getter;
+    private final PropertySetter m_setter;
 
-from .logcontroller import LogController
+    // The constructor method:
+    public PropertyWrapper(Type type,
+                           PropertyGetter getter,
+                           PropertySetter setter)
+    {
+        this(type, (short) 0, getter, setter);
+    }
+
+    public PropertyWrapper(Type type,
+                           short attributes,
+                           PropertyGetter getter,
+                           PropertySetter setter)
+    {
+        m_type = type;
+        m_attributes = attributes;
+        m_getter = getter;
+        m_setter = setter;
+    }
+
+    public Type getType()
+    {
+        return m_type;
+    }
+
+    public short getAttribute()
+    {
+        return m_attributes;
+    }
+
+    public PropertyGetter getGetter()
+    {
+        return m_getter;
+    }
+
+    public PropertySetter getSetter()
+    {
+        return m_setter;
+    }
+}

@@ -4,7 +4,7 @@
 """
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
-║   Copyright (c) 2020 https://prrvchr.github.io                                     ║
+║   Copyright (c) 2020-24 https://prrvchr.github.io                                  ║
 ║                                                                                    ║
 ║   Permission is hereby granted, free of charge, to any person obtaining            ║
 ║   a copy of this software and associated documentation files (the "Software"),     ║
@@ -27,54 +27,84 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import unohelper
+from ..unotool import getContainerWindow
+
+from ..configuration import g_identifier
 
 import traceback
 
 
-class OptionsView():
-    def __init__(self, window, restart, offset, timeout, view, enabled):
-        self._window = window
-        self._getTimeout().Value = timeout
-        self._getDatasource().Model.Enabled = enabled
-        self._setViewName(view, not enabled)
+class OptionWindow():
+    def __init__(self, ctx, window, handler, restart, offset):
+        self._window = getContainerWindow(ctx, window.getPeer(), handler, g_identifier, 'OptionDialog')
+        self._window.setVisible(True)
         self.setRestart(restart)
         self._getRestart().Model.PositionY += offset
 
-# OptionsView getter methods
-    def getViewData(self):
-        return int(self._getTimeout().Value), self._getViewName().Text
+# OptionWindow getter methods
+    def getApiLevel(self):
+        for level in range(3):
+            if self._getApiLevel(level).State == 1:
+                return level
 
-# OptionsView setter methods
-    def setTimeout(self, timeout):
-        self._getTimeout().Value = timeout
+    def getOptions(self):
+        system = self._getSytemTable().State
+        bookmark = self._getBookmark().State
+        mode = self._getSQLMode().State
+        return system, bookmark, mode
 
-    def setViewName(self, view):
-        self._getViewName().Text = view
+# OptionWindow setter methods
+    def dispose(self):
+        self._window.dispose()
+
+    def setDriverLevel(self, level):
+        self._getDriverService(level).State = 1
+
+    def setApiLevel(self, level, enabled, bookmark, mode):
+        self._getApiLevel(level).State = 1
+        self._getApiLevel(0).Model.Enabled = enabled
+        self.enableOptions(level, bookmark, mode)
+
+    def setSystemTable(self, driver, state):
+        self._getSytemTable().Model.Enabled = bool(driver)
+        if driver:
+            self._getSytemTable().State = int(state)
+        else:
+            self._getSytemTable().State = 0
 
     def setRestart(self, enabled):
         self._getRestart().setVisible(enabled)
 
-# OptionsView private setter methods
-    def _setViewName(self, view, disabled):
-        self._getViewLabel().Model.Enabled = disabled
-        control = self._getViewName()
-        control.Model.Enabled = disabled
-        control.Text = view
+    def enableOptions(self, level, bookmark, mode):
+        self._getBookmark().Model.Enabled = bool(level)
+        if level:
+            self._getBookmark().State = int(bookmark)
+            self.enableSQLMode(bookmark, mode)
+        else:
+            self._getBookmark().State = 0
+            self._getSQLMode().Model.Enabled = False
+            self._getSQLMode().State = 0
 
-# OptionsView private control methods
-    def _getTimeout(self):
-        return self._window.getControl('NumericField1')
+    def enableSQLMode(self, state, mode):
+        self._getSQLMode().Model.Enabled = bool(state)
+        self._getSQLMode().State = int(mode) if state else 0
 
-    def _getDatasource(self):
-        return self._window.getControl('CommandButton1')
+# OptionWindow private control methods
+    def _getDriverService(self, index):
+        return self._window.getControl('OptionButton%s' % (index + 1))
 
-    def _getViewLabel(self):
-        return self._window.getControl('Label3')
+    def _getApiLevel(self, index):
+        return self._window.getControl('OptionButton%s' % (index + 3))
 
-    def _getViewName(self):
-        return self._window.getControl('TextField1')
+    def _getSytemTable(self):
+        return self._window.getControl('CheckBox1')
+
+    def _getBookmark(self):
+        return self._window.getControl('CheckBox2')
+
+    def _getSQLMode(self):
+        return self._window.getControl('CheckBox3')
 
     def _getRestart(self):
-        return self._window.getControl('Label4')
+        return self._window.getControl('Label3')
 

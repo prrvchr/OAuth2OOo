@@ -27,15 +27,57 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .dialog import LogManager
-from .dialog import LoggerListener
+import unohelper
 
-from .logger import Logger
+from com.sun.star.awt import XContainerWindowEventHandler
 
-from .loggerpool import LoggerPool
+import traceback
 
-from .loghandler import RollerHandler
 
-from .loghelper import getLogger
+class WindowHandler(unohelper.Base,
+                    XContainerWindowEventHandler):
+    def __init__(self, manager):
+        self._manager = manager
 
-from .logcontroller import LogController
+    # XContainerWindowEventHandler
+    def callHandlerMethod(self, window, event, method):
+        try:
+            handled = False
+            if method == 'Base':
+                self._manager.setDriverService(0)
+                handled = True
+            elif method == 'Enhanced':
+                self._manager.setDriverService(1)
+                handled = True
+            elif method == 'Level0':
+                self._manager.setApiLevel(0)
+                handled = True
+            elif method == 'Level1':
+                self._manager.setApiLevel(1)
+                handled = True
+            elif method == 'Level2':
+                self._manager.setApiLevel(2)
+                handled = True
+            elif method == 'SystemTable':
+                self._manager.setSystemTable(event.Source.State)
+                handled = True
+            elif method == 'UseBookmark':
+                self._manager.setBookmark(event.Source.State)
+                handled = True
+            elif method == 'SQLMode':
+                self._manager.setSQLMode(event.Source.State)
+                handled = True
+            return handled
+        except Exception as e:
+            print("ERROR: %s - %s" % (e, traceback.format_exc()))
+
+    def getSupportedMethodNames(self):
+        return ('Base',
+                'Enhanced',
+                'Level0',
+                'Level1',
+                'Level2',
+                'SystemTable',
+                'UseBookmark',
+                'SQLMode')
+

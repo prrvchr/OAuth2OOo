@@ -27,15 +27,39 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .dialog import LogManager
-from .dialog import LoggerListener
+from .optionsmodel import OptionsModel
+from .optionsview import OptionsView
+from .optionshandler import OptionsListener
 
-from .logger import Logger
+from ..option import OptionManager
 
-from .loggerpool import LoggerPool
+from ..configuration import g_defaultlog
 
-from .loghandler import RollerHandler
+import traceback
 
-from .loghelper import getLogger
 
-from .logcontroller import LogController
+class OptionsManager():
+    def __init__(self, ctx, window, url=None):
+        self._model = OptionsModel(ctx, url)
+        window.addEventListener(OptionsListener(self))
+        self._view = OptionsView(window)
+        self._manager = OptionManager(ctx, window, 20, g_defaultlog)
+        version = self._model.getDriverVersion(self._service())
+        self._view.setDriverVersion(version)
+
+    def dispose(self):
+        self._manager.dispose()
+
+# OptionsManager setter methods
+    def saveSetting(self):
+        self._manager.saveSetting() 
+
+    def loadSetting(self):
+        self._manager.loadSetting()
+        version = self._model.getDriverVersion(self._service())
+        self._view.setDriverVersion(version)
+
+# OptionsManager private methods
+    def _service(self):
+        return self._manager.getDriverService()
+

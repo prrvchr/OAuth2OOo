@@ -27,15 +27,4 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .dialog import LogManager
-from .dialog import LoggerListener
-
-from .logger import Logger
-
-from .loggerpool import LoggerPool
-
-from .loghandler import RollerHandler
-
-from .loghelper import getLogger
-
-from .logcontroller import LogController
+from .optionmanager import OptionManager

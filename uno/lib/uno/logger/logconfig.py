@@ -27,52 +27,55 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
+from .loghandler import getRollerHandlerUrl
+
+from ..unotool import createService
+from ..unotool import getConfiguration
+from ..unotool import getFileSequence
+
 import traceback
 
+# XXX: LogConfig allows access to the Logger configuration
+# XXX: it is used by ./dialog/LogModel and ./LogController
+class LogConfig():
+    def __init__(self, ctx):
+        self._ctx = ctx
+        self._setting = '/org.openoffice.Office.Logging/Settings'
+        self.loadSetting()
 
-class OptionsView():
-    def __init__(self, window):
-        self._window = window
+    def loadSetting(self):
+        self._config = getConfiguration(self._ctx, self._setting, True)
 
-# OptionsView setter methods
-    def initView(self, driver, connection, updated, enabled, version, reboot):
-        self._getVersion().Text = version
-        self._getDriverService(driver).State = 1
-        if updated:
-            self.disableDriverLevel()
-        self._getConnectionService(connection).State = 1
-        self._getConnectionService(0).Model.Enabled = enabled
-        self._getReboot().setVisible(reboot)
+    def getLoggerUrl(self, name):
+        url = '$(userurl)/$(loggername).log'
+        settings = self.getSetting(name).getByName('HandlerSettings')
+        if settings.hasByName('FileURL'):
+            url = settings.getByName('FileURL')
+        path = createService(self._ctx, 'com.sun.star.util.PathSubstitution')
+        url = url.replace('$(loggername)', name)
+        return path.substituteVariables(url, True)
 
-    def setDriverVersion(self, version):
-        self._getVersion().Text = version
+    def getLoggerContent(self, name, roller=False):
+        url, text, length = self.getLoggerData(name, roller)
+        return text, length
 
-    def setDriverLevel(self, level, updated):
-        self._getDriverService(level).State = 1
-        if updated:
-            self.disableDriverLevel()
+    def getLoggerData(self, name, roller=False):
+        url = self._getLoggerUrl(name, roller)
+        length, sequence = getFileSequence(self._ctx, url)
+        text = sequence.value.decode('utf-8')
+        return url, text, length
 
-    def setConnectionLevel(self, level, enabled):
-        self._getConnectionService(level).State = 1
-        self._getConnectionService(0).Model.Enabled = enabled
+    def saveSetting(self):
+        if self._config.hasPendingChanges():
+            self._config.commitChanges()
+            return True
+        return False
 
-    def disableDriverLevel(self):
-        self._getDriverService(0).Model.Enabled = False
-        self._getDriverService(1).Model.Enabled = False
+    def getSetting(self, name):
+        if not self._config.hasByName(name):
+            self._config.insertByName(name, self._config.createInstance())
+        return self._config.getByName(name)
 
-    def setReboot(self, state):
-        self._getReboot().setVisible(state)
-
-# OptionsView private control methods
-    def _getDriverService(self, index):
-        return self._window.getControl('OptionButton%s' % (index + 1))
-
-    def _getConnectionService(self, index):
-        return self._window.getControl('OptionButton%s' % (index + 3))
-
-    def _getVersion(self):
-        return self._window.getControl('Label2')
-
-    def _getReboot(self):
-        return self._window.getControl('Label5')
+    def _getLoggerUrl(self, name, roller=False):
+        return getRollerHandlerUrl(self._ctx, name) if roller else self.getLoggerUrl(name)
 

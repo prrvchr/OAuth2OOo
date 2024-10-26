@@ -27,15 +27,22 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .dialog import LogManager
-from .dialog import LoggerListener
+import unohelper
 
-from .logger import Logger
+from com.sun.star.lang import XEventListener
 
-from .loggerpool import LoggerPool
+import traceback
 
-from .loghandler import RollerHandler
 
-from .loghelper import getLogger
+class OptionsListener(unohelper.Base,
+                      XEventListener):
+    def __init__(self, manager):
+        self._manager = manager
 
-from .logcontroller import LogController
+# com.sun.star.lang.XEventListener
+    def disposing(self, source):
+        try:
+            self._manager.dispose()
+        except Exception as e:
+            print("ERROR: %s - %s" % (e, traceback.format_exc()))
+

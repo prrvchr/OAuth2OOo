@@ -27,15 +27,18 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .dialog import LogManager
-from .dialog import LoggerListener
+import traceback
 
-from .logger import Logger
 
-from .loggerpool import LoggerPool
+class OptionsView():
+    def __init__(self, window):
+        self._window = window
 
-from .loghandler import RollerHandler
+# OptionsView setter methods
+    def setDriverVersion(self, version):
+        self._getVersion().Text = version
 
-from .loghelper import getLogger
+# OptionsView private control methods
+    def _getVersion(self):
+        return self._window.getControl('Label2')
 
-from .logcontroller import LogController

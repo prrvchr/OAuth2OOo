@@ -27,70 +27,56 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
-
-from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from .optionsmodel import OptionsModel
-from .optionsview import OptionsView
-from .optionshandler import OptionsListener
+from .logwrapper import LogWrapper
 
-from ..logger import LogManager
+from .logconfig import LogConfig
 
-from ..configuration import g_defaultlog
+from .loghandler import RollerHandler
+from .loghandler import getRollerHandlerUrl
 
-import os
-import sys
+from ..unotool import getSimpleFile
+from ..unotool import getStringResourceWithLocation
+
+from ..configuration import g_basename
+
 import traceback
 
+# XXX: This LogController allows to use a deletable log file as used in eMailerOOo
+class LogController(LogWrapper):
+    def __init__(self, ctx, name, basename=g_basename, listener=None):
+        super().__init__(ctx, name, basename)
+        self._listener = listener
+        self._setting = None
+        self._config = LogConfig(ctx)
+        if listener is not None:
+            self._logger.addModifyListener(listener)
 
-class OptionsManager():
-    def __init__(self, ctx, window, url=None):
-        self._ctx = ctx
-        self._disposed = False
-        self._disabled = False
-        self._model = OptionsModel(ctx, url)
-        window.addEventListener(OptionsListener(self))
-        self._view = OptionsView(window)
-        self._view.initView(*self._model.getViewData())
-        self._logmanager = LogManager(ctx, window.getPeer(), 'requirements.txt', g_defaultlog)
+    # Public getter method
+    def getLogContent(self, roller=False):
+        return self._config.getLoggerContent(self.Name, roller)
 
+    # Public setter method
     def dispose(self):
-        self._logmanager.dispose()
-        self._disposed = True
+        if self._listener is not None:
+            self._logger.removeModifyListener(self._listener)
 
-    # TODO: One shot disabler handler
-    def isHandlerEnabled(self):
-        if self._disabled:
-            self._disabled = False
-            return False
-        return True
+    def clearLogger(self):
+        url = getRollerHandlerUrl(self._ctx, self.Name)
+        sf = getSimpleFile(self._ctx)
+        if sf.exists(url):
+            sf.kill(url)
+            resolver = getStringResourceWithLocation(self._ctx, self._url, 'Logger')
+            msg = resolver.resolveString(111)
+            handler = RollerHandler(self._ctx, self.Name)
+            self.addRollerHandler(handler)
+            self._logger.logp(SEVERE, 'Logger', 'clearLogger()', msg)
+            self.removeRollerHandler(handler)
 
-# OptionsManager setter methods
-    def updateView(self, versions):
-        with self._lock:
-            self.updateVersion(versions)
+    def addModifyListener(self, listener):
+        self._logger.addModifyListener(listener)
 
-    def updateVersion(self, versions):
-        with self._lock:
-            if not self._disposed:
-                protocol = self._view.getSelectedProtocol()
-                if protocol in versions:
-                    self._view.setVersion(versions[protocol])
-
-    def saveSetting(self):
-        self._logmanager.saveSetting()
-        if self._model.saveSetting() and self._model.isUpdated():
-            self._view.disableDriverLevel()
-
-    def loadSetting(self):
-        self._logmanager.loadSetting()
-        self._view.initView(*self._model.loadSetting())
-
-    def setDriverService(self, driver):
-        self._view.setConnectionLevel(*self._model.setDriverService(driver))
-
-    def setConnectionService(self, level):
-        self._model.setConnectionService(level)
+    def removeModifyListener(self, listener):
+        self._logger.removeModifyListener(listener)
 
