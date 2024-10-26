@@ -28,7 +28,7 @@
   xmlns="http://openoffice.org/extensions/update/2006"
   xmlns:xlink="http://www.w3.org/1999/xlink">
     <identifier value="io.github.prrvchr.OAuth2OOo"/>
-    <version value="1.3.7"/>
+    <version value="1.3.8"/>
     <update-download>
         <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt"/>
     </update-download>
@@ -40,7 +40,7 @@
         <name xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr" lang="fr">OAuth2OOo</name>
     </publisher>
     <release-notes>
-        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-137" lang="en"/>
-        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-137" lang="fr"/>
+        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-138" lang="en"/>
+        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-138" lang="fr"/>
     </release-notes>
 </description>

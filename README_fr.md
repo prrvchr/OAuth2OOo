@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'utilisation][4] et à notre [Politique de protection des données][5].**
 
-# version [1.3.7][6]
+# version [1.3.8][6]
 
 ## Introduction:
 
@@ -431,7 +431,11 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 - Les modifications apportées aux options de l'extension, qui nécessitent un redémarrage de LibreOffice, entraîneront l'affichage d'un message.
 - Afin de fonctionner avec LibreOffice 24.8.x pour Windows (32 et 64 bits), ajout des fichiers binaires, pour Python version 3.9 et les architectures win32 ou win_adm64, à tous les paquets Python inclus dans l'extension.
 
-### Que reste-t-il à faire pour la version 1.3.7:
+### Ce qui a été fait pour la version 1.3.8:
+
+- Modification des options de l'extension accessibles via : **Outils -> Options... -> Internet -> Protocole OAuth2** afin de respecter la nouvelle charte graphique.
+
+### Que reste-t-il à faire pour la version 1.3.8:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -464,7 +468,7 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 [25]: <https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-130>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.7#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.8#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>

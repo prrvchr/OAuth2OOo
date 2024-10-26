@@ -58,7 +58,7 @@ class OptionsManager(unohelper.Base):
         window.addEventListener(OptionsListener(self))
         self._view = OptionsView(window)
         self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
-        self._logmanager = LogManager(ctx, window.getPeer(), 'requirements.txt', g_defaultlog)
+        self._logmanager = LogManager(ctx, window, 'requirements.txt', g_defaultlog)
         self._logger.logprb(INFO, 'OptionsManager', '__init__()', 151)
 
     _restart = False
