@@ -7,8 +7,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222
-      - uses: docker://docker.io/fluidattacks/cli:latest
-        name: machineStandalone
+      - name: Fluid-Attacks scan
+        id: scan
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+        uses: docker://docker.io/fluidattacks/cli:latest
         with:
           args: skims scan ./_fascan.yml
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -am "Fluid-Attacks-Results.csv commit" || exit 0
+          git push origin HEAD:master
+
+      - name: Check for failures
+        if: steps.scan.outcome != 'success'
+        run: exit 1
