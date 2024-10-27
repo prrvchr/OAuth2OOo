@@ -7,15 +7,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fluid-Attacks scan
-        id: scan
-        continue-on-error: true
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+
+      - name: Fluid-Attacks scan
+        id: scan
+        continue-on-error: true
         uses: docker://docker.io/fluidattacks/cli:latest
         with:
           args: skims scan ./_fascan.yml
+
+      - name: Commit and push changes
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
