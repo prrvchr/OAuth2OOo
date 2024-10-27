@@ -1,2 +1,26 @@
-title,cwe,description,cvss,finding,stream,kind,where,snippet,method
-Summary: No vulnerabilities were found in your targets.
+title,cwe,description,cvss,cvss_v4,finding,stream,kind,where,snippet,method
+120. Improper dependency pinning,CWE-829,The dependency html5lib-modern is used in your project but not declared in the requirements.txt file. It is likely a transitive dependency or sub-dependency of another package in OAuth2OOo/source/OAuth2OOo/requirements.txt,CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N/E:U/RL:O/RC:C,CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U,https://help.fluidattacks.com/portal/en/kb/articles/criteria-vulnerabilities-120,skims,SCA,0,"
+   1 | attrs>=24.2.0
+   2 | beautifulsoup4>=4.12.3
+   3 | calmjs>=3.4.4
+   4 | calmjs.parse>=1.3.1
+   5 | calmjs.types>=1.0.1
+   6 | certifi>=2024.7.4
+   7 | cffi>=1.17.0
+   8 | chardet>=5.2.0
+   9 | charset_normalizer>=3.3.2
+  10 | cssselect>=1.2.0
+  11 | decorator>=5.1.1
+  12 | exceptiongroup>=1.2.2
+  13 | extruct>=0.17.0
+  14 | h11>=0.14.0
+  15 | html_text>=0.6.2
+  16 | html5lib>=1.1
+  17 | idna>=3.8
+  18 | ijson>=3.3.0
+  19 | isodate>=0.6.1
+  20 | jmespath>=1.0.1
+  21 | js2xml>=0.5.0
+     ^ Col 0
+",python.pip_incomplete_dependencies_list
+Summary: 1 vulnerabilities were found in your targets.
