@@ -59,6 +59,7 @@ class RequestParameter(unohelper.Base,
         self._data = uno.ByteSequence(b'')
         self._text = ''
         self._datasink = None
+        self._dataurl = ''
         self._noauth = False
         self._auth = ()
         self._noredirect = False
@@ -78,6 +79,7 @@ class RequestParameter(unohelper.Base,
         self._pattern = ''
         self._offset = 0
         self._rtype = NONE
+        self._default = ('Accept', 'Accept-Encoding', 'Connection', 'User-Agent')
 
     @property
     def Name(self):
@@ -135,6 +137,12 @@ class RequestParameter(unohelper.Base,
     @DataSink.setter
     def DataSink(self, datasink):
         self._datasink = datasink
+    @property
+    def DataUrl(self):
+        return self._dataurl
+    @FileUrl.setter
+    def DataUrl(self, url):
+        self._dataurl = url
     @property
     def NoAuth(self):
         return self._noauth
@@ -234,6 +242,8 @@ class RequestParameter(unohelper.Base,
         return self._headers[key]
 
     def setHeader(self, key, value):
+        if key in self._default and not value:
+            value = None
         self._headers[key] = value
 
     def setForm(self, key, value):

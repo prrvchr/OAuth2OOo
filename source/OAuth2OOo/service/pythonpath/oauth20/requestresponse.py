@@ -110,12 +110,16 @@ def getKwArgs(parameter, stream=False):
     elif parameter.Auth:
         print("Request.getKWArgs() Auth")
         kwargs['auth'] = parameter.Auth
-    if parameter.DataSink:
-        print("Request.getKWArgs() DataSink")
-        kwargs['data'] = FileLike(parameter.DataSink)
-    elif parameter.Data:
+    if parameter.Data:
         print("Request.getKWArgs() Data")
         kwargs['data'] = parameter.Data.value
+    elif parameter.DataSink:
+        print("Request.getKWArgs() DataSink")
+        kwargs['data'] = FileLike(parameter.DataSink)
+    elif parameter.DataUrl:
+        print("Request.getKWArgs() DataUrl")
+        path = uno.fileUrlToSystemPath(parameter.DataUrl)
+        kwargs['data'] = open(uno.fileUrlToSystemPath(parameter.DataUrl), 'rb')
     elif parameter.Text:
         print("Request.getKWArgs() Text")
         kwargs['data'] = parameter.Text
@@ -393,7 +397,7 @@ class FileLike():
 
     # Python FileLike Object
     def read(self, length):
-        length, sequence = self._input.readBytes(None, length)
+        length, sequence = self._input.readSomeBytes(None, length)
         return sequence.value
 
     def close(self):
