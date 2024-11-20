@@ -4,7 +4,7 @@
 
 **Use of this software also subjects you to our [Terms Of Use][2].**
 
-Regarding installation, configuration and use, please consult the **[documentation][3]**.
+Regarding installation, configuration and use, please consult the **[Documentation][3]**.
 
 ## Introduction:
 
@@ -69,14 +69,16 @@ ___
 - [Nature and scope rights][24] for `mDriveOOo`.
 - [Nature and scope rights][25] for `eMailerOOo`.
 
-`Supplier` is solely responsible for the nature and scope of the rights over the data it collects, as described in its Data Protection Policy.
+Use of the `Supplier` services through `OAuth2OOo` and/or `Extension`, may submit you to the Data Protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
+
+`Supplier` is solely responsible for the nature and scope of the rights over the data it collects, as described in its Policy.
 
 ___
 ## Security of collected data:
 
 Since the data collected by `OAuth2OOo` and/or `Extension` is located on the `Computer`, **only the** `User` **is responsible for the security of the data collected**.
 
-Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
+Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subject you to the Data Protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
 
 `Supplier` is solely responsible for the security of the data it collects as described in its Policy.
 
@@ -89,7 +91,7 @@ Updating the data collected locally is done each time `OAuth2OOo` and/or `Extens
 
 It is the responsibility of the `User` to uninstall `OAuth2OOo` and/or `Extension` in order to delete the collected data.
 
-Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subject you to the data protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
+Use of the `Supplier` services through `OAuth2OOo` and/or `Extension` may subject you to the Data Protection Policy of `Supplier`. It is the responsibility of the `User` to take knowledge of these Policy from the `Supplier` website.
 
 `Supplier` is solely responsible for the expiration of the data it collects as described in its Policy.
 

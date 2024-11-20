@@ -1,10 +1,10 @@
-# Politique de protection des données
+# Politique de Protection des Données
 
-**This [document][1] in English.**
+**This [document][1] in english.**
 
-**L'utilisation de ce logiciel vous soumet également à nos [Conditions d'utilisation][2].**
+**L'utilisation de ce logiciel vous soumet également à nos [Conditions d'Utilisation][2].**
 
-Concernant l'installation, la configuration et l'utilisation, veuillez consulter la **[documentation][3]**.
+Concernant l'installation, la configuration et l'utilisation, veuillez consulter la **[Documentation][3]**.
 
 ## Introduction:
 
@@ -22,18 +22,18 @@ Pour plus de simplicité, dans la suite de ce document, on nommera:
 - `mDriveOOo`: le logiciel [mDriveOOo][10] dans son intégralité.
 - `eMailerOOo`: le logiciel [eMailerOOo][11] dans son intégralité.
 - `Utilisateur`: l'utilisateur des logiciels précédemment mentionné.
-- `Ordinateur` : l'ordinateur personnel de l'`Utilisateur` sur lequel est installé au moins un des logiciels précédemment mentionné.
+- `Ordinateur`: l'ordinateur personnel de l'`Utilisateur` sur lequel est installé au moins un des logiciels précédemment mentionné.
 - `Extension`:  toute extension installée sur l'`Ordinateur` utilisant les services logiciels de `OAuth2OOo` et faisant partie de la liste des logiciels précédemment mentionné.
 - `Fournisseur`: fournisseur de services Internet fournissant des jetons OAuth2 à `OAuth2OOo` et des services Internet à `Extension`.
 
-`OAuth2OOo` fournissant des services logiciels à `Extension`, **son utilisation vous soumet également à la Politique de protection des données** de `Extension` et dont voici la liste exhaustive:
-- [Politique de protection des données][12] pour `gContactOOo`.
-- [Politique de protection des données][13] pour `mContactOOo`.
-- [Politique de protection des données][14] pour `vCardOOo`.
-- [Politique de protection des données][15] pour `dDriveOOo`.
-- [Politique de protection des données][16] pour `gDriveOOo`.
-- [Politique de protection des données][17] pour `mDriveOOo`.
-- [Politique de protection des données][18] pour `eMailerOOo`.
+`OAuth2OOo` fournissant des services logiciels à `Extension`, **son utilisation vous soumet également à la Politique de Protection des Données** de `Extension` et dont voici la liste exhaustive:
+- [Politique de Protection des Données][12] pour `gContactOOo`.
+- [Politique de Protection des Données][13] pour `mContactOOo`.
+- [Politique de Protection des Données][14] pour `vCardOOo`.
+- [Politique de Protection des Données][15] pour `dDriveOOo`.
+- [Politique de Protection des Données][16] pour `gDriveOOo`.
+- [Politique de Protection des Données][17] pour `mDriveOOo`.
+- [Politique de Protection des Données][18] pour `eMailerOOo`.
 
 ___
 ## Contact:
@@ -53,9 +53,9 @@ L'emplacement de ces données est le répertoire d'installation de l'application
 
 La suppression des données collectées par `OAuth2OOo` et/ou `Extension` est garantie par la désinstallation de l'application `OAuth2OOo` et/ou `Extension`, respectivement.
 
-L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la politique de protection des données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
+L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la Politique de Protection des Données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
 
-Le `Fournisseur` est seul responsable de l'utilisation des données qu'il collecte, comme décrit dans sa politique de protection des données.
+Le `Fournisseur` est seul responsable de l'utilisation des données qu'il collecte, comme décrit dans sa Politique de Protection des Données.
 
 ___
 ## Nature et étendue des droits sur vos données:
@@ -69,6 +69,8 @@ ___
 - [Nature et étendue des droits][24] pour `mDriveOOo`.
 - [Nature et étendue des droits][25] pour `eMailerOOo`.
 
+L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la Politique de Protection des Données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
+
 Le `Fournisseur` est seul responsable de la nature et de l’étendue des droits sur les données qu’il collecte, comme décrit dans sa Politique de Protection des Données.
 
 ___
@@ -76,9 +78,9 @@ ___
 
 Étant donné que les données collectées par `OAuth2OOo` et/ou `Extension` sont situées sur l'`Ordinateur`, **seul l'**`Utilisateur` **est responsable de la sécurité des données collectées**.
 
-L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la politique de protection des données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
+L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la Politique de Protection des Données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
 
-Le `Fournisseur` est seul responsable de la sécurité des données qu'il collecte, comme décrit dans sa politique de protection des données.
+Le `Fournisseur` est seul responsable de la sécurité des données qu'il collecte, comme décrit dans sa Politique de Protection des Données.
 
 ___
 ## Expiration des données collectées:
@@ -89,9 +91,9 @@ La mise à jour des données collectées localement est effectuée chaque fois q
 
 Il est de la responsabilité de l'`Utilisateur` de désinstaller `OAuth2OOo` et/ou `Extension` afin de supprimer les données collectées.
 
-L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la politique de protection des données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
+L'utilisation des services du `Fournisseur` au travers de `OAuth2OOo` et/ou `Extension` peut vous soumettre à la Politique de Protection des Données du `Fournisseur`. Il incombe à l'`Utilisateur` de consulter ces règles sur le site Web du `Fournisseur`.
 
-Le `Fournisseur` est seul responsable de l'expiration des données qu'il collecte comme décrit dans sa politique de protection des données.
+Le `Fournisseur` est seul responsable de l'expiration des données qu'il collecte comme décrit dans sa Politique de Protection des Données.
 
 [1]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
 [2]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
