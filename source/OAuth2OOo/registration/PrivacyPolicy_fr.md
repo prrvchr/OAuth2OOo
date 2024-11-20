@@ -69,6 +69,8 @@ ___
 - [Nature et étendue des droits][24] pour `mDriveOOo`.
 - [Nature et étendue des droits][25] pour `eMailerOOo`.
 
+Le `Fournisseur` est seul responsable de la nature et de l’étendue des droits sur les données qu’il collecte, comme décrit dans sa Politique de Protection des Données.
+
 ___
 ## Sécurité des données collectées:
 

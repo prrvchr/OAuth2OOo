@@ -69,6 +69,8 @@ ___
 - [Nature and scope rights][24] for `mDriveOOo`.
 - [Nature and scope rights][25] for `eMailerOOo`.
 
+`Supplier` is solely responsible for the nature and scope of the rights over the data it collects, as described in its Data Protection Policy.
+
 ___
 ## Security of collected data:
 
