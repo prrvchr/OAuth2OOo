@@ -1,5 +1,3 @@
 sca:
   - dependency_name: html5lib-modern
     reason: False Positive
-  - dependency_name: lxml-html-clean
-    reason: False Positive

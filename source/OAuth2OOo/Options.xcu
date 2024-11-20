@@ -61,9 +61,24 @@
         <value>Google People</value>
       </prop>
     </node>
-    <node oor:name="smtp-mail.outlook.com" oor:op="fuse">
+    <node oor:name="graph.microsoft.com/Outlook" oor:op="fuse">
       <prop oor:name="Scope">
         <value>Microsoft Mail Send</value>
+      </prop>
+    </node>
+    <node oor:name="smtp.office365.com" oor:op="fuse">
+      <prop oor:name="Scope">
+        <value>Microsoft Mail SMTP/IMAP</value>
+      </prop>
+    </node>
+    <node oor:name="outlook.office365.com" oor:op="fuse">
+      <prop oor:name="Scope">
+        <value>Microsoft Mail SMTP/IMAP</value>
+      </prop>
+    </node>
+    <node oor:name="graph.microsoft.com/People" oor:op="fuse">
+      <prop oor:name="Scope">
+        <value>Microsoft People</value>
       </prop>
     </node>
     <node oor:name="graph.microsoft.com" oor:op="fuse">
@@ -78,7 +93,7 @@
         <value>Google</value>
       </prop>
       <prop oor:name="Values">
-        <value>https://www.googleapis.com/auth/gmail.send</value>
+        <value>https://www.googleapis.com/auth/gmail.modify</value>
       </prop>
     </node>
     <node oor:name="Google People" oor:op="fuse">
@@ -89,12 +104,20 @@
         <value>https://www.googleapis.com/auth/contacts https://www.googleapis.com/auth/userinfo.profile</value>
       </prop>
     </node>
+    <node oor:name="Microsoft Mail SMTP/IMAP" oor:op="fuse">
+      <prop oor:name="Provider">
+        <value>Microsoft</value>
+      </prop>
+      <prop oor:name="Values">
+        <value>offline_access https://outlook.office.com/SMTP.Send https://outlook.office.com/IMAP.AccessAsUser.All</value>
+      </prop>
+    </node>
     <node oor:name="Microsoft Mail Send" oor:op="fuse">
       <prop oor:name="Provider">
         <value>Microsoft</value>
       </prop>
       <prop oor:name="Values">
-        <value>offline_access https://graph.microsoft.com/mail.send</value>
+        <value>offline_access https://graph.microsoft.com/Mail.Send</value>
       </prop>
     </node>
     <node oor:name="Microsoft People" oor:op="fuse">

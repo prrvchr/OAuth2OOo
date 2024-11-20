@@ -102,7 +102,7 @@ def execute(ctx, source, session, cls, mtd, parameter, timeout, stream=False):
 
 def getKwArgs(parameter, stream=False):
     args = parameter.toJson(stream)
-    print("Request.getKWArgs() Args: %s" % args)
+    print("Request.getKWArgs() 1 Args: %s" % args)
     kwargs = json.loads(args)
     if parameter.NoAuth:
         print("Request.getKWArgs() NoAuth")
@@ -118,8 +118,8 @@ def getKwArgs(parameter, stream=False):
         kwargs['data'] = FileLike(parameter.DataSink)
     elif parameter.DataUrl:
         print("Request.getKWArgs() DataUrl")
-        path = uno.fileUrlToSystemPath(parameter.DataUrl)
         kwargs['data'] = open(uno.fileUrlToSystemPath(parameter.DataUrl), 'rb')
+    print("Request.getKWArgs() 2")
     return kwargs
 
 

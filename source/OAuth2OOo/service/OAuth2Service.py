@@ -143,7 +143,7 @@ class OAuth2Service(unohelper.Base,
 
     def execute(self, parameter):
         cls, mtd = 'OAuth2Service', 'execute'
-        print("OAuth2Service.executeRequest() 1")
+        print("OAuth2Service.executeRequest() 1 Name: %s" % parameter.Name)
         return getRequestResponse(self._ctx, self, self._session, cls, mtd, parameter, self.Timeout)
 
     def getInputStream(self, parameter, chunk, decode):

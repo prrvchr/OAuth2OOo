@@ -114,6 +114,12 @@ class RequestParameter(unohelper.Base,
     def Query(self, query):
         self._query = json.loads(query)
     @property
+    def Form(self):
+        return json.dumps(self._form)
+    @Form.setter
+    def Form(self, form):
+        self._form = json.loads(form)
+    @property
     def Json(self):
         return json.dumps(self._json)
     @Json.setter
@@ -271,9 +277,39 @@ class RequestParameter(unohelper.Base,
     def setJsonStructure(self, structure):
         self._json.update(json.loads(structure.toJson()))
 
+    def fromJson(self, arguments):
+        print("RequestParameter.fromJson() arguments: %s" % arguments)
+        # XXX: Only Json serializable data can be assigned here!
+        # XXX: This means that it is not possible to assign binary data
+        for key, value in json.loads(arguments).items():
+            if key == 'Json':
+                self._json.update(value)
+            elif key == 'Query':
+                self._query.update(value)
+            elif key == 'Form':
+                self._form.update(value)
+            elif key == 'Headers':
+                self._headers.update(value)
+            elif key == 'Text':
+                self._text = value
+            elif key == 'DataUrl':
+                self._dataurl = value
+            elif key == 'NoAuth':
+                self._noauth = value
+            elif key == 'Auth':
+                self._auth = value
+            elif key == 'NoRedirect':
+                self._noredirect = value
+            elif key == 'NoVerify':
+                self._noverify = value
+            elif key == 'Stream':
+                self._stream = value
+            elif key == 'Separator':
+                self._sep = value
+
     def toJson(self, stream):
-        # FIXME: It is necessary to be able to manage nextPage tokens
-        # FIXME: and sync token present in various XML/JSON REST APIs
+        # XXX: It is necessary to be able to manage nextPage tokens
+        # XXX: and sync token present in various XML/JSON REST APIs
         kwargs = {}
         nextdata = {self._key: self._value} if self._key else {}
         if self._headers:
