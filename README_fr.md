@@ -88,7 +88,7 @@ Les prérequis dépendent de la **plateforme (architecture)** sur laquelle l'ext
 Afin de s'assurer que vos paquets Python sont à jour il est recommandé d'utiliser l'option **Info système** dans les Options de l'extension accessible par:  
 **Outils -> Options -> Internet -> Protocole OAuth2 -> Voir journal -> Info système**  
 Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec la commande:  
-`pip install --upgrade <package-name>`
+`sudo -i pip3 install --upgrade <package-name>`
 
 Pour plus d'information voir: [Ce qui a été fait pour la version 1.3.0][25].
 
@@ -352,7 +352,7 @@ ___
 - Utilisation de la nouvelle version 3.6.2 de [pyRdfa3][85].
 - Tous les paquets Python nécessaires à l'extension sont désormais enregistrés dans un fichier [requirements.txt][23] suivant la [PEP 508][86].
 - Désormais si vous n'êtes pas sous Windows alors les paquets Python nécessaires à l'extension peuvent être facilement installés avec la commande:  
-  `pip install requirements.txt`
+  `sudo -i pip3 install requirements.txt`
 - Simplification de la section [Prérequis][87].
 - De nombreuses corrections...
 

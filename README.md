@@ -88,7 +88,7 @@ The requirement depend on the **platform (architecture)** on which the extension
 To ensure that your Python packages are up to date it is recommended to use the **System Info** option in the extension Options accessible by:  
 **Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System Info**  
 If outdated packages appear, you can update them with the command:  
-`pip install --upgrade <package-name>`
+`sudo -i pip3 install --upgrade <package-name>`
 
 For more information see: [What has been done for version 1.3.0][25].
 
@@ -352,7 +352,7 @@ ___
 - Using the new version 3.6.2 of [pyRdfa3][85].
 - All Python packages necessary for the extension are now recorded in a [requirements.txt][23] file following [PEP 508][86].
 - Now if you are not on Windows then the Python packages necessary for the extension can be easily installed with the command:  
-  `pip install requirements.txt`
+  `sudo -i pip3 install requirements.txt`
 - Simplification of the [Requirement][87] section.
 - Many fixes...
 

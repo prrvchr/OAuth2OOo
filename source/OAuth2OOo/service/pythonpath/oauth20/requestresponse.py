@@ -120,9 +120,6 @@ def getKwArgs(parameter, stream=False):
         print("Request.getKWArgs() DataUrl")
         path = uno.fileUrlToSystemPath(parameter.DataUrl)
         kwargs['data'] = open(uno.fileUrlToSystemPath(parameter.DataUrl), 'rb')
-    elif parameter.Text:
-        print("Request.getKWArgs() Text")
-        kwargs['data'] = parameter.Text
     return kwargs
 
 
@@ -397,7 +394,7 @@ class FileLike():
 
     # Python FileLike Object
     def read(self, length):
-        length, sequence = self._input.readSomeBytes(None, length)
+        length, sequence = self._input.readBytes(None, length)
         return sequence.value
 
     def close(self):

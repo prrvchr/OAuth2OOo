@@ -34,8 +34,9 @@ if sys.stderr is None:
     sys.stderr = open(os.devnull, 'w')
 # FIXME: We need to force the creation of tab files using the utf8 codec to workaround issues with
 # FIXME: the ply package, for systems like Windows that do not have utf8 configured as the default codec.
-from calmjs.parse.parsers.optimize import reoptimize_all
-reoptimize_all(True)
+if os.name == 'nt':
+    from calmjs.parse.parsers.optimize import reoptimize_all
+    reoptimize_all(True)
 
 import js2xml
 from js2xml.utils.objects import make

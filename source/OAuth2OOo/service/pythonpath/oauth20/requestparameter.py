@@ -140,7 +140,7 @@ class RequestParameter(unohelper.Base,
     @property
     def DataUrl(self):
         return self._dataurl
-    @FileUrl.setter
+    @DataUrl.setter
     def DataUrl(self, url):
         self._dataurl = url
     @property
@@ -236,10 +236,13 @@ class RequestParameter(unohelper.Base,
         self._next = True
 
     def hasHeader(self, key):
-        return key in self._headers
+        return key in (k for k, v in self._headers.items() if v is not None)
 
     def getHeader(self, key):
-        return self._headers[key]
+        header = ''
+        if self.hasHeader(key):
+            header = self._headers[key]
+        return header
 
     def setHeader(self, key, value):
         if key in self._default and not value:
@@ -291,6 +294,8 @@ class RequestParameter(unohelper.Base,
             else:
                 data = self._json
             kwargs['json'] = data
+        elif self._text:
+            kwargs['data'] = self._text
         if self._noredirect:
             kwargs['allow_redirects'] = False
         if self._noverify:
