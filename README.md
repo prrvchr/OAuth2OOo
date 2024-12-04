@@ -437,7 +437,11 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 
 ### What has been done for version 1.3.9:
 
+<<<<<<< HEAD
 - Added a new `fromJson()` method to the XResquestParameter interface to make it easier to execute an HTTP request from parameters coming from LibreOffice configuration files (ie: xcu/xcs XML files).
+=======
+- Added a new `fromJson()` method to the [XRequestParameter][67] interface to make it easier to execute an HTTP request from parameters coming from LibreOffice configuration files (ie: xcu/xcs XML files).
+>>>>>>> c63fc256 (new version 1.3.9)
 - Preparation for the migration of the scopes of rights specific to connections to Google servers.
 - Some fixes...
 
