@@ -441,7 +441,14 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - Preparation for the migration of the scopes of rights specific to connections to Google servers.
 - Some fixes...
 
-### What remains to be done for version 1.3.9:
+### What has been done for version 1.4.0:
+
+- All data needed for OAuth2 authorization code flow management is now stored in LibreOffice configuration file [Options.xcu][127].
+- Yahoo's OAuth2 API has been integrated and will be available in the eMailerOOo extension soon.
+- It is now possible to have an OAuth2 redirect uri (ie: `redirect_uri`) in https mode as required when using the Yahoo API. Thanks to Javascript and Github.
+- The TCP/IP port allowing the reception of the GAFA authorization code is now chosen randomly among the free ports (ie: no more conflict problems).
+
+### What remains to be done for version 1.4.0:
 
 - Add new language for internationalization...
 
@@ -573,3 +580,4 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [124]: <https://pypi.org/project/websocket-client/>
 [125]: <https://pypi.org/project/attrs/>
 [126]: <https://pypi.org/project/soupsieve/>
+[127]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/Options.xcu>
