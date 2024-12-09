@@ -84,8 +84,10 @@ class WizardModel(TokenModel):
         self._language = getCurrentLocale(ctx).Language
         self._close = close
         self._readonly = readonly
-        self._host = '127.0.0.1'
+        self._host = 'localhost'
         self._port = 8080
+        code = 'http://%s:%s/' % (self._host, self._port)
+        self._code = base64.urlsafe_b64encode(code.encode()).decode()
         self._watchdog = None
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
         self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'MessageBox')
@@ -96,11 +98,11 @@ class WizardModel(TokenModel):
                            'ScopeTitle':         'ScopeDialog.Title',
                            'AuthorizationError': 'PageWizard3.Label2.Label',
                            'RequestMessage':     'PageWizard3.TextField1.Text.%s',
+                           'TokenError':         'PageWizard3.Label9.Label',
                            'TokenLabel':         'PageWizard4.Label1.Label',
                            'TokenAccess':        'PageWizard4.Label6.Label',
                            'TokenRefresh':       'PageWizard4.Label4.Label',
                            'TokenExpires':       'PageWizard4.Label8.Label',
-                           'TokenError':         'PageWizard4.Label9.Label.1',
                            'DialogTitle':        'MessageBox.Title',
                            'DialogMessage':      'MessageBox.Message'}
 
@@ -366,17 +368,16 @@ class WizardModel(TokenModel):
         return scopes, url, arguments
 
     def _getAuthorizationUrl(self, provider, scopes):
-        args = self._getAuthorizationArguments(provider, scopes)
-        url, arguments = self._getProviderAuthorization(provider)
-        identifiers = getArgumentsIdentifier(self._prefix, self._suffix, args.keys())
-        getter = lambda x: args[x]
-        setArgumentsIdentifier(arguments, identifiers, getter)
-        return url, arguments
+        arguments = self._getAuthorizationArguments(provider, scopes)
+        authorization = provider.getByName('Authorization')
+        url = authorization.getByName('Url')
+        args = json.loads(Template(authorization.getByName('Arguments')).safe_substitute(arguments))
+        return url, args
 
     def _getAuthorizationArguments(self, provider, scopes):
         arguments = {'ClientId':    provider.getByName('ClientId'),
                      'RedirectUri': provider.getByName('RedirectUri'),
-                     'State':       self._uuid,
+                     'State':       self._code,
                      'Scopes':      ' '.join(scopes),
                      'User':        self._user,
                      'Language':    self._language}
@@ -388,15 +389,6 @@ class WizardModel(TokenModel):
             arguments['CodeChallengeMethod'] = method
             arguments['CodeChallenge'] = self._getCodeChallenge(method)
         return arguments
-
-    def _getProviderAuthorization(self, provider):
-        try:
-            authorization = provider.getByName('Authorization')
-            url = authorization.getByName('Url')
-            arguments = json.loads(authorization.getByName('Arguments'))
-            return url, arguments
-        except Exception as e:
-            print("WizardModel._getProviderAuthorization() Error: %s - %s" % (e, traceback.format_exc()))
 
     def _getSignInArguments(self, url, arguments):
         return {'user': self._user,
@@ -433,7 +425,7 @@ class WizardModel(TokenModel):
     def startServer(self, scopes, notify, register):
         self._cancelServer()
         lock = Condition()
-        server = Server(self._ctx, self._user, self._getBaseUrl(), self._provider, self._host, self._port, self._uuid, lock)
+        server = Server(self._ctx, self._user, self._getBaseUrl(), self._provider, self._host, self._port, self._code, lock)
         self._watchdog = WatchDog(self._ctx, server, notify, register, scopes, self._provider, self._user, self.HandlerTimeout, lock)
         server.start()
         self._watchdog.start()

@@ -39,6 +39,7 @@ from .configuration import g_chunk
 from string import Formatter
 from string import Template
 from urllib import parse
+import base64
 import ijson
 import json
 
@@ -72,15 +73,9 @@ def setResquestParameter(prefix, suffix, arguments, request, parameter):
     data = request.getByName('Data')
     if data and data in arguments:
         parameter.Data = uno.ByteSequence(arguments[data])
-    template = request.getByName('Arguments')
-    if template:
-        parameter.fromJson(toJson(prefix, suffix, arguments, template))
-
-def toJson(prefix, suffix, arguments, template):
-    items = json.loads(template)
-    identifiers = getArgumentsIdentifier(prefix, suffix, arguments.keys())
-    setArgumentsIdentifier(items, identifiers, lambda x: arguments[x])
-    return json.dumps(items)
+    args = request.getByName('Arguments')
+    if args:
+        parameter.fromJson(Template(args).safe_substitute(arguments))
 
 def setParametersArguments(parameters, arguments):
     for name in parameters.getElementNames():

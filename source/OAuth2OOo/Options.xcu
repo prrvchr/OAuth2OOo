@@ -142,11 +142,7 @@
       </prop>
     </node>
   </node>
-
-
-
-
-
+<!-- Google **************************************************************************************** -->
   <node oor:name="Providers">
     <node oor:name="Google" oor:op="fuse">
       <prop oor:name="ClientId">
@@ -196,14 +192,9 @@
               <value>refresh_token string</value>
             </prop>
           </node>
-          <node oor:name="TokenType" oor:op="fuse">
-            <prop oor:name="Item">
-              <value>token_type string</value>
-            </prop>
-          </node>
           <node oor:name="ExpiresIn" oor:op="fuse">
             <prop oor:name="Item">
-              <value>expires_in int</value>
+              <value>expires_in number</value>
             </prop>
           </node>
         </node>
@@ -234,14 +225,13 @@
           </node>
           <node oor:name="ExpiresIn" oor:op="fuse">
             <prop oor:name="Item">
-              <value>expires_in int</value>
+              <value>expires_in number</value>
             </prop>
           </node>
         </node>
       </node>
     </node>
-
-
+<!-- Microsoft ************************************************************************************* -->
     <node oor:name="Microsoft" oor:op="fuse">
       <prop oor:name="ClientId">
         <value>ccaf8c05-7245-41bb-b0ef-ee9f790080b4</value>
@@ -287,14 +277,9 @@
               <value>refresh_token string</value>
             </prop>
           </node>
-          <node oor:name="TokenType" oor:op="fuse">
-            <prop oor:name="Item">
-              <value>token_type string</value>
-            </prop>
-          </node>
           <node oor:name="ExpiresIn" oor:op="fuse">
             <prop oor:name="Item">
-              <value>expires_in int</value>
+              <value>expires_in number</value>
             </prop>
           </node>
         </node>
@@ -325,14 +310,13 @@
           </node>
           <node oor:name="ExpiresIn" oor:op="fuse">
             <prop oor:name="Item">
-              <value>expires_in int</value>
+              <value>expires_in number</value>
             </prop>
           </node>
         </node>
       </node>
     </node>
-
-
+<!-- Yahoo ***************************************************************************************** -->
     <node oor:name="Yahoo" oor:op="fuse">
       <prop oor:name="ClientId">
         <value>dj0yJmk9R0hEN3ZhSUtwSmFOJmQ9WVdrOVdIbFJURkpPWkhvbWNHbzlNQT09JnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTNh</value>
@@ -365,7 +349,7 @@
           <value>https://api.login.yahoo.com/oauth2/get_token</value>
         </prop>
         <prop oor:name="Arguments">
-          <value>{"Headers": {"Authorization": "Basic ${BasicCode}", "Content-Type": "application/x-www-form-urlencoded"}, "Form": {"grant_type": "authorization_code", "redirect_uri": "${RedirectUri}", "code": "${Code}"}}</value>
+          <value>{"Headers": {"Authorization": "Basic ${BasicCode}", "Content-Type": "application/x-www-form-urlencoded"}, "Form": {"grant_type": "authorization_code", "redirect_uri": "${RedirectUri}", "code": "${Code}", "code_verifier": "${CodeVerifier}"}}</value>
         </prop>
         <node oor:name="Parameters">
           <node oor:name="Parameter1" oor:op="fuse">
@@ -376,8 +360,28 @@
               <value>${ClientId}:${ClientSecret}</value>
             </prop>
             <prop oor:name="Command">
-              <value>base64</value>
+              <value>encode</value>
             </prop>
+            <node oor:name="Parameters">
+              <node oor:name="Parameter1" oor:op="fuse">
+                <prop oor:name="Name">
+                  <value>BasicCode</value>
+                </prop>
+                <prop oor:name="Command">
+                  <value>base64</value>
+                </prop>
+                <node oor:name="Parameters">
+                  <node oor:name="Parameter1" oor:op="fuse">
+                    <prop oor:name="Name">
+                      <value>BasicCode</value>
+                    </prop>
+                    <prop oor:name="Command">
+                      <value>decode</value>
+                    </prop>
+                  </node>
+                </node>
+              </node>
+            </node>
           </node>
         </node>
         <node oor:name="Responses">
@@ -391,14 +395,9 @@
               <value>refresh_token string</value>
             </prop>
           </node>
-          <node oor:name="TokenType" oor:op="fuse">
-            <prop oor:name="Item">
-              <value>token_type string</value>
-            </prop>
-          </node>
           <node oor:name="ExpiresIn" oor:op="fuse">
             <prop oor:name="Item">
-              <value>expires_in int</value>
+              <value>expires_in number</value>
             </prop>
           </node>
         </node>
@@ -425,8 +424,28 @@
               <value>${ClientId}:${ClientSecret}</value>
             </prop>
             <prop oor:name="Command">
-              <value>base64</value>
+              <value>encode</value>
             </prop>
+            <node oor:name="Parameters">
+              <node oor:name="Parameter1" oor:op="fuse">
+                <prop oor:name="Name">
+                  <value>BasicCode</value>
+                </prop>
+                <prop oor:name="Command">
+                  <value>base64</value>
+                </prop>
+                <node oor:name="Parameters">
+                  <node oor:name="Parameter1" oor:op="fuse">
+                    <prop oor:name="Name">
+                      <value>BasicCode</value>
+                    </prop>
+                    <prop oor:name="Command">
+                      <value>decode</value>
+                    </prop>
+                  </node>
+                </node>
+              </node>
+            </node>
           </node>
         </node>
         <node oor:name="Responses">
@@ -442,7 +461,7 @@
           </node>
           <node oor:name="ExpiresIn" oor:op="fuse">
             <prop oor:name="Item">
-              <value>expires_in int</value>
+              <value>expires_in number</value>
             </prop>
           </node>
         </node>
