@@ -44,10 +44,7 @@ from .dialog import ProviderView
 from .dialog import ScopeHandler
 from .dialog import ScopeView
 
-from ...unolib import PropertySet
-
 from ...unotool import createMessageBox
-from ...unotool import getProperty
 from ...unotool import getStringResource
 
 from ...configuration import g_identifier
@@ -56,8 +53,7 @@ import traceback
 
 
 class OAuth2Manager(unohelper.Base,
-                    XWizardPage,
-                    PropertySet):
+                    XWizardPage):
     def __init__(self, ctx, wizard, model, pageid, parent):
         self._ctx = ctx
         self._dialog = None
@@ -247,11 +243,4 @@ class OAuth2Manager(unohelper.Base,
             self._setActivePath()
         self._dialog.dispose()
         self._dialog = None
-
-    def _getPropertySetInfo(self):
-        properties = {}
-        ro = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
-        properties['PageId'] = getProperty('PageId', 'short', ro)
-        properties['Window'] = getProperty('Window', 'com.sun.star.awt.XWindow', ro)
-        return properties
 

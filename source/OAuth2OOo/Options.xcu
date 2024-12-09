@@ -42,8 +42,11 @@
     <value>120</value>
   </prop>
   <prop oor:name="BaseUrl">
-    <value xml:lang="en">https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/%s_en</value>
-    <value xml:lang="fr">https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/%s_fr</value>
+    <value>https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/</value>
+  </prop>
+  <prop oor:name="Language">
+    <value xml:lang="en">_en</value>
+    <value xml:lang="fr">_fr</value>
   </prop>
   <node oor:name="Urls">
     <node oor:name="mail.yahoo.com" oor:op="fuse">
@@ -155,7 +158,7 @@
         <value>S256</value>
       </prop>
       <prop oor:name="RedirectUri">
-        <value>http://127.0.0.1:8080/</value>
+        <value>http://localhost:${Port}</value>
       </prop>
       <prop oor:name="SignIn">
         <value>GoogleSignIn</value>
@@ -240,7 +243,7 @@
         <value></value>
       </prop>
       <prop oor:name="RedirectUri">
-        <value>http://localhost:8080/</value>
+        <value>http://localhost:${Port}</value>
       </prop>
       <prop oor:name="CodeChallengeMethod">
         <value>S256</value>

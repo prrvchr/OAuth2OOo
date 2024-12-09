@@ -27,16 +27,13 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
-import unohelper
-
 from ..unotool import getDialog
 
 from ..configuration import g_identifier
 
 import traceback
 
-class UserView(unohelper.Base):
+class UserView():
     def __init__(self, ctx, handler, parent, title, label):
         self._dialog = getDialog(ctx, g_identifier, 'UserDialog', handler, parent)
         self._dialog.setTitle(title)

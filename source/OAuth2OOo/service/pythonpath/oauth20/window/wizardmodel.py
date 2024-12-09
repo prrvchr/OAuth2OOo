@@ -28,7 +28,6 @@
 """
 
 import uno
-import unohelper
 
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
@@ -44,10 +43,8 @@ from ..oauth2 import CustomParser
 
 from ..requestresponse import getRequestResponse
 
-from ..oauth2 import getArgumentsIdentifier
 from ..oauth2 import getParserItems
 from ..oauth2 import getResponseResults
-from ..oauth2 import setArgumentsIdentifier
 from ..oauth2 import setResquestParameter
 
 from ..unotool import generateUuid
@@ -84,12 +81,14 @@ class WizardModel(TokenModel):
     def __init__(self, ctx, close=False, readonly=False, url='', user=''):
         super(WizardModel, self).__init__(ctx, url, user)
         self._uuid = generateUuid()
-        self._language = getCurrentLocale(ctx).Language
         self._close = close
         self._readonly = readonly
         self._host = 'localhost'
         self._port = self._findFreePort()
         self._code = 'http://%s:%s' % (self._host, self._port)
+        self._path = self._config.getByName('BaseUrl')
+        self._locale = getCurrentLocale(ctx)
+        self._language = self._config.getByName('Language')
         self._watchdog = None
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
         self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'MessageBox')
@@ -349,10 +348,10 @@ class WizardModel(TokenModel):
 
 # WizardModel getter methods called by WizardPages 2
     def getTermsOfUse(self):
-        return self._getBaseUrl() % 'TermsOfUse'
+        return '%sTermsOfUse%s' % (self._path, self._language)
 
     def getPrivacyPolicy(self):
-        return self._getBaseUrl() % 'PrivacyPolicy'
+        return '%sPrivacyPolicy%s' % (self._path, self._language)
 
     def getAuthorizationUrl(self):
         scopes, url, arguments = self._getAuthorizationData()
@@ -366,7 +365,7 @@ class WizardModel(TokenModel):
         signin = provider.getByName('SignIn')
         if signin:
             arguments = self._getSignInArguments(url, arguments)
-            url = self._getBaseUrl() % signin
+            url = self._path + signin + self._language
         return scopes, url, arguments
 
     def _getAuthorizationUrl(self, provider, scopes):
@@ -378,11 +377,11 @@ class WizardModel(TokenModel):
 
     def _getAuthorizationArguments(self, provider, scopes):
         arguments = {'ClientId':    provider.getByName('ClientId'),
-                     'RedirectUri': provider.getByName('RedirectUri'),
+                     'RedirectUri': self._getRedirectUri(provider),
                      'State':       self._code,
                      'Scopes':      ' '.join(scopes),
                      'User':        self._user,
-                     'Language':    self._language}
+                     'Language':    self._locale.Language}
         clientsecret = provider.getByName('ClientSecret')
         if clientsecret:
             arguments['ClientSecret'] = clientsecret
@@ -391,6 +390,9 @@ class WizardModel(TokenModel):
             arguments['CodeChallengeMethod'] = method
             arguments['CodeChallenge'] = self._getCodeChallenge(method)
         return arguments
+
+    def _getRedirectUri(self, provider):
+        return Template(provider.getByName('RedirectUri')).safe_substitute({'Port': self._port})
 
     def _getSignInArguments(self, url, arguments):
         return {'user': self._user,
@@ -460,7 +462,6 @@ class WizardModel(TokenModel):
         access = user.getByName('AccessToken') if user.hasByName('AccessToken') else self.getTokenAccess(resolver)
         timestamp = user.getByName('TimeStamp')
         never = user.getByName('NeverExpires')
-        print("WizardModel.getUserTokenData() never: %s" % never)
         expires = self.getTokenExpires(resolver) if never else timestamp - int(time.time())
         return never, scopes, access, refresh, expires
 
@@ -480,7 +481,7 @@ class WizardModel(TokenModel):
 
 # WizardModel private getter methods called by WizardPages 1 and WizardPages 3
     def _getBaseUrl(self):
-        return self._config.getByName('BaseUrl')
+        return self._path + '%s' + self._language
 
 # WizardModel private getter methods called by WizardPages 2 and WizardPages 3
     def _getCodeVerifier(self):
@@ -505,7 +506,7 @@ class WizardModel(TokenModel):
         name = request.getByName('Name')
         parameter = RequestParameter(name)
         parser = CustomParser(*getParserItems(request))
-        setResquestParameter(self._prefix, self._suffix, arguments, request, parameter)
+        setResquestParameter(arguments, request, parameter)
         timestamp = int(time.time())
         cls, mtd = 'WizardModel', '_registerToken()'
         try:
@@ -525,7 +526,7 @@ class WizardModel(TokenModel):
     def _getTokenArguments(self, scopes, provider, code):
         arguments = {'ClientSecret': provider.getByName('ClientSecret'),
                      'ClientId':     provider.getByName('ClientId'),
-                     'RedirectUri':  provider.getByName('RedirectUri'),
+                     'RedirectUri':  self._getRedirectUri(provider),
                      'Scopes':       ' '.join(scopes),
                      'Code':         code}
         method = provider.getByName('CodeChallengeMethod')
@@ -554,7 +555,6 @@ class WizardModel(TokenModel):
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
             s.bind(('', 0))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            print("WizardModel._findFreePort() port: %s" % s.getsockname()[1])
             return s.getsockname()[1]
 
 # WizardModel StringResource methods

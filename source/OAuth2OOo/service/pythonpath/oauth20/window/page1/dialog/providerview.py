@@ -27,16 +27,13 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
-import unohelper
-
 from ....unotool import getDialog
 
 from ....configuration import g_identifier
 
 import traceback
 
-class ProviderView(unohelper.Base):
+class ProviderView():
     def __init__(self, ctx, handler, parent, title):
         self._dialog = getDialog(ctx, g_identifier, 'ProviderDialog', handler, parent)
         self._dialog.setTitle(title)

@@ -27,16 +27,13 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
-import unohelper
-
 from ....unotool import getDialog
 
 from ....configuration import g_identifier
 
 import traceback
 
-class ScopeView(unohelper.Base):
+class ScopeView():
     def __init__(self, ctx, handler, parent, title, scopes):
         self._dialog = getDialog(ctx, g_identifier, 'ScopeDialog', handler, parent)
         self._dialog.setTitle(title)

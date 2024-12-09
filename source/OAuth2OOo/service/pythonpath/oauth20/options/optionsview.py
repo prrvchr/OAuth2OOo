@@ -27,12 +27,10 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import unohelper
-
 import traceback
 
 
-class OptionsView(unohelper.Base):
+class OptionsView():
     def __init__(self, dialog):
         self._dialog = dialog
 

@@ -39,15 +39,13 @@ from .oauth2lib import InteractionRequest
 from .oauth2lib import NoOAuth2
 from .oauth2lib import OAuth2OOo
 
-from .oauth2tools import getArgumentsIdentifier
-from .oauth2tools import getOAuth2
-from .oauth2tools import getOAuth2Version
-from .oauth2tools import getParserItems
-from .oauth2tools import getRequest
-from .oauth2tools import getResponseResults
-from .oauth2tools import setArgumentsIdentifier
-from .oauth2tools import setParametersArguments
-from .oauth2tools import setResquestParameter
+from .oauth2tool import getOAuth2
+from .oauth2tool import getOAuth2Version
+from .oauth2tool import getParserItems
+from .oauth2tool import getRequest
+from .oauth2tool import getResponseResults
+from .oauth2tool import setParametersArguments
+from .oauth2tool import setResquestParameter
 
 from .oauth2core import getOAuth2UserName
 from .oauth2core import getOAuth2Token

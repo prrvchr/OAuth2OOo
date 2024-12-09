@@ -41,7 +41,6 @@ from string import Template
 from urllib import parse
 import base64
 import ijson
-import json
 
 
 def getOAuth2(ctx, url='', name=''):
@@ -62,7 +61,7 @@ def getRequest(ctx, url=None, name=None):
         request = createService(ctx, g_service)
     return request
 
-def setResquestParameter(prefix, suffix, arguments, request, parameter):
+def setResquestParameter(arguments, request, parameter):
     setParametersArguments(request.getByName('Parameters'), arguments)
     method = request.getByName('Method')
     if method:
@@ -122,18 +121,6 @@ def setParameterArgument(parameter, key, template, command, arguments):
             arguments[key] = value.lstrip(_getArgumentCommand(command))
     setParametersArguments(parameter.getByName('Parameters'), arguments)
 
-def setArgumentsIdentifier(arguments, identifiers, getter):
-    for key, value in arguments.items():
-        if isinstance(value, dict):
-            setArgumentsIdentifier(value, identifiers, getter)
-        elif isinstance(value, list):
-            _setArgumentsList(value, identifiers, getter)
-        elif value in identifiers:
-            arguments[key] = getter(identifiers[value])
-
-def getArgumentsIdentifier(prefix, suffix, keys):
-    return {_getKey(prefix, suffix, key): key for key in keys}
-
 def getParserItems(request):
     keys = {}
     items = {}
@@ -179,17 +166,4 @@ def _setArgumentTemplate(key, arguments, template):
 
 def _getArgumentCommand(command, default=None, index=1):
     return command[index] if len(command) > index else default
-
-def _setArgumentsList(values, identifiers, getter):
-    for i, value in enumerate(values):
-        if isinstance(value, dict):
-            setArgumentsIdentifier(value, identifiers, getter)
-        elif isinstance(value, list):
-            _setArgumentsList(value, identifiers, getter)
-        elif value in identifiers:
-            values[i] = getter(identifiers[value])
-
-def _getKey(prefix, suffix, key):
-    return prefix + key + suffix
-
 

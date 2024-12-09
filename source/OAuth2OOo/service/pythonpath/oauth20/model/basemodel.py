@@ -27,9 +27,6 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
-import unohelper
-
 from ..unotool import getConfiguration
 
 from ..configuration import g_identifier
@@ -37,7 +34,7 @@ from ..configuration import g_identifier
 import traceback
 
 
-class BaseModel(unohelper.Base):
+class BaseModel():
     def __init__(self, ctx):
         self._ctx = ctx
         self._config = getConfiguration(ctx, g_identifier, True)

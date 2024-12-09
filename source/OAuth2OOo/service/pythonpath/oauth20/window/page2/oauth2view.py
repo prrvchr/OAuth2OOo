@@ -27,8 +27,6 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import unohelper
-
 from ...unotool import getContainerWindow
 
 from ...configuration import g_identifier
@@ -36,7 +34,7 @@ from ...configuration import g_identifier
 import traceback
 
 
-class OAuth2View(unohelper.Base):
+class OAuth2View():
     def __init__(self, ctx, handler, parent):
         self._window = getContainerWindow(ctx, parent, handler, g_identifier, 'PageWizard2')
 
@@ -52,7 +50,9 @@ class OAuth2View(unohelper.Base):
 
 # OAuth2View setter methods
     def setUrl(self, url):
-        self._getUrl().Text = url
+        control = self._getUrl()
+        control.Text = url
+        control.Model.HelpText = url
 
 # OAuth2View private getter control methods
     def _getUrl(self):

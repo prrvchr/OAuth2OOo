@@ -27,20 +27,17 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
-import unohelper
-
 from com.sun.star.auth import RefreshTokenException
 
 from .basemodel import BaseModel
 
-from ..requestresponse import getRequestResponse
-
 from ..requestparameter import RequestParameter
+
+from ..oauth2 import CustomParser
 
 from ..oauth2helper import isUserAuthorized
 
-from ..oauth2 import CustomParser
+from ..requestresponse import getRequestResponse
 
 from ..oauth2 import getParserItems
 from ..oauth2 import getResponseResults
@@ -52,7 +49,6 @@ from ..unotool import getPropertyValueSet
 from ..configuration import g_refresh_overlap
 
 import time
-import json
 import requests
 import traceback
 
@@ -60,8 +56,6 @@ import traceback
 class TokenModel(BaseModel):
     def __init__(self, ctx, url='', user=''):
         super(TokenModel, self).__init__(ctx)
-        self._prefix = '${'
-        self._suffix = '}'
         if url and user:
             self.initialize(url, user)
         else:
@@ -152,7 +146,7 @@ class TokenModel(BaseModel):
         name = request.getByName('Name')
         parameter = RequestParameter(name)
         parser = CustomParser(*getParserItems(request))
-        setResquestParameter(self._prefix, self._suffix, arguments, request, parameter)
+        setResquestParameter(arguments, request, parameter)
         timestamp = int(time.time())
         cls, mtd = 'TokenModel', '_refreshToken()'
         response = getRequestResponse(self._ctx, source, requests.Session(), cls, mtd, parameter, self.Timeout)

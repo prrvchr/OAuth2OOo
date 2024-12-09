@@ -39,10 +39,7 @@ from .oauth2handler import WindowHandler
 
 from .oauth2view import OAuth2View
 
-from ...unolib import PropertySet
-
 from ...unotool import createMessageBox
-from ...unotool import getProperty
 from ...unotool import getStringResource
 
 from ...configuration import g_identifier
@@ -51,8 +48,7 @@ import traceback
 
 
 class OAuth2Manager(unohelper.Base,
-                    XWizardPage,
-                    PropertySet):
+                    XWizardPage):
     def __init__(self, ctx, wizard, model, pageid, parent):
         self._ctx = ctx
         self._wizard = wizard
@@ -106,11 +102,4 @@ class OAuth2Manager(unohelper.Base,
             self._wizard.updateTravelUI()
         else:
             self._view.setToken(*self._model.getUserTokenData(self._resolver))
-
-    def _getPropertySetInfo(self):
-        properties = {}
-        ro = uno.getConstantByName('com.sun.star.beans.PropertyAttribute.READONLY')
-        properties['PageId'] = getProperty('PageId', 'short', ro)
-        properties['Window'] = getProperty('Window', 'com.sun.star.awt.XWindow', ro)
-        return properties
 

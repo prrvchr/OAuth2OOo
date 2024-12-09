@@ -278,7 +278,6 @@ class RequestParameter(unohelper.Base,
         self._json.update(json.loads(structure.toJson()))
 
     def fromJson(self, arguments):
-        print("RequestParameter.fromJson() arguments: %s" % arguments)
         # XXX: Only Json serializable data can be assigned here!
         # XXX: This means that it is not possible to assign binary data
         for key, value in json.loads(arguments).items():
@@ -305,7 +304,7 @@ class RequestParameter(unohelper.Base,
             elif key == 'Stream':
                 self._stream = value
             elif key == 'Separator':
-                self._sep = value
+                self._sep = value[0]
 
     def toJson(self, stream):
         # XXX: It is necessary to be able to manage nextPage tokens
