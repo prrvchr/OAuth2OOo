@@ -44,21 +44,58 @@ class OAuth2View(unohelper.Base):
     def getWindow(self):
         return self._window
 
-    def getCode(self):
-        return self._getCode().Text.strip()
+    def hasError(self):
+        return self._window.Model.Step == 2
 
 # OAuth2View setter methods
-    def setStep(self, step):
-        self._window.Model.Step = step
+    def initView(self, title, never, scopes, access, refresh, expires):
+        self._getTitle().Text = title
+        self._getUpdateButton().Model.Enabled = not never
+        self._getDeleteButton().Model.Enabled = True
+        self._getRefreshButton().Model.Enabled = not never
+        self.setToken(never, scopes, access, refresh, expires)
+
+    def setToken(self, never, scopes, access, refresh, expires):
+        control = self._getScopes()
+        control.Model.StringItemList = scopes
+        if control.ItemCount > 0:
+            control.selectItemPos(0, True)
+        self._getAccess().Text = access
+        self._getRefresh().Text = refresh
+        self._getExpires().Text = expires
+        self._window.Model.Step = 1
 
     def showError(self, message):
-        self._window.Model.Step = 2
         self._getErrorText().Text = message
+        self._getUpdateButton().Model.Enabled = False
+        self._getDeleteButton().Model.Enabled = False
+        self._window.Model.Step = 2
 
 # OAuth2View private getter control methods
-    def _getCode(self):
-        return self._window.getControl('TextField1')
+    def _getTitle(self):
+        return self._window.getControl('Label1')
+
+    def _getScopes(self):
+        return self._window.getControl('ListBox1')
+
+    def _getRefresh(self):
+        return self._window.getControl('Label4')
+
+    def _getAccess(self):
+        return self._window.getControl('Label6')
+
+    def _getExpires(self):
+        return self._window.getControl('Label8')
 
     def _getErrorText(self):
-        return self._window.getControl('TextField2')
+        return self._window.getControl('TextField1')
+
+    def _getUpdateButton(self):
+        return self._window.getControl('CommandButton1')
+
+    def _getDeleteButton(self):
+        return self._window.getControl('CommandButton2')
+
+    def _getRefreshButton(self):
+        return self._window.getControl('CommandButton3')
 

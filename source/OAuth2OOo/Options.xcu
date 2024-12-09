@@ -46,6 +46,11 @@
     <value xml:lang="fr">https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/%s_fr</value>
   </prop>
   <node oor:name="Urls">
+    <node oor:name="mail.yahoo.com" oor:op="fuse">
+      <prop oor:name="Scope">
+        <value>Yahoo Mail</value>
+      </prop>
+    </node>
     <node oor:name="smtp.gmail.com" oor:op="fuse">
       <prop oor:name="Scope">
         <value>Google Mail</value>
@@ -88,6 +93,14 @@
     </node>
   </node>
   <node oor:name="Scopes">
+    <node oor:name="Yahoo Mail" oor:op="fuse">
+      <prop oor:name="Provider">
+        <value>Yahoo</value>
+      </prop>
+      <prop oor:name="Values">
+        <value>https://mail.yahoo.com</value>
+      </prop>
+    </node>
     <node oor:name="Google Mail" oor:op="fuse">
       <prop oor:name="Provider">
         <value>Google</value>
@@ -129,6 +142,11 @@
       </prop>
     </node>
   </node>
+
+
+
+
+
   <node oor:name="Providers">
     <node oor:name="Google" oor:op="fuse">
       <prop oor:name="ClientId">
@@ -137,40 +155,93 @@
       <prop oor:name="ClientSecret">
         <value>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</value>
       </prop>
-      <prop oor:name="AuthorizationUrl">
-        <value>https://accounts.google.com/o/oauth2/v2/auth</value>
-      </prop>
-      <prop oor:name="AuthorizationParameters">
-        <value>{"prompt": "consent", "response_mode": "query", "scope": null, "login_hint": "current_user", "hl": "current_language"}</value>
-      </prop>
-      <prop oor:name="TokenUrl">
-        <value>https://www.googleapis.com/oauth2/v4/token</value>
-      </prop>
-      <prop oor:name="TokenParameters">
-        <value>{"client_secret": null}</value>
-      </prop>
-      <prop oor:name="CodeChallenge">
-        <value>true</value>
-      </prop>
       <prop oor:name="CodeChallengeMethod">
         <value>S256</value>
       </prop>
-      <prop oor:name="HttpHandler">
-        <value>true</value>
-      </prop>
-      <prop oor:name="RedirectAddress">
-        <value>127.0.0.1</value>
-      </prop>
-      <prop oor:name="RedirectPort">
-        <value>8080</value>
+      <prop oor:name="RedirectUri">
+        <value>http://127.0.0.1:8080/</value>
       </prop>
       <prop oor:name="SignIn">
-        <value>true</value>
-      </prop>
-      <prop oor:name="SignInPage">
         <value>GoogleSignIn</value>
       </prop>
+      <node oor:name="Authorization">
+        <prop oor:name="Url">
+          <value>https://accounts.google.com/o/oauth2/v2/auth</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"prompt": "consent", "reponse_mode": "query", "response_type": "code", "code_challenge_method": "${CodeChallengeMethod}", "code_challenge": "${CodeChallenge}", "client_id": "${ClientId}", "scope": "${Scopes}", "redirect_uri": "${RedirectUri}", "state": "${State}", "login_hint": "${User}", "hl": "${Language}"}</value>
+        </prop>
+      </node>
+      <node oor:name="Token">
+        <prop oor:name="Name">
+          <value>getToken</value>
+        </prop>
+        <prop oor:name="Method">
+          <value>POST</value>
+        </prop>
+        <prop oor:name="Url">
+          <value>https://www.googleapis.com/oauth2/v4/token</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"Form": {"grant_type": "authorization_code", "client_id": "${ClientId}", "client_secret": "${ClientSecret}", "redirect_uri": "${RedirectUri}", "code": "${Code}", "code_verifier": "${CodeVerifier}"}}</value>
+        </prop>
+        <node oor:name="Responses">
+          <node oor:name="AccessToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>access_token string</value>
+            </prop>
+          </node>
+          <node oor:name="RefreshToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>refresh_token string</value>
+            </prop>
+          </node>
+          <node oor:name="TokenType" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>token_type string</value>
+            </prop>
+          </node>
+          <node oor:name="ExpiresIn" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>expires_in int</value>
+            </prop>
+          </node>
+        </node>
+      </node>
+      <node oor:name="RefreshToken">
+        <prop oor:name="Name">
+          <value>getRefreshToken</value>
+        </prop>
+        <prop oor:name="Method">
+          <value>POST</value>
+        </prop>
+        <prop oor:name="Url">
+          <value>https://www.googleapis.com/oauth2/v4/token</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"Form": {"grant_type": "refresh_token", "client_id": "${ClientId}", "client_secret": "${ClientSecret}", "refresh_token": "${RefreshToken}"}}</value>
+        </prop>
+        <node oor:name="Responses">
+          <node oor:name="AccessToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>access_token string</value>
+            </prop>
+          </node>
+          <node oor:name="RefreshToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>refresh_token string</value>
+            </prop>
+          </node>
+          <node oor:name="ExpiresIn" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>expires_in int</value>
+            </prop>
+          </node>
+        </node>
+      </node>
     </node>
+
+
     <node oor:name="Microsoft" oor:op="fuse">
       <prop oor:name="ClientId">
         <value>ccaf8c05-7245-41bb-b0ef-ee9f790080b4</value>
@@ -178,39 +249,204 @@
       <prop oor:name="ClientSecret">
         <value></value>
       </prop>
-      <prop oor:name="AuthorizationUrl">
-        <value>https://login.microsoftonline.com/common/oauth2/v2.0/authorize</value>
-      </prop>
-      <prop oor:name="AuthorizationParameters">
-        <value>{"prompt": "consent", "response_mode": "query", "scope": null, "login_hint": "current_user", "hl": "current_language"}</value>
-      </prop>
-      <prop oor:name="TokenUrl">
-        <value>https://login.microsoftonline.com/common/oauth2/v2.0/token</value>
-      </prop>
-      <prop oor:name="TokenParameters">
-        <value>{"scope": null}</value>
-      </prop>
-      <prop oor:name="CodeChallenge">
-        <value>true</value>
+      <prop oor:name="RedirectUri">
+        <value>http://localhost:8080/</value>
       </prop>
       <prop oor:name="CodeChallengeMethod">
         <value>S256</value>
       </prop>
-      <prop oor:name="HttpHandler">
-        <value>true</value>
+      <node oor:name="Authorization">
+        <prop oor:name="Url">
+          <value>https://login.microsoftonline.com/common/oauth2/v2.0/authorize</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"prompt": "consent", "reponse_mode": "query", "response_type": "code", "code_challenge_method": "${CodeChallengeMethod}", "code_challenge": "${CodeChallenge}", "client_id": "${ClientId}", "scope": "${Scopes}", "redirect_uri": "${RedirectUri}", "state": "${State}", "login_hint": "${User}", "hl": "${Language}"}</value>
+        </prop>
+      </node>
+      <node oor:name="Token">
+        <prop oor:name="Name">
+          <value>getToken</value>
+        </prop>
+        <prop oor:name="Method">
+          <value>POST</value>
+        </prop>
+        <prop oor:name="Url">
+          <value>https://login.microsoftonline.com/common/oauth2/v2.0/token</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"Form": {"grant_type": "authorization_code", "client_id": "${ClientId}", "scope": "${Scopes}", "redirect_uri": "${RedirectUri}", "code": "${Code}", "code_verifier": "${CodeVerifier}"}}</value>
+        </prop>
+        <node oor:name="Responses">
+          <node oor:name="AccessToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>access_token string</value>
+            </prop>
+          </node>
+          <node oor:name="RefreshToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>refresh_token string</value>
+            </prop>
+          </node>
+          <node oor:name="TokenType" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>token_type string</value>
+            </prop>
+          </node>
+          <node oor:name="ExpiresIn" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>expires_in int</value>
+            </prop>
+          </node>
+        </node>
+      </node>
+      <node oor:name="RefreshToken">
+        <prop oor:name="Name">
+          <value>getRefreshToken</value>
+        </prop>
+        <prop oor:name="Method">
+          <value>POST</value>
+        </prop>
+        <prop oor:name="Url">
+          <value>https://login.microsoftonline.com/common/oauth2/v2.0/token</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"Form": {"grant_type": "refresh_token", "client_id": "${ClientId}", "scope": "${Scopes}", "refresh_token": "${RefreshToken}"}}</value>
+        </prop>
+        <node oor:name="Responses">
+          <node oor:name="AccessToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>access_token string</value>
+            </prop>
+          </node>
+          <node oor:name="RefreshToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>refresh_token string</value>
+            </prop>
+          </node>
+          <node oor:name="ExpiresIn" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>expires_in int</value>
+            </prop>
+          </node>
+        </node>
+      </node>
+    </node>
+
+
+    <node oor:name="Yahoo" oor:op="fuse">
+      <prop oor:name="ClientId">
+        <value>dj0yJmk9R0hEN3ZhSUtwSmFOJmQ9WVdrOVdIbFJURkpPWkhvbWNHbzlNQT09JnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTNh</value>
       </prop>
-      <prop oor:name="RedirectAddress">
-        <value>localhost</value>
-      </prop>
-      <prop oor:name="RedirectPort">
-        <value>8080</value>
-      </prop>
-      <prop oor:name="SignIn">
-        <value>false</value>
-      </prop>
-      <prop oor:name="SignInPage">
+      <prop oor:name="ClientSecret">
         <value></value>
       </prop>
+      <prop oor:name="RedirectUri">
+        <value>https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/OAuth2Redirect</value>
+      </prop>
+      <prop oor:name="CodeChallengeMethod">
+        <value>S256</value>
+      </prop>
+      <node oor:name="Authorization">
+        <prop oor:name="Url">
+          <value>https://api.login.yahoo.com/oauth2/request_auth</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"client_id": "${ClientId}", "redirect_uri": "${RedirectUri}", "response_type": "code", "code_challenge_method": "${CodeChallengeMethod}", "code_challenge": "${CodeChallenge}", "state": "${State}", "language": "${Language}"}</value>
+        </prop>
+      </node>
+      <node oor:name="Token">
+        <prop oor:name="Name">
+          <value>getToken</value>
+        </prop>
+        <prop oor:name="Method">
+          <value>POST</value>
+        </prop>
+        <prop oor:name="Url">
+          <value>https://api.login.yahoo.com/oauth2/get_token</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"Headers": {"Authorization": "Basic ${BasicCode}", "Content-Type": "application/x-www-form-urlencoded"}, "Form": {"grant_type": "authorization_code", "redirect_uri": "${RedirectUri}", "code": "${Code}"}}</value>
+        </prop>
+        <node oor:name="Parameters">
+          <node oor:name="Parameter1" oor:op="fuse">
+            <prop oor:name="Name">
+              <value>BasicCode</value>
+            </prop>
+            <prop oor:name="Template">
+              <value>${ClientId}:${ClientSecret}</value>
+            </prop>
+            <prop oor:name="Command">
+              <value>base64</value>
+            </prop>
+          </node>
+        </node>
+        <node oor:name="Responses">
+          <node oor:name="AccessToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>access_token string</value>
+            </prop>
+          </node>
+          <node oor:name="RefreshToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>refresh_token string</value>
+            </prop>
+          </node>
+          <node oor:name="TokenType" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>token_type string</value>
+            </prop>
+          </node>
+          <node oor:name="ExpiresIn" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>expires_in int</value>
+            </prop>
+          </node>
+        </node>
+      </node>
+      <node oor:name="RefreshToken">
+        <prop oor:name="Name">
+          <value>getRefreshToken</value>
+        </prop>
+        <prop oor:name="Method">
+          <value>POST</value>
+        </prop>
+        <prop oor:name="Url">
+          <value>https://api.login.yahoo.com/oauth2/get_token</value>
+        </prop>
+        <prop oor:name="Arguments">
+          <value>{"Headers": {"Authorization": "Basic ${BasicCode}", "Content-Type": "application/x-www-form-urlencoded"}, "Form": {"grant_type": "refresh_token", "redirect_uri": "${RedirectUri}", "refresh_token": "${RefreshToken}"}}</value>
+        </prop>
+        <node oor:name="Parameters">
+          <node oor:name="Parameter1" oor:op="fuse">
+            <prop oor:name="Name">
+              <value>BasicCode</value>
+            </prop>
+            <prop oor:name="Template">
+              <value>${ClientId}:${ClientSecret}</value>
+            </prop>
+            <prop oor:name="Command">
+              <value>base64</value>
+            </prop>
+          </node>
+        </node>
+        <node oor:name="Responses">
+          <node oor:name="AccessToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>access_token string</value>
+            </prop>
+          </node>
+          <node oor:name="RefreshToken" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>refresh_token string</value>
+            </prop>
+          </node>
+          <node oor:name="ExpiresIn" oor:op="fuse">
+            <prop oor:name="Item">
+              <value>expires_in int</value>
+            </prop>
+          </node>
+        </node>
+      </node>
     </node>
   </node>
 </oor:component-data>

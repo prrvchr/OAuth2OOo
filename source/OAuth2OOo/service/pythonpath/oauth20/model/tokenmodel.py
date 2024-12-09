@@ -30,22 +30,25 @@
 import uno
 import unohelper
 
-from com.sun.star.json.JsonType import STRING
-from com.sun.star.json.JsonType import NUMBER
-
 from com.sun.star.auth import RefreshTokenException
 
 from .basemodel import BaseModel
 
-from ..requestresponse import getResponse
+from ..requestresponse import getRequestResponse
+
+from ..requestparameter import RequestParameter
 
 from ..oauth2helper import isUserAuthorized
 
+from ..oauth2 import CustomParser
+
+from ..oauth2 import getParserItems
+from ..oauth2 import getResponseResults
+from ..oauth2 import setResquestParameter
+
 from ..unotool import executeDispatch
-from ..unotool import generateUuid
 from ..unotool import getPropertyValueSet
 
-from ..configuration import g_identifier
 from ..configuration import g_refresh_overlap
 
 import time
@@ -57,6 +60,8 @@ import traceback
 class TokenModel(BaseModel):
     def __init__(self, ctx, url='', user=''):
         super(TokenModel, self).__init__(ctx)
+        self._prefix = '${'
+        self._suffix = '}'
         if url and user:
             self.initialize(url, user)
         else:
@@ -142,59 +147,36 @@ class TokenModel(BaseModel):
                 return user.getByName('AccessToken')
 
     def _refreshToken(self, source, provider, user):
-        session = requests.Session()
-        url = provider.getByName('TokenUrl')
-        data = self._getRefreshParameters(user, provider)
+        arguments = self._getRefreshArguments(user, provider)
+        request = provider.getByName('RefreshToken')
+        name = request.getByName('Name')
+        parameter = RequestParameter(name)
+        parser = CustomParser(*getParserItems(request))
+        setResquestParameter(self._prefix, self._suffix, arguments, request, parameter)
         timestamp = int(time.time())
         cls, mtd = 'TokenModel', '_refreshToken()'
-        name = 'Refresh Token for user: %s' % user
-        response = getResponse(self._ctx, source, session, cls, mtd, name,
-                               'POST', url, self.Timeout, {'data': data})
-        if not response.ok:
-            msg = '%s::%s ERROR: %s' % (cls, mtd, response.text)
+        response = getRequestResponse(self._ctx, source, requests.Session(), cls, mtd, parameter, self.Timeout)
+        if response.Ok and parser.hasItems():
+            results = getResponseResults(parser, response)
+            response.close()
+            refresh, access, never, expires = self._getTokenFromResults(results, timestamp)
+            self._saveRefreshedToken(user, refresh, access, never, expires)
+        else:
+            msg = '%s::%s ERROR: %s' % (cls, mtd, response.Text)
+            response.close()
             raise self._getRefreshTokenException(msg)
-        refresh, access, never, expires = self._getTokenFromResponse(response, timestamp)
-        response.close()
-        self._saveRefreshedToken(user, refresh, access, never, expires)
 
-    def _getRefreshParameters(self, user, provider):
-        parameters = self._getRefreshBaseParameters(user, provider)
-        optional = self._getRefreshOptionalParameters(user, provider)
-        option = provider.getByName('TokenParameters')
-        parameters = self._parseParameters(parameters, optional, option)
-        return parameters
-    
-    def _getRefreshBaseParameters(self, user, provider):
-        parameters = {}
-        parameters['refresh_token'] = user.getByName('RefreshToken')
-        parameters['grant_type'] = 'refresh_token'
-        parameters['client_id'] = provider.getByName('ClientId')
-        return parameters
-    
-    def _getRefreshOptionalParameters(self, user, provider):
-        parameters = {}
-        parameters['scope'] = ' '.join(user.getByName('Scopes'))
-        parameters['client_secret'] = provider.getByName('ClientSecret')
-        return parameters
+    def _getRefreshArguments(self, user, provider):
+        return {'ClientSecret': provider.getByName('ClientSecret'),
+                'ClientId':     provider.getByName('ClientId'),
+                'RedirectUri':  provider.getByName('RedirectUri'),
+                'RefreshToken': user.getByName('RefreshToken'),
+                'Scopes':       ' '.join(user.getByName('Scopes'))}
 
-    def _parseParameters(self, base, optional, required):
-        for key, value in json.loads(required).items():
-            if value is None:
-                if key in base:
-                    del base[key]
-                elif key in optional:
-                    base[key] = optional[key]
-            elif value in optional:
-                base[key] = optional[value]
-            else:
-                base[key] = value
-        return base
-
-    def _getTokenFromResponse(self, response, timestamp):
-        result = response.json()
-        refresh = result.get('refresh_token', None)
-        access = result.get('access_token', None)
-        expires = result.get('expires_in', None)
+    def _getTokenFromResults(self, results, timestamp):
+        refresh = results.get('RefreshToken', None)
+        access = results.get('AccessToken', None)
+        expires = results.get('ExpiresIn', None)
         never = expires is None
         return refresh, access, never, 0 if never else timestamp + expires
 

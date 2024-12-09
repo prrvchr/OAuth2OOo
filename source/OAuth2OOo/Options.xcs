@@ -44,20 +44,39 @@
       <prop oor:name="Provider" oor:type="xs:string"/>
       <prop oor:name="Values" oor:type="oor:string-list"/>
     </group>
+    <group oor:name="ParameterSet">
+      <prop oor:name="Name" oor:type="xs:string"/>
+      <prop oor:name="Template" oor:type="xs:string"/>
+      <prop oor:name="Command" oor:type="oor:string-list"/>
+      <set oor:name="Parameters" oor:node-type="ParameterSet"/>
+    </group>
+    <group oor:name="ResponseSet">
+      <prop oor:name="Item" oor:type="oor:string-list"/>
+      <prop oor:name="Trigger" oor:type="oor:string-list"/>
+      <prop oor:name="Collector" oor:type="oor:string-list"/>
+    </group>
+    <group oor:name="QuerySet">
+      <prop oor:name="Url" oor:type="xs:string"/>
+      <prop oor:name="Arguments" oor:type="xs:string"/>
+    </group>
+    <group oor:name="RequestSet">
+      <prop oor:name="Name" oor:type="xs:string"/>
+      <prop oor:name="Method" oor:type="xs:string"/>
+      <prop oor:name="Url" oor:type="xs:string"/>
+      <prop oor:name="Data" oor:type="xs:string"/>
+      <prop oor:name="Arguments" oor:type="xs:string"/>
+      <set oor:name="Parameters" oor:node-type="ParameterSet"/>
+      <set oor:name="Responses" oor:node-type="ResponseSet"/>
+    </group>
     <group oor:name="ProviderSet">
       <prop oor:name="ClientId" oor:type="xs:string"/>
       <prop oor:name="ClientSecret" oor:type="xs:string"/>
-      <prop oor:name="AuthorizationUrl" oor:type="xs:string"/>
-      <prop oor:name="AuthorizationParameters" oor:type="xs:string"/>
-      <prop oor:name="TokenUrl" oor:type="xs:string"/>
-      <prop oor:name="TokenParameters" oor:type="xs:string"/>
-      <prop oor:name="CodeChallenge" oor:type="xs:boolean"/>
+      <prop oor:name="RedirectUri" oor:type="xs:string"/>
       <prop oor:name="CodeChallengeMethod" oor:type="xs:string"/>
-      <prop oor:name="HttpHandler" oor:type="xs:boolean"/>
-      <prop oor:name="RedirectAddress" oor:type="xs:string"/>
-      <prop oor:name="RedirectPort" oor:type="xs:short"/>
-      <prop oor:name="SignIn" oor:type="xs:boolean"/>
-      <prop oor:name="SignInPage" oor:type="xs:string"/>
+      <prop oor:name="SignIn" oor:type="xs:string"/>
+      <node-ref oor:name="Authorization" oor:node-type="QuerySet"/>
+      <node-ref oor:name="Token" oor:node-type="RequestSet"/>
+      <node-ref oor:name="RefreshToken" oor:node-type="RequestSet"/>
       <set oor:name="Users" oor:node-type="UserSet"/>
     </group>
   </templates>

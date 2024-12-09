@@ -41,7 +41,6 @@ from .page1 import OAuth2Manager as WizardPage1
 from .page2 import OAuth2Manager as WizardPage2
 from .page3 import OAuth2Manager as WizardPage3
 from .page4 import OAuth2Manager as WizardPage4
-from .page5 import OAuth2Manager as WizardPage5
 
 from ..unotool import getStringResource
 
@@ -88,8 +87,6 @@ class WizardController(unohelper.Base,
             page = WizardPage3(self._ctx, self._wizard, self._model, pageid, parent)
         elif pageid == 4:
             page = WizardPage4(self._ctx, self._wizard, self._model, pageid, parent)
-        elif pageid == 5:
-            page = WizardPage5(self._ctx, self._wizard, self._model, pageid, parent)
         msg += " Done"
         self._logger.logp(INFO, 'WizardController', 'createPage()', msg)
         return page

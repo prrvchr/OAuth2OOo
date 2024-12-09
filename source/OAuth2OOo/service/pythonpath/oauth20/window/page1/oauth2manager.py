@@ -220,6 +220,7 @@ class OAuth2Manager(unohelper.Base,
         self._wizard.updateTravelUI()
 
     def _showProvider(self, new):
+        return
         provider = self._view.getProvider()
         title, data = self._model.getProviderData(self._resolver, provider)
         self._dialog = ProviderView(self._ctx, ProviderHandler(self), self._view.getWindow().Peer, title)

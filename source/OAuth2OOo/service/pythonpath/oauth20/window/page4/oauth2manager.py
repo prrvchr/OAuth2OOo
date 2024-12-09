@@ -29,7 +29,9 @@
 
 import unohelper
 
-from com.sun.star.ui.dialogs.WizardTravelType import FORWARD
+from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
+
+from com.sun.star.uno import Exception as UnoException
 
 from com.sun.star.ui.dialogs import XWizardPage
 
@@ -39,8 +41,11 @@ from .oauth2view import OAuth2View
 
 from ...unolib import PropertySet
 
-from ...unotool import executeShell
+from ...unotool import createMessageBox
 from ...unotool import getProperty
+from ...unotool import getStringResource
+
+from ...configuration import g_identifier
 
 import traceback
 
@@ -54,6 +59,7 @@ class OAuth2Manager(unohelper.Base,
         self._model = model
         self._pageid = pageid
         self._view = OAuth2View(ctx, WindowHandler(self), parent)
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'PageWizard4')
 
 # XWizardPage
     @property
@@ -64,25 +70,14 @@ class OAuth2Manager(unohelper.Base,
         return self._view.getWindow()
 
     def activatePage(self):
-        self._view.setStep(1)
-        scopes, url = self._model.getAuthorizationData()
-        executeShell(self._ctx, url)
+        self._view.initView(*self._model.getTokenData(self._resolver))
+        self._wizard.activatePath(1, True)
 
     def commitPage(self, reason):
-        if reason == FORWARD:
-            error = self._model.setAuthorization(self._wizard, self._view.getCode())
-            if error is not None:
-                self._view.showError(error)
-                return False
-            self._wizard.updateTravelUI()
-            if self._model.closeWizard():
-                self._wizard.DialogWindow.endDialog(OK)
-            else:
-                self._wizard.travelNext()
         return True
 
     def canAdvance(self):
-        return self._model.isCodeValid(self._view.getCode())
+        return not self._view.hasError()
 
 # XComponent
     def dispose(self):
@@ -93,8 +88,24 @@ class OAuth2Manager(unohelper.Base,
         pass
 
 # OAuth2Manager setter methods
-    def setAuthorization(self):
-        self._wizard.updateTravelUI()
+    def updateToken(self):
+        self._view.setToken(*self._model.getUserTokenData(self._resolver))
+
+    def deleteUser(self):
+        dialog = createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
+        if dialog.execute() == OK:
+            self._model.deleteUser()
+            self._wizard.travelPrevious()
+        dialog.dispose()
+
+    def refreshToken(self):
+        try:
+            self._model.refreshToken(self._wizard)
+        except UnoException as e:
+            self._view.showError(e.Message)
+            self._wizard.updateTravelUI()
+        else:
+            self._view.setToken(*self._model.getUserTokenData(self._resolver))
 
     def _getPropertySetInfo(self):
         properties = {}

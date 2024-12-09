@@ -43,8 +43,14 @@ class WindowHandler(unohelper.Base,
     def callHandlerMethod(self, window, event, method):
         try:
             handled = False
-            if method == 'SetAuthorization':
-                self._manager.setAuthorization()
+            if method == 'Update':
+                self._manager.updateToken()
+                handled = True
+            elif method == 'Delete':
+                self._manager.deleteUser()
+                handled = True
+            elif method == 'Refresh':
+                self._manager.refreshToken()
                 handled = True
             return handled
         except Exception as e:
@@ -52,4 +58,6 @@ class WindowHandler(unohelper.Base,
             print(msg)
 
     def getSupportedMethodNames(self):
-        return ('SetAuthorization', )
+        return ('Update',
+                'Delete',
+                'Refresh')

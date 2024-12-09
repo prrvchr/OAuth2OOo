@@ -62,7 +62,7 @@ class OAuth2Manager(unohelper.Base,
         return self._view.getWindow()
 
     def activatePage(self):
-        self._view.setUrl(self._model.getAuthorizationStr())
+        self._view.setUrl(self._model.getAuthorizationUrl())
 
     def commitPage(self, reason):
         return True

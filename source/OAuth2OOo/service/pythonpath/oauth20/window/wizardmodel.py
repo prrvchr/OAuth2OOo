@@ -40,11 +40,21 @@ from ..model import TokenModel
 from .httpserver import WatchDog
 from .httpserver import Server
 
-from ..requestresponse import getResponse
+from ..oauth2 import CustomParser
+
+from ..requestresponse import getRequestResponse
+
+from ..oauth2 import getArgumentsIdentifier
+from ..oauth2 import getParserItems
+from ..oauth2 import getResponseResults
+from ..oauth2 import setArgumentsIdentifier
+from ..oauth2 import setResquestParameter
 
 from ..unotool import generateUuid
 from ..unotool import getCurrentLocale
 from ..unotool import getStringResource
+
+from ..requestparameter import RequestParameter
 
 from ..oauth2helper import isEmailValid
 from ..oauth2helper import isUserAuthorized
@@ -71,27 +81,28 @@ class WizardModel(TokenModel):
     def __init__(self, ctx, close=False, readonly=False, url='', user=''):
         super(WizardModel, self).__init__(ctx, url, user)
         self._uuid = generateUuid()
+        self._language = getCurrentLocale(ctx).Language
         self._close = close
         self._readonly = readonly
-        self._uri = 'http://%s:%s/'
-        self._urn = 'urn:ietf:wg:oauth:2.0:oob'
+        self._host = '127.0.0.1'
+        self._port = 8080
         self._watchdog = None
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
         self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'MessageBox')
-        self._resources = {'Title': 'PageWizard%s.Title',
-                           'Step': 'PageWizard%s.Step',
-                           'UrlLabel': 'PageWizard1.Label4.Label',
-                           'ProviderTitle': 'ProviderDialog.Title',
-                           'ScopeTitle': 'ScopeDialog.Title',
+        self._resources = {'Title':              'PageWizard%s.Title',
+                           'Step':               'PageWizard%s.Step',
+                           'UrlLabel':           'PageWizard1.Label4.Label',
+                           'ProviderTitle':      'ProviderDialog.Title',
+                           'ScopeTitle':         'ScopeDialog.Title',
                            'AuthorizationError': 'PageWizard3.Label2.Label',
-                           'RequestMessage': 'PageWizard3.TextField1.Text.%s',
-                           'TokenError': 'PageWizard4.Label2.Label',
-                           'TokenLabel': 'PageWizard5.Label1.Label',
-                           'TokenAccess': 'PageWizard5.Label6.Label',
-                           'TokenRefresh': 'PageWizard5.Label4.Label',
-                           'TokenExpires': 'PageWizard5.Label8.Label',
-                           'DialogTitle': 'MessageBox.Title',
-                           'DialogMessage': 'MessageBox.Message'}
+                           'RequestMessage':     'PageWizard3.TextField1.Text.%s',
+                           'TokenLabel':         'PageWizard4.Label1.Label',
+                           'TokenAccess':        'PageWizard4.Label6.Label',
+                           'TokenRefresh':       'PageWizard4.Label4.Label',
+                           'TokenExpires':       'PageWizard4.Label8.Label',
+                           'TokenError':         'PageWizard4.Label9.Label.1',
+                           'DialogTitle':        'MessageBox.Title',
+                           'DialogMessage':      'MessageBox.Message'}
 
     @property
     def HandlerTimeout(self):
@@ -121,8 +132,6 @@ class WizardModel(TokenModel):
         scopes = self._config.getByName('Scopes')
         providers = self._config.getByName('Providers')
         if urls.hasByName(url) and isUserAuthorized(scopes, providers, scope, provider, user):
-            path = 2
-        elif providers.hasByName(provider) and not providers.getByName(provider).getByName('HttpHandler'):
             path = 1
         else:
             path = 0
@@ -341,36 +350,64 @@ class WizardModel(TokenModel):
     def getPrivacyPolicy(self):
         return self._getBaseUrl() % 'PrivacyPolicy'
 
-    def getAuthorizationStr(self):
+    def getAuthorizationUrl(self):
+        scopes, url, arguments = self._getAuthorizationData()
+        return self._getUrlArguments(url, arguments)
+
+    def _getAuthorizationData(self):
         scope = self._config.getByName('Scopes').getByName(self._scope)
         provider = self._config.getByName('Providers').getByName(self._provider)
         scopes = self._getUrlScopes(scope, provider)
-        main = provider.getByName('AuthorizationUrl')
-        parameters = self._getUrlParameters(scopes, provider)
-        arguments = self._getUrlArguments(parameters)
-        url = '%s?%s' % (main, arguments)
-        if provider.getByName('SignIn'):
-            main = self._getSignInUrl(provider)
-            parameters = self._getSignInParameters(url)
-            arguments = self._getUrlArguments(parameters)
-            url = '%s?%s' % (main, arguments)
-        return url
+        url, arguments = self._getAuthorizationUrl(provider, scopes)
+        signin = provider.getByName('SignIn')
+        if signin:
+            arguments = self._getSignInArguments(url, arguments)
+            url = self._getBaseUrl() % signin
+        return scopes, url, arguments
 
-    def _getUrlArguments(self, parameters):
-        arguments = []
-        for key, value in parameters.items():
-            arguments.append('%s=%s' % (key, value))
-        return '&'.join(arguments)
+    def _getAuthorizationUrl(self, provider, scopes):
+        args = self._getAuthorizationArguments(provider, scopes)
+        url, arguments = self._getProviderAuthorization(provider)
+        identifiers = getArgumentsIdentifier(self._prefix, self._suffix, args.keys())
+        getter = lambda x: args[x]
+        setArgumentsIdentifier(arguments, identifiers, getter)
+        return url, arguments
 
-    def _getSignInUrl(self, provider):
-        page = provider.getByName('SignInPage')
-        return self._getBaseUrl() % page
+    def _getAuthorizationArguments(self, provider, scopes):
+        arguments = {'ClientId':    provider.getByName('ClientId'),
+                     'RedirectUri': provider.getByName('RedirectUri'),
+                     'State':       self._uuid,
+                     'Scopes':      ' '.join(scopes),
+                     'User':        self._user,
+                     'Language':    self._language}
+        clientsecret = provider.getByName('ClientSecret')
+        if clientsecret:
+            arguments['ClientSecret'] = clientsecret
+        method = provider.getByName('CodeChallengeMethod')
+        if method:
+            arguments['CodeChallengeMethod'] = method
+            arguments['CodeChallenge'] = self._getCodeChallenge(method)
+        return arguments
 
-    def _getSignInParameters(self, url):
-        parameters = {}
-        parameters['user'] = self._user
-        parameters['url'] = url
-        return parameters
+    def _getProviderAuthorization(self, provider):
+        try:
+            authorization = provider.getByName('Authorization')
+            url = authorization.getByName('Url')
+            arguments = json.loads(authorization.getByName('Arguments'))
+            return url, arguments
+        except Exception as e:
+            print("WizardModel._getProviderAuthorization() Error: %s - %s" % (e, traceback.format_exc()))
+
+    def _getSignInArguments(self, url, arguments):
+        return {'user': self._user,
+                'url':  self._getUrlArguments(url, arguments)}
+
+    def _getUrlArguments(self, url, arguments):
+        query = '&'.join(('%s=%s' % (k, v) for k, v in arguments.items()))
+        return self._getUrl(url, query)
+
+    def _getUrl(self, url, query):
+        return '%s?%s' % (url, query)
 
     def _getUrlScopes(self, scope, provider):
         scopes = self._getUserScopes(provider)
@@ -388,27 +425,15 @@ class WizardModel(TokenModel):
 
 # WizardModel getter methods called by WizardPages 3
     def getAuthorizationData(self):
-        scope = self._config.getByName('Scopes').getByName(self._scope)
-        provider = self._config.getByName('Providers').getByName(self._provider)
-        scopes = self._getUrlScopes(scope, provider)
-        main = provider.getByName('AuthorizationUrl')
-        parameters = self._getUrlParameters(scopes, provider)
-        url = '%s?%s' % (main, requests.compat.urlencode(parameters))
-        if provider.getByName('SignIn'):
-            main = self._getSignInUrl(provider)
-            parameters = self._getSignInParameters(url)
-            url = '%s?%s' % (main, requests.compat.urlencode(parameters))
-        msg = "Make HTTP Request: %s?%s" % (main, self._getUrlArguments(parameters))
+        scopes, url, arguments = self._getAuthorizationData()
+        msg = "Make HTTP Request: %s" % self._getUrlArguments(url, arguments)
         self._logger.logp(INFO, 'WizardModel', 'getAuthorizationData()', msg)
-        return scopes, url
+        return scopes, self._getUrl(url, requests.compat.urlencode(arguments))
 
     def startServer(self, scopes, notify, register):
         self._cancelServer()
-        provider = self._config.getByName('Providers').getByName(self._provider)
-        address = provider.getByName('RedirectAddress')
-        port = provider.getByName('RedirectPort')
         lock = Condition()
-        server = Server(self._ctx, self._user, self._getBaseUrl(), self._provider, address, port, self._uuid, lock)
+        server = Server(self._ctx, self._user, self._getBaseUrl(), self._provider, self._host, self._port, self._uuid, lock)
         self._watchdog = WatchDog(self._ctx, server, notify, register, scopes, self._provider, self._user, self.HandlerTimeout, lock)
         server.start()
         self._watchdog.start()
@@ -425,16 +450,6 @@ class WizardModel(TokenModel):
         return self.getAuthorizationErrorTitle(resolver), self.getRequestErrorMessage(resolver, error)
 
 # WizardModel getter methods called by WizardPages 4
-    def isCodeValid(self, code):
-        return code != ''
-
-    def setAuthorization(self, source, code):
-        scope = self._config.getByName('Scopes').getByName(self._scope)
-        provider = self._config.getByName('Providers').getByName(self._provider)
-        scopes = self._getUrlScopes(scope, provider)
-        return self._registerToken(source, scopes, provider, self._user, code)
-
-# WizardModel getter methods called by WizardPages 5
     def closeWizard(self):
         return self._close
 
@@ -451,6 +466,7 @@ class WizardModel(TokenModel):
         access = user.getByName('AccessToken') if user.hasByName('AccessToken') else self.getTokenAccess(resolver)
         timestamp = user.getByName('TimeStamp')
         never = user.getByName('NeverExpires')
+        print("WizardModel.getUserTokenData() never: %s" % never)
         expires = self.getTokenExpires(resolver) if never else timestamp - int(time.time())
         return never, scopes, access, refresh, expires
 
@@ -476,40 +492,6 @@ class WizardModel(TokenModel):
     def _getCodeVerifier(self):
         return self._uuid + self._uuid
 
-    def _getRedirectUri(self, provider):
-        if provider.getByName('HttpHandler'):
-            uri = self._uri % (provider.getByName('RedirectAddress'), provider.getByName('RedirectPort'))
-        else:
-            uri = self._urn
-        return uri
-
-    def _getUrlParameters(self, scopes, provider):
-        parameters = self._getUrlBaseParameters(provider)
-        optional = self._getUrlOptionalParameters(scopes, provider)
-        option = provider.getByName('AuthorizationParameters')
-        parameters = self._parseParameters(parameters, optional, option)
-        return parameters
-
-    def _getUrlBaseParameters(self, provider):
-        parameters = {}
-        parameters['response_type'] = 'code'
-        parameters['client_id'] = provider.getByName('ClientId')
-        parameters['state'] = self._uuid
-        parameters['redirect_uri'] = self._getRedirectUri(provider)
-        if provider.getByName('CodeChallenge'):
-            method = provider.getByName('CodeChallengeMethod')
-            parameters['code_challenge_method'] = method
-            parameters['code_challenge'] = self._getCodeChallenge(method)
-        return parameters
-
-    def _getUrlOptionalParameters(self, scopes, provider):
-        parameters = {}
-        parameters['scope'] = ' '.join(scopes)
-        parameters['client_secret'] = provider.getByName('ClientSecret')
-        parameters['current_user'] = self._user
-        parameters['current_language'] = getCurrentLocale(self._ctx).Language
-        return parameters
-
     def _getCodeChallenge(self, method):
         code = self._getCodeVerifier()
         if method == 'S256':
@@ -521,55 +503,43 @@ class WizardModel(TokenModel):
             code = challenge[:len(challenge)-padding]
         return code
 
-# WizardModel private getter/setter methods called by WizardPages 3 and WizardPages 4
+# WizardModel private getter/setter methods called by WizardPages 3
     def _registerToken(self, source, scopes, provider, user, code):
         error = None
-        session = requests.Session()
-        url = provider.getByName('TokenUrl')
-        data = self._getTokenParameters(scopes, provider, code)
-        msg = "Make HTTP Request: %s?%s" % (url, self._getUrlArguments(data))
-        self._logger.logp(INFO, 'WizardModel', '_registerToken()', msg)
+        arguments = self._getTokenArguments(scopes, provider, code)
+        request = provider.getByName('Token')
+        name = request.getByName('Name')
+        parameter = RequestParameter(name)
+        parser = CustomParser(*getParserItems(request))
+        setResquestParameter(self._prefix, self._suffix, arguments, request, parameter)
         timestamp = int(time.time())
         cls, mtd = 'WizardModel', '_registerToken()'
-        name = 'Register Token for User: %s' % user
         try:
-            response = getResponse(self._ctx, source, session, cls, mtd, name,
-                                   'POST', url, self.Timeout, {'data': data})
+            response = getRequestResponse(self._ctx, source, requests.Session(), cls, mtd, parameter, self.Timeout)
         except UnoException as e:
             error = e.Message
-        msg = "Receive Response Status: %s - Content: %s" % (response.status_code, response.text)
-        if response.ok:
-            self._saveUserToken(scopes, provider, user, response, timestamp)
+        msg = "Receive Response Status: %s - Content: %s" % (response.StatusCode, response.Text)
+        if response.Ok and parser.hasItems():
+            results = getResponseResults(parser, response)
+            self._saveUserToken(scopes, provider, user, results, timestamp)
         else:
             error = msg
         response.close()
         self._logger.logp(INFO, 'WizardModel', '_registerToken()', msg)
         return error
 
-    def _getTokenParameters(self, scopes, provider, code):
-        parameters = self._getTokenBaseParameters(provider, code)
-        optional = self._getTokenOptionalParameters(scopes, provider)
-        option = provider.getByName('TokenParameters')
-        parameters = self._parseParameters(parameters, optional, option)
-        return parameters
+    def _getTokenArguments(self, scopes, provider, code):
+        arguments = {'ClientSecret': provider.getByName('ClientSecret'),
+                     'ClientId':     provider.getByName('ClientId'),
+                     'RedirectUri':  provider.getByName('RedirectUri'),
+                     'Scopes':       ' '.join(scopes),
+                     'Code':         code}
+        method = provider.getByName('CodeChallengeMethod')
+        if method:
+            arguments['CodeVerifier'] = self._getCodeVerifier()
+        return arguments
 
-    def _getTokenBaseParameters(self, provider, code):
-        parameters = {}
-        parameters['code'] = code
-        parameters['grant_type'] = 'authorization_code'
-        parameters['client_id'] = provider.getByName('ClientId')
-        parameters['redirect_uri'] = self._getRedirectUri(provider)
-        if provider.getByName('CodeChallenge'):
-            parameters['code_verifier'] = self._getCodeVerifier()
-        return parameters
-
-    def _getTokenOptionalParameters(self, scopes, provider):
-        parameters = {}
-        parameters['scope'] = ' '.join(scopes)
-        parameters['client_secret'] = provider.getByName('ClientSecret')
-        return parameters
-
-    def _saveUserToken(self, scopes, provider, name, response, timestamp):
+    def _saveUserToken(self, scopes, provider, name, results, timestamp):
         users = provider.getByName('Users')
         if not users.hasByName(name):
             users.insertByName(name, users.createInstance())
@@ -577,7 +547,7 @@ class WizardModel(TokenModel):
         # user.replaceByName('Scopes', scopes)
         arguments = ('Scopes', uno.Any('[]string', tuple(scopes)))
         uno.invoke(user, 'replaceByName', arguments)
-        refresh, access, never, expires = self._getTokenFromResponse(response, timestamp)
+        refresh, access, never, expires = self._getTokenFromResults(results, timestamp)
         self._saveTokens(user, refresh, access, never, expires)
 
 # WizardModel private getter/setter methods
