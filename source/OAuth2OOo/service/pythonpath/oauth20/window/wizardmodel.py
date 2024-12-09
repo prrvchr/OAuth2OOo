@@ -73,6 +73,9 @@ import base64
 import hashlib
 import json
 import requests
+import socket
+from string import Template
+from contextlib import closing
 from threading import Condition
 import traceback
 
@@ -85,9 +88,8 @@ class WizardModel(TokenModel):
         self._close = close
         self._readonly = readonly
         self._host = 'localhost'
-        self._port = 8080
-        code = 'http://%s:%s/' % (self._host, self._port)
-        self._code = base64.urlsafe_b64encode(code.encode()).decode()
+        self._port = self._findFreePort()
+        self._code = 'http://%s:%s' % (self._host, self._port)
         self._watchdog = None
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
         self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'MessageBox')
@@ -547,6 +549,13 @@ class WizardModel(TokenModel):
         if refresh is not None:
             user.replaceByName('RefreshToken', refresh)
         self._saveRefreshedToken(user, refresh, access, never, timestamp)
+
+    def _findFreePort(self):
+        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+            s.bind(('', 0))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            print("WizardModel._findFreePort() port: %s" % s.getsockname()[1])
+            return s.getsockname()[1]
 
 # WizardModel StringResource methods
     def getPageStep(self, resolver, pageid):

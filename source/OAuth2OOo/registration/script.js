@@ -1,6 +1,5 @@
 export function getParameter(name, value) {
-    var parameter = value,
-        tmp = [];
+    var parameter = value, tmp = [];
     var items = location.search.substr(1).split('&');
     for (var i = 0; i < items.length; i++) {
         tmp = items[i].split('=');
