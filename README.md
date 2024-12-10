@@ -445,7 +445,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 
 - All data needed for OAuth2 authorization code flow management is now stored in LibreOffice configuration file [Options.xcu][127].
 - Yahoo's OAuth2 API has been integrated and will be available in the eMailerOOo extension soon.
-- It is now possible to have an OAuth2 redirect uri (ie: `redirect_uri`) in https mode as required when using the Yahoo API. Thanks to Javascript and Github.
+- It is now possible to have an OAuth2 redirect uri (ie: `redirect_uri`) in https mode as required when using the Yahoo API. Thanks to JavaScript and Github.
 - The TCP/IP port allowing the reception of the GAFA authorization code is now chosen randomly among the free ports (ie: no more conflict problems).
 
 ### What remains to be done for version 1.4.0:
