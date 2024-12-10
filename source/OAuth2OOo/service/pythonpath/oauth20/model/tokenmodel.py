@@ -41,6 +41,7 @@ from ..requestresponse import getRequestResponse
 
 from ..oauth2 import getParserItems
 from ..oauth2 import getResponseResults
+from ..oauth2 import setParametersArguments
 from ..oauth2 import setResquestParameter
 
 from ..unotool import executeDispatch
@@ -145,8 +146,9 @@ class TokenModel(BaseModel):
         request = provider.getByName('RefreshToken')
         name = request.getByName('Name')
         parameter = RequestParameter(name)
-        parser = CustomParser(*getParserItems(request))
+        setParametersArguments(request.getByName('Parameters'), arguments)
         setResquestParameter(arguments, request, parameter)
+        parser = CustomParser(*getParserItems(request))
         timestamp = int(time.time())
         cls, mtd = 'TokenModel', '_refreshToken()'
         response = getRequestResponse(self._ctx, source, requests.Session(), cls, mtd, parameter, self.Timeout)

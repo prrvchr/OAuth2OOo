@@ -45,6 +45,7 @@ from ..requestresponse import getRequestResponse
 
 from ..oauth2 import getParserItems
 from ..oauth2 import getResponseResults
+from ..oauth2 import setParametersArguments
 from ..oauth2 import setResquestParameter
 
 from ..unotool import generateUuid
@@ -505,8 +506,9 @@ class WizardModel(TokenModel):
         request = provider.getByName('Token')
         name = request.getByName('Name')
         parameter = RequestParameter(name)
-        parser = CustomParser(*getParserItems(request))
+        setParametersArguments(request.getByName('Parameters'), arguments)
         setResquestParameter(arguments, request, parameter)
+        parser = CustomParser(*getParserItems(request))
         timestamp = int(time.time())
         cls, mtd = 'WizardModel', '_registerToken()'
         try:
