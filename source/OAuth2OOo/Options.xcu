@@ -49,7 +49,12 @@
     <value xml:lang="fr">_fr</value>
   </prop>
   <node oor:name="Urls">
-    <node oor:name="mail.yahoo.com" oor:op="fuse">
+    <node oor:name="smtp.mail.yahoo.com" oor:op="fuse">
+      <prop oor:name="Scope">
+        <value>Yahoo Mail</value>
+      </prop>
+    </node>
+    <node oor:name="imap.mail.yahoo.com" oor:op="fuse">
       <prop oor:name="Scope">
         <value>Yahoo Mail</value>
       </prop>
@@ -71,17 +76,17 @@
     </node>
     <node oor:name="graph.microsoft.com/Outlook" oor:op="fuse">
       <prop oor:name="Scope">
-        <value>Microsoft Mail Send</value>
+        <value>Microsoft Outlook</value>
       </prop>
     </node>
     <node oor:name="smtp.office365.com" oor:op="fuse">
       <prop oor:name="Scope">
-        <value>Microsoft Mail SMTP/IMAP</value>
+        <value>Microsoft Outlook</value>
       </prop>
     </node>
     <node oor:name="outlook.office365.com" oor:op="fuse">
       <prop oor:name="Scope">
-        <value>Microsoft Mail SMTP/IMAP</value>
+        <value>Microsoft Outlook</value>
       </prop>
     </node>
     <node oor:name="graph.microsoft.com/People" oor:op="fuse">
@@ -128,7 +133,7 @@
         <value>offline_access https://outlook.office.com/SMTP.Send https://outlook.office.com/IMAP.AccessAsUser.All</value>
       </prop>
     </node>
-    <node oor:name="Microsoft Mail Send" oor:op="fuse">
+    <node oor:name="Microsoft Outlook" oor:op="fuse">
       <prop oor:name="Provider">
         <value>Microsoft</value>
       </prop>
