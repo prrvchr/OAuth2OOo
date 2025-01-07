@@ -58,13 +58,17 @@ from oauth20 import getInputStream
 from oauth20 import download
 from oauth20 import upload
 
+from oauth20 import setParameterArguments
+
 from oauth20 import getLogger
 
 from oauth20 import g_identifier
 from oauth20 import g_oauth2
 from oauth20 import g_defaultlog
 from oauth20 import g_basename
+from oauth20 import g_token
 
+from string import Template
 import requests
 import traceback
 
@@ -127,15 +131,34 @@ class OAuth2Service(unohelper.Base,
             return self._model.isAuthorized()
         return True
 
-    def getToken(self, format=''):
+    def getToken(self, template=''):
+        print("OAuth2Service.getToken() 1")
         token = ''
         if self.isAuthorized():
             token = self._model.getAccessToken(self)
-            if format:
-                try:
-                    token = format % token
-                except:
-                    pass
+            if template:
+                token = Template(template).safe_substitute(AccessToken=token)
+        print("OAuth2Service.getToken() 2 Token: %s" % token)
+        return token
+
+    def getTokenWithParameter(self, parameter, arguments):
+        print("OAuth2Service.getTokenWithParameter() 1")
+        token = ''
+        if parameter:
+            if self.isAuthorized():
+                key = parameter.getByName('Name')
+                print("OAuth2Service.getTokenWithParameter() 2 key: %s" % key)
+                args = {arg.Name: arg.Value for arg in arguments}
+                args['UserName'] = self._model.User
+                args['ResourceUrl'] = self._model.Url
+                args['AccessToken'] = self._model.getAccessToken(self)
+                print("OAuth2Service.getTokenWithParameter() 3 key: %s" % key)
+                setParameterArguments(parameter, args)
+                print("OAuth2Service.getTokenWithParameter() 4")
+                if key in args:
+                    token = args[key]
+        else:
+            token = self.getToken(g_token)
         return token
 
     def getRequestParameter(self, name):

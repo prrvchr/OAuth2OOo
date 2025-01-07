@@ -445,7 +445,7 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 
 - Toutes les données nécessaires à la gestion du flux du code d'autorisation OAuth2 sont désormais stockées dans le fichier de configuration de LibreOffice [Options.xcu][127].
 - L'API OAuth2 de Yahoo a été intégrée et sera disponible dans l'extension eMailerOOo prochainement.
-- Il est désormais possible d'avoir une uri de redirection OAuth2 (ie: `redirect_uri`) en mode https comme l'impose l'utilisation de l'API de Yahoo. Merci à JavaScript et Github.
+- Il est désormais possible d'avoir une uri de redirection OAuth2 (ie: `redirect_uri`) en mode https comme l'impose l'utilisation de l'API de Yahoo, grâce au certificat SSL de Github et à JavaScript, voir le fichier [OAuth2Redirect.md][128].
 - Le port TCP/IP permettant la réception du code d'autorisation des GAFA est désormais choisi au hasard parmi les ports libres (ie: plus de problèmes de conflits).
 
 ### Que reste-t-il à faire pour la version 1.4.0:
@@ -581,3 +581,4 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 [125]: <https://pypi.org/project/attrs/>
 [126]: <https://pypi.org/project/soupsieve/>
 [127]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/Options.xcu>
+[128]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/registration/OAuth2Redirect.md>

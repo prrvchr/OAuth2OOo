@@ -86,6 +86,8 @@ from .oauth2 import OAuth2OOo
 from .oauth2 import NoOAuth2
 from .oauth2 import InteractionRequest
 from .oauth2 import getOAuth2UserName
+from .oauth2 import setParameterArguments
+from .oauth2 import g_token
 
 from .oauth2helper import isAuthorized
 
