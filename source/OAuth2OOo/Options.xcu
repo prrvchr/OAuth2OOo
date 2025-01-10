@@ -49,44 +49,21 @@
     <value xml:lang="fr">_fr</value>
   </prop>
   <node oor:name="Urls">
-    <node oor:name="smtp.mail.yahoo.com" oor:op="fuse">
-      <prop oor:name="Scope">
-        <value>Yahoo Mail</value>
-      </prop>
-    </node>
-    <node oor:name="imap.mail.yahoo.com" oor:op="fuse">
-      <prop oor:name="Scope">
-        <value>Yahoo Mail</value>
-      </prop>
-    </node>
-    <node oor:name="smtp.gmail.com" oor:op="fuse">
+    <!-- SMTP & IMAP hostname Urls ******************************************************************************** -->
+    <node oor:name="gmail.googleapis.com" oor:op="fuse">
       <prop oor:name="Scope">
         <value>Google Mail</value>
       </prop>
     </node>
-    <node oor:name="imap.gmail.com" oor:op="fuse">
+    <node oor:name="graph.microsoft.com/Mail" oor:op="fuse">
       <prop oor:name="Scope">
-        <value>Google Mail</value>
+        <value>Microsoft Mail</value>
       </prop>
     </node>
+    <!-- Provider API Urls ******************************************************************************** -->
     <node oor:name="people.googleapis.com" oor:op="fuse">
       <prop oor:name="Scope">
         <value>Google People</value>
-      </prop>
-    </node>
-    <node oor:name="graph.microsoft.com/Outlook" oor:op="fuse">
-      <prop oor:name="Scope">
-        <value>Microsoft Outlook</value>
-      </prop>
-    </node>
-    <node oor:name="smtp.office365.com" oor:op="fuse">
-      <prop oor:name="Scope">
-        <value>Microsoft Outlook</value>
-      </prop>
-    </node>
-    <node oor:name="outlook.office365.com" oor:op="fuse">
-      <prop oor:name="Scope">
-        <value>Microsoft Outlook</value>
       </prop>
     </node>
     <node oor:name="graph.microsoft.com/People" oor:op="fuse">
@@ -94,21 +71,8 @@
         <value>Microsoft People</value>
       </prop>
     </node>
-    <node oor:name="graph.microsoft.com" oor:op="fuse">
-      <prop oor:name="Scope">
-        <value>Microsoft People</value>
-      </prop>
-    </node>
   </node>
   <node oor:name="Scopes">
-    <node oor:name="Yahoo Mail" oor:op="fuse">
-      <prop oor:name="Provider">
-        <value>Yahoo</value>
-      </prop>
-      <prop oor:name="Values">
-        <value>https://mail.yahoo.com</value>
-      </prop>
-    </node>
     <node oor:name="Google Mail" oor:op="fuse">
       <prop oor:name="Provider">
         <value>Google</value>
@@ -133,7 +97,7 @@
         <value>offline_access https://outlook.office.com/SMTP.Send https://outlook.office.com/IMAP.AccessAsUser.All</value>
       </prop>
     </node>
-    <node oor:name="Microsoft Outlook" oor:op="fuse">
+    <node oor:name="Microsoft Mail" oor:op="fuse">
       <prop oor:name="Provider">
         <value>Microsoft</value>
       </prop>

@@ -61,3 +61,6 @@ class OAuth2Model(TokenModel):
     def Provider(self):
         return self._provider
 
+    def isRegisteredUrl(self, url):
+        return url in self.UrlList
+

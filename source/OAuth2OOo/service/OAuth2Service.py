@@ -58,7 +58,7 @@ from oauth20 import getInputStream
 from oauth20 import download
 from oauth20 import upload
 
-from oauth20 import setParameterArguments
+from oauth20 import setParametersArguments
 
 from oauth20 import getLogger
 
@@ -93,8 +93,8 @@ class OAuth2Service(unohelper.Base,
                 # FIXME: The Url and User name must not be able to be changed (ie: ReadOnly)
                 args = {'Url': url, 'UserName': user, 'ReadOnly': True}
                 executeDispatch(ctx, 'oauth2:wizard', getPropertyValueSet(args))
-                # The OAuth2 Wizard has been canceled
                 if not isAuthorized(urls, scopes, providers, url, user):
+                    # The OAuth2 Wizard has been canceled
                     return None
         return super(OAuth2Service, cls).__new__(cls)
 
@@ -131,34 +131,30 @@ class OAuth2Service(unohelper.Base,
             return self._model.isAuthorized()
         return True
 
+    def isRegisteredUrl(self, url):
+        return self._model.isRegisteredUrl(url)
+
     def getToken(self, template=''):
-        print("OAuth2Service.getToken() 1")
         token = ''
         if self.isAuthorized():
             token = self._model.getAccessToken(self)
             if template:
                 token = Template(template).safe_substitute(AccessToken=token)
-        print("OAuth2Service.getToken() 2 Token: %s" % token)
         return token
 
-    def getTokenWithParameter(self, parameter, arguments):
-        print("OAuth2Service.getTokenWithParameter() 1")
-        token = ''
-        if parameter:
+    def getTokenWithParameters(self, parameters, arguments):
+        if parameters:
+            token = ''
             if self.isAuthorized():
-                key = parameter.getByName('Name')
-                print("OAuth2Service.getTokenWithParameter() 2 key: %s" % key)
                 args = {arg.Name: arg.Value for arg in arguments}
-                args['UserName'] = self._model.User
-                args['ResourceUrl'] = self._model.Url
-                args['AccessToken'] = self._model.getAccessToken(self)
-                print("OAuth2Service.getTokenWithParameter() 3 key: %s" % key)
-                setParameterArguments(parameter, args)
-                print("OAuth2Service.getTokenWithParameter() 4")
-                if key in args:
-                    token = args[key]
+                args.update({'UserName':    self._model.User,
+                             'ResourceUrl': self._model.Url,
+                             'AccessToken': self._model.getAccessToken(self)})
+                key = setParametersArguments(parameters, args)
+                token = args.get(key, token)
         else:
             token = self.getToken(g_token)
+        print("OAuth2Service.getTokenWithParameters() 1 Token: %s" % token)
         return token
 
     def getRequestParameter(self, name):
