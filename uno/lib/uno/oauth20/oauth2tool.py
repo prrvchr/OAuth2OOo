@@ -32,7 +32,7 @@ import uno
 from ..unotool import createService
 from ..unotool import getExtensionVersion
 
-from .configuration import g_service as g_oauth2
+from .configuration import g_service
 from .configuration import g_identifier
 from .configuration import g_chunk
 
@@ -46,16 +46,16 @@ import ijson
 
 def getRequest(ctx, url=None, name=None):
     if url and name:
-        request = createService(ctx, g_oauth2, url, name)
+        request = createService(ctx, g_service, url, name)
     else:
-        request = createService(ctx, g_oauth2)
+        request = createService(ctx, g_service)
     return request
 
 def getOAuth2(ctx, url='', name=''):
     if url and name:
-        oauth2 = createService(ctx, g_oauth2, url, name)
+        oauth2 = createService(ctx, g_service, url, name)
     else:
-        oauth2 = createService(ctx, g_oauth2)
+        oauth2 = createService(ctx, g_service)
     return oauth2
 
 def getOAuth2Version(ctx):

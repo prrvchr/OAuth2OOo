@@ -47,8 +47,6 @@ from .oauth2core import getOAuth2Token
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_service
-from .configuration import g_version
-
-from .configuration import g_oauth2
 from .configuration import g_token
+from .configuration import g_version
 

@@ -32,15 +32,12 @@ from .options import OptionsManager
 from .model import HandlerModel
 from .model import OAuth2Model
 
-
 from .oauth2dispatch import OAuth2Dispatch
 
-from .configuration import g_extension
-from .configuration import g_identifier
-from .configuration import g_oauth2
-from .configuration import g_defaultlog
-from .configuration import g_errorlog
-from .configuration import g_basename
+from .requestparameter import RequestParameter
+
+from .dialog import UserHandler
+from .dialog import UserView
 
 from .unotool import createService
 from .unotool import executeDispatch
@@ -53,17 +50,12 @@ from .unotool import getResourceLocation
 from .unotool import getStringResource
 from .unotool import getSimpleFile
 
-from .dialog import UserHandler
-from .dialog import UserView
-
 from .logger import getLogger
 
 from .request import download
 from .request import getInputStream
 from .request import getSessionMode
 from .request import upload
-
-from .requestparameter import RequestParameter
 
 from .requestresponse import raiseForStatus
 from .requestresponse import getRequestResponse
@@ -82,12 +74,19 @@ from .webdriver import Browsers
 from .webdriver import clickButton
 from .webdriver import sendKey
 
-from .oauth2 import OAuth2OOo
-from .oauth2 import NoOAuth2
-from .oauth2 import InteractionRequest
-from .oauth2 import getOAuth2UserName
-from .oauth2 import setParametersArguments
-from .oauth2 import g_token
+from .oauth20 import OAuth2OOo
+from .oauth20 import NoOAuth2
+from .oauth20 import InteractionRequest
+from .oauth20 import getOAuth2UserName
+from .oauth20 import setParametersArguments
 
 from .oauth2helper import isAuthorized
+
+from .configuration import g_extension
+from .configuration import g_identifier
+from .configuration import g_service
+from .configuration import g_defaultlog
+from .configuration import g_errorlog
+from .configuration import g_basename
+from .configuration import g_token
 

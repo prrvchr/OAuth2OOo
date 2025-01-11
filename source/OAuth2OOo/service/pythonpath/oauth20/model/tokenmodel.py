@@ -33,16 +33,16 @@ from .basemodel import BaseModel
 
 from ..requestparameter import RequestParameter
 
-from ..oauth2 import CustomParser
+from ..oauth20 import CustomParser
 
 from ..oauth2helper import isUserAuthorized
 
 from ..requestresponse import getRequestResponse
 
-from ..oauth2 import getParserItems
-from ..oauth2 import getResponseResults
-from ..oauth2 import setParametersArguments
-from ..oauth2 import setResquestParameter
+from ..oauth20 import getParserItems
+from ..oauth20 import getResponseResults
+from ..oauth20 import setParametersArguments
+from ..oauth20 import setResquestParameter
 
 from ..unotool import executeDispatch
 from ..unotool import getPropertyValueSet

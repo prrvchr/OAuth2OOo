@@ -63,7 +63,7 @@ from oauth20 import setParametersArguments
 from oauth20 import getLogger
 
 from oauth20 import g_identifier
-from oauth20 import g_oauth2
+from oauth20 import g_service
 from oauth20 import g_defaultlog
 from oauth20 import g_basename
 from oauth20 import g_token
@@ -74,7 +74,7 @@ import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = g_oauth2
+g_ImplementationName = g_service
 
 
 class OAuth2Service(unohelper.Base,
