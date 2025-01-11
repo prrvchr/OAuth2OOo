@@ -27,13 +27,13 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from com.sun.star.uno import Exception as UnoException
+import uno
 
 from ..unotool import createService
 from ..unotool import getExtensionVersion
 
+from .configuration import g_service as g_oauth2
 from .configuration import g_identifier
-from .configuration import g_service
 from .configuration import g_chunk
 
 from string import Formatter
@@ -44,23 +44,23 @@ import json
 import ijson
 
 
+def getRequest(ctx, url=None, name=None):
+    if url and name:
+        request = createService(ctx, g_oauth2, url, name)
+    else:
+        request = createService(ctx, g_oauth2)
+    return request
+
 def getOAuth2(ctx, url='', name=''):
     if url and name:
-        oauth2 = createService(ctx, g_service, url, name)
+        oauth2 = createService(ctx, g_oauth2, url, name)
     else:
-        oauth2 = createService(ctx, g_service)
+        oauth2 = createService(ctx, g_oauth2)
     return oauth2
 
 def getOAuth2Version(ctx):
     version = getExtensionVersion(ctx, g_identifier)
     return version
-
-def getRequest(ctx, url=None, name=None):
-    if url and name:
-        request = createService(ctx, g_service, url, name)
-    else:
-        request = createService(ctx, g_service)
-    return request
 
 def setResquestParameter(arguments, request, parameter):
     method = request.getByName('Method')

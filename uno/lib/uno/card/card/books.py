@@ -27,58 +27,36 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from com.sun.star.sdbc import SQLException
+from .book import Book
 
-from .database import DataBase
-
-from .datasource import DataSource
-
-from .cardtool import getLogException
-
-from .dbtool import getConnectionUrl
-
-from .unotool import checkVersion
-from .unotool import getExtensionVersion
-
-from .oauth2 import getOAuth2Version
-from .oauth2 import g_extension as g_oauth2ext
-from .oauth2 import g_version as g_oauth2ver
-
-from .jdbcdriver import g_extension as g_jdbcext
-from .jdbcdriver import g_identifier as g_jdbcid
-from .jdbcdriver import g_version as g_jdbcver
-
-from .configuration import g_extension
-from .configuration import g_host
-
-from .dbconfig import g_folder
-from .dbconfig import g_version
-
-import traceback
+from collections import OrderedDict
 
 
-def getDataSource(ctx, logger, source, cls, mtd):
-    oauth2 = getOAuth2Version(ctx)
-    driver = getExtensionVersion(ctx, g_jdbcid)
-    if oauth2 is None:
-        raise getLogException(logger, source, 1003, 1121, cls, mtd, g_oauth2ext, g_extension)
-    elif not checkVersion(oauth2, g_oauth2ver):
-        raise getLogException(logger, source, 1003, 1122, cls, mtd, oauth2, g_oauth2ext, g_oauth2ver)
-    elif driver is None:
-        raise getLogException(logger, source, 1003, 1121, cls, mtd, g_jdbcext, g_extension)
-    elif not checkVersion(driver, g_jdbcver):
-        raise getLogException(logger, source, 1003, 1122, cls, mtd, driver, g_jdbcext, g_jdbcver)
-    else:
-        path = g_folder + '/' + g_host
-        url = getConnectionUrl(ctx, path)
-        try:
-            database = DataBase(ctx, url)
-        except SQLException as e:
-            raise getLogException(logger, source, 1005, 1123, cls, mtd, url, e.Message)
-        else:
-            if not database.isUptoDate():
-                raise getLogException(logger, source, 1005, 1124, cls, mtd, database.Version, g_version)
-            else:
-                return DataSource(ctx, database)
-    return None
+class Books(object):
+    def __init__(self, ctx, metadata, new):
+        self._ctx = ctx
+        print("Books.__init__() 1")
+        self._books = self._getBooks(metadata, new)
+        print("Books.__init__() 2")
+
+    def getBooks(self):
+        return self._books.values()
+
+    def hasBook(self, uri):
+        return uri in self._books
+
+    def getBook(self, uri):
+        return self._books[uri]
+
+    def setBook(self, uri, book):
+        self._books[uri] = book
+
+    # Private methods
+    def _getBooks(self, metadata, new):
+        books = OrderedDict()
+        for kwargs in metadata:
+            book = Book(self._ctx, new, **kwargs)
+            print("AddressBook._getBooks() Url: %s" % book.Uri)
+            books[book.Uri] = book
+        return books
 
