@@ -75,7 +75,7 @@ def getDataBaseConnection(ctx, url, user, pwd, new, infos=None):
         infos = getDriverInfos(ctx, url, g_drvinfos)
     return getDataSourceConnection(ctx, url, user, pwd, new, infos)
 
-def createDataBase(ctx, logger, connection, odb):
+def createDataBase(ctx, connection, odb):
     # TODO: Log all database creation
     # XXX Creation order are very important here...
     tables = connection.getTables()
@@ -166,7 +166,7 @@ def _getAddressbookColumns(ctx, connection):
     call.close()
 
 def _getProcedures():
-    for name in ('SelectUser', 'InsertUser', 'InsertBook', 'UpdateAddressbookName',
+    for name in ('SelectUser', 'InsertUser', 'InsertBook', 'UpdateBookName',
                  'MergeCard', 'MergeGroup', 'MergeGroupMembers', 'DeleteCard',
                  'UpdateCardSync', 'GetLastCardSync', 'GetLastBookSync',
                  'GetLastGroupSync', 'SelectChangedCards', 'SelectColumns', 'SelectColumnIds',

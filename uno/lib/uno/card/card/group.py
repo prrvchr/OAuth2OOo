@@ -27,36 +27,36 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .book import Book
 
-from collections import OrderedDict
+class Group():
+    def __init__(self, new, group, uri, name, token=''):
+        self._new = new
+        self._id = group
+        self._uri = uri
+        self._name = name
+        self._token = token
 
+    @property
+    def Id(self):
+        return self._id
+    @property
+    def Uri(self):
+        return self._uri
+    @property
+    def Name(self):
+        return self._name
+    @property
+    def Token(self):
+        return self._token
 
-class Books(object):
-    def __init__(self, ctx, metadata, new):
-        self._ctx = ctx
-        print("Books.__init__() 1")
-        self._books = self._getBooks(metadata, new)
-        print("Books.__init__() 2")
+    def isNew(self):
+        return self._new
 
-    def getBooks(self):
-        return self._books.values()
+    def resetNew(self):
+        self._new = False
 
-    def hasBook(self, uri):
-        return uri in self._books
+    def isRenamed(self, name):
+        return self._name != name
 
-    def getBook(self, uri):
-        return self._books[uri]
-
-    def setBook(self, uri, book):
-        self._books[uri] = book
-
-    # Private methods
-    def _getBooks(self, metadata, new):
-        books = OrderedDict()
-        for kwargs in metadata:
-            book = Book(self._ctx, new, **kwargs)
-            print("AddressBook._getBooks() Url: %s" % book.Uri)
-            books[book.Uri] = book
-        return books
-
+    def setName(self, name):
+        self._name = name

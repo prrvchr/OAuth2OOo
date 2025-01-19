@@ -27,17 +27,21 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
+from .group import Group
 
-class Book(object):
-    def __init__(self, ctx, new, **kwargs):
-        self._ctx = ctx
+import json
+
+
+class Book():
+    def __init__(self, new, **kwargs):
         self._new = new
-        self._changed = False
         self._id = kwargs.get('Book')
         self._uri = kwargs.get('Uri')
         self._name = kwargs.get('Name')
         self._tag = kwargs.get('Tag')
         self._token = kwargs.get('Token')
+        groups = (Group(new, *group) for group in json.loads(kwargs.get('Groups', '[]')))
+        self._groups = {group.Uri: group for group in groups}
 
     @property
     def Id(self):
@@ -56,11 +60,26 @@ class Book(object):
         return self._token
 
     def isNew(self):
-        new = self._new
-        self._new = False
-        return new
+        return self._new
 
-    def hasNameChanged(self, name):
+    def resetNew(self):
+        self._new = False
+
+    def hasGroup(self, uri):
+        return uri in self._groups
+
+    def getGroups(self):
+        return self._groups.values()
+
+    def getGroup(self, uri):
+        return self._groups[uri]
+
+    def setNewGroup(self, uri, *args):
+        group = Group(True, *args)
+        self._groups[uri] = group
+        return group
+
+    def isRenamed(self, name):
         return self._name != name
 
     def setName(self, name):
