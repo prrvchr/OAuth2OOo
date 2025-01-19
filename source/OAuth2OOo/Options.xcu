@@ -78,7 +78,8 @@
         <value>Google</value>
       </prop>
       <prop oor:name="Values">
-        <value>https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.metadata</value>
+        <!-- <value>https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.metadata</value> -->
+        <value>https://www.googleapis.com/auth/gmail.modify</value>
       </prop>
     </node>
     <node oor:name="Google People" oor:op="fuse">
