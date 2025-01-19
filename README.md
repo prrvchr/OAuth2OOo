@@ -446,6 +446,12 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - All data needed for OAuth2 authorization code flow management is now stored in LibreOffice configuration file [Options.xcu][127].
 - It is now possible to have an OAuth2 redirect uri (ie: `redirect_uri`) in https mode as required by some third party APIs, using Github's SSL certificate and JavaScript, see the file [OAuth2Redirect.md][128].
 - The TCP/IP port allowing the reception of the GAFA authorization code is now chosen randomly among the free ports (ie: no more conflict problems).
+- It is possible to build the extension archive (ie: the oxt file) with the [Apache Ant][129] utility and the [build.xml][130] script file.
+- The extension will refuse to install under OpenOffice regardless of version or LibreOffice other than 7.x or higher.
+- OAuth2 data flow management using authorization code copy has been removed. Only receiving the authorization code via HTTP is now supported.
+- Two methods have been added to the [XOAuth2Service.idl interface][55]:
+  - `isRegisteredUrl` to know if a URL is registered in the OAuth2 configuration.
+  - `getTokenWithParameters` to obtain an OAuth2 token in the format given by the parameters.
 
 ### What remains to be done for version 1.4.0:
 
@@ -458,7 +464,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [3]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_en>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
-[6]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-139>
+[6]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-140>
 [7]: <https://prrvchr.github.io>
 [8]: <https://www.libreoffice.org/download/download/>
 [9]: <https://www.openoffice.org/download/index.html>
@@ -480,7 +486,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [25]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-130>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.3.9#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.4.0#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
@@ -581,3 +587,5 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [126]: <https://pypi.org/project/soupsieve/>
 [127]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/Options.xcu>
 [128]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/registration/OAuth2Redirect.md>
+[129]: <https://ant.apache.org/>
+[130]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/build.xml>
