@@ -42,7 +42,7 @@ from ..unotool import executeFrameDispatch
 from ..unotool import getDesktop
 from ..unotool import getPropertyValueSet
 
-from ..oauth2 import getOAuth2UserName
+from ..oauth20 import getOAuth2UserName
 
 from ..configuration import g_identifier
 from ..configuration import g_defaultlog

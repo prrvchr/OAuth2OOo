@@ -57,7 +57,7 @@ from com.sun.star.rest import URLRequiredException
 
 from com.sun.star.rest import XRequestResponse
 
-from .oauth2 import NoOAuth2
+from .oauth20 import NoOAuth2
 
 from .logger import getLogger
 

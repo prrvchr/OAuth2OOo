@@ -39,14 +39,14 @@ from ..model import TokenModel
 from .httpserver import WatchDog
 from .httpserver import Server
 
-from ..oauth2 import CustomParser
+from ..oauth20 import CustomParser
 
 from ..requestresponse import getRequestResponse
 
-from ..oauth2 import getParserItems
-from ..oauth2 import getResponseResults
-from ..oauth2 import setParametersArguments
-from ..oauth2 import setResquestParameter
+from ..oauth20 import getParserItems
+from ..oauth20 import getResponseResults
+from ..oauth20 import setParametersArguments
+from ..oauth20 import setResquestParameter
 
 from ..unotool import generateUuid
 from ..unotool import getCurrentLocale
