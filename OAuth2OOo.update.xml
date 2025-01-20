@@ -24,23 +24,25 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 -->
-<description
-  xmlns="http://openoffice.org/extensions/update/2006"
-  xmlns:xlink="http://www.w3.org/1999/xlink">
-    <identifier value="io.github.prrvchr.OAuth2OOo"/>
-    <version value="1.4.0"/>
-    <update-download>
-        <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt"/>
-    </update-download>
-    <dependencies xmlns:dep="http://openoffice.org/extensions/description/2006">
-        <dep:OpenOffice.org-minimal-version value="4.1" dep:name="OpenOffice.org 4.1"/>
-    </dependencies>
-    <publisher>
-        <name xlink:href="https://prrvchr.github.io/OAuth2OOo/" lang="en">OAuth2OOo</name>
-        <name xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr" lang="fr">OAuth2OOo</name>
-    </publisher>
-    <release-notes>
-        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-140" lang="en"/>
-        <src xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-140" lang="fr"/>
-    </release-notes>
+<description xmlns="http://openoffice.org/extensions/update/2006"
+             xmlns:d="http://openoffice.org/extensions/description/2006"
+             xmlns:l="http://libreoffice.org/extensions/description/2011"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+  <identifier value="io.github.prrvchr.OAuth2OOo"/>
+  <version value="1.4.0"/>
+  <update-download>
+    <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt"/>
+  </update-download>
+  <dependencies>
+    <OpenOffice.org-minimal-version value="LibreOffice 7.0" d:name="LibreOffice 7.0"/>
+    <l:LibreOffice-minimal-version value="7.0" d:name="LibreOffice 7.0"/>
+  </dependencies>
+  <publisher>
+    <name xlink:href="https://prrvchr.github.io/OAuth2OOo/" lang="en">OAuth2OOo</name>
+    <name xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr" lang="fr">OAuth2OOo</name>
+  </publisher>
+  <release-notes>
+    <src xlink:href="https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-140" lang="en"/>
+    <src xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-140" lang="fr"/>
+  </release-notes>
 </description>
