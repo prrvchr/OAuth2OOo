@@ -40,8 +40,8 @@ from com.sun.star.ucb.ContentInfoAttribute import KIND_FOLDER
 
 from com.sun.star.ucb import IllegalIdentifierException
 
-from ..oauth2 import getRequest
-from ..oauth2 import g_oauth2
+from ..oauth20 import getRequest
+from ..oauth20 import g_service
 
 from ..dbtool import currentDateTimeInTZ
 from ..dbtool import currentUnoDateTime
@@ -99,7 +99,7 @@ class User():
             if request is None:
                 # If we have a Null value here then it means that the user has abandoned
                 # the OAuth2 Wizard, there is nothing more to do except throw an exception
-                msg = self._getExceptionMessage(mtd, 501, g_oauth2)
+                msg = self._getExceptionMessage(mtd, 501, g_service)
                 raise IllegalIdentifierException(msg, source)
             user = self.Provider.getUser(source, request, name)
             metadata = database.insertUser(user)
@@ -178,8 +178,10 @@ class User():
 
     # method called from DataSource.queryContent()
     def getContent(self, authority, uri):
-        isroot = uri.getPathSegmentCount() == 0
-        return self._getContent(authority, uri.getPath(), isroot)
+        path = uri.getPath()
+        print("User.getContent() Count: %s - Path: %s" % (uri.getPathSegmentCount(), uri.getPath()))
+        isroot = path == g_ucbseparator or uri.getPathSegmentCount() == 0
+        return self._getContent(authority, path.removesuffix('/'), isroot)
 
     def setLock(self):
         if self._lock is not None:
