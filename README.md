@@ -29,7 +29,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][4] and [Data Protection Policy][5].**
 
-# version [1.4.0][6]
+# version [1.4.1][6]
 
 ## Introduction:
 
@@ -455,7 +455,34 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - Added binaries needed for Python libraries to work on Linux and LibreOffice 24.8 (ie: Python 3.9).
 - Many fixes...
 
-### What remains to be done for version 1.4.0:
+### What has been done for version 1.4.1:
+
+- Updated the [Python attrs][125] package to version 25.1.0.
+- Updated the [Python beautifulsoup4][97] package to version 4.13.3.
+- Updated the [Python certifi][98] package to version 2025.1.31.
+- Updated the [Python cffi][99] package to version 1.17.1.
+- Updated the [Python charset-normalizer][100] package to version 3.4.1.
+- Updated the [Python extruct][102] package to version 0.18.0.
+- Updated the [Python html-text][103] package to version 0.7.0.
+- Updated the [Python idna][89] package to version 3.10.
+- Updated the [Python isodate][131] package to version 0.7.2.
+- Updated the [Python jsonpath_ng][105] package to version 1.7.0.
+- Updated the [Python lxml][106] package to version 5.3.1.
+- Updated the [Python packaging][108] package to version 24.2.
+- Updated the [Python parsel][109] package to version 1.10.0.
+- Updated the [Python pyparsing][111] package to version 3.2.1.
+- Updated the [Python rdflib][132] package to version 7.1.3.
+- Updated the [Python selenium][114] package to version 4.28.1.
+- Updated the [Python setuptools][115] package to version 75.8.0.
+- Updated the [Python six][133] package to version 1.17.0.
+- Updated the [Python tqdm][91] package to version 4.67.1.
+- Updated the [Python trio][118] package to version 0.29.0.
+- Updated the [Python urllib3][120] package to version 2.3.0.
+- Updated the [Python validators][121] package to version 0.34.0.
+- Updated the [Python w3lib][122] package to version 2.3.1.
+- Support for Python version 3.13.
+
+### What remains to be done for version 1.4.1:
 
 - Add new language for internationalization...
 
@@ -591,3 +618,6 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [128]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/registration/OAuth2Redirect.md>
 [129]: <https://ant.apache.org/>
 [130]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/build.xml>
+[131]: <https://pypi.org/project/isodate/>
+[132]: <https://pypi.org/project/rdflib/>
+[133]: <https://pypi.org/project/six/>

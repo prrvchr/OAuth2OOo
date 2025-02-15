@@ -29,7 +29,7 @@
 
 **L'utilisation de ce logiciel vous soumet à nos [Conditions d'Utilisation][4] et à notre [Politique de Protection des Données][5].**
 
-# version [1.4.0][6]
+# version [1.4.1][6]
 
 ## Introduction:
 
@@ -455,7 +455,34 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 - Ajout des fichiers binaires nécessaires aux bibliothèques Python pour fonctionner sous Linux et LibreOffice 24.8 (ie: Python 3.9).
 - De nombreuses corrections...
 
-### Que reste-t-il à faire pour la version 1.4.0:
+### Ce qui a été fait pour la version 1.4.1:
+
+- Mise à jour du paquet [Python attrs][125] vers la version 25.1.0.
+- Mise à jour du paquet [Python beautifulsoup4][97] vers la version 4.13.3.
+- Mise à jour du paquet [Python certifi][98] vers la version 2025.1.31.
+- Mise à jour du paquet [Python cffi][99] vers la version 1.17.1.
+- Mise à jour du paquet [Python charset-normalizer][100] vers la version 3.4.1.
+- Mise à jour du paquet [Python extruct][102] vers la version 0.18.0.
+- Mise à jour du paquet [Python html-text][103] vers la version 0.7.0.
+- Mise à jour du paquet [Python idna][89] vers la version 3.10.
+- Mise à jour du paquet [Python isodate][131] vers la version 0.7.2.
+- Mise à jour du paquet [Python jsonpath_ng][105] vers la version 1.7.0.
+- Mise à jour du paquet [Python lxml][106] vers la version 5.3.1.
+- Mise à jour du paquet [Python packaging][108] vers la version 24.2.
+- Mise à jour du paquet [Python parsel][109] vers la version 1.10.0.
+- Mise à jour du paquet [Python pyparsing][111] vers la version 3.2.1.
+- Mise à jour du paquet [Python rdflib][132] vers la version 7.1.3.
+- Mise à jour du paquet [Python selenium][114] vers la version 4.28.1.
+- Mise à jour du paquet [Python setuptools][115] vers la version 75.8.0.
+- Mise à jour du paquet [Python six][133] vers la version 1.17.0.
+- Mise à jour du paquet [Python tqdm][91] vers la version 4.67.1.
+- Mise à jour du paquet [Python trio][118] vers la version 0.29.0.
+- Mise à jour du paquet [Python urllib3][120] vers la version 2.3.0.
+- Mise à jour du paquet [Python validators][121] vers la version 0.34.0.
+- Mise à jour du paquet [Python w3lib][122] vers la version 2.3.1.
+- Support de Python version 3.13.
+
+### Que reste-t-il à faire pour la version 1.4.1:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -591,3 +618,6 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 [128]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/registration/OAuth2Redirect.md>
 [129]: <https://ant.apache.org/>
 [130]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/build.xml>
+[131]: <https://pypi.org/project/isodate/>
+[132]: <https://pypi.org/project/rdflib/>
+[133]: <https://pypi.org/project/six/>
