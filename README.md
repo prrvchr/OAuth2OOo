@@ -493,7 +493,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [3]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_en>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
-[6]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-140>
+[6]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-141>
 [7]: <https://prrvchr.github.io>
 [8]: <https://www.libreoffice.org/download/download/>
 [9]: <https://www.openoffice.org/download/index.html>
@@ -515,7 +515,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [25]: <https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-130>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.4.0#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.4.1#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
