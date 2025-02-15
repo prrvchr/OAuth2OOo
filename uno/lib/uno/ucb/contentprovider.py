@@ -146,7 +146,7 @@ class ContentProvider(unohelper.Base,
 
     def _getPresentationUrl(self, url):
         # FIXME: Sometimes the url can end with a dot, it must be removed
-        url = url.removesuffix('.')
+        url = url.rstrip('.')
         uri = parseUrl(self._transformer, url)
         if uri is not None:
             url = self._transformer.getPresentation(uri, True)

@@ -105,7 +105,7 @@ class DataSource():
             msg = self._logger.resolveString(311, url)
             raise IllegalIdentifierException(msg, source)
         user.setLock()
-        content = user.getContent(authority, uri)
+        content = user.getContentByUri(authority, uri)
         if content is None:
             msg = self._logger.resolveString(311, url)
             raise IllegalIdentifierException(msg, source)
