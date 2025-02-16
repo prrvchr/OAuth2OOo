@@ -29,7 +29,7 @@
              xmlns:l="http://libreoffice.org/extensions/description/2011"
              xmlns:xlink="http://www.w3.org/1999/xlink">
   <identifier value="io.github.prrvchr.OAuth2OOo"/>
-  <version value="1.4.0"/>
+  <version value="1.4.1"/>
   <update-download>
     <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt"/>
   </update-download>
@@ -42,7 +42,7 @@
     <name xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr" lang="fr">OAuth2OOo</name>
   </publisher>
   <release-notes>
-    <src xlink:href="https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-140" lang="en"/>
-    <src xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-140" lang="fr"/>
+    <src xlink:href="https://prrvchr.github.io/OAuth2OOo/#what-has-been-done-for-version-141" lang="en"/>
+    <src xlink:href="https://prrvchr.github.io/OAuth2OOo/README_fr#ce-qui-a-%C3%A9t%C3%A9-fait-pour-la-version-141" lang="fr"/>
   </release-notes>
 </description>
