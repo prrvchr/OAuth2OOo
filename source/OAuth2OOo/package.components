@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://openoffice.org/2010/uno-components">
+  <component loader="com.sun.star.loader.Python" uri="service/OAuth2Service.py">
+    <implementation name="io.github.prrvchr.OAuth2OOo.OAuth2Service">
+      <service name="io.github.prrvchr.OAuth2OOo.OAuth2Service"/>
+    </implementation>
+  </component>
+  <component loader="com.sun.star.loader.Python" uri="service/OAuth2Dispatcher.py">
+    <implementation name="io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher">
+      <service name="io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher"/>
+    </implementation>
+  </component>
+  <component loader="com.sun.star.loader.Python" uri="service/OAuth2Handler.py">
+    <implementation name="io.github.prrvchr.OAuth2OOo.OAuth2Handler">
+      <service name="io.github.prrvchr.OAuth2OOo.OAuth2Handler"/>
+    </implementation>
+  </component>
+  <component loader="com.sun.star.loader.Python" uri="service/OAuth2Plugin.py">
+    <implementation name="io.github.prrvchr.OAuth2OOo.OAuth2Plugin">
+      <service name="io.github.prrvchr.OAuth2OOo.OAuth2Plugin"/>
+    </implementation>
+  </component>
+  <component loader="com.sun.star.loader.Python" uri="service/OptionsHandler.py">
+    <implementation name="io.github.prrvchr.OAuth2OOo.OptionsHandler">
+      <service name="io.github.prrvchr.OAuth2OOo.OptionsHandler"/>
+    </implementation>
+  </component>
+</components>

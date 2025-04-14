@@ -23,20 +23,14 @@
 ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
--->
-<!DOCTYPE manifest:manifest PUBLIC "-//OpenOffice.org//DTD Manifest 1.0//EN" "Manifest.dtd">
-<manifest:manifest xmlns:manifest="http://openoffice.org/2001/manifest">
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-typelibrary;type=RDB" manifest:full-path="types.rdb"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.basic-library" manifest:full-path="OAuth2OOo/"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="service/OAuth2Service.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="service/OptionsHandler.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="OptionsDialog.xcu"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-schema" manifest:full-path="Options.xcs"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="Options.xcu"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="service/OAuth2Dispatcher.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="ProtocolHandler.xcu"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="service/OAuth2Handler.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="InteractionHandler.xcu"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Python" manifest:full-path="service/OAuth2Plugin.py"/>
-    <manifest:file-entry manifest:media-type="application/vnd.sun.star.configuration-data" manifest:full-path="CalcAddIns.xcu"/>
+--><manifest:manifest xmlns:manifest="http://openoffice.org/2001/manifest">
+  <manifest:file-entry manifest:full-path="types.rdb" manifest:media-type="application/vnd.sun.star.uno-typelibrary;type=RDB"/>
+  <manifest:file-entry manifest:full-path="OAuth2OOo/" manifest:media-type="application/vnd.sun.star.basic-library"/>
+  <manifest:file-entry manifest:full-path="Options.xcs" manifest:media-type="application/vnd.sun.star.configuration-schema"/>
+  <manifest:file-entry manifest:full-path="OptionsDialog.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+  <manifest:file-entry manifest:full-path="Options.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+  <manifest:file-entry manifest:full-path="ProtocolHandler.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+  <manifest:file-entry manifest:full-path="InteractionHandler.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+  <manifest:file-entry manifest:full-path="CalcAddIns.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+  <manifest:file-entry manifest:full-path="package.components" manifest:media-type="application/vnd.sun.star.uno-components"/>
 </manifest:manifest>

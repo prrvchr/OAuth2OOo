@@ -47,7 +47,8 @@ import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = f'{g_identifier}.OptionsHandler'
+g_ImplementationName = 'io.github.prrvchr.OAuth2OOo.OptionsHandler'
+g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.OptionsHandler', )
 
 
 class OptionsHandler(unohelper.Base,
@@ -94,5 +95,5 @@ class OptionsHandler(unohelper.Base,
 
 g_ImplementationHelper.addImplementation(OptionsHandler,                            # UNO object class
                                          g_ImplementationName,                      # Implementation name
-                                        (g_ImplementationName,))                    # List of implemented services
+                                         g_ServiceNames)                    # List of implemented services
 

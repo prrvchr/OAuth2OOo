@@ -43,7 +43,8 @@ import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = '%s.OAuth2Dispatcher' % g_identifier
+g_ImplementationName = 'io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher'
+g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher', )
 
 
 class OAuth2Dispatcher(unohelper.Base,
@@ -85,5 +86,5 @@ class OAuth2Dispatcher(unohelper.Base,
 
 g_ImplementationHelper.addImplementation(OAuth2Dispatcher,
                                          g_ImplementationName,
-                                        (g_ImplementationName,))
+                                         g_ServiceNames)
 
