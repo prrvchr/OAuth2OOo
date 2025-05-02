@@ -67,30 +67,16 @@ ___
 
 ## Prérequis:
 
-Afin de profiter des dernières versions des bibliothèques Python utilisées dans OAuth2OOo, la version 2 de Python a été abandonnée au profit de **Python 3.8 minimum**.  
-Cela signifie que **OAuth2OOo ne supporte plus OpenOffice et LibreOffice 6.x sous Windows depuis sa version 1.1.0**.
-Je ne peux que vous conseiller **de migrer vers LibreOffice 7.x**.
+La version minimale de LibreOffice prise en charge par l'extension OAuth2OOo dépend de la façon dont vous avez installé LibreOffice sur votre ordinateur:
 
-Les prérequis dépendent de la **plateforme (architecture)** sur laquelle l'extension est installée:
+- **Quelle que soit la plateforme**, si vous avez installé LibreOffice depuis le [site de téléchargement de LibreOffice][23], **la version minimale de LibreOffice est 7.0**.
 
-- Si vous êtes **sous Windows (win32 or win_amd64)** vous devez utiliser **LibreOffice version 7.x minimum**.
-
-- Si vous êtes **sous Linux (x86_64) avec une version Python de 3.8 à 3.12** vous devez utiliser **LibreOffice version 6.x ou supérieure** (LibreOffice version 7.x est fortement recommandée).
-
-- Pour toutes les autres **plateformes / architectures (Linux, macOS... / aarch64, arm64...) ou version de Python**, vous devez:
-  - Vous assurez que votre version de Python est 3.8 minimum.
-  - Télécharger le fichier [requirements.txt][23].
-  - Installer à l'aide de [pip][24], les paquets Python nécessaires à l'extension avec la commande:  
+- **Sous Linux** si vous avez utilisé le gestionnaire de paquets pour installer LibreOffice, **la version minimale de LibreOffice est 6.0**. Cependant, vous devez vous assurer que la version de Python fournie par le système n'est pas inférieure à 3.8.  
+De plus, vos packages Python fournis par le système peuvent être obsolètes. La journalisation de l'extension vous permettera de verifier si c'est le cas. Elle est accessible via le menu: **Outils -> Options -> Internet -> Protocole OAuth2-> Voir journal -> Info système** et nécessite le redemarrage de LibreOffice aprés son activation.  
+Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec cette procédure:  
+    - Télécharger le fichier [requirements.txt][24].
+    - Installer à l'aide de [pip][25], les paquets Python nécessaires à l'extension avec la commande:  
     `pip install requirements.txt`
-  - Installer l'extension sous LibreOffice version 6.x ou supérieure.
-
-**Sous Linux et macOS les paquets** utilisés par l'extension, peuvent s'il sont déja installé provenir du système et donc, **peuvent ne pas être à jour**.  
-Afin de s'assurer que vos paquets Python sont à jour il est recommandé d'utiliser l'option **Info système** dans les Options de l'extension accessible par:  
-**Outils -> Options -> Internet -> Protocole OAuth2 -> Voir journal -> Info système**  
-Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec la commande:  
-`sudo -i pip3 install --upgrade <package-name>`
-
-Pour plus d'information voir: [Ce qui a été fait pour la version 1.3.0][25].
 
 Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.  
 Pour installer le PPA de Mozilla veuillez taper la commande:  
@@ -166,6 +152,21 @@ Le protocole OAuth2 permet d'accéder aux ressources de serveurs, après accepta
 La révocation a lieu dans la gestion des applications associées à votre compte.
 
 Plus aucun mot de passe n'est stocké dans LibreOffice.
+
+___
+
+## Comment créer l'extension:
+
+Normalement, l'extension est créée avec Eclipse pour Java et [LOEclipse][37]. Pour contourner Eclipse, j'ai modifié LOEclipse afin de permettre la création de l'extension avec Apache Ant.  
+Pour créer l'extension jdbcDriverOOo avec l'aide d'Apache Ant, vous devez:
+- Installer le [SDK Java][38] version 8 ou supérieure.
+- Installer [Apache Ant][39] version 1.9.1 ou supérieure.
+- Installer [LibreOffice et son SDK][40] version 7.x ou supérieure.
+- Cloner le dépôt [OAuth2OOo][41] sur GitHub dans un dossier.
+- Depuis ce dossier, accédez au répertoire: `source/OAuth2OOo/`
+- Dans ce répertoire, modifiez le fichier `build.properties` afin que les propriétés `office.install.dir` et `sdk.dir` pointent vers les dossiers d'installation de LibreOffice et de son SDK, respectivement.
+- Lancez la création de l'archive avec la commande: `ant`
+- Vous trouverez l'archive générée dans le sous-dossier: `dist/`
 
 ___
 
@@ -482,7 +483,15 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 - Mise à jour du paquet [Python w3lib][122] vers la version 2.3.1.
 - Support de Python version 3.13.
 
-### Que reste-t-il à faire pour la version 1.4.1:
+### Ce qui a été fait pour la version 1.5.0:
+
+- Mise à jour du paquet [Python packaging][108] vers la version 25.0.
+- Rétrogradage du paquet [Python setuptools][115] vers la version 75.3.2, afin d'assurer la prise en charge de Python 3.8.
+- Mise à jour du paquet [Python h11][134] vers la version 0.16.0 afin de répondre à l'alerte de securité [Dependabot #16][135]
+- Déploiement de l'enregistrement passif permettant une installation beaucoup plus rapide des extensions et de différencier les services UNO enregistrés de ceux fournis par une implémentation Java ou Python. Cet enregistrement passif est assuré par l'extension [LOEclipse][136] via les [PR#152][137] et [PR#157][138].
+
+
+### Que reste-t-il à faire pour la version 1.5.0:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -621,3 +630,5 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 [131]: <https://pypi.org/project/isodate/>
 [132]: <https://pypi.org/project/rdflib/>
 [133]: <https://pypi.org/project/six/>
+[134]: <https://pypi.org/project/h11/>
+[135]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/16>

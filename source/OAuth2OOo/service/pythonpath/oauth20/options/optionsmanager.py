@@ -4,7 +4,7 @@
 """
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
-║   Copyright (c) 2020-24 https://prrvchr.github.io                                  ║
+║   Copyright (c) 2020-25 https://prrvchr.github.io                                  ║
 ║                                                                                    ║
 ║   Permission is hereby granted, free of charge, to any person obtaining            ║
 ║   a copy of this software and associated documentation files (the "Software"),     ║
@@ -53,12 +53,13 @@ import traceback
 class OptionsManager(unohelper.Base):
     def __init__(self, ctx, window, logger):
         self._ctx = ctx
-        self._logger = logger
         self._model = OptionsModel(ctx)
         window.addEventListener(OptionsListener(self))
         self._view = OptionsView(window)
-        self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
         self._logmanager = LogManager(ctx, window, 'requirements.txt', g_defaultlog)
+        self._logmanager.initView()
+        self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
+        self._logger = logger
         self._logger.logprb(INFO, 'OptionsManager', '__init__()', 151)
 
     _restart = False

@@ -67,30 +67,16 @@ ___
 
 ## Requirement:
 
-In order to take advantage of the latest versions of the Python libraries used in OAuth2OOo, version 2 of Python has been abandoned in favor of **Python 3.8 minimum**.  
-This means that **OAuth2OOo no longer supports OpenOffice and LibreOffice 6.x on Windows since version 1.1.0**.
-I can only advise you **to migrate to LibreOffice 7.x**.
+The minimum version of LibreOffice supported by the OAuth2OOo extension depends on how you installed LibreOffice on your computer:
 
-The requirement depend on the **platform (architecture)** on which the extension is installed:
+- **Regardless of platform**, if you installed LibreOffice from the [LibreOffice download site][23], **the minimum version of LibreOffice is 7.0**.
 
-- If you are **on Windows (win32 or win_amd64)** you must use **LibreOffice version 7.x minimum**.
-
-- If you are **on Linux (x86_64) with a Python version from 3.8 to 3.12** you must use **LibreOffice version 6.x or higher** (LibreOffice version 7.x is strongly recommended).
-
-- For all other **platforms / architectures (Linux, macOS... / aarch64, arm64...) or Python version**, you need:
-  - Make sure your version of Python is 3.8 minimum.
-  - Download the file [requirements.txt][23].
-  - Install using [pip][24], the Python packages necessary for the extension with the command:  
+- **On Linux**, if you used the package manager to install LibreOffice, **the minimum version of LibreOffice is 6.0**. However, you must ensure that the system-provided Python version is not lower than 3.8.  
+In addition, your system-provided Python packages can be out of date. The extension's logging will allow you to check if this is the case. It is accessible via the menu: **Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System Info** and requires restarting LibreOffice after activation.  
+If outdated packages appear, you can update them with this procedure:  
+    - Download the file [requirements.txt][24].
+    - Install using [pip][25], the Python packages necessary for the extension with the command:  
     `pip install requirements.txt`
-  - Install the extension under LibreOffice version 6.x or higher.
-
-**On Linux and macOS the packages** used by the extension, if already installed, may come from the system and therefore **may not be up to date**.  
-To ensure that your Python packages are up to date it is recommended to use the **System Info** option in the extension Options accessible by:  
-**Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System Info**  
-If outdated packages appear, you can update them with the command:  
-`sudo -i pip3 install --upgrade <package-name>`
-
-For more information see: [What has been done for version 1.3.0][25].
 
 If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.  
 To install the Mozilla PPA please type the command:  
@@ -166,6 +152,21 @@ The OAuth2 protocol allows access to server resources, after accepting the conne
 The revocation takes place in the management of the applications associated with your account.
 
 No more password is stored in LibreOffice.
+
+___
+
+## How to build the extension:
+
+Normally, the extension is created with Eclipse for Java and [LOEclipse][37]. To work around Eclipse, I modified LOEclipse to allow the extension to be created with Apache Ant.  
+To create the jdbcDriverOOo extension with the help of Apache Ant, you need to:
+- Install the [Java SDK][38] version 17 or higher.
+- Install [Apache Ant][39] version 1.9.1 or higher.
+- Install [LibreOffice and its SDK][40] version 7.x or higher.
+- Clone the [OAuth2OOo][41] repository on GitHub into a folder.
+- From this folder, move to the directory: `source/OAuth2OOo/`
+- In this directory, edit the file: `build.properties` so that the `office.install.dir` and `sdk.dir` properties point to the folders where LibreOffice and its SDK were installed, respectively.
+- Start the archive creation process using the command: `ant`
+- You will find the generated archive in the subfolder: `dist/`
 
 ___
 
@@ -482,7 +483,13 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - Updated the [Python w3lib][122] package to version 2.3.1.
 - Support for Python version 3.13.
 
-### What remains to be done for version 1.4.1:
+### What has been done for version 1.5.0:
+
+- Updated the [Python packaging][108] package to version 25.0.
+- Downgrade the [Python setuptools][115] package to version 75.3.2. to ensure support for Python 3.8.
+- Updated the [Python h11][134] package to version 0.16.0 to address the [Dependabot #16][135] security alert.
+
+### What remains to be done for version 1.5.0:
 
 - Add new language for internationalization...
 
@@ -621,3 +628,5 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [131]: <https://pypi.org/project/isodate/>
 [132]: <https://pypi.org/project/rdflib/>
 [133]: <https://pypi.org/project/six/>
+[134]: <https://pypi.org/project/h11/>
+[135]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/16>
