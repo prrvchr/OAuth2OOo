@@ -27,47 +27,44 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from com.sun.star.sdbcx import XDataDefinitionSupplier
-from com.sun.star.sdbcx import XCreateCatalog
-from com.sun.star.sdbcx import XDropCatalog
+from com.sun.star.sdbc import SQLException
 
-from ..driver import Driver as DriverBase
+from .unotool import checkVersion
+from .unotool import getExtensionVersion
+from .unotool import getLibreOfficeInfo
+
+from .jdbcdriver import g_extension as g_jdbcext
+from .jdbcdriver import g_identifier as g_jdbcid
+from .jdbcdriver import g_version as g_jdbcver
+
+from .configuration import g_dbname
+from .configuration import g_extension
+from .configuration import g_lover
 
 import traceback
 
 
-class Driver(DriverBase,
-             XDataDefinitionSupplier,
-             XCreateCatalog,
-             XDropCatalog):
+def checkConfiguration(ctx, logger):
+    name, version = getLibreOfficeInfo(ctx)
+    if not checkVersion(version, g_lover):
+        raise _getException(logger, 1001, 122, 123, name, version, name, g_lover)
+    version = getExtensionVersion(ctx, g_jdbcid)
+    if version is None:
+        raise _getException(logger, 1001, 121, 124, g_jdbcext, g_extension)
+    if not checkVersion(version, g_jdbcver):
+        raise _getException(logger, 1001, 122, 125, version, g_jdbcext, g_jdbcver)
 
-    def __init__(self, ctx, lock, logger, service, implementation):
-        services = (implementation, 'com.sun.star.sdbc.Driver', 'com.sun.star.sdbcx.Driver')
-        DriverBase.__init__(self, ctx, lock, logger, service, implementation, services)
+def getException(logger, source, code, exc, state, resource, *args):
+    error = SQLException()
+    error.ErrorCode = code
+    error.NextException = exc
+    error.SQLState = logger.resolveString(state)
+    error.Message = logger.resolveString(resource, *args)
+    error.Context = source
+    return error
 
-    # XDataDefinitionSupplier
-    def getDataDefinitionByConnection(self, connection):
-        try:
-            self._logger.logprb(INFO, 'Driver', 'getDataDefinitionByConnection()', 151)
-            driver = self._getDriver()
-            return driver.getDataDefinitionByConnection(connection)
-        except SQLException as e:
-            raise e
-        except Exception as e:
-            self._logger.logprb(SEVERE, 'Driver', 'getDataDefinitionByConnection()', 152, e, traceback.format_exc())
-
-    def getDataDefinitionByURL(self, url, infos):
-        self._logger.logprb(INFO, 'Driver', 'getDataDefinitionByURL()', 161, url)
-        return self.getDataDefinitionByConnection(connect(url, infos))
-
-    # XCreateCatalog
-    def createCatalog(self, info):
-        self._logger.logprb(INFO, 'Driver', 'createCatalog()', 171)
-
-    # XDropCatalog
-    def dropCatalog(self, name, info):
-        self._logger.logprb(INFO, 'Driver', 'dropCatalog()', 181, name)
+def _getException(logger, code, state, resource, *args):
+    return getException(logger, None, code, None, state, resource, *args)
 
