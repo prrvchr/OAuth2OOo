@@ -72,7 +72,7 @@ La version minimale de LibreOffice prise en charge par l'extension OAuth2OOo dé
 - **Quelle que soit la plateforme**, si vous avez installé LibreOffice depuis le [site de téléchargement de LibreOffice][23], **la version minimale de LibreOffice est 7.0**.
 
 - **Sous Linux** si vous avez utilisé le gestionnaire de paquets pour installer LibreOffice, **la version minimale de LibreOffice est 6.0**. Cependant, vous devez vous assurer que la version de Python fournie par le système n'est pas inférieure à 3.8.  
-De plus, vos packages Python fournis par le système peuvent être obsolètes. La journalisation de l'extension vous permettera de verifier si c'est le cas. Elle est accessible via le menu: **Outils -> Options -> Internet -> Protocole OAuth2-> Voir journal -> Info système** et nécessite le redemarrage de LibreOffice aprés son activation.  
+De plus, vos packages Python fournis par le système peuvent être obsolètes. La journalisation de l'extension vous permettera de vérifier si c'est le cas. Elle est accessible via le menu: **Outils -> Options -> Internet -> Protocole OAuth2-> Voir journal -> Info système** et nécessite le redemarrage de LibreOffice aprés son activation.  
 Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec cette procédure:  
     - Télécharger le fichier [requirements.txt][24].
     - Installer à l'aide de [pip][25], les paquets Python nécessaires à l'extension avec la commande:  
@@ -158,7 +158,7 @@ ___
 ## Comment créer l'extension:
 
 Normalement, l'extension est créée avec Eclipse pour Java et [LOEclipse][37]. Pour contourner Eclipse, j'ai modifié LOEclipse afin de permettre la création de l'extension avec Apache Ant.  
-Pour créer l'extension jdbcDriverOOo avec l'aide d'Apache Ant, vous devez:
+Pour créer l'extension OAuth2OOo avec l'aide d'Apache Ant, vous devez:
 - Installer le [SDK Java][38] version 8 ou supérieure.
 - Installer [Apache Ant][39] version 1.9.1 ou supérieure.
 - Installer [LibreOffice et son SDK][40] version 7.x ou supérieure.

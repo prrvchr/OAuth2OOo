@@ -328,6 +328,8 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - Downgrade the [Python setuptools][85] package to version 75.3.2. to ensure support for Python 3.8.
 - Updated the [Python h11][105] package to version 0.16.0 to address the [Dependabot #16][106] security alert.
 - Passive registration deployment that allows for much faster installation of extensions and differentiation of registered UNO services from those provided by a Java or Python implementation. This passive registration is provided by the [LOEclipse][37] extension via [PR#152][107] and [PR#157][108].
+- It is now possible to build the oxt file of the OAuth2OOo extension only with the help of Apache Ant and a copy of the GitHub repository. The [How to build the extension][109] section has been added to the documentation.
+- Implemented [PEP 570][110] in [logging][111] to support unique multiple arguments.
 
 ### What remains to be done for version 1.5.0:
 
@@ -443,3 +445,6 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [106]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/16>
 [107]: <https://github.com/LibreOffice/loeclipse/pull/152>
 [108]: <https://github.com/LibreOffice/loeclipse/pull/157>
+[109]: <https://prrvchr.github.io/OAuth2OOo/#how-to-build-the-extension>
+[110]: <https://peps.python.org/pep-0570/>
+[111]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logwrapper.py#L109>
