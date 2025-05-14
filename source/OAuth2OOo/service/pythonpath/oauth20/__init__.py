@@ -32,7 +32,7 @@ from .options import OptionsManager
 from .model import HandlerModel
 from .model import OAuth2Model
 
-from .oauth2dispatch import OAuth2Dispatch
+from .dispatch import Dispatch
 
 from .requestparameter import RequestParameter
 
@@ -45,10 +45,10 @@ from .unotool import getConfiguration
 from .unotool import getCurrentLocale
 from .unotool import getDialog
 from .unotool import getParentWindow
-from .unotool import getPropertyValueSet
 from .unotool import getResourceLocation
 from .unotool import getStringResource
 from .unotool import getSimpleFile
+from .unotool import hasInterface
 
 from .logger import getLogger
 

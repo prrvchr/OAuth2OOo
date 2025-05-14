@@ -50,11 +50,11 @@ from .configuration import g_identifier
 import traceback
 
 
-class OAuth2Dispatch(unohelper.Base,
-                     XNotifyingDispatch):
-    def __init__(self, ctx, parent):
+class Dispatch(unohelper.Base,
+               XNotifyingDispatch):
+    def __init__(self, ctx, frame):
         self._ctx = ctx
-        self._parent = parent
+        self._frame = frame
         self._listeners = []
 
 # XNotifyingDispatch
@@ -97,7 +97,8 @@ class OAuth2Dispatch(unohelper.Base,
         if unowizard:
             wizard = createService(self._ctx, 'com.sun.star.ui.dialogs.Wizard')
         else:
-            wizard = Wizard(self._ctx, g_wizard_page, True, self._parent)
+            window = self._frame.getContainerWindow().getToolkit().getActiveTopWindow()
+            wizard = Wizard(self._ctx, g_wizard_page, True, window)
         controller = WizardController(self._ctx, wizard, close, readonly, url, user)
         if unowizard:
             arguments = ((uno.Any('[][]short', g_wizard_paths), controller), )

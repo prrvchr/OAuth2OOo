@@ -5,11 +5,6 @@
       <service name="io.github.prrvchr.OAuth2OOo.OAuth2Service"/>
     </implementation>
   </component>
-  <component loader="com.sun.star.loader.Python" uri="service/OAuth2Dispatcher.py">
-    <implementation name="io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher">
-      <service name="io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher"/>
-    </implementation>
-  </component>
   <component loader="com.sun.star.loader.Python" uri="service/OAuth2Handler.py">
     <implementation name="io.github.prrvchr.OAuth2OOo.OAuth2Handler">
       <service name="io.github.prrvchr.OAuth2OOo.OAuth2Handler"/>
@@ -23,6 +18,11 @@
   <component loader="com.sun.star.loader.Python" uri="service/OptionsHandler.py">
     <implementation name="io.github.prrvchr.OAuth2OOo.OptionsHandler">
       <service name="io.github.prrvchr.OAuth2OOo.OptionsHandler"/>
+    </implementation>
+  </component>
+  <component loader="com.sun.star.loader.Python" uri="service/Dispatcher.py">
+    <implementation name="io.github.prrvchr.OAuth2OOo.Dispatcher">
+      <service name="io.github.prrvchr.OAuth2OOo.Dispatcher"/>
     </implementation>
   </component>
 </components>

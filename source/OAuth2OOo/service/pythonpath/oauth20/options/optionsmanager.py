@@ -38,9 +38,8 @@ from .optionshandler import OptionsListener
 
 from ..logger import LogManager
 
-from ..unotool import executeFrameDispatch
+from ..unotool import executeDispatch
 from ..unotool import getDesktop
-from ..unotool import getPropertyValueSet
 
 from ..oauth20 import getOAuth2UserName
 
@@ -89,14 +88,10 @@ class OptionsManager(unohelper.Base):
                 message = self._model.getProviderName(url)
                 user = getOAuth2UserName(self._ctx, self, url, message)
             close = self._view.getAutoClose()
-            args = getPropertyValueSet({'Url': url, 'UserName': user, 'Close': close})
-            frame = getDesktop(self._ctx).getCurrentFrame()
-            if frame is not None:
-                executeFrameDispatch(self._ctx, frame, 'oauth2:wizard', args)
-                self._logger.logprb(INFO, 'OptionsManager', 'connect()', 181, user, url)
-            else:
-                self._logger.logprb(INFO, 'OptionsManager', 'connect()', 182, user, url)
+            args = {'Url': url, 'UserName': user, 'Close': close}
+            executeDispatch(self._ctx, 'oauth2:wizard', **args)
+            self._logger.logprb(INFO, 'OptionsManager', 'connect()', 181, user, url)
         except Exception as e:
             print("OptionsManager.connect() ERROR: %s - %s" % (e, traceback.format_exc()))
-            self._logger.logprb(SEVERE, 'OptionsManager', 'connect()', 183, user, url, e, traceback.format_exc())
+            self._logger.logprb(SEVERE, 'OptionsManager', 'connect()', 182, user, url, e, traceback.format_exc())
 

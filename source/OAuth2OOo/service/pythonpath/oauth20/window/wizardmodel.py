@@ -195,7 +195,8 @@ class WizardModel(TokenModel):
         self.commit()
 
     def getMessageBoxData(self):
-        return self.getDialogMessage(), self.getDialogTitle()
+        box = uno.Enum('com.sun.star.awt.MessageBoxType', 'MESSAGEBOX')
+        return box, 2, self.getDialogTitle(), self.getDialogMessage()
 
     def _getProviderData(self, provider):
         clientid = provider.getByName('ClientId')

@@ -27,7 +27,6 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
 
 from com.sun.star.frame import XDispatchProvider
@@ -35,7 +34,9 @@ from com.sun.star.frame import XDispatchProvider
 from com.sun.star.lang import XInitialization
 from com.sun.star.lang import XServiceInfo
 
-from oauth20 import OAuth2Dispatch
+from oauth20 import Dispatch
+
+from oauth20 import hasInterface
 
 from oauth20 import g_identifier
 
@@ -43,29 +44,30 @@ import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = 'io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher'
-g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher', )
+g_ImplementationName = 'io.github.prrvchr.OAuth2OOo.Dispatcher'
+g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.Dispatcher', )
 
 
-class OAuth2Dispatcher(unohelper.Base,
-                       XDispatchProvider,
-                       XInitialization,
-                       XServiceInfo):
+class Dispatcher(unohelper.Base,
+                 XDispatchProvider,
+                 XInitialization,
+                 XServiceInfo):
     def __init__(self, ctx):
         self._ctx = ctx
         self._frame = None
 
 # XInitialization
     def initialize(self, args):
-        if len(args) > 0:
+        service = 'com.sun.star.frame.Frame'
+        interface = 'com.sun.star.lang.XServiceInfo'
+        if len(args) > 0 and hasInterface(args[0], interface) and args[0].supportsService(service):
             self._frame = args[0]
 
 # XDispatchProvider
     def queryDispatch(self, url, frame, flags):
         dispatch = None
-        if url.Path in ('wizard',):
-            parent = self._frame.getContainerWindow()
-            dispatch = OAuth2Dispatch(self._ctx, parent)
+        if url.Protocol == 'oauth2:':
+            dispatch = Dispatch(self._ctx, self._frame)
         return dispatch
 
     def queryDispatches(self, requests):
@@ -83,8 +85,6 @@ class OAuth2Dispatcher(unohelper.Base,
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
-
-g_ImplementationHelper.addImplementation(OAuth2Dispatcher,
-                                         g_ImplementationName,
-                                         g_ServiceNames)
-
+g_ImplementationHelper.addImplementation(Dispatcher,                      # UNO object class
+                                         g_ImplementationName,            # Implementation name
+                                         g_ServiceNames)                  # List of implemented services

@@ -30,7 +30,7 @@
   xmlns:oor="http://openoffice.org/2001/registry"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <node oor:name="HandlerSet">
-    <node oor:name="io.github.prrvchr.OAuth2OOo.OAuth2Dispatcher" oor:op="replace">
+    <node oor:name="io.github.prrvchr.OAuth2OOo.Dispatcher" oor:op="replace">
       <prop oor:name="Protocols">
         <value>oauth2:*</value>
       </prop>

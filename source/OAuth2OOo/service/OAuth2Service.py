@@ -49,7 +49,6 @@ from oauth20 import OAuth2OOo
 from oauth20 import executeDispatch
 from oauth20 import getConfiguration
 from oauth20 import isAuthorized
-from oauth20 import getPropertyValueSet
 
 from oauth20 import getSessionMode
 
@@ -93,7 +92,7 @@ class OAuth2Service(unohelper.Base,
             if not isAuthorized(urls, scopes, providers, url, user):
                 # FIXME: The Url and User name must not be able to be changed (ie: ReadOnly)
                 args = {'Url': url, 'UserName': user, 'ReadOnly': True}
-                executeDispatch(ctx, 'oauth2:wizard', getPropertyValueSet(args))
+                executeDispatch(ctx, 'oauth2:wizard', **args)
                 if not isAuthorized(urls, scopes, providers, url, user):
                     # The OAuth2 Wizard has been canceled
                     return None
