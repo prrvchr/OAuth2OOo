@@ -86,7 +86,7 @@ import traceback
 def getDuration(delta):
     days, hours, minutes = delta.days, delta.seconds // 3600, delta.seconds % 3600 // 60
     seconds = delta.seconds - hours * 3600 - minutes * 60
-    duration = uno.createUnoStruct('io.github.prrvchr.css.util.Duration')
+    duration = uno.createUnoStruct('com.sun.star.util.Duration')
     duration.Days = days
     duration.Hours = hours
     duration.Minutes = minutes
