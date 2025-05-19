@@ -327,9 +327,10 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - Updated the [Python packaging][78] package to version 25.0.
 - Downgrade the [Python setuptools][85] package to version 75.3.2. to ensure support for Python 3.8.
 - Updated the [Python h11][105] package to version 0.16.0 to address the [Dependabot #16][106] security alert.
-- Passive registration deployment that allows for much faster installation of extensions and differentiation of registered UNO services from those provided by a Java or Python implementation. This passive registration is provided by the [LOEclipse][37] extension via [PR#152][107] and [PR#157][108].
-- It is now possible to build the oxt file of the OAuth2OOo extension only with the help of Apache Ant and a copy of the GitHub repository. The [How to build the extension][109] section has been added to the documentation.
-- Implemented [PEP 570][110] in [logging][111] to support unique multiple arguments.
+- Passive registration deployment that allows for much faster installation of extensions and differentiation of registered UNO services from those provided by a Java or Python implementation. This passive registration is provided by the [LOEclipse][107] extension via [PR#152][108] and [PR#157][109].
+- Modified [LOEclipse][107] to support the new `rdb` file format produced by the `unoidl-write` compilation utility. `idl` files have been updated to support both available compilation tools: idlc and unoidl-write.
+- It is now possible to build the oxt file of the OAuth2OOo extension only with the help of Apache Ant and a copy of the GitHub repository. The [How to build the extension][110] section has been added to the documentation.
+- Implemented [PEP 570][111] in [logging][112] to support unique multiple arguments.
 
 ### What remains to be done for version 1.5.0:
 
@@ -443,8 +444,9 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [104]: <https://pypi.org/project/six/>
 [105]: <https://pypi.org/project/h11/>
 [106]: <https://github.com/prrvchr/OAuth2OOo/security/dependabot/16>
-[107]: <https://github.com/LibreOffice/loeclipse/pull/152>
-[108]: <https://github.com/LibreOffice/loeclipse/pull/157>
-[109]: <https://prrvchr.github.io/OAuth2OOo/#how-to-build-the-extension>
-[110]: <https://peps.python.org/pep-0570/>
-[111]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logwrapper.py#L109>
+[107]: <https://github.com/LibreOffice/loeclipse>
+[108]: <https://github.com/LibreOffice/loeclipse/pull/152>
+[109]: <https://github.com/LibreOffice/loeclipse/pull/157>
+[110]: <https://prrvchr.github.io/OAuth2OOo/#how-to-build-the-extension>
+[111]: <https://peps.python.org/pep-0570/>
+[112]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logwrapper.py#L109>
