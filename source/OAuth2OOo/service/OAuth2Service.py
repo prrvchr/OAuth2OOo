@@ -92,7 +92,7 @@ class OAuth2Service(unohelper.Base,
             if not isAuthorized(urls, scopes, providers, url, user):
                 # FIXME: The Url and User name must not be able to be changed (ie: ReadOnly)
                 args = {'Url': url, 'UserName': user, 'ReadOnly': True}
-                executeDispatch(ctx, 'oauth2:wizard', **args)
+                executeDispatch(ctx, 'oauth2:Wizard', **args)
                 if not isAuthorized(urls, scopes, providers, url, user):
                     # The OAuth2 Wizard has been canceled
                     return None

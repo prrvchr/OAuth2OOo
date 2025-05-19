@@ -77,7 +77,7 @@ class TokenModel(BaseModel):
     def isAuthorized(self):
         if not self.hasAuthorization():
             args = {'Url': self._url, 'UserName': self._user, 'ReadOnly': True}
-            executeDispatch(self._ctx, 'oauth2:wizard', **args)
+            executeDispatch(self._ctx, 'oauth2:Wizard', **args)
             return self.hasAuthorization()
         return True
 

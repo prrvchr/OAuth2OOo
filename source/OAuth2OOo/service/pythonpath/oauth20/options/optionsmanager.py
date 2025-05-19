@@ -89,7 +89,7 @@ class OptionsManager(unohelper.Base):
                 user = getOAuth2UserName(self._ctx, self, url, message)
             close = self._view.getAutoClose()
             args = {'Url': url, 'UserName': user, 'Close': close}
-            executeDispatch(self._ctx, 'oauth2:wizard', **args)
+            executeDispatch(self._ctx, 'oauth2:Wizard', **args)
             self._logger.logprb(INFO, 'OptionsManager', 'connect()', 181, user, url)
         except Exception as e:
             print("OptionsManager.connect() ERROR: %s - %s" % (e, traceback.format_exc()))

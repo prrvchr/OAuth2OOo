@@ -67,7 +67,7 @@ class Dispatch(unohelper.Base,
     def dispatch(self, uri, arguments):
         state = FAILURE
         result = ()
-        if uri.Path == 'wizard':
+        if uri.Path == 'Wizard':
             url = user = ''
             readonly = False
             close = True
