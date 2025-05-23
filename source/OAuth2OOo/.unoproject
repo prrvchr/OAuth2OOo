@@ -1,0 +1,10 @@
+#UNO project configuration file
+#Sun May 18 13:15:52 CEST 2025
+project.build=build
+project.idl=/idl
+project.implementation=OAuth2OOo
+project.language=Python
+project.ooo=LibreOffice 7.6
+project.prefix=io.github.prrvchr
+project.sdk=7.6.7.2
+project.srcdir=/service
