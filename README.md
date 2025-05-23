@@ -29,7 +29,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][4] and [Data Protection Policy][5].**
 
-# version [1.4.1][6]
+# version [1.5.0][6]
 
 ## Introduction:
 
@@ -160,7 +160,7 @@ ___
 Normally, the extension is created with Eclipse for Java and [LOEclipse][37]. To work around Eclipse, I modified LOEclipse to allow the extension to be created with Apache Ant.  
 To create the OAuth2OOo extension with the help of Apache Ant, you need to:
 - Install the [Java SDK][38] version 17 or higher.
-- Install [Apache Ant][39] version 1.9.1 or higher.
+- Install [Apache Ant][39] version 1.10.0 or higher.
 - Install [LibreOffice and its SDK][40] version 7.x or higher.
 - Clone the [OAuth2OOo][41] repository on GitHub into a folder.
 - From this folder, move to the directory: `source/OAuth2OOo/`
@@ -219,7 +219,7 @@ ___
 [25]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
 [26]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [27]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.4.1#right>
+[28]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.5.0#right>
 [29]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
 [30]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
 [31]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
