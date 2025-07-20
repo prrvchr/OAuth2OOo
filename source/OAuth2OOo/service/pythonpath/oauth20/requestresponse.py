@@ -279,7 +279,7 @@ class RequestResponse(unohelper.Base,
         return getDuration(self._response.elapsed)
     @property
     def DataSink(self):
-        return InputStream(self._response)
+        return DataStream(self._response)
 
     def close(self):
         self._response.close()
@@ -318,9 +318,12 @@ class RequestResponse(unohelper.Base,
         delimiter = separator if separator != '' else None
         return Enumerator(self._response.iter_lines(chunk, decode, delimiter), decode)
 
+    def getInputStream(self, chunk, decode):
+        return InputStream(self._response, chunk, decode)
 
-class InputStream(unohelper.Base,
-                  XInputStream):
+
+class DataStream(unohelper.Base,
+                 XInputStream):
     def __init__(self, response):
         self._response = response
         self._input = response.raw
@@ -350,6 +353,46 @@ class InputStream(unohelper.Base,
         return self._input.tell()
     def getLength(self):
         return self._length
+
+
+class InputStream(unohelper.Base,
+                  XInputStream):
+    def __init__(self, response, chunk, decode):
+        self._response = response
+        self._iterator = response.iter_content(chunk, decode)
+        self._chunk = chunk
+        self._buffer = b''
+
+    #XInputStream
+    def readBytes(self, sequence, length):
+        sequence = uno.ByteSequence(self._readBytes(length))
+        return len(sequence), sequence
+
+    def readSomeBytes(self, sequence, length):
+        return self.readBytes(sequence, length)
+
+    def skipBytes(self, length):
+        self._readBytes(length)
+
+    def available(self):
+        return self._chunk
+
+    def closeInput(self):
+        self._response.close()
+
+    def _readBytes(self, length):
+        buffer = self._buffer
+        size = len(buffer)
+        if size < length:
+            try:
+                while size < length:
+                    chunk = next(self._iterator)
+                    buffer += chunk
+                    size += len(chunk)
+            except StopIteration:
+                pass
+        self._buffer = buffer[length:]
+        return buffer[:length]
 
 
 class Enumerator(unohelper.Base,
