@@ -33,8 +33,6 @@ import unohelper
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
-from com.sun.star.io import XInputStream
-
 from com.sun.star.ucb.ConnectionMode import ONLINE
 from com.sun.star.ucb.ConnectionMode import OFFLINE
 
@@ -59,6 +57,7 @@ from .requestresponse import getDuration
 from .requestresponse import getExceptionMessage
 from .requestresponse import raiseHTTPException
 from .requestresponse import raiseRequestException
+from .requestresponse import InputStream
 from .requestresponse import RequestResponse
 
 from .unotool import getSimpleFile
@@ -249,50 +248,9 @@ def getSessionMode(ctx, host, port=80):
         mode = ONLINE
     return mode
 
-
 def getInputStream(ctx, source, session, cls, mtd, parameter, timeout, chunk, decode):
     response = execute(ctx, source, session, cls, mtd, parameter, timeout, True)
     return InputStream(response, chunk, decode)
-
-
-class InputStream(unohelper.Base,
-                  XInputStream):
-    def __init__(self, response, chunk, decode):
-        self._response = response
-        self._iterator = response.iter_content(chunk, decode)
-        self._chunk = chunk
-        self._buffer = b''
-
-    #XInputStream
-    def readBytes(self, sequence, length):
-        sequence = uno.ByteSequence(self._readBytes(length))
-        return len(sequence), sequence
-
-    def readSomeBytes(self, sequence, length):
-        return self.readBytes(sequence, length)
-
-    def skipBytes(self, length):
-        self._readBytes(length)
-
-    def available(self):
-        return self._chunk
-
-    def closeInput(self):
-        self._response.close()
-
-    def _readBytes(self, length):
-        buffer = self._buffer
-        size = len(buffer)
-        if size < length:
-            try:
-                while size < length:
-                    chunk = next(self._iterator)
-                    buffer += chunk
-                    size += len(chunk)
-            except StopIteration:
-                pass
-        self._buffer = buffer[length:]
-        return buffer[:length]
 
 
 def _raiseResponseException(ctx, source, cls, mtd, code, parameter, response):

@@ -332,7 +332,13 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 - It is now possible to build the oxt file of the OAuth2OOo extension only with the help of Apache Ant and a copy of the GitHub repository. The [How to build the extension][110] section has been added to the documentation.
 - Implemented [PEP 570][111] in [logging][112] to support unique multiple arguments.
 
-### What remains to be done for version 1.5.0:
+### What has been done for version 1.5.1:
+
+Added a BASIC macro [GithubDownloadRequest][113] to download the latest version of OAuth2OOo from the revisions on the Github site.  
+To enable uploading to Github, this macro uses two HTTP requests, one to initialize a session with cookies and the other to perform the upload.  
+This might help me find a solution to allow automatic updating of extensions in LibreOffice from Github revisions.
+
+### What remains to be done for version 1.5.1:
 
 - Add new language for internationalization...
 
@@ -450,3 +456,4 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 [110]: <https://prrvchr.github.io/OAuth2OOo/#how-to-build-the-extension>
 [111]: <https://peps.python.org/pep-0570/>
 [112]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logwrapper.py#L109>
+[113]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GithubDownloadRequest.xba>

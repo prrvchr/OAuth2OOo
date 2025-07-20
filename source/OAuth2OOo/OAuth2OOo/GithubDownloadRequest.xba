@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="HTTPGetRequest" script:language="StarBasic">
+
+Rem ╔════════════════════════════════════════════════════════════════════════════════════╗
+Rem ║                                                                                    ║
+Rem ║   Copyright (c) 2020-25 https://prrvchr.github.io                                  ║
+Rem ║                                                                                    ║
+Rem ║   Permission is hereby granted, free of charge, to any person obtaining            ║
+Rem ║   a copy of this software and associated documentation files (the &quot;Software&quot;),     ║
+Rem ║   to deal in the Software without restriction, including without limitation        ║
+Rem ║   the rights to use, copy, modify, merge, publish, distribute, sublicense,         ║
+Rem ║   and/or sell copies of the Software, and to permit persons to whom the Software   ║
+Rem ║   is furnished to do so, subject to the following conditions:                      ║
+Rem ║                                                                                    ║
+Rem ║   The above copyright notice and this permission notice shall be included in       ║
+Rem ║   all copies or substantial portions of the Software.                              ║
+Rem ║                                                                                    ║
+Rem ║   THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,                  ║
+Rem ║   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES                  ║
+Rem ║   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.        ║
+Rem ║   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY             ║
+Rem ║   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,             ║
+Rem ║   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE       ║
+Rem ║   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                    ║
+Rem ║                                                                                    ║
+Rem ╚════════════════════════════════════════════════════════════════════════════════════╝
+
+Sub Main
+
+    Rem Ask the user for a URL file to download
+    sSource = InputBox(&quot;Please provide the URL of the file&quot;, &quot;Download URL&quot;, _
+                       &quot;https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt&quot;)
+    Rem User clicked Cancel
+    if sSource = &quot;&quot; then
+        exit sub
+    endif
+
+    Rem Ask the user where to upload the file
+    oFp = CreateUnoService(&quot;com.sun.star.ui.dialogs.OfficeFolderPicker&quot;)
+    oFp.Title = &quot;Choose the download directory&quot;
+    if oFp.execute() = com.sun.star.ui.dialogs.ExecutableDialogResults.OK Then
+        sTarget = oFP.Directory
+    else
+        exit sub
+    endif
+
+    oUrl = getUrl(sSource)
+
+    Rem First we need to create the UNO OAuth2Service without OAuth2
+    oRequest = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
+
+    Rem We need a first request to initialize HTTP cookies and allow the download
+    oParameter = oRequest.getRequestParameter(&quot;github-cookies&quot;)
+    Rem This first request must be made on the server from which you are downloading
+    oParameter.Url = oUrl.Protocol + oUrl.Server
+    oResponse = oRequest.execute(oParameter)
+    oResponse.close()
+
+    Rem Now that the cookies are initialized we can proceed with the download
+    oParameter = oRequest.getRequestParameter(&quot;github-download&quot;)
+
+    oParameter.Url = sSource
+    
+    Rem If we want an InputStream from the response, we need to enable the stream
+    oParameter.Stream = true
+
+    Rem To obtain the HTTP response we use the execute() method
+    Rem of the OAuth2Service service with the HTTP parameter as argument
+    oResponse = oRequest.execute(oParameter)
+
+    if oResponse.Ok then
+        oSf = createUNOService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+        oSf.writeFile(sTarget + &quot;/&quot; + oUrl.Name, oResponse.getInputStream(65536, false))
+        sText = &quot;File: &quot; + oUrl.Name + &quot; donwloaded...&quot;
+    else
+        sText = oResponse.Text
+    endif
+
+    Rem When it is finished we have to close the HTTP response
+    oResponse.close()
+
+    Msgbox sText
+
+End Sub
+
+
+Function getUrl(sSource As String) As Variant
+    oUrl = createUnoStruct(&quot;com.sun.star.util.URL&quot;)
+    oUrl.Complete = sSource
+    oUrlTransformer = createUnoService(&quot;com.sun.star.util.URLTransformer&quot;)
+    oUrlTransformer.parseStrict(oUrl)
+    getUrl = oUrl
+End Function
+
+</script:module>
+
