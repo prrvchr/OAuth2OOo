@@ -28,7 +28,8 @@ Rem ╚════════════════════════�
 Sub Main
 
     Rem Ask the user for a URL file to download
-    sSource = InputBox(&quot;Please provide the URL of the file&quot;, &quot;Download URL&quot;)
+    sSource = InputBox(&quot;Please provide the URL of the file&quot;, &quot;Download URL&quot;, _
+                       &quot;https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt&quot;)
     Rem User clicked Cancel
     if sSource = &quot;&quot; then
         exit sub

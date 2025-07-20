@@ -29,13 +29,13 @@
              xmlns:l="http://libreoffice.org/extensions/description/2011"
              xmlns:xlink="http://www.w3.org/1999/xlink">
   <identifier value="io.github.prrvchr.OAuth2OOo"/>
-  <version value="1.5.0"/>
+  <version value="1.5.1"/>
   <update-download>
-    <src xlink:href="https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt"/>
+    <src xlink:href="https://github.com/prrvchr/OAuth2OOo/raw/refs/heads/master/source/OAuth2OOo/dist/OAuth2OOo.oxt"/>
   </update-download>
   <dependencies>
-    <OpenOffice.org-minimal-version value="LibreOffice 6.0" d:name="LibreOffice 6.0"/>
-    <l:LibreOffice-minimal-version value="6.0" d:name="LibreOffice 6.0"/>
+    <d:OpenOffice.org-minimal-version value="6.0" d:name="LibreOffice 6.0"/>
+    <l:LibreOffice-minimal-version value="6.0" l:name="LibreOffice 6.0"/>
   </dependencies>
   <publisher>
     <name xlink:href="https://prrvchr.github.io/OAuth2OOo/" lang="en">OAuth2OOo</name>
