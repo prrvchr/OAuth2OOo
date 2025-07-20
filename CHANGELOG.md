@@ -335,7 +335,7 @@ If your architecture is not yet supported by OAuth2OOo (Mac OSX, arm...), I advi
 ### What has been done for version 1.5.1:
 
 Added a BASIC macro [GithubDownloadRequest][113] to download the latest version of OAuth2OOo from the revisions on the Github site.  
-To enable uploading to Github, this macro uses two HTTP requests, one to initialize a session with cookies and the other to perform the upload.  
+To enable downloading from Github, this macro uses two HTTP requests, one to initialize a session with cookies and the other to perform the download.  
 This might help me find a solution to allow automatic updating of extensions in LibreOffice from Github revisions.
 
 ### What remains to be done for version 1.5.1:
