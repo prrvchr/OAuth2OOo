@@ -49,7 +49,7 @@ Sub Main
 
     Rem First we need to create the UNO OAuth2Service with the OAuth2 protocol support
     Rem (ie: with an Url and a User email address)
-    oRequest = CreateUnoServiceWithArguments(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;, Array(sUrl, sUser))
+    oRequest = createUnoServiceWithArguments(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;, Array(sUrl, sUser))
     Rem User canceled OAuth2 Wizard.
     if isNull(oRequest) then
         exit sub

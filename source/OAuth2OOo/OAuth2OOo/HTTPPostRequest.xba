@@ -38,7 +38,7 @@ Sub Main
     sKey = &quot;Key1&quot;
 
     Rem First we need to create the UNO OAuth2Service without OAuth2
-    oRequest = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
+    oRequest = createUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
 
     Rem To execute an HTTP request we first need a HTTP Request parameter
     oParameter = oRequest.getRequestParameter(&quot;httpbin&quot;)

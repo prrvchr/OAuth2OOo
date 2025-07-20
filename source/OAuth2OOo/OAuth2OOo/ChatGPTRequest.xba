@@ -40,7 +40,7 @@ Sub Main
     sQuery = &quot;How to make HTTP requests in Basic in LibreOffice?&quot;
 
     Rem First we need to create the OAuth2Service
-    oRequest = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
+    oRequest = createUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
     
     Rem To execute an HTTP request we first need a HTTP Request parameter
     oParameter = oRequest.getRequestParameter(&quot;ChatGPT&quot;)

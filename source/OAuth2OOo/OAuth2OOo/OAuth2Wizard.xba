@@ -27,7 +27,7 @@ Rem ╚════════════════════════�
 
 
 Sub OAuth2Wizard
-    Set oDispatch = CreateUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+    Set oDispatch = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
     Dim args(0) As New com.sun.star.beans.PropertyValue
     args(0).Name = "Close"
     args(0).Value = false

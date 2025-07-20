@@ -35,19 +35,23 @@ Sub Main
         exit sub
     endif
 
-    Rem Ask the user where to upload the file
-    oFp = CreateUnoService(&quot;com.sun.star.ui.dialogs.OfficeFolderPicker&quot;)
+    Rem Ask the user where to download the file
+    sTarget = &quot;&quot;
+    oFp = createUnoService(&quot;com.sun.star.ui.dialogs.OfficeFolderPicker&quot;)
     oFp.Title = &quot;Choose the download directory&quot;
     if oFp.execute() = com.sun.star.ui.dialogs.ExecutableDialogResults.OK Then
-        sTarget = oFP.Directory
-    else
+        sTarget = oFp.Directory
+    endif
+    oFp.dispose()
+    Rem User clicked Cancel
+    if sTarget = &quot;&quot; then
         exit sub
     endif
 
     oUrl = getUrl(sSource)
 
     Rem First we need to create the UNO OAuth2Service without OAuth2
-    oRequest = CreateUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
+    oRequest = createUnoService(&quot;io.github.prrvchr.OAuth2OOo.OAuth2Service&quot;)
 
     Rem We need a first request to initialize HTTP cookies and allow the download
     oParameter = oRequest.getRequestParameter(&quot;github-cookies&quot;)
@@ -71,7 +75,7 @@ Sub Main
     if oResponse.Ok then
         oSf = createUNOService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
         oSf.writeFile(sTarget + &quot;/&quot; + oUrl.Name, oResponse.getInputStream(65536, false))
-        sText = &quot;File: &quot; + oUrl.Name + &quot; donwloaded...&quot;
+        sText = &quot;File: &quot; + oUrl.Name + &quot; downloaded...&quot;
     else
         sText = oResponse.Text
     endif
