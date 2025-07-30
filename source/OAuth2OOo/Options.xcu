@@ -39,7 +39,7 @@
     <value>30</value>
   </prop>
   <prop oor:name="HandlerTimeout">
-    <value>120</value>
+    <value>180</value>
   </prop>
   <prop oor:name="BaseUrl">
     <value>https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/</value>

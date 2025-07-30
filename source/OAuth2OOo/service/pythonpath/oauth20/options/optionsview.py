@@ -50,7 +50,7 @@ class OptionsView():
         return self._dialog.getPeer()
 
     def getUrl(self):
-        return self._getUrls().SelectedText
+        return self._getUrls().getSelectedItem()
 
     def getAutoClose(self):
         return bool(self._getAutoClose().State)
@@ -70,7 +70,7 @@ class OptionsView():
 
 # OptionsView private getter control methods
     def _getUrls(self):
-        return self._dialog.getControl('ComboBox1')
+        return self._dialog.getControl('ListBox1')
 
     def _getAutoClose(self):
         return self._dialog.getControl('CheckBox1')

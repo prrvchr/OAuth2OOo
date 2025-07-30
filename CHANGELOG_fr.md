@@ -342,6 +342,7 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 
 - Correction de la macro BASIC [GithubDownloadRequest][113].
 - Correction de lien vers l'historique dans le fichier `README_fr.md`.
+- Vous pouvez à nouveau utiliser une URL pour lancer l'assistant OAuth2 dans les options de l'extension.
 - La mise à jour automatique des extensions a été corrigée, voir [tdf#159775][114], merci à `Mike Kaganski`. Ceci sera bientôt disponible dans LibreOffice 25.8.x.
 
 ### Que reste-t-il à faire pour la version 1.5.2:

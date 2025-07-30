@@ -342,6 +342,7 @@ This might help me find a solution to allow automatic updating of extensions in 
 
 - Fixed the BASIC macro [GithubDownloadRequest][113].
 - Fixed changelog link in the `README.md` file.
+- You can again use a URL to launch the OAuth2 wizard in the extension options.
 - Automatic extension updates have been fixed, see [tdf#159775][114], thanks to `Mike Kaganski`. This will be available soon in LibreOffice 25.8.x.
 
 ### What remains to be done for version 1.5.2:
