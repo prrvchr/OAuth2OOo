@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="HTTPGetRequest" script:language="StarBasic">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="GithubDownloadRequest" script:language="StarBasic">
 
 Rem ╔════════════════════════════════════════════════════════════════════════════════════╗
 Rem ║                                                                                    ║

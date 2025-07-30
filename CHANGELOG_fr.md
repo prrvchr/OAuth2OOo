@@ -332,14 +332,21 @@ Si votre architecture n'est pas encore supportée par OAuth2OOo (Mac OSX, arm...
 - Il est désormais possible de créer le fichier oxt de l'extension OAuth2OOo uniquement avec Apache Ant et une copie du dépôt GitHub. La section [Comment créer l'extension][110] a été ajoutée à la documentation.
 - Implémentation de [PEP 570][111] dans la [journalisation][112] pour prendre en charge les arguments multiples uniques.
 
-
 ### Ce qui a été fait pour la version 1.5.1:
 
 Ajout d'une macro BASIC [GithubDownloadRequest][113] pour télécharger la dernière version de OAuth2OOo à partir des révisions sur le site Github.  
 Pour permettre le téléchargement sur Github, cette macro utilise deux requêtes HTTP, une pour initialiser une session avec des cookies et l'autre pour effectuer le téléchargement.  
 Cela pourrait m'aider à trouver une solution pour permettre la mise à jour automatique des extensions dans LibreOffice à partir des révisions Github.
 
-### Que reste-t-il à faire pour la version 1.5.1:
+### Ce qui a été fait pour la version 1.5.2:
+
+- Correction de la macro BASIC [GithubDownloadRequest][113].
+- Correction de lien vers l'historique dans le fichier `README_fr.md`.
+- Vous pouvez à nouveau utiliser une URL pour lancer l'assistant OAuth2 dans les options de l'extension.
+- La mise à jour automatique des extensions a été corrigée, voir [tdf#159775][114], merci à `Mike Kaganski`. Ceci sera bientôt disponible dans LibreOffice 25.8.x.
+- Support de LibreOffice 25.2.x et 25.8.x sous Windows 64 bits. Voir [issue#25][115].
+
+### Que reste-t-il à faire pour la version 1.5.2:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -458,3 +465,5 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 [111]: <https://peps.python.org/pep-0570/>
 [112]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logwrapper.py#L109>
 [113]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GithubDownloadRequest.xba>
+[114]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159775>
+[115]: <https://github.com/prrvchr/OAuth2OOo/issues/25>
