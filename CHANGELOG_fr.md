@@ -344,6 +344,7 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 - Correction de lien vers l'historique dans le fichier `README_fr.md`.
 - Vous pouvez à nouveau utiliser une URL pour lancer l'assistant OAuth2 dans les options de l'extension.
 - La mise à jour automatique des extensions a été corrigée, voir [tdf#159775][114], merci à `Mike Kaganski`. Ceci sera bientôt disponible dans LibreOffice 25.8.x.
+- Support de LibreOffice 25.2.x et 25.8.x sous Windows 64 bits. Voir [issue#25][115].
 
 ### Que reste-t-il à faire pour la version 1.5.2:
 
@@ -465,3 +466,4 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 [112]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logwrapper.py#L109>
 [113]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GithubDownloadRequest.xba>
 [114]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159775>
+[115]: <https://github.com/prrvchr/OAuth2OOo/issues/25>
