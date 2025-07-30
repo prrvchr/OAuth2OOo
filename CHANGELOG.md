@@ -338,7 +338,13 @@ Added a BASIC macro [GithubDownloadRequest][113] to download the latest version 
 To enable downloading from Github, this macro uses two HTTP requests, one to initialize a session with cookies and the other to perform the download.  
 This might help me find a solution to allow automatic updating of extensions in LibreOffice from Github revisions.
 
-### What remains to be done for version 1.5.1:
+### What has been done for version 1.5.2:
+
+- Fixed the BASIC macro [GithubDownloadRequest][113].
+- Fixed changelog link in the `README.md` file.
+- Automatic extension updates have been fixed, see [tdf#159775][114], thanks to `Mike Kaganski`. This will be available soon in LibreOffice 25.8.x.
+
+### What remains to be done for version 1.5.2:
 
 - Add new language for internationalization...
 
@@ -457,3 +463,4 @@ This might help me find a solution to allow automatic updating of extensions in 
 [111]: <https://peps.python.org/pep-0570/>
 [112]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logwrapper.py#L109>
 [113]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GithubDownloadRequest.xba>
+[114]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159775>
