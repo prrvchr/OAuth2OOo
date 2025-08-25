@@ -43,11 +43,11 @@ class OAuth2View():
     def getWindow(self):
         return self._window
 
+# OAuth2View setter methods
     def setStep(self, step):
         self._window.Model.Step = step
 
-# OAuth2View setter methods
-    def notify(self, value):
+    def setProgress(self, value):
         self._getProgessBar().Value = value
 
     def showError(self, title, message):

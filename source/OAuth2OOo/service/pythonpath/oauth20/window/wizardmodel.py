@@ -428,11 +428,11 @@ class WizardModel(TokenModel):
         self._logger.logp(INFO, 'WizardModel', 'getAuthorizationData()', msg)
         return scopes, self._getUrl(url, requests.compat.urlencode(arguments))
 
-    def startServer(self, scopes, notify, register):
+    def startServer(self, scopes, progress, caller):
         self._cancelServer()
         lock = Condition()
         server = Server(self._ctx, self._user, self._getBaseUrl(), self._provider, self._host, self._port, self._code, lock)
-        self._watchdog = WatchDog(self._ctx, server, notify, register, scopes, self._provider, self._user, self.HandlerTimeout, lock)
+        self._watchdog = WatchDog(self._ctx, server, progress, caller, scopes, self._provider, self._user, self.HandlerTimeout, lock)
         server.start()
         self._watchdog.start()
         self._logger.logp(INFO, 'OAuth2Manager', 'startServer()', "WizardServer Started ... Done")

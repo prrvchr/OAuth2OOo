@@ -29,6 +29,8 @@
 
 import unohelper
 
+from com.sun.star.awt import XCallback
+
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 
 from com.sun.star.ui.dialogs import XWizardPage
@@ -36,6 +38,7 @@ from com.sun.star.ui.dialogs import XWizardPage
 from .oauth2view import OAuth2View
 
 from ...unotool import executeShell
+from ...unotool import getArgumentSet
 from ...unotool import getStringResource
 
 from ...configuration import g_identifier
@@ -44,7 +47,8 @@ import traceback
 
 
 class OAuth2Manager(unohelper.Base,
-                    XWizardPage):
+                    XWizardPage,
+                    XCallback):
     def __init__(self, ctx, wizard, model, pageid, parent):
         self._ctx = ctx
         self._wizard = wizard
@@ -65,13 +69,17 @@ class OAuth2Manager(unohelper.Base,
         self._view.setStep(1)
         scopes, url = self._model.getAuthorizationData()
         executeShell(self._ctx, url)
-        self._model.startServer(scopes, self.notify, self.register)
+        self._model.startServer(scopes, self.setProgress, self)
 
     def commitPage(self, reason):
         return True
 
     def canAdvance(self):
         return self._model.hasAuthorization()
+
+# XCallback
+    def notify(self, data):
+        self._notify(**getArgumentSet(data))
 
 # XComponent
     def dispose(self):
@@ -82,10 +90,11 @@ class OAuth2Manager(unohelper.Base,
         pass
 
 # OAuth2Manager setter methods
-    def notify(self, percent):
-        self._view.notify(percent)
+    def setProgress(self, percent):
+        self._view.setProgress(percent)
 
-    def register(self, scopes, provider, user, code, error):
+# OAuth2Manager private methods
+    def _notify(self, scopes, provider, user, code, error):
         if error is None:
             error = self._model.registerToken(self._wizard, scopes, provider, user, code)
             if error is None:
