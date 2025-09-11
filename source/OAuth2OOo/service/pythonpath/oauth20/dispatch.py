@@ -38,7 +38,7 @@ from com.sun.star.frame.DispatchResultState import FAILURE
 from com.sun.star.frame import XNotifyingDispatch
 
 from .wizard import Wizard
-from .window import WizardController
+from .wizard import WizardController
 
 from .unotool import createService
 from .unotool import getConfiguration
