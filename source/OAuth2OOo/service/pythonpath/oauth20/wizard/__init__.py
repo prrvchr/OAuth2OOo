@@ -27,8 +27,7 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .wizard import wizard
+from .wizard import Wizard
 
 from .wizardcontroller import WizardController
-
 

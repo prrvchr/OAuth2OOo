@@ -346,12 +346,12 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 - La mise à jour automatique des extensions a été corrigée, voir [tdf#159775][114], merci à `Mike Kaganski`. Ceci sera bientôt disponible dans LibreOffice 25.8.x.
 - Support de LibreOffice 25.2.x et 25.8.x sous Windows 64 bits. Voir [issue#25][115].
 
-### Ce qui a été fait pour la version 1.5.3:
+### Ce qui a été fait pour la version 1.6.0:
 
 - Toutes les méthodes exécutées en arrière-plan utilisent désormais le service UNO [com.sun.star.awt.AsyncCallback][116] pour le rappel.
 - Des petites corrections.
 
-### Que reste-t-il à faire pour la version 1.5.3:
+### Que reste-t-il à faire pour la version 1.6.0:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
