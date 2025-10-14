@@ -24,6 +24,7 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 -->
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
 <dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="UserDialog" dlg:left="30" dlg:top="30" dlg:width="150" dlg:height="55" dlg:help-text="&amp;UserDialog.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;UserDialog.Title">
  <dlg:bulletinboard>
   <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="5" dlg:top="0" dlg:width="140" dlg:height="15" dlg:help-text="&amp;UserDialog.Label1.HelpText" dlg:value="&amp;UserDialog.Label1.Label" dlg:valign="center"/>
@@ -34,3 +35,4 @@
   <dlg:button dlg:id="CommandButton2" dlg:tab-index="3" dlg:disabled="true" dlg:left="100" dlg:top="35" dlg:width="45" dlg:height="15" dlg:help-text="&amp;UserDialog.CommandButton2.HelpText" dlg:value="&amp;UserDialog.CommandButton2.Label" dlg:button-type="ok" dlg:default="true"/>
  </dlg:bulletinboard>
 </dlg:window>
+

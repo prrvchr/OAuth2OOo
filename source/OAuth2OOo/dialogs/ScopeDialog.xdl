@@ -24,6 +24,7 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 -->
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
 <dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="ScopeDialog" dlg:left="88" dlg:top="10" dlg:width="220" dlg:height="130" dlg:help-text="&amp;ScopeDialog.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;ScopeDialog.Title">
   <dlg:styles>
     <dlg:style dlg:style-id="0" dlg:font-weight="150"/>
@@ -46,3 +47,4 @@
     <dlg:button dlg:id="CommandButton4" dlg:tab-index="6" dlg:disabled="true" dlg:left="170" dlg:top="110" dlg:width="45" dlg:height="15" dlg:help-text="&amp;ScopeDialog.CommandButton4.HelpText" dlg:default="true" dlg:value="&amp;ScopeDialog.CommandButton4.Label" dlg:button-type="ok"/>
   </dlg:bulletinboard>
 </dlg:window>
+
