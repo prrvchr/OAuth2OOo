@@ -66,6 +66,19 @@ Because it is together that we can make Free Software smarter.
 
 ___
 
+## Certification CASA:
+
+In order to provide you with interoperability with **Google**, the **OAuth2OOo** extension requires [CASA certification][50].  
+Until now, this certification was free and carried out by a Google partner. The **OAuth2OOo** application obtained its [CASA certification on 11/28/2023][51].
+
+**Now this certification has become paid and costs $600.**
+
+I have never anticipated such a fee and am counting on your contribution to fund this.
+
+Thank you for your help. [![Sponsor][52]][53]
+
+___
+
 ## Requirement:
 
 The minimum version of LibreOffice supported by the OAuth2OOo extension depends on how you installed LibreOffice on your computer:
@@ -240,3 +253,8 @@ ___
 [46]: <https://github.com/prrvchr/OAuth2OOo.git>
 [47]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
 [48]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG>
+
+[50]: <https://appdefensealliance.dev/casa>
+[51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/LOV_OAuth2OOo.pdf>
+[52]: <https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86#right>
+[53]: <https://github.com/sponsors/prrvchr>

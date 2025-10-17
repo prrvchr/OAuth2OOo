@@ -66,6 +66,19 @@ Car c'est ensemble que nous pouvons rendre le Logiciel Libre plus intelligent.
 
 ___
 
+## Certification CASA:
+
+Afin de garantir l'interopérabilité avec **Google**, l'extension **OAuth2OOo** nécessite la [certification CASA][50].  
+Jusqu'à présent, cette certification était gratuite et réalisée par un partenaire de Google. L'application **OAuth2OOo** a obtenu sa [certification CASA le 28/11/2023][51].
+
+**Maintenant cette certification est devenue désormais payante et coûte 600$.**
+
+Je n'avais jamais anticipé de tels frais et je compte sur votre contribution pour financer ce projet.
+
+Merci pour votre aide. [![Sponsor][52]][53]
+
+___
+
 ## Prérequis:
 
 La version minimale de LibreOffice prise en charge par l'extension OAuth2OOo dépend de la façon dont vous avez installé LibreOffice sur votre ordinateur:
@@ -240,3 +253,8 @@ ___
 [46]: <https://github.com/prrvchr/OAuth2OOo.git>
 [47]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
 [48]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG_fr>
+
+[50]: <https://appdefensealliance.dev/casa>
+[51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/LOV_OAuth2OOo.pdf>
+[52]: <https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86#right>
+[53]: <https://github.com/sponsors/prrvchr>
