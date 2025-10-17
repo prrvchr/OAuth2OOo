@@ -68,14 +68,14 @@ ___
 
 ## Certification CASA:
 
-Afin de garantir l'interopérabilité avec **Google**, l'extension **OAuth2OOo** nécessite la [certification CASA][50].  
-Jusqu'à présent, cette certification était gratuite et réalisée par un partenaire de Google. L'application **OAuth2OOo** a obtenu sa [certification CASA le 28/11/2023][51].
+Afin de garantir l'interopérabilité avec **Google**, l'extension **OAuth2OOo** nécessite la [certification CASA][25].  
+Jusqu'à présent, cette certification était gratuite et réalisée par un partenaire de Google. L'application **OAuth2OOo** a obtenu sa [certification CASA][26] le 28/11/2023.
 
 **Maintenant cette certification est devenue désormais payante et coûte 600$.**
 
 Je n'avais jamais anticipé de tels frais et je compte sur votre contribution pour financer ce projet.
 
-Merci pour votre aide. [![Sponsor][52]][53]
+Merci pour votre aide. [![Sponsor][27]][28]
 
 ___
 
@@ -83,13 +83,13 @@ ___
 
 La version minimale de LibreOffice prise en charge par l'extension OAuth2OOo dépend de la façon dont vous avez installé LibreOffice sur votre ordinateur:
 
-- **Quelle que soit la plateforme**, si vous avez installé LibreOffice depuis le [site de téléchargement de LibreOffice][25], **la version minimale de LibreOffice est 7.0**.
+- **Quelle que soit la plateforme**, si vous avez installé LibreOffice depuis le [site de téléchargement de LibreOffice][29], **la version minimale de LibreOffice est 7.0**.
 
 - **Sous Linux** si vous avez utilisé le gestionnaire de paquets pour installer LibreOffice, **la version minimale de LibreOffice est 6.0**. Cependant, vous devez vous assurer que la version de Python fournie par le système n'est pas inférieure à 3.8.  
 De plus, vos packages Python fournis par le système peuvent être obsolètes. La journalisation de l'extension vous permettera de vérifier si c'est le cas. Elle est accessible via le menu: **Outils -> Options -> Internet -> Protocole OAuth2-> Voir journal -> Info système** et nécessite le redemarrage de LibreOffice aprés son activation.  
 Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec cette procédure:  
-    - Télécharger le fichier [requirements.txt][26].
-    - Installer à l'aide de [pip][27], les paquets Python nécessaires à l'extension avec la commande:  
+    - Télécharger le fichier [requirements.txt][30].
+    - Installer à l'aide de [pip][31], les paquets Python nécessaires à l'extension avec la commande:  
     `pip install requirements.txt`
 
 Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.  
@@ -103,7 +103,7 @@ ___
 Il semble important que le fichier n'ait pas été renommé lors de son téléchargement.  
 Si nécessaire, renommez-le avant de l'installer.
 
-- ![OAuth2OOo logo][28] Installer l'extension **[OAuth2OOo.oxt][29]** [![Version][30]][29]
+- ![OAuth2OOo logo][32] Installer l'extension **[OAuth2OOo.oxt][33]** [![Version][34]][33]
 
 Redémarrez LibreOffice après l'installation.  
 **Attention, redémarrer LibreOffice peut ne pas suffire.**
@@ -133,10 +133,10 @@ oRequest = createUnoServiceWithArguments("io.github.prrvchr.OAuth2OOo.OAuth2Serv
 
 ### Utiliser le service UNO OAuth2Service pour executer des requêtes HTTP:
 
-Vous disposez désormais d'un objet `oRequest` qui répond à l'interface définie dans le fichier [XOAuth2Service.idl][31].  
+Vous disposez désormais d'un objet `oRequest` qui répond à l'interface définie dans le fichier [XOAuth2Service.idl][35].  
 Avec cette interface, deux méthodes sont nécessaires pour exécuter une requête HTTP:
-- `getRequestParameter([in] string Name)`, qui vous permet d'obtenir un objet répondant à l'interface [XRequestParameter.idl][32]. Cette interface vous permet de configurer la requête HTTP avant son exécution.
-- `execute([in] com::sun::star::rest::XRequestParameter Parameter)`, qui vous permet d'obtenir un objet répondant à l'interface [XRequestResponse.idl][33]. Cela vous permet d'obtenir presque tout ce qui est possible avec une réponse HTTP.
+- `getRequestParameter([in] string Name)`, qui vous permet d'obtenir un objet répondant à l'interface [XRequestParameter.idl][36]. Cette interface vous permet de configurer la requête HTTP avant son exécution.
+- `execute([in] com::sun::star::rest::XRequestParameter Parameter)`, qui vous permet d'obtenir un objet répondant à l'interface [XRequestResponse.idl][37]. Cela vous permet d'obtenir presque tout ce qui est possible avec une réponse HTTP.
 
 Pour aller plus loin, je vous conseille de prendre connaissance des macros qui sont livrées avec l'extension et qui implémentent tous types de requêtes HTTP.
 
@@ -144,21 +144,21 @@ ___
 
 ## Uno OAuth2.0 API pour LibreOffice.
 
-![OAuth2OOo Wizard Page1 screenshot][34]
+![OAuth2OOo Wizard Page1 screenshot][38]
 
-![OAuth2OOo Wizard Page2 screenshot][35]
+![OAuth2OOo Wizard Page2 screenshot][39]
 
-![OAuth2OOo Wizard Page3 screenshot][36]
+![OAuth2OOo Wizard Page3 screenshot][40]
 
-![OAuth2OOo Browser Page1 screenshot][37]
+![OAuth2OOo Browser Page1 screenshot][41]
 
-![OAuth2OOo Browser Page2 screenshot][38]
+![OAuth2OOo Browser Page2 screenshot][42]
 
-![OAuth2OOo Browser Page3 screenshot][39]
+![OAuth2OOo Browser Page3 screenshot][43]
 
-![OAuth2OOo Browser Page4 screenshot][40]
+![OAuth2OOo Browser Page4 screenshot][44]
 
-![OAuth2OOo Wizard Page4 screenshot][41]
+![OAuth2OOo Wizard Page4 screenshot][45]
 
 Le protocole OAuth2 permet d'accéder aux ressources de serveurs, après acceptation de l'autorisation de connexion, en échangeant des jetons.
 
@@ -170,12 +170,12 @@ ___
 
 ## Comment créer l'extension:
 
-Normalement, l'extension est créée avec Eclipse pour Java et [LOEclipse][42]. Pour contourner Eclipse, j'ai modifié LOEclipse afin de permettre la création de l'extension avec Apache Ant.  
+Normalement, l'extension est créée avec Eclipse pour Java et [LOEclipse][46]. Pour contourner Eclipse, j'ai modifié LOEclipse afin de permettre la création de l'extension avec Apache Ant.  
 Pour créer l'extension OAuth2OOo avec l'aide d'Apache Ant, vous devez:
-- Installer le [SDK Java][43] version 8 ou supérieure.
-- Installer [Apache Ant][44] version 1.10.0 ou supérieure.
-- Installer [LibreOffice et son SDK][45] version 7.x ou supérieure.
-- Cloner le dépôt [OAuth2OOo][46] sur GitHub dans un dossier.
+- Installer le [SDK Java][47] version 8 ou supérieure.
+- Installer [Apache Ant][48] version 1.10.0 ou supérieure.
+- Installer [LibreOffice et son SDK][49] version 7.x ou supérieure.
+- Cloner le dépôt [OAuth2OOo][50] sur GitHub dans un dossier.
 - Depuis ce dossier, accédez au répertoire: `source/OAuth2OOo/`
 - Dans ce répertoire, modifiez le fichier `build.properties` afin que les propriétés `office.install.dir` et `sdk.dir` pointent vers les dossiers d'installation de LibreOffice et de son SDK, respectivement.
 - Lancez la création de l'archive avec la commande: `ant`
@@ -193,7 +193,7 @@ ___
 
 * LibreOffice 24.8.0.3 (X86_64) - Windows 10(x64) - Python version 3.9.19 (sous Lubuntu 22.04 / VirtualBox 6.1.38)
 
-* **Ne fonctionne pas avec OpenOffice** voir [dysfonctionnement 128569][47]. N'ayant aucune solution, je vous encourrage d'installer **LibreOffice**.
+* **Ne fonctionne pas avec OpenOffice** voir [dysfonctionnement 128569][51]. N'ayant aucune solution, je vous encourrage d'installer **LibreOffice**.
 
 Je vous encourage en cas de problème :confused:  
 de créer un [dysfonctionnement][24]  
@@ -203,7 +203,7 @@ ___
 
 ## Historique:
 
-### [Toutes les changements sont consignées dans l'Historique des versions][48]
+### [Toutes les changements sont consignées dans l'Historique des versions][52]
 
 [1]: </img/oauth2.svg#collapse>
 [2]: <https://prrvchr.github.io/OAuth2OOo/>
@@ -229,32 +229,31 @@ ___
 [22]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/Page-Jaunes-Linux.ods>
 [23]: <https://github.com/prrvchr/OAuth2OOo>
 [24]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[25]: <https://fr.libreoffice.org/download/telecharger-libreoffice/>
-[26]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/requirements.txt>
-[27]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
-[28]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
-[29]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[30]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
-[31]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
-[32]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
-[33]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.6.0#right>
-[34]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
-[35]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
-[36]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
-[37]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4_fr.png>
-[38]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5_fr.png>
-[39]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6_fr.png>
-[40]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7_fr.png>
-[41]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8_fr.png>
-[42]: <https://github.com/LibreOffice/loeclipse>
-[43]: <https://adoptium.net/temurin/releases/?version=8&package=jdk>
-[44]: <https://ant.apache.org/manual/install.html>
-[45]: <https://downloadarchive.documentfoundation.org/libreoffice/old/7.6.7.2/>
-[46]: <https://github.com/prrvchr/OAuth2OOo.git>
-[47]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
-[48]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG_fr>
-
-[50]: <https://appdefensealliance.dev/casa>
-[51]: <https://github.com/prrvchr/OAuth2OOo/blob/master/LOV_OAuth2OOo.pdf>
-[52]: <https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86#right>
-[53]: <https://github.com/sponsors/prrvchr>
+[25]: <https://appdefensealliance.dev/casa>
+[26]: <https://github.com/prrvchr/OAuth2OOo/blob/master/LOV_OAuth2OOo.pdf>
+[27]: <https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86#right>
+[28]: <https://github.com/sponsors/prrvchr>
+[29]: <https://fr.libreoffice.org/download/telecharger-libreoffice/>
+[30]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/requirements.txt>
+[31]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
+[32]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
+[33]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
+[34]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
+[35]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
+[36]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
+[3*]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.6.0#right>
+[38]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1_fr.png>
+[39]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2_fr.png>
+[40]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3_fr.png>
+[41]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4_fr.png>
+[42]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5_fr.png>
+[43]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6_fr.png>
+[44]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7_fr.png>
+[45]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8_fr.png>
+[46]: <https://github.com/LibreOffice/loeclipse>
+[47]: <https://adoptium.net/temurin/releases/?version=8&package=jdk>
+[48]: <https://ant.apache.org/manual/install.html>
+[49]: <https://downloadarchive.documentfoundation.org/libreoffice/old/7.6.7.2/>
+[50]: <https://github.com/prrvchr/OAuth2OOo.git>
+[51]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
+[52]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG_fr>
