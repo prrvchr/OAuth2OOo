@@ -69,7 +69,8 @@ ___
 ## Certification CASA:
 
 Afin de garantir l'interopérabilité avec **Google**, l'extension **OAuth2OOo** nécessite la [certification CASA][25].  
-Jusqu'à présent, cette certification était gratuite et réalisée par un partenaire de Google. L'application **OAuth2OOo** a obtenu sa [certification CASA][26] le 28/11/2023.
+Jusqu'à présent, cette certification était gratuite et réalisée par un partenaire de Google.  
+L'application **OAuth2OOo** a obtenu sa [certification CASA][26] le 28/11/2023.
 
 **Maintenant cette certification est devenue désormais payante et coûte 600$.**
 

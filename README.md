@@ -66,10 +66,11 @@ Because it is together that we can make Free Software smarter.
 
 ___
 
-## Certification CASA:
+## CASA certification:
 
 In order to provide you with interoperability with **Google**, the **OAuth2OOo** extension requires [CASA certification][25].  
-Until now, this certification was free and carried out by a Google partner. The **OAuth2OOo** application obtained its [CASA certification][26] on 11/28/2023.
+Until now, this certification was free and carried out by a Google partner.  
+The **OAuth2OOo** application obtained its [CASA certification][26] on 11/28/2023.
 
 **Now this certification has become paid and costs $600.**
 
