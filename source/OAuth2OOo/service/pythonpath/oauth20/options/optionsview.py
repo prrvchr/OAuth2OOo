@@ -31,8 +31,8 @@ import traceback
 
 
 class OptionsView():
-    def __init__(self, dialog):
-        self._dialog = dialog
+    def __init__(self, window):
+        self._window = window
 
 # OptionsView public setter methods
     def initView(self, restart, connect, read, handler, urls):
@@ -46,8 +46,8 @@ class OptionsView():
         self._getRestart().setVisible(enabled)
 
 # OptionsView public getter methods
-    def getParent(self):
-        return self._dialog.getPeer()
+    def getWindow(self):
+        return self._window
 
     def getUrl(self):
         return self._getUrls().getSelectedItem()
@@ -70,20 +70,20 @@ class OptionsView():
 
 # OptionsView private getter control methods
     def _getUrls(self):
-        return self._dialog.getControl('ListBox1')
+        return self._window.getControl('ListBox1')
 
     def _getAutoClose(self):
-        return self._dialog.getControl('CheckBox1')
+        return self._window.getControl('CheckBox1')
 
     def _getConnectTimeout(self):
-        return self._dialog.getControl('NumericField1')
+        return self._window.getControl('NumericField1')
 
     def _getReadTimeout(self):
-        return self._dialog.getControl('NumericField2')
+        return self._window.getControl('NumericField2')
 
     def _getHandlerTimeout(self):
-        return self._dialog.getControl('NumericField3')
+        return self._window.getControl('NumericField3')
 
     def _getRestart(self):
-        return self._dialog.getControl('Label5')
+        return self._window.getControl('Label5')
 
