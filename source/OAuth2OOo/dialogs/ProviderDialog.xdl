@@ -24,6 +24,7 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 -->
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
 <dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="ProviderDialog" dlg:left="88" dlg:top="10" dlg:width="280" dlg:height="260" dlg:help-text="&amp;ProviderDialog.HelpText" dlg:closeable="true" dlg:moveable="true" dlg:title="&amp;ProviderDialog.Title">
   <dlg:styles>
     <dlg:style dlg:style-id="0" dlg:font-weight="150"/>
@@ -75,7 +76,7 @@
       </dlg:radio>
     </dlg:radiogroup>
     <dlg:text dlg:id="Label7" dlg:tab-index="21" dlg:disabled="true" dlg:left="135" dlg:top="200" dlg:width="35" dlg:height="15" dlg:help-text="&amp;ProviderDialog.Label7.HelpText" dlg:value="&amp;ProviderDialog.Label7.Label" dlg:valign="center" dlg:tabstop="false"/>
-    <dlg:menulist dlg:id="ListBox1" dlg:tab-index="22" dlg:disabled="true" dlg:left="175" dlg:top="200" dlg:width="50" dlg:height="15" dlg:help-text="&amp;ProviderDialog.ListBox1.HelpText" dlg:value="&amp;ProviderDialog.ListBox1.Text" dlg:spin="true">
+    <dlg:menulist dlg:id="ListBox1" dlg:tab-index="22" dlg:disabled="true" dlg:left="175" dlg:top="200" dlg:width="50" dlg:height="15" dlg:help-text="&amp;ProviderDialog.ListBox1.HelpText" dlg:spin="true">
       <dlg:menupopup>
         <dlg:menuitem dlg:value="&amp;ProviderDialog.ListBox1.StringItemList.0"/>
         <dlg:menuitem dlg:value="&amp;ProviderDialog.ListBox1.StringItemList.1"/>
@@ -87,3 +88,4 @@
     <dlg:button dlg:id="CommandButton2" dlg:tab-index="26" dlg:disabled="true" dlg:left="230" dlg:top="240" dlg:width="45" dlg:height="14" dlg:help-text="&amp;ProviderDialog.CommandButton2.HelpText" dlg:default="true" dlg:value="&amp;ProviderDialog.CommandButton2.Label" dlg:button-type="ok"/>
   </dlg:bulletinboard>
 </dlg:window>
+

@@ -24,6 +24,7 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 -->
+<!DOCTYPE library:library PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "library.dtd">
 <library:library xmlns:library="http://openoffice.org/2000/library" library:name="OAuth2OOo" library:readonly="false" library:passwordprotected="false">
   <library:element library:name="OAuth2Wizard"/>
   <library:element library:name="ChatGPTRequest"/>
@@ -33,3 +34,4 @@
   <library:element library:name="GraphAPIRequest"/>
   <library:element library:name="GithubDownloadRequest"/>
 </library:library>
+

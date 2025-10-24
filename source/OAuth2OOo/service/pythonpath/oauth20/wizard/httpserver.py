@@ -42,6 +42,7 @@ from requests.compat import urlencode
 
 
 from ..unotool import createService
+from ..unotool import getPropertyValueSet
 
 from ..oauth2helper import getOAuth2ErrorCode
 
@@ -58,18 +59,19 @@ import traceback
 
 
 class WatchDog(Thread):
-    def __init__(self, ctx, server, notify, register, scopes, provider, user, timeout, lock):
+    def __init__(self, ctx, server, progress, caller, scopes, provider, user, timeout, lock):
         Thread.__init__(self)
         self._ctx = ctx
         self._server = server
-        self._notify = notify
-        self._register = register
+        self._progress = progress
+        self._caller = caller
         self._scopes = scopes
         self._provider = provider
         self._user = user
         self._timeout = timeout
         self._lock = lock
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
+        self._callback = createService(ctx, "com.sun.star.awt.AsyncCallback")
         self._end = 0
         # TODO Time in seconds between two refreshes
         self._wait = 1
@@ -81,15 +83,18 @@ class WatchDog(Thread):
             while now < self._end and self._server.is_alive():
                 value =  min(self._timeout, int(now - start))
                 if self._end != 0:
-                    self._notify(value)
+                    self._progress(value)
                 self._lock.wait(self._wait)
                 now = timer()
             if self._server.is_alive():
                 self._server.stopAccepting()
                 self._server.join()
             if self._end != 0:
-                self._notify(self._timeout)
-                self._register(self._scopes, self._provider, self._user, *self._server.getResults())
+                self._progress(self._timeout)
+                code, error = self._server.getResults()
+                data = getPropertyValueSet({'scopes': self._scopes, 'provider': self._provider,
+                                            'user': self._user, 'code': code, 'error': error})
+                self._callback.addCallback(self._caller, data)
             self._lock.notifyAll()
             self._logger.logp(INFO, 'WatchDog', 'run()', "WatchDog Running ... Done")
 

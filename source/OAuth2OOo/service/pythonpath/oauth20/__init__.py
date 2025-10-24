@@ -48,7 +48,7 @@ from .unotool import getParentWindow
 from .unotool import getResourceLocation
 from .unotool import getStringResource
 from .unotool import getSimpleFile
-from .unotool import hasInterface
+from .unotool import hasFrameInterface
 
 from .logger import getLogger
 

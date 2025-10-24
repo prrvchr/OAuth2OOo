@@ -38,7 +38,7 @@ from com.sun.star.frame.DispatchResultState import FAILURE
 from com.sun.star.frame import XNotifyingDispatch
 
 from .wizard import Wizard
-from .window import WizardController
+from .wizard import WizardController
 
 from .unotool import createService
 from .unotool import getConfiguration
@@ -71,6 +71,7 @@ class Dispatch(unohelper.Base,
             url = user = ''
             readonly = False
             close = True
+            parent = None
             for argument in arguments:
                 if argument.Name == 'Url':
                     url = argument.Value
@@ -78,9 +79,13 @@ class Dispatch(unohelper.Base,
                     user = argument.Value
                 elif argument.Name == 'ReadOnly':
                     readonly = argument.Value
+                elif argument.Name == 'ParentWindow':
+                    parent = argument.Value
                 elif argument.Name == 'Close':
                     close = argument.Value
-            state, result = self._showOAuth2Wizard(close, readonly, url, user)
+            if parent is None:
+                parent = self._frame.getContainerWindow().getToolkit().getActiveTopWindow()
+            state, result = self._showOAuth2Wizard(url, user, readonly, parent, close)
         return state, result
 
     def addStatusListener(self, listener, url):
@@ -90,15 +95,14 @@ class Dispatch(unohelper.Base,
         pass
 
     # Show the OAuth2OOo Wizard
-    def _showOAuth2Wizard(self, close, readonly, url, user):
+    def _showOAuth2Wizard(self, url, user, readonly, parent, close):
         state = FAILURE
         result = ()
         unowizard = getConfiguration(self._ctx, g_identifier).getByName('UnoWizard')
         if unowizard:
             wizard = createService(self._ctx, 'com.sun.star.ui.dialogs.Wizard')
         else:
-            window = self._frame.getContainerWindow().getToolkit().getActiveTopWindow()
-            wizard = Wizard(self._ctx, g_wizard_page, True, window)
+            wizard = Wizard(self._ctx, g_wizard_page, True, parent)
         controller = WizardController(self._ctx, wizard, close, readonly, url, user)
         if unowizard:
             arguments = ((uno.Any('[][]short', g_wizard_paths), controller), )

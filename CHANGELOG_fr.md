@@ -346,7 +346,12 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 - La mise à jour automatique des extensions a été corrigée, voir [tdf#159775][114], merci à `Mike Kaganski`. Ceci sera bientôt disponible dans LibreOffice 25.8.x.
 - Support de LibreOffice 25.2.x et 25.8.x sous Windows 64 bits. Voir [issue#25][115].
 
-### Que reste-t-il à faire pour la version 1.5.2:
+### Ce qui a été fait pour la version 1.6.0:
+
+- Toutes les méthodes nécessaires à l'affichage et s'exécutant en arrière-plan utilisent désormais le service UNO [com.sun.star.awt.AsyncCallback][116] pour le rappel.
+- A été testé sous LibreOfficeDev 26.2.
+
+### Que reste-t-il à faire pour la version 1.6.0:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
@@ -362,16 +367,16 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 [8]: <https://bugs.documentfoundation.org/show_bug.cgi?id=132666>
 [9]: <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter>
 [10]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/ui/dialogs/XWizardPage.html>
-[11]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page1/oauth2manager.py>
-[12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page1/oauth2view.py>
-[13]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page2/oauth2manager.py>
-[14]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page2/oauth2view.py>
-[15]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page3/oauth2manager.py>
-[16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page3/oauth2view.py>
-[17]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page4/oauth2manager.py>
-[18]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page4/oauth2view.py>
-[19]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page5/oauth2manager.py>
-[20]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/window/page5/oauth2view.py>
+[11]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page1/oauth2manager.py>
+[12]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page1/oauth2view.py>
+[13]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page2/oauth2manager.py>
+[14]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page2/oauth2view.py>
+[15]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page3/oauth2manager.py>
+[16]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page3/oauth2view.py>
+[17]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page4/oauth2manager.py>
+[18]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page4/oauth2view.py>
+[19]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page5/oauth2manager.py>
+[20]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/window/page5/oauth2view.py>
 [21]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Service.py>
 [22]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
 [23]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/OAuth2Dispatcher.py>
@@ -380,9 +385,9 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 [26]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/task/XInteractionHandler2.html>
 [27]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logmanager.py>
 [28]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/lib/uno/logger/logview.py>
-[29]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsmanager.py>
-[30]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/options/optionsview.py>
-[31]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/oauth2model.py>
+[29]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/options/optionsmanager.py>
+[30]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/options/optionsview.py>
+[31]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/oauth2model.py>
 [32]: <https://github.com/prrvchr/OAuth2OOo/issues/10>
 [33]: <https://pypi.org/project/requests/2.31.0/>
 [34]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
@@ -396,8 +401,8 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 [42]: <https://pypi.org/project/selenium/4.16.0/>
 [43]: <https://pypi.org/project/webdriver-manager/3.8.6/>
 [44]: <https://developer.mozilla.org/en-US/docs/Web/WebDriver>
-[45]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestparameter.py>
-[46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth2/requestresponse.py>
+[45]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/requestparameter.py>
+[46]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/service/pythonpath/oauth20/requestresponse.py>
 [47]: <https://github.com/prrvchr/OAuth2OOo/issues/13>
 [48]: <https://github.com/prrvchr/OAuth2OOo/actions/workflows/dev.yml>
 [49]: <https://github.com/fluidattacks>
@@ -467,3 +472,4 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 [113]: <https://github.com/prrvchr/OAuth2OOo/blob/master/source/OAuth2OOo/OAuth2OOo/GithubDownloadRequest.xba>
 [114]: <https://bugs.documentfoundation.org/show_bug.cgi?id=159775>
 [115]: <https://github.com/prrvchr/OAuth2OOo/issues/25>
+[116]: <https://www.openoffice.org/api/docs/common/ref/com/sun/star/awt/AsyncCallback.html>
