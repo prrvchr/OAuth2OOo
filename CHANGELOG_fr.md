@@ -348,8 +348,8 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 
 ### Ce qui a été fait pour la version 1.6.0:
 
-- Toutes les méthodes exécutées en arrière-plan utilisent désormais le service UNO [com.sun.star.awt.AsyncCallback][116] pour le rappel.
-- Des petites corrections.
+- Toutes les méthodes nécessaires à l'affichage et s'exécutant en arrière-plan utilisent désormais le service UNO [com.sun.star.awt.AsyncCallback][116] pour le rappel.
+- A été testé sous LibreOfficeDev 26.2.
 
 ### Que reste-t-il à faire pour la version 1.6.0:
 

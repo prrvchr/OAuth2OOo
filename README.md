@@ -60,6 +60,7 @@ Being free software I encourage you:
 - To duplicate its [source code][23].
 - To make changes, corrections, improvements.
 - To open [issue][24] if needed.
+- To [participate in the costs][25] of [CASA certification][26].
 
 In short, to participate in the development of this extension.
 Because it is together that we can make Free Software smarter.
@@ -68,15 +69,15 @@ ___
 
 ## CASA certification:
 
-In order to provide you with interoperability with **Google**, the **OAuth2OOo** extension requires [CASA certification][25].  
+In order to provide you with interoperability with **Google**, the **OAuth2OOo** extension requires [CASA certification][26].  
 Until now, this certification was free and carried out by a Google partner.  
-The **OAuth2OOo** application obtained its [CASA certification][26] on 11/28/2023.
+The **OAuth2OOo** application obtained its [CASA certification][27] on 11/28/2023.
 
 **Now this certification has become paid and costs $600.**
 
-I have never anticipated such a fee and am counting on your contribution to fund this.
+I never anticipated such costs and I am counting on your contribution to finance this certification.
 
-Thank you for your help. [![Sponsor][27]][28]
+Thank you for your help. [![Sponsor][28]][25]
 
 ___
 
@@ -230,10 +231,10 @@ ___
 [22]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/Page-Jaunes-Linux.ods>
 [23]: <https://github.com/prrvchr/OAuth2OOo>
 [24]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[25]: <https://appdefensealliance.dev/casa>
-[26]: <https://github.com/prrvchr/OAuth2OOo/blob/master/LOV_OAuth2OOo.pdf>
-[27]: <https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86#right>
-[28]: <https://github.com/sponsors/prrvchr>
+[25]: <https://github.com/sponsors/prrvchr>
+[26]: <https://appdefensealliance.dev/casa>
+[27]: <https://github.com/prrvchr/OAuth2OOo/blob/master/LOV_OAuth2OOo.pdf>
+[28]: <https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86#right>
 [29]: <https://www.libreoffice.org/download/download-libreoffice/>
 [30]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/requirements.txt>
 [31]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>

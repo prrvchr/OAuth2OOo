@@ -60,6 +60,7 @@ Etant un logiciel libre je vous encourage:
 - A dupliquer son [code source][23].
 - A apporter des modifications, des corrections, des ameliorations.
 - D'ouvrir un [dysfonctionnement][24] si nécessaire.
+- De [participer au frais][25] de la [certification CASA][26].
 
 Bref, à participer au developpement de cette extension.
 Car c'est ensemble que nous pouvons rendre le Logiciel Libre plus intelligent.
@@ -68,15 +69,15 @@ ___
 
 ## Certification CASA:
 
-Afin de garantir l'interopérabilité avec **Google**, l'extension **OAuth2OOo** nécessite la [certification CASA][25].  
+Afin de garantir l'interopérabilité avec **Google**, l'extension **OAuth2OOo** nécessite la [certification CASA][26].  
 Jusqu'à présent, cette certification était gratuite et réalisée par un partenaire de Google.  
-L'application **OAuth2OOo** a obtenu sa [certification CASA][26] le 28/11/2023.
+L'application **OAuth2OOo** a obtenu sa [certification CASA][27] le 28/11/2023.
 
 **Maintenant cette certification est devenue désormais payante et coûte 600$.**
 
-Je n'avais jamais anticipé de tels frais et je compte sur votre contribution pour financer ce projet.
+Je n'avais jamais anticipé de tels frais et je compte sur votre contribution pour financer cette certification.
 
-Merci pour votre aide. [![Sponsor][27]][28]
+Merci pour votre aide. [![Sponsor][28]][25]
 
 ___
 
@@ -230,10 +231,10 @@ ___
 [22]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/Page-Jaunes-Linux.ods>
 [23]: <https://github.com/prrvchr/OAuth2OOo>
 [24]: <https://github.com/prrvchr/OAuth2OOo/issues/new>
-[25]: <https://appdefensealliance.dev/casa>
-[26]: <https://github.com/prrvchr/OAuth2OOo/blob/master/LOV_OAuth2OOo.pdf>
-[27]: <https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86#right>
-[28]: <https://github.com/sponsors/prrvchr>
+[25]: <https://github.com/sponsors/prrvchr>
+[26]: <https://appdefensealliance.dev/casa>
+[27]: <https://github.com/prrvchr/OAuth2OOo/blob/master/LOV_OAuth2OOo.pdf>
+[28]: <https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86#right>
 [29]: <https://fr.libreoffice.org/download/telecharger-libreoffice/>
 [30]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/requirements.txt>
 [31]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>

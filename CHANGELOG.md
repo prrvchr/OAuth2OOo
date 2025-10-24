@@ -348,8 +348,8 @@ This might help me find a solution to allow automatic updating of extensions in 
 
 ### What has been done for version 1.6.0:
 
-- All methods running in the background now use the UNO service [com.sun.star.awt.AsyncCallback][116] for callback.
-- Small corrections.
+- All methods needed for rendering and running in the background now use the UNO service [com.sun.star.awt.AsyncCallback][116] for callback.
+- Has been tested under LibreOfficeDev 26.2.
 
 ### What remains to be done for version 1.6.0:
 
