@@ -351,7 +351,11 @@ This might help me find a solution to allow automatic updating of extensions in 
 - All methods needed for rendering and running in the background now use the UNO service [com.sun.star.awt.AsyncCallback][116] for callback.
 - Has been tested under LibreOfficeDev 26.2.
 
-### What remains to be done for version 1.6.0:
+### What has been done for version 1.6.1:
+
+- Updated the [Python pyRdfa3][54] package to version 3.6.5.
+
+### What remains to be done for version 1.6.1:
 
 - Add new language for internationalization...
 

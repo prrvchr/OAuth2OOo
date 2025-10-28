@@ -35,6 +35,8 @@ from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 from com.sun.star.frame.DispatchResultState import SUCCESS
 from com.sun.star.frame.DispatchResultState import FAILURE
 
+from com.sun.star.frame import FeatureStateEvent
+
 from com.sun.star.frame import XNotifyingDispatch
 
 from .wizard import Wizard
@@ -83,16 +85,20 @@ class Dispatch(unohelper.Base,
                     parent = argument.Value
                 elif argument.Name == 'Close':
                     close = argument.Value
-            if parent is None:
-                parent = self._frame.getContainerWindow().getToolkit().getActiveTopWindow()
             state, result = self._showOAuth2Wizard(url, user, readonly, parent, close)
         return state, result
 
     def addStatusListener(self, listener, url):
-        pass
+        state = FeatureStateEvent()
+        state.FeatureURL = url
+        state.IsEnabled = True
+        #state.State = True
+        listener.statusChanged(state)
+        self._listeners.append(listener)
 
     def removeStatusListener(self, listener, url):
-        pass
+        if listener in self._listeners:
+            self._listeners.remove(listener)
 
     # Show the OAuth2OOo Wizard
     def _showOAuth2Wizard(self, url, user, readonly, parent, close):

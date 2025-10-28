@@ -44,7 +44,6 @@ from .unotool import executeDispatch
 from .unotool import getConfiguration
 from .unotool import getCurrentLocale
 from .unotool import getDialog
-from .unotool import getParentWindow
 from .unotool import getResourceLocation
 from .unotool import getStringResource
 from .unotool import getSimpleFile

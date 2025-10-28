@@ -351,7 +351,11 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 - Toutes les méthodes nécessaires à l'affichage et s'exécutant en arrière-plan utilisent désormais le service UNO [com.sun.star.awt.AsyncCallback][116] pour le rappel.
 - A été testé sous LibreOfficeDev 26.2.
 
-### Que reste-t-il à faire pour la version 1.6.0:
+### Ce qui a été fait pour la version 1.6.1:
+
+- Mise à jour du paquet [Python pyRdfa3][54] vers la version 3.6.5.
+
+### Que reste-t-il à faire pour la version 1.6.1:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 

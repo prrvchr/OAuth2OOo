@@ -60,6 +60,7 @@ class Dispatcher(unohelper.Base,
     def initialize(self, args):
         if isinstance(args, tuple) and len(args) and hasFrameInterface(args[0]):
             self._frame = args[0]
+            print("Dispatcher.initialize() 1")
 
 # XDispatchProvider
     def queryDispatch(self, url, frame, flags):

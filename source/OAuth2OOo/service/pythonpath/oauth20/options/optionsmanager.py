@@ -84,11 +84,10 @@ class OptionsManager(unohelper.Base):
         user = url = ''
         try:
             url = self._view.getUrl()
+            parent = self._view.getWindow().getPeer()
             if url != '':
                 message = self._model.getProviderName(url)
-                parent = self._view.getWindow().getPeer()
                 user = getOAuth2UserName(self._ctx, self, url, message, parent, message)
-            parent = self._view.getWindow()
             close = self._view.getAutoClose()
             args = {'Url': url, 'UserName': user, 'ParentWindow': parent, 'Close': close}
             executeDispatch(self._ctx, 'oauth2:Wizard', **args)
