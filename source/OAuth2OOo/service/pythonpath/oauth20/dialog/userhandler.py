@@ -47,9 +47,8 @@ class UserHandler(unohelper.Base,
                 self._manager.setUserName(event.Source.Text.strip())
                 handled = True
             return handled
-        except Exception as e:
-            msg = "Error: %s" % traceback.print_exc()
-            print(msg)
+        except:
+            print("UserHandler.callHandlerMethod() ERROR: %s" % traceback.format_exc())
 
     def getSupportedMethodNames(self):
         return ('SetUser', )

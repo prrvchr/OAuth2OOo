@@ -53,11 +53,11 @@ class WindowHandler(unohelper.Base,
                 self._manager.refreshToken()
                 handled = True
             return handled
-        except Exception as e:
-            msg = "Error: %s" % traceback.print_exc()
-            print(msg)
+        except:
+            print("WindowHandler.callHandlerMethod() ERROR: %s" % traceback.format_exc())
 
     def getSupportedMethodNames(self):
         return ('Update',
                 'Delete',
                 'Refresh')
+

@@ -95,9 +95,8 @@ class WindowHandler(unohelper.Base,
                 self._manager.removeScope()
                 handled = True
             return handled
-        except Exception as e:
-            msg = "Error: %s" % traceback.print_exc()
-            print(msg)
+        except:
+            print("WindowHandler.callHandlerMethod() ERROR: %s" % traceback.format_exc())
 
     def getSupportedMethodNames(self):
         return ('SetUser',
@@ -113,3 +112,4 @@ class WindowHandler(unohelper.Base,
                 'AddScope',
                 'EditScope',
                 'RemoveScope')
+

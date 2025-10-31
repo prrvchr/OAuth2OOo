@@ -73,7 +73,6 @@ class Dispatch(unohelper.Base,
             url = user = ''
             readonly = False
             close = True
-            parent = None
             for argument in arguments:
                 if argument.Name == 'Url':
                     url = argument.Value
@@ -81,11 +80,9 @@ class Dispatch(unohelper.Base,
                     user = argument.Value
                 elif argument.Name == 'ReadOnly':
                     readonly = argument.Value
-                elif argument.Name == 'ParentWindow':
-                    parent = argument.Value
                 elif argument.Name == 'Close':
                     close = argument.Value
-            state, result = self._showOAuth2Wizard(url, user, readonly, parent, close)
+            state, result = self._showOAuth2Wizard(url, user, readonly, close)
         return state, result
 
     def addStatusListener(self, listener, url):
@@ -101,14 +98,14 @@ class Dispatch(unohelper.Base,
             self._listeners.remove(listener)
 
     # Show the OAuth2OOo Wizard
-    def _showOAuth2Wizard(self, url, user, readonly, parent, close):
+    def _showOAuth2Wizard(self, url, user, readonly, close):
         state = FAILURE
         result = ()
         unowizard = getConfiguration(self._ctx, g_identifier).getByName('UnoWizard')
         if unowizard:
             wizard = createService(self._ctx, 'com.sun.star.ui.dialogs.Wizard')
         else:
-            wizard = Wizard(self._ctx, g_wizard_page, True, parent)
+            wizard = Wizard(self._ctx, g_wizard_page)
         controller = WizardController(self._ctx, wizard, close, readonly, url, user)
         if unowizard:
             arguments = ((uno.Any('[][]short', g_wizard_paths), controller), )
@@ -119,6 +116,5 @@ class Dispatch(unohelper.Base,
         if wizard.execute() == OK:
             state = SUCCESS
             result = (controller.Url, controller.User, controller.Token)
-        controller.dispose()
         return state, result
 

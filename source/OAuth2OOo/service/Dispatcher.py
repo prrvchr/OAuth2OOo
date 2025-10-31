@@ -60,7 +60,6 @@ class Dispatcher(unohelper.Base,
     def initialize(self, args):
         if isinstance(args, tuple) and len(args) and hasFrameInterface(args[0]):
             self._frame = args[0]
-            print("Dispatcher.initialize() 1")
 
 # XDispatchProvider
     def queryDispatch(self, url, frame, flags):
@@ -84,6 +83,8 @@ class Dispatcher(unohelper.Base,
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
+
 g_ImplementationHelper.addImplementation(Dispatcher,                      # UNO object class
                                          g_ImplementationName,            # Implementation name
                                          g_ServiceNames)                  # List of implemented services
+

@@ -30,6 +30,8 @@
 import uno
 import unohelper
 
+from com.sun.star.lang import XComponent
+
 from com.sun.star.ui.dialogs import XWizardController
 
 from com.sun.star.logging.LogLevel import INFO
@@ -54,7 +56,8 @@ import traceback
 
 
 class WizardController(unohelper.Base,
-                       XWizardController):
+                       XWizardController,
+                       XComponent):
     def __init__(self, ctx, wizard, close, readonly, url, user):
         self._ctx = ctx
         self._wizard = wizard
@@ -74,7 +77,16 @@ class WizardController(unohelper.Base,
 
     def dispose(self):
         self._model.dispose()
-        self._wizard.DialogWindow.dispose()
+
+# XComponent
+    def dispose(self):
+        self._model.dispose()
+
+    def addEventListener(self, listener):
+        pass
+
+    def removeEventListener(self, listener):
+        pass
 
 # XWizardController
     def createPage(self, parent, pageid):
@@ -101,9 +113,6 @@ class WizardController(unohelper.Base,
         msg = "PageId: %s..." % pageid
         title = self._model.getPageTitle(self._resolver, pageid)
         self._wizard.setTitle(title)
-        backward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.PREVIOUS')
-        forward = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.NEXT')
-        finish = uno.getConstantByName('com.sun.star.ui.dialogs.WizardButton.FINISH')
         msg += " Done"
         self._logger.logp(INFO, 'WizardController', 'onActivatePage()', msg)
 
