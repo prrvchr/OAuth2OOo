@@ -353,6 +353,7 @@ This might help me find a solution to allow automatic updating of extensions in 
 
 ### What has been done for version 1.6.1:
 
+- All modal windows now open correctly in modal mode.
 - Updated the [Python pyRdfa3][54] package to version 3.6.5.
 
 ### What remains to be done for version 1.6.1:

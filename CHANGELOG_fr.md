@@ -353,6 +353,7 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 
 ### Ce qui a été fait pour la version 1.6.1:
 
+- Toutes les fenêtres modales s'ouvrent désormais correctement en mode modal.
 - Mise à jour du paquet [Python pyRdfa3][54] vers la version 3.6.5.
 
 ### Que reste-t-il à faire pour la version 1.6.1:
