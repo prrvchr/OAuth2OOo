@@ -116,5 +116,7 @@ class Dispatch(unohelper.Base,
         if wizard.execute() == OK:
             state = SUCCESS
             result = (controller.Url, controller.User, controller.Token)
+        if unowizard:
+            wizard.DialogWindow.dispose()
         return state, result
 
