@@ -86,11 +86,10 @@ class OptionsManager(unohelper.Base):
             url = self._view.getUrl()
             if url != '':
                 message = self._model.getProviderName(url)
-                parent = self._view.getWindow().getPeer()
-                user = getOAuth2UserName(self._ctx, self, url, message, parent, message)
-            parent = self._view.getWindow()
+                user = getOAuth2UserName(self._ctx, self, url, message)
+            readonly = user and url
             close = self._view.getAutoClose()
-            args = {'Url': url, 'UserName': user, 'ParentWindow': parent, 'Close': close}
+            args = {'Url': url, 'UserName': user, 'ReadOnly': readonly, 'Close': close}
             executeDispatch(self._ctx, 'oauth2:Wizard', **args)
             self._logger.logprb(INFO, 'OptionsManager', 'connect()', 181, user, url)
         except Exception as e:

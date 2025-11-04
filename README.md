@@ -29,7 +29,7 @@
 
 **The use of this software subjects you to our [Terms Of Use][4] and [Data Protection Policy][5].**
 
-# version [1.6.0][6]
+# version [1.6.1][6]
 
 ## Introduction:
 
@@ -212,7 +212,7 @@ ___
 [3]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_en>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
-[6]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG#what-has-been-done-for-version-160>
+[6]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG#what-has-been-done-for-version-161>
 [7]: <https://prrvchr.github.io>
 [8]: <https://www.libreoffice.org/download/download/>
 [9]: <https://www.openoffice.org/download/index.html>
@@ -240,7 +240,7 @@ ___
 [31]: <https://packaging.python.org/en/latest/tutorials/installing-packages/#use-pip-for-installing>
 [32]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [33]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
-[34]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.6.0#right>
+[34]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.6.1#right>
 [35]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
 [36]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
 [37]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>

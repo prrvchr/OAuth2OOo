@@ -57,9 +57,8 @@ class ScopeHandler(unohelper.Base,
                 self._manager.removeScopeValue()
                 handled = True
             return handled
-        except Exception as e:
-            msg = "Error: %s" % traceback.print_exc()
-            print(msg)
+        except:
+            print("ScopeHandler.callHandlerMethod() ERROR: %s" % traceback.format_exc())
 
     def getSupportedMethodNames(self):
         return ('Select',

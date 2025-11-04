@@ -88,7 +88,7 @@ class OAuth2Manager(unohelper.Base,
         self._view.setToken(*self._model.getUserTokenData(self._resolver))
 
     def deleteUser(self):
-        dialog = createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
+        dialog = createMessageBox(self._ctx, *self._model.getMessageBoxData())
         if dialog.execute() == OK:
             self._model.deleteUser()
             self._wizard.travelPrevious()

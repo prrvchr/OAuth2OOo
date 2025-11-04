@@ -72,6 +72,11 @@ class OAuth2View():
         control.Model.StringItemList = urls
         control.Text = url
         control.Model.Enabled = enabled
+        self._getProviders().Model.Enabled = enabled
+        self._getScopes().Model.Enabled = enabled
+        self.enableRemoveUrl(enabled)
+        self.enableEditProvider(enabled)
+        self.enableEditScope(enabled)
 
     def enableAddUrl(self, enabled):
         self._getAddUrl().Model.Enabled = enabled

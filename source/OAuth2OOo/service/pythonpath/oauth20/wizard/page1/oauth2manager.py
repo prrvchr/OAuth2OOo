@@ -207,7 +207,7 @@ class OAuth2Manager(unohelper.Base,
 
 # OAuth2Manager private getter methods
     def _getMessageBox(self):
-        return createMessageBox(self._view.getWindow().Peer, *self._model.getMessageBoxData())
+        return createMessageBox(self._ctx, *self._model.getMessageBoxData())
 
 # OAuth2Manager private setter methods
     def _setActivePath(self):

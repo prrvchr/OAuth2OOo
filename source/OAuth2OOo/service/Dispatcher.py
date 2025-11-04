@@ -83,6 +83,8 @@ class Dispatcher(unohelper.Base,
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
+
 g_ImplementationHelper.addImplementation(Dispatcher,                      # UNO object class
                                          g_ImplementationName,            # Implementation name
                                          g_ServiceNames)                  # List of implemented services
+

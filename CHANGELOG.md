@@ -351,7 +351,15 @@ This might help me find a solution to allow automatic updating of extensions in 
 - All methods needed for rendering and running in the background now use the UNO service [com.sun.star.awt.AsyncCallback][116] for callback.
 - Has been tested under LibreOfficeDev 26.2.
 
-### What remains to be done for version 1.6.0:
+### What has been done for version 1.6.1:
+
+- If the OAuth2 configuration wizard is opened in read-only mode, then the first page of the wizard is no longer editable.
+- This can be verified in the extension options by launching the wizard and providing a URL and a username.
+- It is possible to use the UNO Wizard service instead of the embedded Wizard by modifying the parameter `io.github.prrvchr.OAuth2OOo.UnoWizard` in the LibreOffice expert configuration.
+- All modal windows now open correctly in modal mode.
+- Updated the [Python pyRdfa3][54] package to version 3.6.5.
+
+### What remains to be done for version 1.6.1:
 
 - Add new language for internationalization...
 

@@ -29,6 +29,8 @@
 
 import uno
 
+from com.sun.star.awt.MessageBoxType import MESSAGEBOX
+
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
@@ -195,8 +197,7 @@ class WizardModel(TokenModel):
         self.commit()
 
     def getMessageBoxData(self):
-        box = uno.Enum('com.sun.star.awt.MessageBoxType', 'MESSAGEBOX')
-        return box, 2, self.getDialogTitle(), self.getDialogMessage()
+        return self.getDialogTitle(), self.getDialogMessage(), MESSAGEBOX, 2
 
     def _getProviderData(self, provider):
         clientid = provider.getByName('ClientId')

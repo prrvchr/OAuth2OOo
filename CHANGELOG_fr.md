@@ -351,7 +351,15 @@ Cela pourrait m'aider à trouver une solution pour permettre la mise à jour aut
 - Toutes les méthodes nécessaires à l'affichage et s'exécutant en arrière-plan utilisent désormais le service UNO [com.sun.star.awt.AsyncCallback][116] pour le rappel.
 - A été testé sous LibreOfficeDev 26.2.
 
-### Que reste-t-il à faire pour la version 1.6.0:
+### Ce qui a été fait pour la version 1.6.1:
+
+- Si l'assistant de configuration OAuth2 est ouvert en mode lecture seule alors la première page de l'assistant n'est plus modifiable.
+- Ceci peut être vérifié dans les options de l'extension en lançant l'assistant et en fournissant une URL et un nom d'utilisateur.
+- Il est possible d'utiliser le service UNO Wizard au lieu de l'assistant intégré en modifiant le paramètre `io.github.prrvchr.OAuth2OOo.UnoWizard` dans la configuration experte de LibreOffice.
+- Toutes les fenêtres modales s'ouvrent désormais correctement en mode modal.
+- Mise à jour du paquet [Python pyRdfa3][54] vers la version 3.6.5.
+
+### Que reste-t-il à faire pour la version 1.6.1:
 
 - Ajouter de nouvelles langue pour l'internationalisation...
 
