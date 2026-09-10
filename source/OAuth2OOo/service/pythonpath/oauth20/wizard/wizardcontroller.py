@@ -75,9 +75,6 @@ class WizardController(unohelper.Base,
     def Token(self):
         return self._model.getAccessToken(self._wizard)
 
-    def dispose(self):
-        self._model.dispose()
-
 # XComponent
     def dispose(self):
         self._model.dispose()

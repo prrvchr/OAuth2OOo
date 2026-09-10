@@ -171,9 +171,12 @@ class _TroveClassifier:
 
 <<<<<<< HEAD
     downloaded: typing.Union[None, "Literal[False]", typing.Set[str]]
+<<<<<<< HEAD
 =======
     downloaded: None | Literal[False] | set[str]
 >>>>>>> master
+=======
+>>>>>>> 6bdf97b2 (new version 1.7.0)
     """
     None => not cached yet
     False => unavailable
@@ -430,6 +433,7 @@ try:
         try:
             _licenses.canonicalize_license_expression(value)
 <<<<<<< HEAD
+<<<<<<< HEAD
             return True
         except _licenses.InvalidLicenseExpression:
             return False
@@ -438,6 +442,11 @@ try:
             return False
         return True
 >>>>>>> master
+=======
+            return True
+        except _licenses.InvalidLicenseExpression:
+            return False
+>>>>>>> 6bdf97b2 (new version 1.7.0)
 
 except ImportError:  # pragma: no cover
     _logger.warning(
@@ -446,6 +455,7 @@ except ImportError:  # pragma: no cover
         "To enforce validation, please install `packaging>=24.2`."
     )
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     def SPDX(value: str) -> bool:
         return True
@@ -477,3 +487,7 @@ def import_name(value: str) -> bool:
     idents, _, _ = value.partition(";")
     return all(not keyword.iskeyword(ident) for ident in idents.rstrip().split("."))
 >>>>>>> master
+=======
+    def SPDX(value: str) -> bool:
+        return True
+>>>>>>> 6bdf97b2 (new version 1.7.0)

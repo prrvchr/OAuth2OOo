@@ -42,12 +42,16 @@ from com.sun.star.frame import XNotifyingDispatch
 from .wizard import Wizard
 from .wizard import WizardController
 
+from .unotool import createMessageBox
 from .unotool import createService
 from .unotool import getConfiguration
+from .unotool import getStringResource
 
 from .configuration import g_wizard_paths
 from .configuration import g_wizard_page
 from .configuration import g_identifier
+
+from .oauth20 import g_checkSetup
 
 import traceback
 
@@ -58,6 +62,8 @@ class Dispatch(unohelper.Base,
         self._ctx = ctx
         self._frame = frame
         self._listeners = []
+        self._resources = {'Title': 'Dispatch.ErrorBox.Title',
+                           'Message': 'Dispatch.ErrorBox.Message'}
 
 # XNotifyingDispatch
     def dispatchWithNotification(self, uri, arguments, listener):
@@ -69,7 +75,9 @@ class Dispatch(unohelper.Base,
     def dispatch(self, uri, arguments):
         state = FAILURE
         result = ()
-        if uri.Path == 'Wizard':
+        if g_checkSetup:
+            self._showMessageBox()
+        elif uri.Path == 'Wizard':
             url = user = ''
             readonly = False
             close = True
@@ -96,6 +104,15 @@ class Dispatch(unohelper.Base,
     def removeStatusListener(self, listener, url):
         if listener in self._listeners:
             self._listeners.remove(listener)
+
+    # Show MessageBox Error
+    def _showMessageBox(self):
+        resolver = getStringResource(self._ctx, g_identifier, 'dialogs', 'MessageBox')
+        title = resolver.resolveString(self._resources.get('Title'))
+        message = resolver.resolveString(self._resources.get('Message'))
+        dialog = createMessageBox(self._ctx, title, message)
+        dialog.execute()
+        dialog.dispose()
 
     # Show the OAuth2OOo Wizard
     def _showOAuth2Wizard(self, url, user, readonly, close):
