@@ -2,6 +2,9 @@
 layout: default
 title: OAuth2OOo documentation (Français)
 permalink: /fr/
+redirect_from:
+  - /README_fr
+  - /README_fr.html
 ---
 <!--
 ╔════════════════════════════════════════════════════════════════════════════════════╗

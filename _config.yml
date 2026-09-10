@@ -6,6 +6,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-seo-tag
   - jemoji
+  - jekyll-redirect-from
 favicon: true
 logo: /img/oauth2.svg
 email: prrvchr@gmail.com
