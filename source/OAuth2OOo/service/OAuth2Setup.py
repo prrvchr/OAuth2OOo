@@ -27,63 +27,61 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
 
-from com.sun.star.logging.LogLevel import SEVERE
-
-from com.sun.star.awt import XContainerWindowEventHandler
 from com.sun.star.lang import XServiceInfo
+from com.sun.star.task import XAsyncJob
+from com.sun.star.util import XCloseable
 
-from oauth20 import OptionsManager
+from oauth20 import SetupManager
 
-from oauth20 import getLogger
+from oauth20 import createMessageBox
+from oauth20 import getStringResource
 
-from oauth20 import g_identifier
-from oauth20 import g_defaultlog
-from oauth20 import g_basename
+from .oauth20 import g_checkSetup
+from .oauth20 import g_identifier
 
+
+import socket
 import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = 'io.github.prrvchr.OAuth2OOo.OptionsHandler'
-g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.OptionsHandler', )
+g_ImplementationName = 'io.github.prrvchr.OAuth2OOo.OAuth2Setup'
+g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.OAuth2Setup',
+                  'com.sun.star.task.Job')
 
 
-class OptionsHandler(unohelper.Base,
-                     XServiceInfo,
-                     XContainerWindowEventHandler):
+class OAuth2Setup(unohelper.Base,
+                  XServiceInfo,
+                  XAsyncJob,
+                  XCloseable):
     def __init__(self, ctx):
         self._ctx = ctx
-        self._manager = None
-        self._logger = getLogger(ctx, g_defaultlog, g_basename)
+        self._name = 'SetupWindow'
+        self._resources = {'Title': 'OAuthSetup.ErrorBox.Title',
+                           'Message': 'OAuthSetup.ErrorBox.Message'}
 
-    # XContainerWindowEventHandler
-    def callHandlerMethod(self, window, event, method):
+    # XAsyncJob
+    def executeAsync(self, arguments, listener):
         try:
-            handled = False
-            if method == 'external_event':
-                if event == 'initialize':
-                    self._manager = OptionsManager(self._ctx, window, self._logger)
-                    handled = True
-                elif event == 'ok':
-                    self._manager.saveSetting()
-                    handled = True
-                elif event == 'back':
-                    self._manager.loadSetting()
-                    handled = True
-            elif method == 'Connect':
-                self._manager.connect()
-                handled = True
-            return handled
+            if g_checkSetup:
+                if self._checkInternet():
+                    SetupManager(self._ctx, self._name)
+                else:
+                    self._showMessageBox()
         except Exception as e:
-            print("OptionsHandler.callHandlerMethod() ERROR: %s" % traceback.format_exc())
-            self._logger.logprb(SEVERE, 'OptionsHandler', 'callHandlerMethod()', 141, e, traceback.format_exc())
+            # FIXME: It is essential to notify LibreOffice of
+            # FIXME: the Job's completion so as not to block its loading.
+            pass
+        finally:
+            if listener is not None:
+                listener.jobFinished(self, None)
+        return None
 
-    def getSupportedMethodNames(self):
-        return ('external_event',
-                'Connect')
+    # XCloseable
+    def close(self, deliverOwnership):
+        print("OAuth2Setup.close() ************************************")
 
     # XServiceInfo
     def supportsService(self, service):
@@ -93,8 +91,26 @@ class OptionsHandler(unohelper.Base,
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
+    # Show MessageBox Error
+    def _showMessageBox(self):
+        resolver = getStringResource(self._ctx, g_identifier, 'dialogs', 'MessageBox')
+        title = resolver.resolveString(self._resources.get('Title'))
+        message = resolver.resolveString(self._resources.get('Message'))
+        dialog = createMessageBox(self._ctx, title, message)
+        dialog.execute()
+        dialog.dispose()
 
-g_ImplementationHelper.addImplementation(OptionsHandler,                            # UNO object class
-                                         g_ImplementationName,                      # Implementation name
-                                         g_ServiceNames)                            # List of implemented services
+    def _checkInternet(self, host="8.8.8.8", port=53, timeout=3):
+        try:
+            socket.setdefaulttimeout(timeout)
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((host, port))
+            return True
+        except (OSError, socket.timeout):
+            return False
+
+
+g_ImplementationHelper.addImplementation(OAuth2Setup,
+                                         g_ImplementationName,
+                                         g_ServiceNames)
 

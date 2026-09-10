@@ -1,3 +1,0 @@
-[console_scripts]
-imapclient-interact = imapclient.interact:main
-imapclient-livetest = imapclient.livetest:main

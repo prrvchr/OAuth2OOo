@@ -45,8 +45,6 @@ from lxml import etree
 from jsonpath_ng import parse
 import extruct
 from w3lib.html import get_base_url
-#from rdflib.plugin import register, Serializer
-#register('json-ld', Serializer, 'rdflib_jsonld.serializer', 'JsonLDSerializer')
 
 import json
 from six import string_types, text_type
