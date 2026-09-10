@@ -1,3 +1,0 @@
-sca:
-  - dependency_name: html5lib-modern
-    reason: False Positive
