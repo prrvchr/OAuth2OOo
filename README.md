@@ -1,7 +1,7 @@
 ---
 layout: default
 title: OAuth2OOo documentation (English)
-permalink: /OAuth2OOo/
+permalink: /
 ---
 <!--
 ╔════════════════════════════════════════════════════════════════════════════════════╗

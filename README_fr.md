@@ -1,7 +1,7 @@
 ---
 layout: default
 title: OAuth2OOo documentation (Français)
-permalink: /OAuth2OOo/fr/
+permalink: /fr/
 ---
 <!--
 ╔════════════════════════════════════════════════════════════════════════════════════╗
