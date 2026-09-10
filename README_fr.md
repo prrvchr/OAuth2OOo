@@ -1,3 +1,8 @@
+---
+layout: default
+title: OAuth2OOo documentation (Français)
+permalink: /OAuth2OOo/fr/
+---
 <!--
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                    ║
@@ -207,6 +212,8 @@ ___
 
 ### [Toutes les changements sont consignées dans l'Historique des versions][52]
 
+[Configurer les extensions LibreOffice][53]
+
 [1]: </img/oauth2.svg#collapse>
 [2]: <https://prrvchr.github.io/OAuth2OOo/>
 [3]: <https://prrvchr.github.io/OAuth2OOo>
@@ -259,3 +266,4 @@ ___
 [50]: <https://github.com/prrvchr/OAuth2OOo.git>
 [51]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
 [52]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG_fr>
+[53]: <https://prrvchr.github.io/fr/setup/>
