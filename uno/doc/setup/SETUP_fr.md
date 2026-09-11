@@ -60,6 +60,8 @@ ___
 
 ![Setup page6 screenshot][11]
 
+Pour garantir un démarrage rapide de LibreOffice, il est recommandé de laisser l'option **Ignorer cette vérification au démarrage** sélectionnée.
+
 [1]: </img/github.svg#collapse>
 [2]: <https://prrvchr.github.io/>
 [3]: <../>
