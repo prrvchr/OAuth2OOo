@@ -219,7 +219,7 @@ ___
 
 [1]: </img/oauth2.svg#collapse>
 [2]: <https://prrvchr.github.io/OAuth2OOo/>
-[3]: <https://prrvchr.github.io/OAuth2OOo>
+[3]: <https://prrvchr.github.io/OAuth2OOo/>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_fr>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_fr>
 [6]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG_fr#ce-qui-a-été-fait-pour-la-version-161>
@@ -269,4 +269,4 @@ ___
 [50]: <https://github.com/prrvchr/OAuth2OOo.git>
 [51]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
 [52]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG_fr>
-[53]: <https://prrvchr.github.io/fr/setup/>
+[53]: <./setup/fr/>

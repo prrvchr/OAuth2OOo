@@ -2,6 +2,9 @@
 layout: default
 title: OAuth2OOo documentation (English)
 permalink: /
+redirect_from:
+  - /README
+  - /README.html
 ---
 <!--
 ╔════════════════════════════════════════════════════════════════════════════════════╗
@@ -216,7 +219,7 @@ ___
 
 [1]: </img/oauth2.svg#collapse>
 [2]: <https://prrvchr.github.io/OAuth2OOo/>
-[3]: <https://prrvchr.github.io/OAuth2OOo/README_fr>
+[3]: <https://prrvchr.github.io/OAuth2OOo/fr/>
 [4]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/TermsOfUse_en>
 [5]: <https://prrvchr.github.io/OAuth2OOo/source/OAuth2OOo/registration/PrivacyPolicy_en>
 [6]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG#what-has-been-done-for-version-161>
@@ -266,4 +269,4 @@ ___
 [50]: <https://github.com/prrvchr/OAuth2OOo.git>
 [51]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
 [52]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG>
-[53]: <https://prrvchr.github.io/setup/>
+[53]: <./setup/>
