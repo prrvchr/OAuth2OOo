@@ -169,7 +169,11 @@ class _TroveClassifier:
     option (classifiers will be validated anyway during the upload to PyPI).
     """
 
+<<<<<<< HEAD
+    downloaded: typing.Union[None, "Literal[False]", typing.Set[str]]
+=======
     downloaded: None | Literal[False] | set[str]
+>>>>>>> master
     """
     None => not cached yet
     False => unavailable
@@ -425,9 +429,15 @@ try:
         """
         try:
             _licenses.canonicalize_license_expression(value)
+<<<<<<< HEAD
+            return True
+        except _licenses.InvalidLicenseExpression:
+            return False
+=======
         except _licenses.InvalidLicenseExpression:
             return False
         return True
+>>>>>>> master
 
 except ImportError:  # pragma: no cover
     _logger.warning(
@@ -436,6 +446,10 @@ except ImportError:  # pragma: no cover
         "To enforce validation, please install `packaging>=24.2`."
     )
 
+<<<<<<< HEAD
+    def SPDX(value: str) -> bool:
+        return True
+=======
     def SPDX(value: str) -> bool:  # noqa: ARG001
         return True
 
@@ -462,3 +476,4 @@ def import_name(value: str) -> bool:
 
     idents, _, _ = value.partition(";")
     return all(not keyword.iskeyword(ident) for ident in idents.rstrip().split("."))
+>>>>>>> master

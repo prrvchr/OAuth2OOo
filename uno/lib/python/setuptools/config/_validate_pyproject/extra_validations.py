@@ -32,6 +32,8 @@ class IncludedDependencyGroupMustExist(ValidationError):
     _URL = "https://peps.python.org/pep-0735/"
 
 
+<<<<<<< HEAD
+=======
 class ImportNameCollision(ValidationError):
     _DESC = """According to PEP 794:
 
@@ -50,6 +52,7 @@ class ImportNameMissing(ValidationError):
     _URL = "https://peps.python.org/pep-0794/"
 
 
+>>>>>>> master
 def validate_project_dynamic(pyproject: T) -> T:
     project_table = pyproject.get("project", {})
     dynamic = project_table.get("dynamic", [])
@@ -98,6 +101,9 @@ def validate_include_depenency(pyproject: T) -> T:
     return pyproject
 
 
+<<<<<<< HEAD
+EXTRA_VALIDATIONS = (validate_project_dynamic, validate_include_depenency)
+=======
 def _remove_private(items: Iterable[str]) -> Generator[str, None, None]:
     for item in items:
         yield item.partition(";")[0].rstrip()
@@ -149,3 +155,4 @@ EXTRA_VALIDATIONS = (
     validate_include_depenency,
     validate_import_name_issues,
 )
+>>>>>>> master
