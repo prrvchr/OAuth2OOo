@@ -62,6 +62,8 @@ ___
 
 Pour garantir un démarrage rapide de LibreOffice, il est recommandé de laisser l'option **Ignorer cette vérification au démarrage** sélectionnée.
 
+**Vous devez redémarrer LibreOffice pour que ces modifications prennent effet**.
+
 [1]: </img/github.svg#collapse>
 [2]: <https://prrvchr.github.io/>
 [3]: <../>

@@ -62,6 +62,8 @@ ___
 
 To ensure a quick startup of LibreOffice, it is recommended to leave the **Disable this startup check** option selected.
 
+**You must restart LibreOffice for these changes to take effect**.
+
 [1]: </img/github.svg#collapse>
 [2]: <https://prrvchr.github.io/>
 [3]: <./fr/>
