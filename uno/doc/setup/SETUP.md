@@ -66,10 +66,10 @@ To ensure a quick startup of LibreOffice, it is recommended to leave the **Disab
 [2]: <https://prrvchr.github.io/>
 [3]: <./fr/>
 [4]: <../>
-[5]: <../../img/SetupWizard1.png>
+[5]: <../img/SetupWizard1.png>
 [6]: <../#installation>
-[7]: <../../img/SetupWizard2.png>
-[8]: <../../img/SetupWizard3.png>
-[9]: <../../img/SetupWizard4.png>
-[10]: <../../img/SetupWizard5.png>
-[11]: <../../img/SetupWizard6.png>
+[7]: <../img/SetupWizard2.png>
+[8]: <../img/SetupWizard3.png>
+[9]: <../img/SetupWizard4.png>
+[10]: <../img/SetupWizard5.png>
+[11]: <../img/SetupWizard6.png>
