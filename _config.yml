@@ -2,7 +2,7 @@ url: "https://prrvchr.github.io"
 baseurl: "/OAuth2OOo"
 remote_theme: prrvchr/minimalist
 include:
-  - uno/docs/
+  - uno/doc/setup/
 plugins:
   - jekyll-redirect-from
   - jekyll-remote-theme
