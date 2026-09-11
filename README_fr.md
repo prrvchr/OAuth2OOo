@@ -269,5 +269,4 @@ ___
 [50]: <https://github.com/prrvchr/OAuth2OOo.git>
 [51]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
 [52]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG_fr>
-[53]: <./setup/>
-
+[53]: <../setup/fr/>

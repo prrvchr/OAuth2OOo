@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Configurer les extensions LibreOffice (Français)
-permalink: /fr/setup/
+permalink: /setup/fr/
 ---
 <!--
 ╔════════════════════════════════════════════════════════════════════════════════════╗
@@ -38,5 +38,5 @@ ___
 
 [1]: </img/github.svg#collapse>
 [2]: <https://prrvchr.github.io/>
-[3]: <../../setup/>
-[4]: <../>
+[3]: <../>
+[4]: <../../fr/>

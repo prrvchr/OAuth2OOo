@@ -38,5 +38,5 @@ ___
 
 [1]: </img/github.svg#collapse>
 [2]: <https://prrvchr.github.io/>
-[3]: <../fr/setup/>
+[3]: <./fr/>
 [4]: <../>
