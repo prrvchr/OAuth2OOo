@@ -93,9 +93,9 @@ ___
 
 The minimum version of LibreOffice supported by the OAuth2OOo extension depends on how you installed LibreOffice on your computer:
 
-- **Regardless of platform**, if you installed LibreOffice from the [LibreOffice download site][29], **the minimum version of LibreOffice is 7.0**.
+- **Regardless of platform**, if you installed LibreOffice from the [LibreOffice download site][29], **the minimum version of LibreOffice is 7.5**.
 
-- **On Linux**, if you used the package manager to install LibreOffice, **the minimum version of LibreOffice is 6.0**. However, you must ensure that the system-provided Python version is not lower than 3.8.  
+- **On Linux**, if you used the package manager to install LibreOffice, **the minimum version of LibreOffice is 6.0**. However, you must ensure that the system-provided Python version is not lower than 3.10.  
 In addition, your system-provided Python packages can be out of date. The extension's logging will allow you to check if this is the case. It is accessible via the menu: **Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System Info** and requires restarting LibreOffice after activation.  
 If outdated packages appear, you can update them with this procedure:  
     - Download the file [requirements.txt][30].
@@ -119,6 +119,8 @@ Restart LibreOffice after installation.
 **Be careful, restarting LibreOffice may not be enough.**
 - **On Windows** to ensure that LibreOffice restarts correctly, use Windows Task Manager to verify that no LibreOffice services are visible after LibreOffice shuts down (and kill it if so).
 - **Under Linux or macOS** you can also ensure that LibreOffice restarts correctly, by launching it from a terminal with the command `soffice` and using the key combination `Ctrl + C` if after stopping LibreOffice, the terminal is not active (no command prompt).
+
+After this restart, you will be asked **to install Python packages containing binary files**. Please refer to the [Installing Python packages][] section for more information.
 
 ___
 

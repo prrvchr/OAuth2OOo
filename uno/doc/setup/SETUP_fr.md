@@ -28,15 +28,43 @@ permalink: /setup/fr/
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 -->
-# [![GitHub logo][1]][2] Configurer les extensions LibreOffice
+# [![GitHub logo][1]][2] Installation de paquets Python
 
 **This [document][3] in English.**
 
-**Retour à la [documentation][4].**
+Concernant l'installation, la configuration et l'utilisation,
+veuillez consulter la **[Documentation][4]**.
+
+## Introduction:
+
+Si l'extension LibreOffice que vous venez d'installer nécessite des paquets Python contenant des fichiers binaires,
+un assistant vous invitera à installer ces paquets lors du premier redémarrage.
+
+L'extension ne peut pas être utilisée tant que cette procédure n'a pas été exécutée et que LibreOffice n'a pas été redémarré.
 
 ___
+
+## Configuration des paquets Python:
+
+![Setup page1 screenshot][5]
+
+![Setup page2 screenshot][6]
+
+![Setup page3 screenshot][7]
+
+![Setup page4 screenshot][8]
+
+![Setup page5 screenshot][9]
+
+![Setup page6 screenshot][10]
 
 [1]: </img/github.svg#collapse>
 [2]: <https://prrvchr.github.io/>
 [3]: <../>
 [4]: <../../fr/>
+[5]: <../../img/SetupWizard1_fr.png>
+[6]: <../../img/SetupWizard2_fr.png>
+[7]: <../../img/SetupWizard3_fr.png>
+[8]: <../../img/SetupWizard4_fr.png>
+[9]: <../../img/SetupWizard5_fr.png>
+[10]: <../../img/SetupWizard6_fr.png>
