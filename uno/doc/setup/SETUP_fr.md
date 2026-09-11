@@ -48,23 +48,26 @@ ___
 
 ![Setup page1 screenshot][5]
 
-![Setup page2 screenshot][6]
+**Si cette fenêtre n'apparaît pas au redémarrage de LibreOffice**, cela signifie que [LibreOffice n'a pas été fermé correctement][6].
 
-![Setup page3 screenshot][7]
+![Setup page2 screenshot][7]
 
-![Setup page4 screenshot][8]
+![Setup page3 screenshot][8]
 
-![Setup page5 screenshot][9]
+![Setup page4 screenshot][9]
 
-![Setup page6 screenshot][10]
+![Setup page5 screenshot][10]
+
+![Setup page6 screenshot][11]
 
 [1]: </img/github.svg#collapse>
 [2]: <https://prrvchr.github.io/>
 [3]: <../>
 [4]: <../../fr/>
 [5]: <../../img/SetupWizard1_fr.png>
-[6]: <../../img/SetupWizard2_fr.png>
-[7]: <../../img/SetupWizard3_fr.png>
-[8]: <../../img/SetupWizard4_fr.png>
-[9]: <../../img/SetupWizard5_fr.png>
-[10]: <../../img/SetupWizard6_fr.png>
+[6]: <../../fr/#installation>
+[7]: <../../img/SetupWizard2_fr.png>
+[8]: <../../img/SetupWizard3_fr.png>
+[9]: <../../img/SetupWizard4_fr.png>
+[10]: <../../img/SetupWizard5_fr.png>
+[11]: <../../img/SetupWizard6_fr.png>

@@ -120,7 +120,7 @@ Restart LibreOffice after installation.
 - **On Windows** to ensure that LibreOffice restarts correctly, use Windows Task Manager to verify that no LibreOffice services are visible after LibreOffice shuts down (and kill it if so).
 - **Under Linux or macOS** you can also ensure that LibreOffice restarts correctly, by launching it from a terminal with the command `soffice` and using the key combination `Ctrl + C` if after stopping LibreOffice, the terminal is not active (no command prompt).
 
-After this restart, you will be asked **to install Python packages containing binary files**. Please refer to the [Installing Python packages][] section for more information.
+After this restart, you will be asked **to install Python packages containing binary files**. Please refer to the [Installing Python packages][35] section for more information.
 
 ___
 
@@ -145,10 +145,10 @@ oRequest = createUnoServiceWithArguments("io.github.prrvchr.OAuth2OOo.OAuth2Serv
 
 ### Use the UNO OAuth2Service to perform HTTP requests:
 
-You now have an `oRequest` object that responds to the interface defined in the [XOAuth2Service.idl][35] file.  
+You now have an `oRequest` object that responds to the interface defined in the [XOAuth2Service.idl][36] file.  
 With this interface, two methods are required to execute an HTTP request:
-- `getRequestParameter([in] string Name)`, which allows you to obtain an object responding to the [XRequestParameter.idl][36] interface. This interface allows you to configure the HTTP request before execution.
-- `execute([in] com::sun::star::rest::XRequestParameter Parameter)`, which allows you to obtain an object responding to the [XRequestResponse.idl][37] interface. This allows you to achieve almost anything possible with an HTTP response.
+- `getRequestParameter([in] string Name)`, which allows you to obtain an object responding to the [XRequestParameter.idl][37] interface. This interface allows you to configure the HTTP request before execution.
+- `execute([in] com::sun::star::rest::XRequestParameter Parameter)`, which allows you to obtain an object responding to the [XRequestResponse.idl][38] interface. This allows you to achieve almost anything possible with an HTTP response.
 
 To go further, I advise you to take a look at the macros that are delivered with the extension and which implement all types of HTTP requests.
 
@@ -156,21 +156,21 @@ ___
 
 ## Uno OAuth2.0 API for LibreOffice.
 
-![OAuth2OOo Wizard Page1 screenshot][38]
+![OAuth2OOo Wizard Page1 screenshot][39]
 
-![OAuth2OOo Wizard Page2 screenshot][39]
+![OAuth2OOo Wizard Page2 screenshot][40]
 
-![OAuth2OOo Wizard Page3 screenshot][40]
+![OAuth2OOo Wizard Page3 screenshot][41]
 
-![OAuth2OOo Browser Page1 screenshot][41]
+![OAuth2OOo Browser Page1 screenshot][42]
 
-![OAuth2OOo Browser Page2 screenshot][42]
+![OAuth2OOo Browser Page2 screenshot][43]
 
-![OAuth2OOo Browser Page3 screenshot][43]
+![OAuth2OOo Browser Page3 screenshot][44]
 
-![OAuth2OOo Browser Page4 screenshot][44]
+![OAuth2OOo Browser Page4 screenshot][45]
 
-![OAuth2OOo Wizard Page4 screenshot][45]
+![OAuth2OOo Wizard Page4 screenshot][46]
 
 The OAuth2 protocol allows access to server resources, after accepting the connection authorization, by exchanging tokens.
 
@@ -182,12 +182,12 @@ ___
 
 ## How to build the extension:
 
-Normally, the extension is created with Eclipse for Java and [LOEclipse][46]. To work around Eclipse, I modified LOEclipse to allow the extension to be created with Apache Ant.  
+Normally, the extension is created with Eclipse for Java and [LOEclipse][47]. To work around Eclipse, I modified LOEclipse to allow the extension to be created with Apache Ant.  
 To create the OAuth2OOo extension with the help of Apache Ant, you need to:
-- Install the [Java SDK][47] version 17 or higher.
-- Install [Apache Ant][48] version 1.10.0 or higher.
-- Install [LibreOffice and its SDK][49] version 7.x or higher.
-- Clone the [OAuth2OOo][50] repository on GitHub into a folder.
+- Install the [Java SDK][48] version 17 or higher.
+- Install [Apache Ant][49] version 1.10.0 or higher.
+- Install [LibreOffice and its SDK][50] version 7.x or higher.
+- Clone the [OAuth2OOo][51] repository on GitHub into a folder.
 - From this folder, move to the directory: `source/OAuth2OOo/`
 - In this directory, edit the file: `build.properties` so that the `office.install.dir` and `sdk.dir` properties point to the folders where LibreOffice and its SDK were installed, respectively.
 - Start the archive creation process using the command: `ant`
@@ -205,7 +205,7 @@ ___
 
 * LibreOffice 24.8.0.3 (x86_64) - Windows 10(x64) - Python version 3.9.19 (under Lubuntu 22.04 / VirtualBox 6.1.38)
 
-* **Does not work with OpenOffice** see [bug 128569][51]. Having no solution, I encourage you to install **LibreOffice**.
+* **Does not work with OpenOffice** see [bug 128569][52]. Having no solution, I encourage you to install **LibreOffice**.
 
 I encourage you in case of problem :confused:  
 to create an [issue][24]  
@@ -215,9 +215,7 @@ ___
 
 ## Historical:
 
-### [All changes are logged in the version History][52]
-
-[Configure LibreOffice extensions][53]
+### [All changes are logged in the version History][53]
 
 [1]: </img/oauth2.svg#collapse>
 [2]: <https://prrvchr.github.io/OAuth2OOo/>
@@ -253,23 +251,23 @@ ___
 [32]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2OOo.svg#middle>
 [33]: <https://github.com/prrvchr/OAuth2OOo/releases/latest/download/OAuth2OOo.oxt>
 [34]: <https://img.shields.io/github/downloads/prrvchr/OAuth2OOo/latest/total?label=v1.6.1#right>
-[35]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
-[36]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
-[37]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
-[38]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
-[39]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
-[40]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
-[41]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>
-[42]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5.png>
-[43]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6.png>
-[44]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7.png>
-[45]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8.png>
-[46]: <https://github.com/LibreOffice/loeclipse>
-[47]: <https://adoptium.net/temurin/releases/?version=8&package=jdk>
-[48]: <https://ant.apache.org/manual/install.html>
-[49]: <https://downloadarchive.documentfoundation.org/libreoffice/old/7.6.7.2/>
-[50]: <https://github.com/prrvchr/OAuth2OOo.git>
-[51]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
-[52]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG>
-[53]: <./setup/>
+[35]: <./setup/>
+[36]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/auth/XOAuth2Service.idl>
+[37]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestParameter.idl>
+[38]: <https://github.com/prrvchr/OAuth2OOo/blob/master/uno/rdb/idl/com/sun/star/rest/XRequestResponse.idl>
+[39]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard1.png>
+[40]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard2.png>
+[41]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard3.png>
+[42]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard4.png>
+[43]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard5.png>
+[44]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard6.png>
+[45]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard7.png>
+[46]: <https://prrvchr.github.io/OAuth2OOo/img/OAuth2Wizard8.png>
+[47]: <https://github.com/LibreOffice/loeclipse>
+[48]: <https://adoptium.net/temurin/releases/?version=8&package=jdk>
+[49]: <https://ant.apache.org/manual/install.html>
+[50]: <https://downloadarchive.documentfoundation.org/libreoffice/old/7.6.7.2/>
+[51]: <https://github.com/prrvchr/OAuth2OOo.git>
+[52]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
+[53]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG>
 
