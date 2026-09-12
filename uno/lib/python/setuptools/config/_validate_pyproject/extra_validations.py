@@ -33,6 +33,7 @@ class IncludedDependencyGroupMustExist(ValidationError):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 class ImportNameCollision(ValidationError):
     _DESC = """According to PEP 794:
@@ -53,6 +54,8 @@ class ImportNameMissing(ValidationError):
 
 
 >>>>>>> master
+=======
+>>>>>>> 6bdf97b2 (new version 1.7.0)
 def validate_project_dynamic(pyproject: T) -> T:
     project_table = pyproject.get("project", {})
     dynamic = project_table.get("dynamic", [])
@@ -101,6 +104,7 @@ def validate_include_depenency(pyproject: T) -> T:
     return pyproject
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 EXTRA_VALIDATIONS = (validate_project_dynamic, validate_include_depenency)
 =======
@@ -156,3 +160,6 @@ EXTRA_VALIDATIONS = (
     validate_import_name_issues,
 )
 >>>>>>> master
+=======
+EXTRA_VALIDATIONS = (validate_project_dynamic, validate_include_depenency)
+>>>>>>> 6bdf97b2 (new version 1.7.0)

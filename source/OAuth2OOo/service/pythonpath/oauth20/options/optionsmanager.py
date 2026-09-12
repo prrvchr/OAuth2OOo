@@ -43,6 +43,8 @@ from ..unotool import getDesktop
 
 from ..oauth20 import getOAuth2UserName
 
+from ..oauth20 import g_checkSetup
+
 from ..configuration import g_identifier
 from ..configuration import g_defaultlog
 
@@ -61,7 +63,7 @@ class OptionsManager(unohelper.Base):
         self._logger = logger
         self._logger.logprb(INFO, 'OptionsManager', '__init__()', 151)
 
-    _restart = False
+    _restart = g_checkSetup
 
     def dispose(self):
         self._logmanager.dispose()
@@ -72,8 +74,8 @@ class OptionsManager(unohelper.Base):
         self._logger.logprb(INFO, 'OptionsManager', 'loadSetting()', 161)
 
     def saveSetting(self):
-        connect, read, handler = self._view.getViewData()
-        self._model.setOptionsData(connect, read, handler)
+        connect, read, handler, startup = self._view.getViewData()
+        self._model.setOptionsData(connect, read, handler, startup)
         option = self._model.commit()
         if self._logmanager.saveSetting():
             OptionsManager._restart = True

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: OAuth2OOo documentation (English)
-permalink: /
+permalink: /OAuth2OOo/
 redirect_from:
   - /README
   - /README.html
@@ -95,16 +95,16 @@ The minimum version of LibreOffice supported by the OAuth2OOo extension depends 
 
 - **Regardless of platform**, if you installed LibreOffice from the [LibreOffice download site][29], **the minimum version of LibreOffice is 7.5**.
 
-- **On Linux**, if you used the package manager to install LibreOffice, **the minimum version of LibreOffice is 6.0**. However, you must ensure that the system-provided Python version is not lower than 3.10.  
-In addition, your system-provided Python packages can be out of date. The extension's logging will allow you to check if this is the case. It is accessible via the menu: **Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System Info** and requires restarting LibreOffice after activation.  
-If outdated packages appear, you can update them with this procedure:  
-    - Download the file [requirements.txt][30].
-    - Install using [pip][31], the Python packages necessary for the extension with the command:  
-    `pip install requirements.txt`
+- **On Linux**, if you used the package manager to install LibreOffice, **the minimum version of LibreOffice is 6.0**. However, you must ensure that the system-provided Python version is not lower than 3.8.  
+  In addition, your system-provided Python packages can be out of date. The extension's logging will allow you to check if this is the case. It is accessible via the menu: **Tools -> Options -> Internet -> OAuth2 protocol -> View log -> System Info** and requires restarting LibreOffice after activation.  
+  If outdated packages appear, you can update them with this procedure:  
+  - Download the file [requirements.txt][30].
+  - Install using [pip][31], the Python packages necessary for the extension with the command:  
+  `pip install requirements.txt`
 
-If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.  
-To install the Mozilla PPA please type the command:  
-`sudo add-apt-repository ppa:mozillateam/ppa`
+  If you want to **drive Firefox in Calc on Ubuntu** then you need to reinstall Firefox from the Mozilla PPA.  
+  To install the Mozilla PPA please type the command:  
+  `sudo add-apt-repository ppa:mozillateam/ppa`
 
 ___
 
@@ -269,5 +269,4 @@ ___
 [50]: <https://downloadarchive.documentfoundation.org/libreoffice/old/7.6.7.2/>
 [51]: <https://github.com/prrvchr/OAuth2OOo.git>
 [52]: <https://bz.apache.org/ooo/show_bug.cgi?id=128569>
-[53]: <https://prrvchr.github.io/OAuth2OOo/CHANGELOG>
-
+[53]: <https://prrvchr.github.io/OAuth2OOo/change/>

@@ -35,11 +35,12 @@ class OptionsView():
         self._window = window
 
 # OptionsView public setter methods
-    def initView(self, restart, connect, read, handler, urls):
+    def initView(self, restart, connect, read, handler, urls, startup):
         self._getConnectTimeout().setValue(connect)
         self._getReadTimeout().setValue(read)
         self._getHandlerTimeout().setValue(handler)
         self._getUrls().Model.StringItemList = urls
+        self._getStartupJob().State = int(startup)
         self.setRestart(restart)
 
     def setRestart(self, enabled):
@@ -56,7 +57,7 @@ class OptionsView():
         return bool(self._getAutoClose().State)
 
     def getViewData(self):
-        return self._getConnect(), self._getRead(), self._getHandler()
+        return self._getConnect(), self._getRead(), self._getHandler(), self._getStartup()
 
 # OptionsView private getter methods
     def _getConnect(self):
@@ -68,12 +69,21 @@ class OptionsView():
     def _getHandler(self):
         return int(self._getHandlerTimeout().getValue())
 
+    def _getHandler(self):
+        return int(self._getHandlerTimeout().getValue())
+
+    def _getStartup(self):
+        return bool(self._getStartupJob().State)
+
 # OptionsView private getter control methods
     def _getUrls(self):
         return self._window.getControl('ListBox1')
 
     def _getAutoClose(self):
         return self._window.getControl('CheckBox1')
+
+    def _getStartupJob(self):
+        return self._window.getControl('CheckBox2')
 
     def _getConnectTimeout(self):
         return self._window.getControl('NumericField1')

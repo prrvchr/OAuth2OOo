@@ -32,14 +32,23 @@ import uno
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
+<<<<<<< HEAD
+from ..unotool import deregisterStartupJob
+=======
 from ..logger import getLogger
 
 from ..unotool import getConfiguration
+>>>>>>> 6bdf97b2 (new version 1.7.0)
 from ..unotool import getPathSubstitution
 from ..unotool import getResourceLocation
 from ..unotool import getSimpleFile
 from ..unotool import getStringResource
 
+<<<<<<< HEAD
+from ..logger import getLogger
+
+=======
+>>>>>>> 6bdf97b2 (new version 1.7.0)
 from ..configuration import g_basename
 from ..configuration import g_defaultlog
 from ..configuration import g_identifier
@@ -55,8 +64,15 @@ import traceback
 
 
 class SetupModel():
+<<<<<<< HEAD
+    def __init__(self, ctx, job, name, code):
+        self._ctx = ctx
+        self._job = job
+        self._code = code
+=======
     def __init__(self, ctx, name):
         self._ctx = ctx
+>>>>>>> 6bdf97b2 (new version 1.7.0)
         self._modules = []
         self._requirements = '/requirements.txt'
         self._program = getPathSubstitution(ctx, '$(prog)')
@@ -78,7 +94,12 @@ class SetupModel():
         url = self._url + self._requirements
         if getSimpleFile(self._ctx).exists(url):
             self._checkPackages(url, maxProgress, progress)
+<<<<<<< HEAD
+        success = len(self._modules) > 0
+        return success, self._getResult(self._modules)
+=======
         return self._getResult(self._modules)
+>>>>>>> 6bdf97b2 (new version 1.7.0)
 
     def installPackages(self, maxProgress, progress):
         index = 1
@@ -94,19 +115,30 @@ class SetupModel():
             message = self._pipInstall(info, command, module)
             if message is None:
                 importlib.invalidate_caches()
+<<<<<<< HEAD
+                self._log(INFO, self._code + 1, module)
+            else:
+                modules.append(module)
+                self._log(SEVERE, self._code + 2, module, message)
+=======
                 self._log(INFO, 201, module)
             else:
                 modules.append(module)
                 self._log(SEVERE, 202, module, message)
+>>>>>>> 6bdf97b2 (new version 1.7.0)
         success = len(modules) == 0
         return success, self._getResult(self._modules) if success else self._getResult(modules)
 
     def deregisterJob(self):
+<<<<<<< HEAD
+        deregisterStartupJob(self._ctx, self._job)
+=======
         path = "/org.openoffice.Office.Jobs/Events/OnStartApp/JobList"
         config = getConfiguration(self._ctx, path, True)
         if config.hasByName("OAuth2Setup"):
             config.removeByName("OAuth2Setup")
             config.commitChanges()
+>>>>>>> 6bdf97b2 (new version 1.7.0)
 
     def _checkPackages(self, url, maxProgress, progress):
         packages = []

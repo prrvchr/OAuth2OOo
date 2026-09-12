@@ -25,4 +25,10 @@
       <service name="io.github.prrvchr.OAuth2OOo.Dispatcher"/>
     </implementation>
   </component>
+  <component loader="com.sun.star.loader.Python" uri="service/Setup.py">
+    <implementation name="io.github.prrvchr.OAuth2OOo.Setup">
+      <service name="io.github.prrvchr.OAuth2OOo.Setup"/>
+      <service name="com.sun.star.task.Job"/>
+    </implementation>
+  </component>
 </components>

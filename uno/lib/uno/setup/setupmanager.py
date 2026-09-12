@@ -37,8 +37,13 @@ import traceback
 
 
 class SetupManager():
+<<<<<<< HEAD
+    def __init__(self, ctx, job, name, code):
+        self._model = SetupModel(ctx, job, name, code)
+=======
     def __init__(self, ctx, name):
         self._model = SetupModel(ctx, name)
+>>>>>>> 6bdf97b2 (new version 1.7.0)
         self._view = SetupView(ctx, WindowHandler(self), name, self._model.getTitle())
 
     def cancel(self):
@@ -66,9 +71,15 @@ class SetupManager():
     def _checkRequirements(self):
         self._view.setPage(*self._model.getPage(2))
         self._view.enableNext(False)
+<<<<<<< HEAD
+        success, result = self._model.checkRequirements(self.setMaxProgress, self.setProgress)
+        self._view.enableNext(True)
+        if success:
+=======
         result = self._model.checkRequirements(self.setMaxProgress, self.setProgress)
         self._view.enableNext(True)
         if result:
+>>>>>>> 6bdf97b2 (new version 1.7.0)
             self._view.setPage(*self._model.getPage(3))
             self._view.setResult(result)
         else:
