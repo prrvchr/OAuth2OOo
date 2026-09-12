@@ -31,7 +31,6 @@ import unohelper
 
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.task import XAsyncJob
-from com.sun.star.util import XCloseable
 
 from oauth20 import SetupManager
 
@@ -54,10 +53,10 @@ g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.OAuth2Setup',
 
 class OAuth2Setup(unohelper.Base,
                   XServiceInfo,
-                  XAsyncJob,
-                  XCloseable):
+                  XAsyncJob):
     def __init__(self, ctx):
         self._ctx = ctx
+        self._job = 'OAuth2Setup'
         self._name = 'SetupWindow'
         self._resources = {'Title': 'OAuthSetup.ErrorBox.Title',
                            'Message': 'OAuthSetup.ErrorBox.Message'}
@@ -67,7 +66,7 @@ class OAuth2Setup(unohelper.Base,
         try:
             if g_checkSetup:
                 if self._checkInternet():
-                    SetupManager(self._ctx, self._name)
+                    SetupManager(self._ctx, self._job, self._name)
                 else:
                     self._showMessageBox()
         except Exception as e:
@@ -78,10 +77,6 @@ class OAuth2Setup(unohelper.Base,
             if listener is not None:
                 listener.jobFinished(self, None)
         return None
-
-    # XCloseable
-    def close(self, deliverOwnership):
-        print("OAuth2Setup.close() ************************************")
 
     # XServiceInfo
     def supportsService(self, service):
