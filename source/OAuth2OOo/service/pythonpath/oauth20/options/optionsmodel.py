@@ -29,6 +29,10 @@
 
 from ..model import BaseModel
 
+from ..unotool import deregisterStartupJob
+from ..unotool import hasStartupJob
+from ..unotool import registerStartupJob
+
 from ..oauth2helper import getProviderName
 
 import traceback
@@ -37,6 +41,7 @@ import traceback
 class OptionsModel(BaseModel):
     def __init__(self, ctx):
         super(OptionsModel, self).__init__(ctx)
+        self._job = 'OAuth2OOoSetup'
 
     @property
     def _ConnectTimeout(self):
@@ -47,18 +52,26 @@ class OptionsModel(BaseModel):
     @property
     def _HandlerTimeout(self):
         return self._config.getByName('HandlerTimeout')
+    @property
+    def _Startup(self):
+        return hasStartupJob(self._ctx, self._job)
 
     def getOptionsData(self):
-        return self._ConnectTimeout, self._ReadTimeout, self._HandlerTimeout, self.UrlList
+        return self._ConnectTimeout, self._ReadTimeout, self._HandlerTimeout, self.UrlList, self._Startup
 
     def getProviderName(self, url):
         return getProviderName(self._config, url)
 
-    def setOptionsData(self, connect, read, handler):
+    def setOptionsData(self, connect, read, handler, startup):
         if connect != self._ConnectTimeout:
             self._config.replaceByName('ConnectTimeout', connect)
         if read != self._ReadTimeout:
             self._config.replaceByName('ReadTimeout', read)
         if handler != self._HandlerTimeout:
             self._config.replaceByName('HandlerTimeout', handler)
+        if startup != self._Startup:
+            if startup:
+                registerStartupJob(self._ctx, self._job)
+            else:
+                deregisterStartupJob(self._ctx, self._job)
 

@@ -74,8 +74,8 @@ class OptionsManager(unohelper.Base):
         self._logger.logprb(INFO, 'OptionsManager', 'loadSetting()', 161)
 
     def saveSetting(self):
-        connect, read, handler = self._view.getViewData()
-        self._model.setOptionsData(connect, read, handler)
+        connect, read, handler, startup = self._view.getViewData()
+        self._model.setOptionsData(connect, read, handler, startup)
         option = self._model.commit()
         if self._logmanager.saveSetting():
             OptionsManager._restart = True

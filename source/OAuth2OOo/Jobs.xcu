@@ -32,16 +32,16 @@
   oor:package="org.openoffice.Office"
   oor:name="Jobs">
   <node oor:name="Jobs">
-    <node oor:name="OAuth2Setup" oor:op="fuse">
+    <node oor:name="OAuth2OOoSetup" oor:op="fuse">
       <prop oor:name="Service">
-        <value>io.github.prrvchr.OAuth2OOo.OAuth2Setup</value>
+        <value>io.github.prrvchr.OAuth2OOo.Setup</value>
       </prop>
     </node>
   </node>
   <node oor:name="Events">
     <node oor:name="OnStartApp" oor:op="fuse">
       <node oor:name="JobList">
-        <node oor:name="OAuth2Setup" oor:op="fuse"/>
+        <node oor:name="OAuth2OOoSetup" oor:op="fuse"/>
       </node>
     </node>
   </node>

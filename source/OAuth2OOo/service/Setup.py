@@ -37,7 +37,6 @@ from oauth20 import SetupManager
 from oauth20 import createMessageBox
 from oauth20 import getStringResource
 
-from .oauth20 import g_checkSetup
 from .oauth20 import g_identifier
 
 
@@ -46,29 +45,29 @@ import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
-g_ImplementationName = 'io.github.prrvchr.OAuth2OOo.OAuth2Setup'
-g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.OAuth2Setup',
+g_ImplementationName = 'io.github.prrvchr.OAuth2OOo.Setup'
+g_ServiceNames = ('io.github.prrvchr.OAuth2OOo.Setup',
                   'com.sun.star.task.Job')
 
 
-class OAuth2Setup(unohelper.Base,
-                  XServiceInfo,
-                  XAsyncJob):
+class Setup(unohelper.Base,
+            XServiceInfo,
+            XAsyncJob):
     def __init__(self, ctx):
         self._ctx = ctx
-        self._job = 'OAuth2Setup'
+        self._job = 'OAuth2OOoSetup'
         self._name = 'SetupWindow'
-        self._resources = {'Title': 'OAuthSetup.ErrorBox.Title',
-                           'Message': 'OAuthSetup.ErrorBox.Message'}
+        self._code = 200
+        self._resources = {'Title': 'Setup.ErrorBox.Title',
+                           'Message': 'Setup.ErrorBox.Message'}
 
     # XAsyncJob
     def executeAsync(self, arguments, listener):
         try:
-            if g_checkSetup:
-                if self._checkInternet():
-                    SetupManager(self._ctx, self._job, self._name)
-                else:
-                    self._showMessageBox()
+            if self._checkInternet():
+                SetupManager(self._ctx, self._job, self._name, self._code)
+            else:
+                self._showMessageBox()
         except Exception as e:
             # FIXME: It is essential to notify LibreOffice of
             # FIXME: the Job's completion so as not to block its loading.
@@ -105,7 +104,7 @@ class OAuth2Setup(unohelper.Base,
             return False
 
 
-g_ImplementationHelper.addImplementation(OAuth2Setup,
+g_ImplementationHelper.addImplementation(Setup,
                                          g_ImplementationName,
                                          g_ServiceNames)
 
