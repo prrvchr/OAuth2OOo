@@ -1,0 +1,109 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+import sys
+import unittest
+import doctest
+from textwrap import dedent
+from io import StringIO
+from os.path import basename
+from os.path import dirname
+
+examples = {
+    '/tmp/html4.js': dedent("""
+    var bold = function(s) {
+        return '<b>' + s + '</b>';
+    };
+
+    var italics = function(s) {
+        return '<i>' + s + '</i>';
+    };
+    """).lstrip(),
+    '/tmp/legacy.js': dedent("""
+    var marquee = function(s) {
+        return '<marquee>' + s + '</marquee>';
+    };
+
+    var blink = function(s) {
+        return '<blink>' + s + '</blink>';
+    };
+    """).lstrip(),
+}
+
+
+class StringIOWrapper(StringIO):
+    """
+    Needed to rstrip the output to make all doctest output behave in a
+    consistent way across all platforms because for whatever reason the
+    doctest has different behaviors between Windows and others...
+    """
+
+    def read(self):
+        return StringIO.read(self).rstrip()
+
+
+def make_suite():  # pragma: no cover
+    from calmjs.parse.lexers import es5 as es5lexer
+    from calmjs.parse import walkers
+    from calmjs.parse import sourcemap
+
+    def open(p, flag='r'):
+        result = StringIOWrapper(examples[p] if flag == 'r' else '')
+        # Need basename here because Python 3.13 under Windows broke
+        # _something_ and made the reporting inconsistent...
+        result.name = basename(p)
+        return result
+
+    parser = doctest.DocTestParser()
+    # Python 2 can't handle current string standards.
+    optflags = (
+        doctest.SKIP
+        if sys.version_info < (3,) else
+        doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
+    )
+
+    try:
+        from importlib import metadata
+        pkgdesc = metadata.metadata('calmjs.parse').get('description')
+        pkgdesc = pkgdesc.replace('\r', '') if pkgdesc else ''
+    except ImportError:
+        from pkg_resources import get_distribution
+        dist = get_distribution('calmjs.parse')
+        if dist:
+            if dist.has_metadata('PKG-INFO'):
+                pkgdesc = dist.get_metadata('PKG-INFO').replace('\r', '')
+            elif dist.has_metadata('METADATA'):
+                pkgdesc = dist.get_metadata('METADATA').replace('\r', '')
+            else:
+                pkgdesc = ''
+
+    pkgdesc_tests = [
+        t for t in parser.parse(pkgdesc) if isinstance(t, doctest.Example)]
+
+    test_loader = unittest.TestLoader()
+    test_suite = test_loader.discover(
+        'calmjs.parse.tests', pattern='test_*.py',
+        top_level_dir=dirname(__file__)
+    )
+    try:
+        test_suite.addTest(doctest.DocTestSuite(
+            es5lexer, optionflags=optflags))
+        test_suite.addTest(doctest.DocTestSuite(
+            walkers, optionflags=optflags))
+        test_suite.addTest(doctest.DocTestSuite(
+            sourcemap, optionflags=optflags))
+        test_suite.addTest(doctest.DocTestCase(
+            # skipping all the error case tests which should all be in the
+            # troubleshooting section at the end; bump the index whenever
+            # more failure examples are added.
+            # also note that line number is unknown, as PKG_INFO has headers
+            # and also the counter is somehow inaccurate in this case.
+            doctest.DocTest(pkgdesc_tests[:-1], {
+                'open': open}, 'PKG_INFO', 'README.rst', None, pkgdesc),
+            optionflags=optflags,
+        ))
+    except AttributeError:
+        # Assuming this is in Python>3.9 where the -OO flag was used...
+        pass
+
+    return test_suite
