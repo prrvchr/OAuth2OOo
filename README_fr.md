@@ -1,7 +1,7 @@
 ---
 layout: default
 title: OAuth2OOo documentation (Français)
-permalink: /fr/
+permalink: /OAuth2OOo/fr/
 redirect_from:
   - /README_fr
   - /README_fr.html
@@ -95,16 +95,16 @@ La version minimale de LibreOffice prise en charge par l'extension OAuth2OOo dé
 
 - **Quelle que soit la plateforme**, si vous avez installé LibreOffice depuis le [site de téléchargement de LibreOffice][29], **la version minimale de LibreOffice est 7.5**.
 
-- **Sous Linux** si vous avez utilisé le gestionnaire de paquets pour installer LibreOffice, **la version minimale de LibreOffice est 6.0**. Cependant, vous devez vous assurer que la version de Python fournie par le système n'est pas inférieure à 3.10.  
-De plus, vos packages Python fournis par le système peuvent être obsolètes. La journalisation de l'extension vous permettera de vérifier si c'est le cas. Elle est accessible via le menu: **Outils -> Options -> Internet -> Protocole OAuth2-> Voir journal -> Info système** et nécessite le redemarrage de LibreOffice aprés son activation.  
-Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec cette procédure:  
-    - Télécharger le fichier [requirements.txt][30].
-    - Installer à l'aide de [pip][31], les paquets Python nécessaires à l'extension avec la commande:  
-    `pip install requirements.txt`
+- **Sous Linux** si vous avez utilisé le gestionnaire de paquets pour installer LibreOffice, **la version minimale de LibreOffice est 6.0**. Cependant, vous devez vous assurer que la version de Python fournie par le système n'est pas inférieure à 3.8.  
+  De plus, vos packages Python fournis par le système peuvent être obsolètes. La journalisation de l'extension vous permettera de vérifier si c'est le cas. Elle est accessible via le menu: **Outils -> Options -> Internet -> Protocole OAuth2-> Voir journal -> Info système** et nécessite le redemarrage de LibreOffice aprés son activation.  
+  Si des paquets obsolètes apparaissent, vous pouvez les mettre à jour avec cette procédure:  
+  - Télécharger le fichier [requirements.txt][30].
+  - Installer à l'aide de [pip][31], les paquets Python nécessaires à l'extension avec la commande:  
+  `pip install requirements.txt`
 
-Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.  
-Pour installer le PPA de Mozilla veuillez taper la commande:  
-`sudo add-apt-repository ppa:mozillateam/ppa`
+  Si vous voulez **piloter Firefox dans Calc sous Ubuntu** alors il vous faut reinstaller Firefox à partir du PPA de Mozilla.  
+  Pour installer le PPA de Mozilla veuillez taper la commande:  
+  `sudo add-apt-repository ppa:mozillateam/ppa`
 
 ___
 
