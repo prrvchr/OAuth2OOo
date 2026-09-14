@@ -27,17 +27,10 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
-import unohelper
-
-from com.sun.star.logging.LogLevel import INFO
-from com.sun.star.logging.LogLevel import SEVERE
-
 from .tokenmodel import TokenModel
 
 from ..logger import getLogger
 
-from ..configuration import g_identifier
 from ..configuration import g_defaultlog
 from ..configuration import g_basename
 
@@ -45,8 +38,8 @@ import traceback
 
 
 class OAuth2Model(TokenModel):
-    def __init__(self, ctx, url='', user=''):
-        super(OAuth2Model, self).__init__(ctx, url, user)
+    def __init__(self, ctx, url, user, parent=None):
+        super().__init__(ctx, url, user, parent)
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
 
     @property
