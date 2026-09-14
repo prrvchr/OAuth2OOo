@@ -47,11 +47,10 @@ from .unotool import createService
 from .unotool import getConfiguration
 from .unotool import getStringResource
 
+from .configuration import g_check
 from .configuration import g_wizard_paths
 from .configuration import g_wizard_page
 from .configuration import g_identifier
-
-from .oauth20 import g_checkSetup
 
 import traceback
 
@@ -75,7 +74,7 @@ class Dispatch(unohelper.Base,
     def dispatch(self, uri, arguments):
         state = FAILURE
         result = ()
-        if g_checkSetup:
+        if g_check:
             self._showMessageBox()
         elif uri.Path == 'Wizard':
             url = user = ''
