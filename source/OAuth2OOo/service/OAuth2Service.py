@@ -27,49 +27,48 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
+
+from com.sun.star.frame.DispatchResultState import FAILURE
+from com.sun.star.frame.DispatchResultState import SUCCESS
 
 from com.sun.star.lang import EventObject
 from com.sun.star.lang import XComponent
 from com.sun.star.lang import XServiceInfo
-from com.sun.star.auth import XOAuth2Service
-from com.sun.star.auth import RefreshTokenException
 
-from com.sun.star.logging.LogLevel import INFO
-from com.sun.star.logging.LogLevel import SEVERE
+from com.sun.star.auth import XOAuth2Service
 
 from com.sun.star.ucb.ConnectionMode import OFFLINE
-from com.sun.star.ucb.ConnectionMode import ONLINE
 
 from oauth20 import RequestParameter
 from oauth20 import OAuth2Model
 from oauth20 import OAuth2OOo
 
-from oauth20 import executeDispatch
-from oauth20 import getConfiguration
-from oauth20 import isAuthorized
-
-from oauth20 import getSessionMode
-
-from oauth20 import getRequestResponse
-from oauth20 import getInputStream
 from oauth20 import download
-from oauth20 import upload
-
-from oauth20 import setParametersArguments
-
+from oauth20 import getConfiguration
+from oauth20 import getInputStream
 from oauth20 import getLogger
+from oauth20 import getRequestResponse
+from oauth20 import getSessionMode
+from oauth20 import isAuthorized
+from oauth20 import upload
+from oauth20 import setParametersArguments
+from oauth20 import showOAuth2Wizard
 
+from oauth20 import State
 from oauth20 import g_identifier
-from oauth20 import g_service
 from oauth20 import g_defaultlog
 from oauth20 import g_basename
 from oauth20 import g_token
 
 from string import Template
-import requests
 import traceback
+try:
+    import requests
+except ImportError as e:
+    print("OAuth2Service ImportError ERROR: %s" % traceback.format_exc())
+    State.restart = True
+
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -91,9 +90,8 @@ class OAuth2Service(unohelper.Base,
             providers = config.getByName('Providers')
             if not isAuthorized(urls, scopes, providers, url, user):
                 # FIXME: The Url and User name must not be able to be changed (ie: ReadOnly)
-                args = {'Url': url, 'UserName': user, 'ReadOnly': True}
-                executeDispatch(ctx, 'oauth2:Wizard', **args)
-                if not isAuthorized(urls, scopes, providers, url, user):
+                state, _ = showOAuth2Wizard(ctx, url=url, user=user, readonly=True)
+                if state == FAILURE or not isAuthorized(urls, scopes, providers, url, user):
                     # The OAuth2 Wizard has been canceled
                     return None
         return super(OAuth2Service, cls).__new__(cls)
@@ -109,12 +107,15 @@ class OAuth2Service(unohelper.Base,
     @property
     def ResourceUrl(self):
         return self._model.Url
+
     @property
     def ProviderName(self):
         return self._model.Provider
+
     @property
     def UserName(self):
         return self._model.User
+
     @property
     def Timeout(self):
         return self._model.Timeout
@@ -127,9 +128,10 @@ class OAuth2Service(unohelper.Base,
         return getSessionMode(self._ctx, host)
 
     def isAuthorized(self):
-        if self._model.isOAuth2():
-            return self._model.isAuthorized()
-        return True
+        if self._model.isAuthorized():
+            return True
+        state, _ = showOAuth2Wizard(self._ctx, **self._model.getWizardArguments())
+        return state == SUCCESS and self._model.isAuthorized()
 
     def isRegisteredUrl(self, url):
         return self._model.isRegisteredUrl(url)
@@ -181,14 +183,15 @@ class OAuth2Service(unohelper.Base,
         session.codes = requests.codes
         return session
 
-
     # XComponent
     def dispose(self):
         source = EventObject(self)
         for listener in self._listeners:
             listener.disposing(source)
+
     def addEventListener(self, listener):
         self._listeners.append(listener)
+
     def removeEventListener(self, listener):
         if listener in self._listeners:
             self._listeners.remove(listener)
@@ -196,8 +199,10 @@ class OAuth2Service(unohelper.Base,
     # XServiceInfo
     def supportsService(self, service):
         return g_ImplementationHelper.supportsService(g_ImplementationName, service)
+
     def getImplementationName(self):
         return g_ImplementationName
+
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
@@ -205,4 +210,3 @@ class OAuth2Service(unohelper.Base,
 g_ImplementationHelper.addImplementation(OAuth2Service,
                                          g_ImplementationName,
                                          g_ServiceNames)
-

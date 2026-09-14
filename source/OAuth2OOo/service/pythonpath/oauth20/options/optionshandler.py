@@ -29,8 +29,6 @@
 
 import unohelper
 
-from com.sun.star.awt import XContainerWindowEventHandler
-
 from com.sun.star.lang import XEventListener
 
 import traceback
@@ -45,6 +43,5 @@ class OptionsListener(unohelper.Base,
     def disposing(self, source):
         try:
             self._manager.dispose()
-        except:
+        except Exception:
             print("OptionsListener.disposing() ERROR: %s" % traceback.format_exc())
-

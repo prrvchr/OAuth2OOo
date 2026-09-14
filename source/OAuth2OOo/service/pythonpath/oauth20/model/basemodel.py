@@ -31,8 +31,6 @@ from ..unotool import getConfiguration
 
 from ..configuration import g_identifier
 
-import traceback
-
 
 class BaseModel():
     def __init__(self, ctx):
@@ -54,4 +52,3 @@ class BaseModel():
             self._config.commitChanges()
             return True
         return False
-

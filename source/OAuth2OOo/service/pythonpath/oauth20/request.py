@@ -28,7 +28,6 @@
 """
 
 import uno
-import unohelper
 
 from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
@@ -40,7 +39,6 @@ from com.sun.star.rest.HTTPStatusCode import CREATED
 from com.sun.star.rest.HTTPStatusCode import OK
 
 from com.sun.star.rest import FileNotFoundException
-from com.sun.star.rest import HTTPException
 from com.sun.star.rest import RequestException
 
 from com.sun.star.rest.ParameterType import JSON
@@ -48,13 +46,8 @@ from com.sun.star.rest.ParameterType import HEADER
 
 from com.sun.star.connection import NoConnectException
 
-from com.sun.star.rest import ConnectionException
-from com.sun.star.rest import ConnectTimeoutException
-from com.sun.star.rest import ReadTimeoutException
-
 from .requestresponse import execute
 from .requestresponse import getDuration
-from .requestresponse import getExceptionMessage
 from .requestresponse import raiseHTTPException
 from .requestresponse import raiseRequestException
 from .requestresponse import InputStream
@@ -62,8 +55,13 @@ from .requestresponse import RequestResponse
 
 from .unotool import getSimpleFile
 
-from requests.exceptions import HTTPError
-from requests.exceptions import RequestException as RequestError
+from .configuration import State
+try:
+    from requests.exceptions import HTTPError
+    from requests.exceptions import RequestException as RequestError
+except TypeError as e:
+    State.restart = True
+
 import time
 from datetime import timedelta
 import re
@@ -97,8 +95,8 @@ def download(ctx, source, logger, session, parameter, url, timeout, chunk, retry
                         stream.closeOutput()
                         raiseRequestException(ctx, source, cls, mtd, parameter.Name, 123, e)
                     print('request.download() Download ERROR')
-                    range = 'bytes=%s-' % stream.getLength()
-                    parameter.setHeader('Range', range)
+                    rang = 'bytes=%s-' % stream.getLength()
+                    parameter.setHeader('Range', rang)
                     time.sleep(delay)
                 else:
                     d = getDuration(response.elapsed)
@@ -185,12 +183,15 @@ class Uploader():
     @property
     def NextRange(self):
         return self._getNextRange()
+
     @property
     def Count(self):
         return self._count
+
     @property
     def Elapsed(self):
         return getDuration(self._delta)
+
     @property
     def Response(self):
         return self._response
@@ -198,8 +199,8 @@ class Uploader():
     def uploadRange(self, start, length, data):
         self._parameter.Data = data
         end = start + length -1
-        range = 'bytes %s-%s/%s' % (start, end, self._size)
-        self._parameter.setHeader('Content-Range', range)
+        rang = 'bytes %s-%s/%s' % (start, end, self._size)
+        self._parameter.setHeader('Content-Range', rang)
         response = execute(self._ctx, self._source, self._session, self._cls, self._mtd, self._parameter, self._timeout)
         self._status = response.status_code
         self._delta += response.elapsed
@@ -223,12 +224,12 @@ class Uploader():
     def _hasDataRange(self, data):
         self._range = matched = None
         if self._parameter.RangeField in data:
-            range = data.get(self._parameter.RangeField)
+            rang = data.get(self._parameter.RangeField)
             # FIXME: Some provider like Microsoft give a Range as a JSON list
             # FIXME: if so we only get the first value
-            if isinstance(range, list):
-                range = range[0]
-            matched = self._regex.search(range)
+            if isinstance(rang, list):
+                rang = rang[0]
+            matched = self._regex.search(rang)
             if matched:
                 self._range = matched.group(1)
         return self._range is not None
@@ -248,6 +249,7 @@ def getSessionMode(ctx, host, port=80):
         mode = ONLINE
     return mode
 
+
 def getInputStream(ctx, source, session, cls, mtd, parameter, timeout, chunk, decode):
     response = execute(ctx, source, session, cls, mtd, parameter, timeout, True)
     return InputStream(response, chunk, decode)
@@ -260,4 +262,3 @@ def _raiseResponseException(ctx, source, cls, mtd, code, parameter, response):
         raiseHTTPException(ctx, source, cls, mtd, parameter.Name, code, e)
     else:
         raiseRequestException(ctx, source, cls, mtd, parameter.Name, code, e)
-
