@@ -31,11 +31,11 @@ from com.sun.star.auth import RefreshTokenException
 
 from .basemodel import BaseModel
 
-from ..requestparameter import RequestParameter
-
 from ..oauth20 import CustomParser
 
-from ..oauth2helper import isUserAuthorized
+from ..requestparameter import RequestParameter
+
+from .helper import isUserAuthorized
 
 from ..requestresponse import getRequestResponse
 
@@ -44,18 +44,27 @@ from ..oauth20 import getResponseResults
 from ..oauth20 import setParametersArguments
 from ..oauth20 import setResquestParameter
 
-from ..unotool import executeDispatch
-
+from ..configuration import State
 from ..configuration import g_refresh_overlap
 
 import time
-import requests
+
 import traceback
+
+try:
+    from requests import Session
+except ImportError as e:
+    print("tokenmodel ImportError ERROR: %s" % traceback.format_exc())
+    State.restart = True
+except Exception as e:
+    print("tokenmodel Exception ERROR: %s" % traceback.format_exc())
+    State.restart = True
 
 
 class TokenModel(BaseModel):
-    def __init__(self, ctx, url='', user=''):
-        super(TokenModel, self).__init__(ctx)
+    def __init__(self, ctx, url='', user='', parent=None):
+        super().__init__(ctx)
+        self._parent = parent
         if url and user:
             self.initialize(url, user)
         else:
@@ -74,14 +83,10 @@ class TokenModel(BaseModel):
     def isOAuth2(self):
         return self._isoauth2
 
-    def isAuthorized(self):
-        if not self.hasAuthorization():
-            args = {'Url': self._url, 'UserName': self._user, 'ReadOnly': True}
-            executeDispatch(self._ctx, 'oauth2:Wizard', **args)
-            return self.hasAuthorization()
-        return True
+    def getWizardArguments(self):
+        return {'url': self._url, 'user': self._user, 'readonly': True, 'parent': self._parent}
 
-    def hasAuthorization(self):
+    def isAuthorized(self):
         if self._isoauth2:
             scopes = self._config.getByName('Scopes')
             providers = self._config.getByName('Providers')
@@ -150,7 +155,7 @@ class TokenModel(BaseModel):
         parser = CustomParser(*getParserItems(request))
         timestamp = int(time.time())
         cls, mtd = 'TokenModel', '_refreshToken()'
-        response = getRequestResponse(self._ctx, source, requests.Session(), cls, mtd, parameter, self.Timeout)
+        response = getRequestResponse(self._ctx, source, Session(), cls, mtd, parameter, self.Timeout)
         if response.Ok and parser.hasItems():
             results = getResponseResults(parser, response)
             response.close()

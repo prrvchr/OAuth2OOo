@@ -30,28 +30,19 @@
 import uno
 import unohelper
 
-from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
-
-from com.sun.star.frame.DispatchResultState import SUCCESS
 from com.sun.star.frame.DispatchResultState import FAILURE
 
 from com.sun.star.frame import FeatureStateEvent
 
 from com.sun.star.frame import XNotifyingDispatch
 
-from .wizard import Wizard
-from .wizard import WizardController
+from .wizard import showOAuth2Wizard
 
 from .unotool import createMessageBox
-from .unotool import createService
-from .unotool import getConfiguration
 from .unotool import getStringResource
 
-from .configuration import g_wizard_paths
-from .configuration import g_wizard_page
+from .configuration import State
 from .configuration import g_identifier
-
-from .oauth20 import g_checkSetup
 
 import traceback
 
@@ -75,22 +66,10 @@ class Dispatch(unohelper.Base,
     def dispatch(self, uri, arguments):
         state = FAILURE
         result = ()
-        if g_checkSetup:
+        if State.restart:
             self._showMessageBox()
         elif uri.Path == 'Wizard':
-            url = user = ''
-            readonly = False
-            close = True
-            for argument in arguments:
-                if argument.Name == 'Url':
-                    url = argument.Value
-                elif argument.Name == 'UserName':
-                    user = argument.Value
-                elif argument.Name == 'ReadOnly':
-                    readonly = argument.Value
-                elif argument.Name == 'Close':
-                    close = argument.Value
-            state, result = self._showOAuth2Wizard(url, user, readonly, close)
+            state, result = showOAuth2Wizard(self._ctx, **arguments)
         return state, result
 
     def addStatusListener(self, listener, url):
@@ -113,27 +92,4 @@ class Dispatch(unohelper.Base,
         dialog = createMessageBox(self._ctx, title, message)
         dialog.execute()
         dialog.dispose()
-
-    # Show the OAuth2OOo Wizard
-    def _showOAuth2Wizard(self, url, user, readonly, close):
-        state = FAILURE
-        result = ()
-        unowizard = getConfiguration(self._ctx, g_identifier).getByName('UnoWizard')
-        if unowizard:
-            wizard = createService(self._ctx, 'com.sun.star.ui.dialogs.Wizard')
-        else:
-            wizard = Wizard(self._ctx, g_wizard_page)
-        controller = WizardController(self._ctx, wizard, close, readonly, url, user)
-        if unowizard:
-            arguments = ((uno.Any('[][]short', g_wizard_paths), controller), )
-            uno.invoke(wizard, 'initialize', arguments)
-        else:
-            arguments = (g_wizard_paths, controller)
-            wizard.initialize(arguments)
-        if wizard.execute() == OK:
-            state = SUCCESS
-            result = (controller.Url, controller.User, controller.Token)
-        if unowizard:
-            wizard.DialogWindow.dispose()
-        return state, result
 

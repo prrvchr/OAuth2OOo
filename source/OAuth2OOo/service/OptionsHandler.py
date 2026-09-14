@@ -76,6 +76,9 @@ class OptionsHandler(unohelper.Base,
             elif method == 'Connect':
                 self._manager.connect()
                 handled = True
+            elif method == 'ShowSetup':
+                self._manager.showSetup()
+                handled = True
             return handled
         except Exception as e:
             print("OptionsHandler.callHandlerMethod() ERROR: %s" % traceback.format_exc())
@@ -83,7 +86,8 @@ class OptionsHandler(unohelper.Base,
 
     def getSupportedMethodNames(self):
         return ('external_event',
-                'Connect')
+                'Connect',
+                'ShowSetup')
 
     # XServiceInfo
     def supportsService(self, service):

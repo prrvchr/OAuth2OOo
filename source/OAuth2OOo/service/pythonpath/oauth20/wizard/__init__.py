@@ -27,7 +27,5 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .wizard import Wizard
-
-from .wizardcontroller import WizardController
+from .helper import showOAuth2Wizard
 

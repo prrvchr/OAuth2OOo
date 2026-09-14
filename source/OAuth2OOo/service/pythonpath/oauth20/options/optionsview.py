@@ -31,19 +31,27 @@ import traceback
 
 
 class OptionsView():
-    def __init__(self, window):
+    def __init__(self, window, update, links):
         self._window = window
+        self._getSetup().Model.Enabled = update
+        for i, link in enumerate(links, start=1):
+            self._getLink(i).URL = link
 
 # OptionsView public setter methods
-    def initView(self, restart, connect, read, handler, urls):
+    def dispose(self):
+        self._window.dispose()
+
+    def initView(self, connect, read, handler, urls, setup, state):
         self._getConnectTimeout().setValue(connect)
         self._getReadTimeout().setValue(read)
         self._getHandlerTimeout().setValue(handler)
         self._getUrls().Model.StringItemList = urls
-        self.setRestart(restart)
+        self._setSetup(setup)
+        self.refreshView(state)
 
-    def setRestart(self, enabled):
-        self._getRestart().setVisible(enabled)
+    def refreshView(self, state):
+        self._window.Model.Step = state.step
+        self._enableButtons(state)
 
 # OptionsView public getter methods
     def getWindow(self):
@@ -55,8 +63,21 @@ class OptionsView():
     def getAutoClose(self):
         return bool(self._getAutoClose().State)
 
+    def getSetup(self):
+        return self._getSetup().getSelectedItemPos()
+
     def getViewData(self):
-        return self._getConnect(), self._getRead(), self._getHandler()
+        return self._getConnect(), self._getRead(), self._getHandler(), self.getSetup()
+
+# OptionsView private methods
+    def _setSetup(self, setup):
+        control = self._getSetup()
+        if control.Model.Enabled:
+            control.selectItemPos(setup, True)
+
+    def _enableButtons(self, state):
+        enabled = state.python and not state.restart
+        self._getWizardButton().Model.Enabled = enabled
 
 # OptionsView private getter methods
     def _getConnect(self):
@@ -84,6 +105,12 @@ class OptionsView():
     def _getHandlerTimeout(self):
         return self._window.getControl('NumericField3')
 
-    def _getRestart(self):
-        return self._window.getControl('Label5')
+    def _getWizardButton(self):
+        return self._window.getControl('CommandButton1')
+
+    def _getSetup(self):
+        return self._window.getControl('ListBox2')
+
+    def _getLink(self, index):
+        return self._window.getControl(f'Hyperlink{index}')
 
