@@ -43,9 +43,6 @@ from ..unotool import getDesktop
 
 from ..oauth20 import getOAuth2UserName
 
-from ..oauth20 import g_checkSetup
-
-from ..configuration import g_identifier
 from ..configuration import g_defaultlog
 
 import traceback
@@ -59,28 +56,25 @@ class OptionsManager(unohelper.Base):
         self._view = OptionsView(window)
         self._logmanager = LogManager(ctx, window, 'requirements.txt', g_defaultlog)
         self._logmanager.initView()
-        self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
+        self._view.initView(*self._model.getOptionsData())
         self._logger = logger
         self._logger.logprb(INFO, 'OptionsManager', '__init__()', 151)
-
-    _restart = g_checkSetup
 
     def dispose(self):
         self._logmanager.dispose()
 
     def loadSetting(self):
-        self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
+        self._view.initView(*self._model.getOptionsData())
         self._logmanager.loadSetting()
         self._logger.logprb(INFO, 'OptionsManager', 'loadSetting()', 161)
 
     def saveSetting(self):
-        connect, read, handler = self._view.getViewData()
-        self._model.setOptionsData(connect, read, handler)
+        self._model.setOptionsData(*self._view.getViewData())
         option = self._model.commit()
         if self._logmanager.saveSetting():
-            OptionsManager._restart = True
+            OptionsModel._restart = True
             self._view.setRestart(True)
-        self._logger.logprb(INFO, 'OptionsManager', 'saveSetting()', 171, option, OptionsManager._restart)
+        self._logger.logprb(INFO, 'OptionsManager', 'saveSetting()', 171, option, OptionsModel._restart)
 
     def connect(self):
         user = url = ''
