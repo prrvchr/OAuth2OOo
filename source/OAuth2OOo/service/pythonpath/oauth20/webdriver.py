@@ -40,13 +40,17 @@ from com.sun.star.util import XCloseListener
 
 from .configuration import g_identifier
 
-from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from .config.configuration import State
+try:
+    from selenium import webdriver                                    # noqa
+    from selenium.webdriver.support.wait import WebDriverWait         # noqa
+    from selenium.webdriver.support import expected_conditions as EC  # noqa
+except (ImportError, TypeError) as e:
+    State.restart = True
+
 import uuid
-from six import string_types, text_type
-from threading import Thread
-import traceback
+from six import string_types
+from six import text_type
 
 
 def sendKey(driver, wait, by, path, value):
@@ -56,6 +60,7 @@ def sendKey(driver, wait, by, path, value):
     else:
         element = driver.find_element(by, path)
     element.send_keys(value)
+
 
 def clickButton(driver, wait, by, path):
     if wait:
@@ -72,10 +77,12 @@ class CloseListener(unohelper.Base,
         self._browser = browser
 
     # XCloseListener
-    def queryClosing(self, source, ownership):
+    def queryClosing(self, source, _ownership):
         self._browser.close(source.Source)
+
     def notifyClosing(self, source):
         pass
+
     def disposing(self, source):
         pass
 
@@ -141,6 +148,7 @@ class Browser():
     @property
     def Driver(self):
         return self._driver
+
     @property
     def Session(self):
         return self._session
@@ -160,7 +168,7 @@ class Browser():
         try:
             self.Driver.title
             return False
-        except:
+        except Exception:
             return True
 
     def _getWebDriver(self, location, name, path, options):
@@ -172,7 +180,7 @@ class Browser():
                 for o in options:
                     option.add_argument(o)
         return self._getWebDriverClass(location, name, option)
-    
+
     def _getWebOptionClass(self, name, path):
         options = None
         if name in ('Brave', 'Chrome', 'Chromium'):
@@ -198,41 +206,41 @@ class Browser():
         if path and isinstance(path, string_types):
             kwargs['path'] = path
         if name == 'Brave':
-            from selenium.webdriver.chrome.service import Service as BraveService
-            from webdriver_manager.chrome import ChromeDriverManager
-            from webdriver_manager.core.utils import ChromeType
+            from selenium.webdriver.chrome.service import Service as BraveService  # noqa
+            from webdriver_manager.chrome import ChromeDriverManager               # noqa
+            from webdriver_manager.core.utils import ChromeType                    # noqa
             kwargs['chrome_type'] = ChromeType.BRAVE
             driver = webdriver.Chrome(service=BraveService(ChromeDriverManager(**kwargs).install()), options=options)
         elif name == 'Chrome':
-            from selenium.webdriver.chrome.service import Service as ChromeService
-            from webdriver_manager.chrome import ChromeDriverManager
+            from selenium.webdriver.chrome.service import Service as ChromeService  # noqa
+            from webdriver_manager.chrome import ChromeDriverManager                # noqa
             driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(**kwargs).install()), options=options)
         elif name == 'Chromium':
-            from selenium.webdriver.chrome.service import Service as ChromiumService
-            from webdriver_manager.chrome import ChromeDriverManager
-            from webdriver_manager.core.utils import ChromeType
+            from selenium.webdriver.chrome.service import Service as ChromiumService  # noqa
+            from webdriver_manager.chrome import ChromeDriverManager                  # noqa
+            from webdriver_manager.core.utils import ChromeType                       # noqa
             kwargs['chrome_type'] = ChromeType.CHROMIUM
             driver = webdriver.Chrome(service=ChromiumService(ChromeDriverManager(**kwargs).install()), options=options)
         elif name == 'Edge':
-            from selenium.webdriver.edge.service import Service as EdgeService
-            from webdriver_manager.microsoft import EdgeChromiumDriverManager
+            from selenium.webdriver.edge.service import Service as EdgeService  # noqa
+            from webdriver_manager.microsoft import EdgeChromiumDriverManager   # noqa
             driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager(**kwargs).install()), options=options)
         elif name == 'Firefox':
-            from selenium.webdriver.firefox.service import Service as FirefoxService
-            from webdriver_manager.firefox import GeckoDriverManager
+            from selenium.webdriver.firefox.service import Service as FirefoxService  # noqa
+            from webdriver_manager.firefox import GeckoDriverManager                  # noqa
             driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager(**kwargs).install()), options=options)
         elif name == 'Ie':
-            from selenium.webdriver.ie.service import Service as IEService
-            from webdriver_manager.microsoft import IEDriverManager
+            from selenium.webdriver.ie.service import Service as IEService  # noqa
+            from webdriver_manager.microsoft import IEDriverManager         # noqa
             driver = webdriver.Ie(service=IEService(IEDriverManager(**kwargs).install()), options=options)
         elif name == 'Opera':
-            from selenium.webdriver.chrome import service as OperaService
-            from webdriver_manager.opera import OperaDriverManager
+            from selenium.webdriver.chrome import service as OperaService  # noqa
+            from webdriver_manager.opera import OperaDriverManager         # noqa
             service = OperaService.Service(OperaDriverManager(**kwargs).install())
             service.start()
             driver = webdriver.Remote(service.service_url, options=options)
         elif name == 'Safari':
-            from selenium.webdriver.safari import service as SafariService
+            from selenium.webdriver.safari import service as SafariService  # noqa
             driver = webdriver.Safari(service=SafariService(), options=options)
         return driver
 
@@ -259,6 +267,7 @@ class VolatileResult(unohelper.Base,
     def addResultListener(self, listener):
         print("VolatileResult.addResultListener()")
         self._rlisteners.append(listener)
+
     def removeResultListener(self, listener):
         print("VolatileResult.removeResultListener()")
         if listener in self._rlisteners:
@@ -270,9 +279,11 @@ class VolatileResult(unohelper.Base,
         source = EventObject(self)
         for listener in self._listeners:
             listener.disposing(source)
+
     def addEventListener(self, listener):
         print("VolatileResult.addEventListener()")
         self._listeners.append(listener)
+
     def removeEventListener(self, listener):
         print("VolatileResult.removeEventListener()")
         if listener in self._listeners:
@@ -282,10 +293,11 @@ class VolatileResult(unohelper.Base,
     def supportsService(self, service):
         print("VolatileResult.supportsService()")
         return service == self._service
+
     def getImplementationName(self):
         print("VolatileResult.getImplementationName()")
         return self._name
+
     def getSupportedServiceNames(self):
         print("VolatileResult.getSupportedServiceNames()")
         return (self._service, )
-

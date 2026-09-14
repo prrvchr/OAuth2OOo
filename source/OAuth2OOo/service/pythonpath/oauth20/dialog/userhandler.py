@@ -40,16 +40,15 @@ class UserHandler(unohelper.Base,
         self._manager = manager
 
     # XDialogEventHandler
-    def callHandlerMethod(self, dialog, event, method):
+    def callHandlerMethod(self, _dialog, event, method):
         try:
             handled = False
             if method == 'SetUser':
                 self._manager.setUserName(event.Source.Text.strip())
                 handled = True
             return handled
-        except:
+        except Exception:
             print("UserHandler.callHandlerMethod() ERROR: %s" % traceback.format_exc())
 
     def getSupportedMethodNames(self):
         return ('SetUser', )
-

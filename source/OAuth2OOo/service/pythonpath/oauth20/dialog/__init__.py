@@ -26,7 +26,3 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
-
-from .userhandler import UserHandler
-from .userview import UserView
-
