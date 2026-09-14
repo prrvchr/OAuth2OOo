@@ -27,7 +27,6 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
 
 from com.sun.star.container import XEnumeration
@@ -53,7 +52,6 @@ from collections import OrderedDict
 from six import string_types
 from six import integer_types
 import json
-import traceback
 
 
 def getJsonStructure(data, null=True):
@@ -70,7 +68,7 @@ def getJsonStructure(data, null=True):
 class JsonBuilder(unohelper.Base,
                   XJsonBuilder):
 
-    #XJsonBuilder
+    # XJsonBuilder
     def createArray(self):
         return JsonArrayBuilder()
 
@@ -84,7 +82,7 @@ class JsonValue(unohelper.Base,
         self._data = data
         self._type = jsontype
 
-    #XJsonValue
+    # XJsonValue
     def getValueType(self):
         return self._type
 
@@ -94,7 +92,7 @@ class JsonNumber(JsonValue,
     def __init__(self, data):
         super(XJsonNumber, self).__init__(data, NUMBER)
 
-    #XJsonNumber
+    # XJsonNumber
     def isIntegral(self):
         return isinstance(self._data, int)
 
@@ -119,23 +117,9 @@ class JsonStructure(JsonValue,
     def __init__(self, data, jsontype):
         super(JsonValue, self).__init__(data, jsontype)
 
-    #XJsonStructure
+    # XJsonStructure
     def toJson(self):
         return json.dumps(self._data)
-
-    def _getElementType(self, data):
-        jsontype = NULL
-        if isinstance(data, dict):
-            jsontype = OBJECT
-        elif isinstance(data, (list, tuple)):
-            jsontype = ARRAY
-        elif isinstance(data, string_types):
-            jsontype = STRING
-        elif isinstance(data, (integer_types, float)):
-            jsontype = NUMBER
-        elif isinstance(data, bool):
-            jsontype = BOOLEAN
-        return jsontype
 
 
 class JsonArray(JsonStructure,
@@ -143,7 +127,7 @@ class JsonArray(JsonStructure,
     def __init__(self, data):
         super(JsonStructure, self).__init__(data, ARRAY)
 
-    #XJsonArray
+    # XJsonArray
     @property
     def Count(self):
         return len(self._data)
@@ -175,7 +159,7 @@ class JsonObject(JsonStructure,
     def __init__(self, data):
         super(JsonStructure, self).__init__(data, OBJECT)
 
-    #XJsonObject
+    # XJsonObject
     def getBoolean(self, key):
         return bool(self._data[key])
 
@@ -191,7 +175,7 @@ class JsonObject(JsonStructure,
     def isNull(self, key):
         return self._data[key] is None
 
-    def getElementType(self, index):
+    def getElementType(self, key):
         return _getElementType(self._data[key])
 
     def getElementNames(self):
@@ -205,9 +189,10 @@ class Enumerator(unohelper.Base,
         self._count = len(data)
         self._index = 0
 
-    #XEnumeration
+    # XEnumeration
     def hasMoreElements(self):
         return self._index < self._count
+
     def nextElement(self):
         if not self.hasMoreElements():
             raise NoSuchElementException('Error: no more elements exist', self)
@@ -222,7 +207,7 @@ class JsonArrayBuilder(unohelper.Base,
         self._builders = []
         self._values = []
 
-    #XJsonArrayBuilder
+    # XJsonArrayBuilder
     def addShort(self, value):
         return self._addValue(value)
 
@@ -277,7 +262,7 @@ class JsonObjectBuilder(unohelper.Base,
         self._builders = []
         self._values = OrderedDict()
 
-    #XJsonObjectBuilder
+    # XJsonObjectBuilder
     def addShort(self, key, value):
         return self._addValue(key, value)
 
@@ -325,3 +310,17 @@ class JsonObjectBuilder(unohelper.Base,
         self._values[key] = value
         return self
 
+
+def _getElementType(data):
+    jsontype = NULL
+    if isinstance(data, dict):
+        jsontype = OBJECT
+    elif isinstance(data, (list, tuple)):
+        jsontype = ARRAY
+    elif isinstance(data, string_types):
+        jsontype = STRING
+    elif isinstance(data, (integer_types, float)):
+        jsontype = NUMBER
+    elif isinstance(data, bool):
+        jsontype = BOOLEAN
+    return jsontype

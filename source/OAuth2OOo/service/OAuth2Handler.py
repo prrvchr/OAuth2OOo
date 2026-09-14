@@ -27,8 +27,9 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
+
+from com.sun.star.frame.DispatchResultState import SUCCESS
 
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK
 
@@ -42,9 +43,8 @@ from oauth20 import UserView
 from oauth20 import UserHandler
 from oauth20 import HandlerModel
 
-from oauth20 import g_identifier
+from oauth20 import showOAuth2Wizard
 
-import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -64,13 +64,14 @@ class OAuth2Handler(unohelper.Base,
 
     # XInitialization
     def initialize(self, properties):
-        for property in properties:
-            if property.Name == 'Parent':
-                self._parent = property.Value
+        for prop in properties:
+            if prop.Name == 'Parent':
+                self._parent = prop.Value
 
     # XInteractionHandler2, XInteractionHandler
     def handle(self, interaction):
         self.handleInteractionRequest(interaction)
+
     def handleInteractionRequest(self, interaction):
         # TODO: interaction.getRequest() does not seem to be functional under LibreOffice !!!
         # TODO: throw error AttributeError: "args"
@@ -87,7 +88,7 @@ class OAuth2Handler(unohelper.Base,
             approved = self._showUserDialog(interaction, url, request.Message)
         return approved
 
-    def _getToken(self, interaction, url, user, format):
+    def _getToken(self, interaction, url, user, options):
         token = ''
         status = 0
         self._model.initialize(url, user)
@@ -99,16 +100,17 @@ class OAuth2Handler(unohelper.Base,
             status = 0
         continuation = interaction.getContinuations()[status]
         if status:
-            if format:
-                token = format % token
+            if options:
+                token = options % token
             continuation.setToken(token)
         continuation.select()
         return status == 1
 
     def _isAuthorized(self):
-        if self._model.isOAuth2():
-            return self._model.isAuthorized()
-        return False
+        if self._model.isAuthorized():
+            return True
+        state, _ = showOAuth2Wizard(self._ctx, **self._model.getWizardArguments())
+        return state == SUCCESS and self._model.isAuthorized()
 
     def _showUserDialog(self, interaction, url, message):
         title, label = self._model.getUserData(url, message)
@@ -129,8 +131,10 @@ class OAuth2Handler(unohelper.Base,
     # XServiceInfo
     def supportsService(self, service):
         return g_ImplementationHelper.supportsService(g_ImplementationName, service)
+
     def getImplementationName(self):
         return g_ImplementationName
+
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
@@ -138,4 +142,3 @@ class OAuth2Handler(unohelper.Base,
 g_ImplementationHelper.addImplementation(OAuth2Handler,
                                          g_ImplementationName,
                                          g_ServiceNames)
-

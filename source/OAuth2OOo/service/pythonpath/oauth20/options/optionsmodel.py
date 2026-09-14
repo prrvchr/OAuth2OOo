@@ -29,36 +29,63 @@
 
 from ..model import BaseModel
 
-from ..oauth2helper import getProviderName
+from ..model import getProviderName
 
-import traceback
+from ..unotool import getStringResource
+
+from ..configuration import g_identifier
 
 
 class OptionsModel(BaseModel):
     def __init__(self, ctx):
         super(OptionsModel, self).__init__(ctx)
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'OptionsDialog')
+        self._resources = {'Link': 'OptionsDialog.Label5.Url.%s'}
 
     @property
-    def _ConnectTimeout(self):
+    def _connect(self):
         return self._config.getByName('ConnectTimeout')
+
+    @_connect.setter
+    def _connect(self, connect):
+        self._config.replaceByName('ConnectTimeout', connect)
+
     @property
-    def _ReadTimeout(self):
+    def _read(self):
         return self._config.getByName('ReadTimeout')
+
+    @_read.setter
+    def _read(self, read):
+        self._config.replaceByName('ReadTimeout', read)
+
     @property
-    def _HandlerTimeout(self):
+    def _handler(self):
         return self._config.getByName('HandlerTimeout')
 
-    def getOptionsData(self):
-        return self._ConnectTimeout, self._ReadTimeout, self._HandlerTimeout, self.UrlList
+    @_handler.setter
+    def _handler(self, handler):
+        self._config.replaceByName('HandlerTimeout', handler)
+
+    def getConfig(self):
+        return self._config
+
+    def getInitData(self, state):
+        return self._connect, self._read, self._handler, self.UrlList, *self.getRefreshData(state)
+
+    def getRefreshData(self, state):
+        return state, state.getMessage(self._ctx), self._getLink(state.code)
 
     def getProviderName(self, url):
         return getProviderName(self._config, url)
 
     def setOptionsData(self, connect, read, handler):
-        if connect != self._ConnectTimeout:
-            self._config.replaceByName('ConnectTimeout', connect)
-        if read != self._ReadTimeout:
-            self._config.replaceByName('ReadTimeout', read)
-        if handler != self._HandlerTimeout:
-            self._config.replaceByName('HandlerTimeout', handler)
+        if connect != self._connect:
+            self._connect = connect
+        if read != self._read:
+            self._read = read
+        if handler != self._handler:
+            self._handler = handler
 
+    def _getLink(self, code):
+        resource = self._resources.get('Link') % code
+        return self._resolver.resolveString(resource)

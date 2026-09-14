@@ -33,19 +33,26 @@ from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
 
 from .optionsmodel import OptionsModel
+
 from .optionsview import OptionsView
+
 from .optionshandler import OptionsListener
 
-from ..logger import LogManager
+from .logger import LogManager
 
-from ..unotool import executeDispatch
-from ..unotool import getDesktop
+from .setup import SetupHandler
+from .setup import SetupManager
+
+from ..runner import DispatchListener
+
+from ..setup import SetupCheck
+
+from ..setup import showSetup
 
 from ..oauth20 import getOAuth2UserName
+from ..oauth20 import showOAuth2
 
-from ..oauth20 import g_checkSetup
-
-from ..configuration import g_identifier
+from ..configuration import State
 from ..configuration import g_defaultlog
 
 import traceback
@@ -54,33 +61,54 @@ import traceback
 class OptionsManager(unohelper.Base):
     def __init__(self, ctx, window, logger):
         self._ctx = ctx
+        self._checker = None
+        self._disposed = False
         self._model = OptionsModel(ctx)
-        window.addEventListener(OptionsListener(self))
-        self._view = OptionsView(window)
-        self._logmanager = LogManager(ctx, window, 'requirements.txt', g_defaultlog)
+        self._view = OptionsView(ctx, window)
+        self._logmanager = LogManager(ctx, self._view.getFrame(), 'requirements.txt', g_defaultlog)
+        self._setup = SetupManager(ctx, self._view.getSetup(), SetupHandler(self), self._model.getConfig())
+        self._listener = OptionsListener(self)
+        window.addEventListener(self._listener)
         self._logmanager.initView()
-        self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
         self._logger = logger
         self._logger.logprb(INFO, 'OptionsManager', '__init__()', 151)
+        self._loadView(self.init)
+        self._view.getLayout().addLayout(self._logmanager.getLayout()).addLayout(self._setup.getLayout())
 
-    _restart = g_checkSetup
+    def init(self, state):
+        self._checker = None
+        if not self._disposed:
+            self._setup.init()
+            self._view.initView(*self._model.getInitData(state))
+            self._logmanager.loadSetting()
+            self._logger.logprb(INFO, 'OptionsManager', 'init()', 161)
 
-    def dispose(self):
+    def refresh(self, state):
+        self._checker = None
+        if not self._disposed:
+            self._view.refreshView(*self._model.getRefreshData(state))
+
+    def dispose(self, window):
+        if self._disposed:
+            return
+        self._disposed = True
+        self._setup.dispose()
         self._logmanager.dispose()
+        self._view.dispose()
+        window.removeEventListener(self._listener)
 
     def loadSetting(self):
-        self._view.initView(OptionsManager._restart, *self._model.getOptionsData())
-        self._logmanager.loadSetting()
-        self._logger.logprb(INFO, 'OptionsManager', 'loadSetting()', 161)
+        self._loadView(self.init)
 
     def saveSetting(self):
-        connect, read, handler = self._view.getViewData()
-        self._model.setOptionsData(connect, read, handler)
+        if self._checker:
+            self._checker.cancel()
+        self._setup.saveSetting()
+        self._model.setOptionsData(*self._view.getViewData())
         option = self._model.commit()
         if self._logmanager.saveSetting():
-            OptionsManager._restart = True
-            self._view.setRestart(True)
-        self._logger.logprb(INFO, 'OptionsManager', 'saveSetting()', 171, option, OptionsManager._restart)
+            State.restart = True
+        self._logger.logprb(INFO, 'OptionsManager', 'saveSetting()', 171, option, State.restart)
 
     def connect(self):
         user = url = ''
@@ -90,11 +118,24 @@ class OptionsManager(unohelper.Base):
                 message = self._model.getProviderName(url)
                 user = getOAuth2UserName(self._ctx, self, url, message)
             readonly = user and url
+            parent = self._view.getWindow()
             close = self._view.getAutoClose()
-            args = {'Url': url, 'UserName': user, 'ReadOnly': readonly, 'Close': close}
-            executeDispatch(self._ctx, 'oauth2:Wizard', **args)
+            showOAuth2(self._ctx, Url=url, User=user, ReadOnly=readonly, Parent=parent, Close=close)
             self._logger.logprb(INFO, 'OptionsManager', 'connect()', 181, user, url)
         except Exception as e:
             print("OptionsManager.connect() ERROR: %s - %s" % (e, traceback.format_exc()))
             self._logger.logprb(SEVERE, 'OptionsManager', 'connect()', 182, user, url, e, traceback.format_exc())
 
+    def showSetup(self):
+        mode = self._setup.getSetupMode()
+        showSetup(self._ctx, Dispatch=DispatchListener(self), Mode=mode)
+
+    def dispatchFinished(self, _notification):
+        if not self._disposed:
+            self._loadView(self.refresh)
+
+    def _loadView(self, callback):
+        if not self._disposed:
+            mode = self._setup.getSetupMode()
+            self._checker = SetupCheck(self._ctx, callback, python=True, mode=mode)
+            self._checker.start()

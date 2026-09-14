@@ -27,25 +27,50 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import traceback
+from com.sun.star.awt import Size
+
+from ..unotool import Layout
+from ..unotool import LinkListener
+from ..unotool import SubLayout
 
 
 class OptionsView():
-    def __init__(self, window):
+    def __init__(self, ctx, window):
         self._window = window
+        self._link = LinkListener(ctx, self._getLabel())
+        self._layout = SubLayout(Layout(window, size=Size(279, 270), **self._getLayouts()))
+        window.addWindowListener(self._layout)
 
 # OptionsView public setter methods
-    def initView(self, restart, connect, read, handler, urls):
+    def dispose(self):
+        if self._layout:
+            self._layout.dispose()
+            self._layout = None
+        if self._link:
+            self._link.dispose()
+            self._link = None
+
+    def initView(self, connect, read, handler, urls, state, label, url):
         self._getConnectTimeout().setValue(connect)
         self._getReadTimeout().setValue(read)
         self._getHandlerTimeout().setValue(handler)
         self._getUrls().Model.StringItemList = urls
-        self.setRestart(restart)
+        self.refreshView(state, label, url)
 
-    def setRestart(self, enabled):
-        self._getRestart().setVisible(enabled)
+    def refreshView(self, state, label, url):
+        self._setLabel(label, url)
+        self._enableButtons(state)
 
 # OptionsView public getter methods
+    def getLayout(self):
+        return self._layout
+
+    def getFrame(self):
+        return self._getFrame()
+
+    def getSetup(self):
+        return self._getSetup()
+
     def getWindow(self):
         return self._window
 
@@ -58,6 +83,33 @@ class OptionsView():
     def getViewData(self):
         return self._getConnect(), self._getRead(), self._getHandler()
 
+# OptionsView private methods
+    def _getLayouts(self):
+        return {'horizontals': self._getHorizontals(),
+                'tops': self._getTops()}
+
+    def _getHorizontals(self):
+        yield self._getFrame()
+        yield self._getSetup()
+        for index in range(1, 3):
+            yield self._getFixedLine(index)
+        yield self._getUrls()
+        yield self._getLabel()
+
+    def _getTops(self):
+        yield self._getWizardButton()
+        yield self._getAutoClose()
+        for index in range(1, 4):
+            yield self._getNumericField(index)
+
+    def _setLabel(self, label, url):
+        self._getLabel().Model.Label = label
+        self._link.setUrl(url)
+
+    def _enableButtons(self, state):
+        enabled = state.python and not state.restart
+        self._getWizardButton().Model.Enabled = enabled
+
 # OptionsView private getter methods
     def _getConnect(self):
         return int(self._getConnectTimeout().getValue())
@@ -69,6 +121,15 @@ class OptionsView():
         return int(self._getHandlerTimeout().getValue())
 
 # OptionsView private getter control methods
+    def _getFrame(self):
+        return self._window.getControl('FrameControl1')
+
+    def _getSetup(self):
+        return self._window.getControl('FrameControl2')
+
+    def _getFixedLine(self, index):
+        return self._window.getControl(f'FixedLine{index}')
+
     def _getUrls(self):
         return self._window.getControl('ListBox1')
 
@@ -84,6 +145,11 @@ class OptionsView():
     def _getHandlerTimeout(self):
         return self._window.getControl('NumericField3')
 
-    def _getRestart(self):
-        return self._window.getControl('Label5')
+    def _getWizardButton(self):
+        return self._window.getControl('CommandButton1')
 
+    def _getNumericField(self, index):
+        return self._window.getControl(f'NumericField{index}')
+
+    def _getLabel(self):
+        return self._window.getControl('Label5')

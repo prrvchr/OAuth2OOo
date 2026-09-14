@@ -27,7 +27,6 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
 
 from com.sun.star.logging.LogLevel import SEVERE
@@ -39,7 +38,6 @@ from oauth20 import OptionsManager
 
 from oauth20 import getLogger
 
-from oauth20 import g_identifier
 from oauth20 import g_defaultlog
 from oauth20 import g_basename
 
@@ -76,6 +74,9 @@ class OptionsHandler(unohelper.Base,
             elif method == 'Connect':
                 self._manager.connect()
                 handled = True
+            elif method == 'ShowSetup':
+                self._manager.showSetup()
+                handled = True
             return handled
         except Exception as e:
             print("OptionsHandler.callHandlerMethod() ERROR: %s" % traceback.format_exc())
@@ -83,13 +84,16 @@ class OptionsHandler(unohelper.Base,
 
     def getSupportedMethodNames(self):
         return ('external_event',
-                'Connect')
+                'Connect',
+                'ShowSetup')
 
     # XServiceInfo
     def supportsService(self, service):
         return g_ImplementationHelper.supportsService(g_ImplementationName, service)
+
     def getImplementationName(self):
         return g_ImplementationName
+
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
@@ -97,4 +101,3 @@ class OptionsHandler(unohelper.Base,
 g_ImplementationHelper.addImplementation(OptionsHandler,                            # UNO object class
                                          g_ImplementationName,                      # Implementation name
                                          g_ServiceNames)                            # List of implemented services
-
