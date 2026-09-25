@@ -30,18 +30,24 @@
 import uno
 
 from ..unotool import checkVersion
+from ..unotool import createService
+from ..unotool import executeDesktopDispatch
 from ..unotool import getExtensionVersion
+from ..unotool import getPropertyValueSet
 from ..unotool import getResourceLocation
 from ..unotool import getSimpleFile
 
 import importlib
 from packaging.requirements import Requirement
 import pkg_resources as pkgr
-import re
-import subprocess
 from time import sleep
 import traceback
+from xml.dom import minicompat
 
+
+def showSetup(ctx, identifier, listener=None, /, **kwargs):
+    url = f'vnd.sun.star.job:service={identifier}.Setup'
+    executeDesktopDispatch(ctx, url, listener, **kwargs)
 
 def checkExtensions(ctx, extensions, cancel=None, maxProgress=None, progress=None, resolver=None):
     i = 0
@@ -60,18 +66,34 @@ def checkExtensions(ctx, extensions, cancel=None, maxProgress=None, progress=Non
             sleep(1)
     return dependencies
 
-def checkJava(java, maxProgress=None, progress=None, resolver=None):
-    success = False
+def checkJava(ctx, java, maxProgress=None, progress=None, resolver=None):
     if maxProgress:
-        maxProgress(2)
+        maxProgress(3)
     if progress and resolver:
         progress(resolver(), 1)
-    version = _getJavaVersion()
+    code = _getJavaStatus(ctx)
     if progress and resolver:
-        progress(resolver(version), 2)
+        progress(resolver(), 2)
+    if code > 0:
+        minimum, version = _getDefaultVersion(*java)
+    else:
+        code, minimum, version = _getJavaVersion(ctx, *java)
+    if progress and resolver:
+        progress(resolver(version), 3)
         sleep(1)
-    success = version is not None and checkVersion(version, java)
-    return success, version if success else java
+    print("checkJava() java: %s - version: %s" % (minimum, version))
+    return code, minimum, version
+
+def checkAgent(ctx, service, url, agent):
+    support = False
+    driver = createService(ctx, service)
+    if driver:
+        properties = getPropertyValueSet({agent: True})
+        for info in driver.getPropertyInfo(url, properties):
+            if info.Name == agent:
+                support = info.Value != 'false'
+                break
+    return support
 
 def checkPython(ctx, identifier, cancel=None, maxProgress=None, progress=None, resolver=None):
     modules = []
@@ -82,25 +104,41 @@ def checkPython(ctx, identifier, cancel=None, maxProgress=None, progress=None, r
     success = len(modules) == 0
     return success, packages if success else modules
 
+def _getJavaStatus(ctx):
+    service = 'com.sun.star.comp.stoc.JavaVirtualMachine'
+    jvm = createService(ctx, service)
+    if jvm is None:
+        return 4
+    if jvm.isVMEnabled():
+        return 0
+    return 3
+
+def _getDefaultVersion(extension, java, script):
+    return java, java
+
+def _getJavaVersion(ctx, extension, java, script):
+    results = 2, java, java
+    try:
+        service = 'com.sun.star.script.provider.MasterScriptProviderFactory'
+        factory = createService(ctx, service)
+        provider = factory.createScriptProvider('')
+        url = f'vnd.sun.star.script:{script}?language=Java&location=user:uno_packages/{extension}.oxt'
+        macro = provider.getScript(url)
+        if macro:
+            result = macro.invoke((), (), ())
+            version = result[0]
+            if version:
+                if checkVersion(version, java):
+                    results = 0, java, version
+                else:
+                    results = 1, java, version
+    except Exception:
+        pass
+    return results
+
 def _checkExtension(ctx, identifier, data):
     version = getExtensionVersion(ctx, identifier)
     return version is not None and checkVersion(version, data[1])
-
-def _getJavaVersion():
-    version = None
-    try:
-        result = subprocess.run(['java', '-version'],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 text=True,
-                                 check=True)
-        line = result.stderr.splitlines()[0]
-        match = re.search(r'"([^"]+)"', line)
-        if match:
-            version = match.group(1)
-    except Exception:
-        pass
-    return version
 
 def _checkPackages(modules, packages, url, cancel, maxProgress, progress, resolver):
     with open(uno.fileUrlToSystemPath(url)) as requirements:
