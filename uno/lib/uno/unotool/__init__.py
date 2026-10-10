@@ -27,7 +27,10 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
+from .transferable import Factory as Transferable
+
 from .unotool import checkInternet
+from .unotool import checkVersion
 from .unotool import createMessageBox
 from .unotool import createService
 from .unotool import deregisterStartupJob
@@ -82,6 +85,7 @@ from .unotool import getSimpleFile
 from .unotool import getStreamSequence
 from .unotool import getStringResource
 from .unotool import getStringResourceWithLocation
+from .unotool import getSystemClipboard
 from .unotool import getTempFile
 from .unotool import getToolKit
 from .unotool import getTopWindow

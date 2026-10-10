@@ -27,24 +27,12 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-# jdbcDriverOOo general configuration
-g_extension = 'jdbcDriverOOo'
-g_identifier = 'io.github.prrvchr.%s' % g_extension
-g_service = '%s.Driver' % g_identifier
-g_services = ('io.github.prrvchr.jdbcdriver.sdbc.Driver',
-              'io.github.prrvchr.jdbcdriver.sdbcx.Driver',
-              'io.github.prrvchr.jdbcdriver.sdb.Driver')
-g_version = '1.7.1'
-g_agent = 'SupportsInstrumentationAgent'
-g_protocol = 'juda:jdbc'
-g_java = '17'
-g_script = 'JavaInfo.io.github.prrvchr.java.info.JavaInfo.getVersion'
+from .cancel import Cancel
 
-# jdbcDriverOOo special configuration
-g_resource = 'resource'
-g_basename = 'Driver'
-g_defaultlog = 'Driver'
-g_errorlog = 'jdbcDriverError'
+from .error import CancelException
+from .error import RunnerException
 
-class State:
-    restart = False
+from .listener import DispatchListener
+
+from .runner import Runner
+
