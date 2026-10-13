@@ -27,74 +27,53 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from ...unotool import getConfiguration
+from ...unotool import getContainerWindow
 
 from ...configuration import g_identifier
 
 import traceback
 
 
-class OptionsModel():
-    def __init__(self, ctx):
-        self._rebootkeys = ('ApiLevel', 'ResultSetType')
-        configkeys = ('UseCachedRowSet', 'ShowSystemTable', )
-        self._keys = self._rebootkeys + configkeys
-        self._config = getConfiguration(ctx, g_identifier, True)
-        self._settings = self._getSettings()
-        self._instrumented = False
+class OptionView():
+    def __init__(self, ctx, window, handler):
+        self._window = getContainerWindow(ctx, window.getPeer(), handler, g_identifier, 'OptionDialog')
+        self._window.setVisible(True)
 
-# OptionModel getter methods
-    def getViewData(self):
-        level = self._settings.get('ApiLevel')
-        crs = self._settings.get('UseCachedRowSet')
-        system = self._settings.get('ShowSystemTable')
-        return level, crs, system
+# OptionView setter methods
+    def dispose(self):
+        self._window.dispose()
 
-    def getConfigApiLevel(self):
-        return self._config.getByName('ApiLevel')
+    def initView(self, level, crs, system, rst, enabled, state):
+        self._getApiLevel(level).State = 1
+        self._getCachedRowSet().State = int(crs)
+        self._getSytemTable().State = int(system)
+        self.refreshView(rst, enabled, state)
 
-    def refreshData(self):
-        self._settings = self._getSettings()
-        level = self._settings.get('ApiLevel')
-        rst = self._settings.get('ResultSetType')
-        crs = self._settings.get('UseCachedRowSet')
-        system = self._settings.get('ShowSystemTable')
-        return level, rst, crs, system, self._isRowSetEnabled(level)
+    def refreshView(self, rst, enabled, state):
+        if state.agent:
+            self._getResultSetType(rst).State = 1
+        else:
+            self._getResultSetType(0).State = 1
+        self.enableResultSetType(state.agent and enabled)
+        self.enableCachedRowSet(state.agent and enabled and rst != 0)
 
-# OptionModel setter methods
-    def setApiLevel(self, level):
-        self._settings['ApiLevel'] = level
-        return self._instrumented and self._isRowSetEnabled(level)
+    def enableResultSetType(self, enabled, options=(0, 1, 2)):
+        for index in options:
+            self._getResultSetType(index).Model.Enabled = enabled
 
-    def setResultSetType(self, level):
-        self._settings['ResultSetType'] = level
-        return level != 0
+    def enableCachedRowSet(self, enabled):
+        self._getCachedRowSet().Model.Enabled = enabled
 
-    def setCachedRowSet(self, state):
-        self._settings['UseCachedRowSet'] = bool(state)
+# OptionView private control methods
+    def _getApiLevel(self, index):
+        return self._window.getControl('OptionButton%s' % (index + 1))
 
-    def setSystemTable(self, state):
-        self._settings['ShowSystemTable'] = bool(state)
+    def _getResultSetType(self, index):
+        return self._window.getControl('OptionButton%s' % (index + 4))
 
-    def saveSetting(self):
-        reboot = False
-        for key in self._keys:
-            if key != 'ResultSetType' or self._instrumented:
-                value = self._settings.get(key)
-                if value != self._config.getByName(key):
-                    self._config.replaceByName(key, value)
-                    if key in self._rebootkeys:
-                        reboot = True
-        if self._config.hasPendingChanges():
-            self._config.commitChanges()
-        return reboot
+    def _getCachedRowSet(self):
+        return self._window.getControl('CheckBox1')
 
-# OptionModel private methods
-    def _getSettings(self):
-        settings = {}
-        for key in self._keys:
-            settings[key] = self._config.getByName(key)
-        return settings
+    def _getSytemTable(self):
+        return self._window.getControl('CheckBox2')
 
-    def _isRowSetEnabled(self, level):
-        return level != 0

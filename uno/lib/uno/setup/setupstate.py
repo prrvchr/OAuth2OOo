@@ -27,87 +27,59 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from .optionsmodel import OptionsModel
+from ..configuration import State
 
-from .optionsview import OptionsWindow
-
-from .optionshandler import WindowHandler
-
-from ...runner import DispatchListener
-
-from ...setup import CheckSetup
-
-from ..logger import LogManager
-
-from ...setup import showSetup
-
-from ...configuration import g_identifier
-
-import traceback
+from dataclasses import dataclass
+from dataclasses import InitVar
 
 
-class OptionsManager():
-    def __init__(self, ctx, window, java, agent, logger, *loggers):
-        self._ctx = ctx
-        self._java = java
-        self._agent = agent
-        self._logmanager = LogManager(ctx, window, 'requirements.txt', logger, *loggers)
-        self._model = OptionsModel(ctx)
-        self._view = OptionsWindow(ctx, window, WindowHandler(self), *self._model.getViewData())
-        if java and agent:
-            setup = CheckSetup(ctx, self.notify, java=java, agent=agent)
-            setup.start()
+@dataclass
+class SetupState:
+    state: InitVar[bool] = True
 
-    def notify(self, extension, java, agent, database, python):
-        if java and agent:
-            pass
+    extension: bool = True
+    jcode: int = 0
+    agent: bool = True
+    database: bool = True
+    pcode: int = 0
 
-# OptionManager setter methods
-    def initView(self):
-        self._logmanager.initView()
-        self._initView()
+    def __post_init__(self, state: bool):
+        if not state:
+            self.extension = False
+            self.jcode = 4
+            self.agent = False
+            self.database = False
+            self.pcode = 2
 
-    def dispose(self):
-        self._logmanager.dispose()
-        self._view.dispose()
+    @property
+    def java(self) -> bool:
+        return self.jcode == 0
 
-# OptionManager getter methods
-    def getConfigApiLevel(self):
-        return self._model.getConfigApiLevel()
+    @property
+    def python(self) -> bool:
+        return self.pcode == 0
 
-# OptionManager setter methods
-    def saveSetting(self):
-        saved = self._logmanager.saveSetting()
-        saved |= self._model.saveSetting()
-        return saved
+    @property
+    def restart(self) -> bool:
+        return State.restart
 
-    def loadSetting(self):
-        self._logmanager.loadSetting()
-        self._initView()
+    @property
+    def isperfect(self) -> bool:
+        return all([self.extension, self.java, self.agent, self.python]) and not self.restart
 
-    def setApiLevel(self, level):
-        enabled = self._model.setApiLevel(level)
-        self._view.enableResultSetType(enabled)
-        self._view.enableCachedRowSet(enabled)
-
-    def setResultSetType(self, level):
-        enabled = self._model.setResultSetType(level)
-        self._view.enableCachedRowSet(enabled)
-
-    def setCachedRowSet(self, state):
-        self._model.setCachedRowSet(state)
-
-    def setSystemTable(self, state):
-        self._model.setSystemTable(state)
-
-    def showSetup(self):
-        showSetup(self._ctx, g_identifier, DispatchListener=DispatchListener(self))
-
-    def dispatchFinished(self, notification):
-        setup = CheckSetup(self._ctx, self.notify, java=self._java, agent=self._agent)
-        setup.start()
-
-# OptionManager private methods
-    def _initView(self):
-        self._view.initView(*self._model.getViewData())
+    @property
+    def step(self) -> int:
+        if not self.extension:
+            return 2
+        if not self.java:
+            return 2 + self.jcode
+        if not self.agent:
+            return 8
+        if not self.database:
+            return 9
+        if not self.python:
+            return 9 + self.pcode
+        if self.restart:
+            return 14
+        return 1
 

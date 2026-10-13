@@ -27,58 +27,74 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from ...unotool import getContainerWindow
+from .optionmodel import OptionModel
+
+from .optionview import OptionView
+
+from .optionhandler import WindowHandler
+
+from ...runner import DispatchListener
+
+from ...setup import SetupCheck
+
+from ..logger import LogManager
+
+from ...setup import showSetup
 
 from ...configuration import g_identifier
 
 import traceback
 
 
-class OptionsWindow():
-    def __init__(self, ctx, window, handler, level, crs, system):
-        self._window = getContainerWindow(ctx, window.getPeer(), handler, g_identifier, 'OptionDialog')
-        self._window.setVisible(True)
-        self.enableResultSetType(False)
-        self.enableCachedRowSet(False)
-        self.initView(level, crs, system)
+class OptionManager():
+    def __init__(self, ctx, window, dispatch, logger, *loggers):
+        self._ctx = ctx
+        self._dispatch = dispatch
+        self._model = OptionModel(ctx)
+        self._logmanager = LogManager(ctx, window, 'requirements.txt', logger, *loggers)
+        self._logmanager.initView()
+        self._view = OptionView(ctx, window, WindowHandler(self))
 
-# OptionWindow setter methods
+    def init(self, state):
+        self._view.initView(*self._model.getInitData(state))
+
+    def refresh(self, state):
+        self._view.refreshView(*self._model.getRefreshData(state))
+
+# OptionManager setter methods
     def dispose(self):
-        self._window.dispose()
+        self._logmanager.dispose()
+        self._view.dispose()
 
-    def initView(self, level, crs, system):
-        self._getApiLevel(level).State = 1
-        self._getCachedRowSet().State = int(crs)
-        self._getSytemTable().State = int(system)
+# OptionManager getter methods
+    def getConfigApiLevel(self):
+        return self._model.getConfigApiLevel()
 
-    def refreshView(self, instrumented, level, rst, crs, system, enabled):
-        self._getApiLevel(level).State = 1
-        if instrumented:
-            self._getResultSetType(rst).State = 1
-        else:
-            self._getResultSetType(0).State = 1
-        self._getCachedRowSet().State = int(crs)
-        self.enableResultSetType(instrumented and enabled)
-        self.enableCachedRowSet(instrumented and enabled and rst != 0)
-        self._getSytemTable().State = int(system)
+# OptionManager setter methods
+    def saveSetting(self):
+        saved = self._logmanager.saveSetting()
+        saved |= self._model.saveSetting()
+        return saved
 
-    def enableResultSetType(self, enabled, options=(0, 1, 2)):
-        for index in options:
-            self._getResultSetType(index).Model.Enabled = enabled
+    def loadSetting(self):
+        self._logmanager.loadSetting()
+        self._initView()
 
-    def enableCachedRowSet(self, enabled):
-        self._getCachedRowSet().Model.Enabled = enabled
+    def setApiLevel(self, level):
+        enabled = self._model.setApiLevel(level)
+        self._view.enableResultSetType(enabled)
+        self._view.enableCachedRowSet(enabled)
 
-# OptionWindow private control methods
-    def _getApiLevel(self, index):
-        return self._window.getControl('OptionButton%s' % (index + 1))
+    def setResultSetType(self, level):
+        enabled = self._model.setResultSetType(level)
+        self._view.enableCachedRowSet(enabled)
 
-    def _getResultSetType(self, index):
-        return self._window.getControl('OptionButton%s' % (index + 4))
+    def setCachedRowSet(self, state):
+        self._model.setCachedRowSet(state)
 
-    def _getCachedRowSet(self):
-        return self._window.getControl('CheckBox1')
+    def setSystemTable(self, state):
+        self._model.setSystemTable(state)
 
-    def _getSytemTable(self):
-        return self._window.getControl('CheckBox2')
+    def showSetup(self):
+        showSetup(self._ctx, g_identifier, DispatchListener=self._dispatch)
 
