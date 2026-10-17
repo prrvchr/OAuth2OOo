@@ -41,6 +41,7 @@ from .requestparameter import RequestParameter
 from .dialog import UserHandler
 from .dialog import UserView
 
+from .unotool import checkInternet
 from .unotool import createMessageBox
 from .unotool import createService
 from .unotool import executeDispatch
@@ -73,6 +74,7 @@ from .oauth20 import setParametersArguments
 
 from .oauth2helper import isAuthorized
 
+from .configuration import g_check
 from .configuration import g_extension
 from .configuration import g_identifier
 from .configuration import g_service
@@ -81,7 +83,6 @@ from .configuration import g_errorlog
 from .configuration import g_basename
 from .configuration import g_token
 
-from .oauth20 import g_checkSetup
 try:
     from .plugin import extract2Json
     from .plugin import flattenJson
@@ -96,6 +97,6 @@ try:
     from .webdriver import clickButton
     from .webdriver import sendKey
 except Exception as e:
-    g_checkSetup = True
-    # do nothing OAuth2Setup will do
+    g_check = True
+    # do nothing Setup will do
 
