@@ -26,63 +26,64 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
+import traceback
 
-from .setup import SetupManager
-
-from .options import OptionsManager
-
-from .model import HandlerModel
-from .model import OAuth2Model
-
-from .dispatch import Dispatch
-
-from .requestparameter import RequestParameter
-
-from .dialog import UserHandler
-from .dialog import UserView
-
-from .unotool import createMessageBox
-from .unotool import createService
-from .unotool import executeDispatch
-from .unotool import getConfiguration
-from .unotool import getContainerWindow
-from .unotool import getCurrentLocale
-from .unotool import getDialog
-from .unotool import getResourceLocation
-from .unotool import getStringResource
-from .unotool import getSimpleFile
-from .unotool import getTopWindow
-from .unotool import hasFrameInterface
-
-from .logger import getLogger
-
-from .request import download
-from .request import getInputStream
-from .request import getSessionMode
-from .request import upload
-
-from .requestresponse import raiseForStatus
-from .requestresponse import getRequestResponse
-from .requestresponse import getResponse
-
-from .oauth20 import OAuth2OOo
-from .oauth20 import NoOAuth2
-from .oauth20 import InteractionRequest
-from .oauth20 import getOAuth2UserName
-from .oauth20 import setParametersArguments
-
-from .oauth2helper import isAuthorized
-
-from .configuration import g_extension
-from .configuration import g_identifier
-from .configuration import g_service
-from .configuration import g_defaultlog
-from .configuration import g_errorlog
-from .configuration import g_basename
-from .configuration import g_token
-
-from .oauth20 import g_checkSetup
 try:
+    from .setup import SetupManager
+    
+    from .options import OptionsManager
+    
+    from .model import HandlerModel
+    from .model import OAuth2Model
+    
+    from .dispatch import Dispatch
+    
+    from .requestparameter import RequestParameter
+    
+    from .dialog import UserHandler
+    from .dialog import UserView
+    
+    from .oauth20 import showOAuth2
+    
+    from .unotool import executeDispatch
+    from .unotool import findFrame
+    from .unotool import getConfiguration
+    from .unotool import getJobArguments
+    from .unotool import getResourceLocation
+    from .unotool import hasFrameInterface
+    from .unotool import notifyDispatch
+    
+    from .logger import getLogger
+    
+    from .request import download
+    from .request import getInputStream
+    from .request import getSessionMode
+    from .request import upload
+    
+    from .requestresponse import raiseForStatus
+    from .requestresponse import getRequestResponse
+    from .requestresponse import getResponse
+    
+    from .oauth20 import OAuth2OOo
+    from .oauth20 import NoOAuth2
+    from .oauth20 import InteractionRequest
+    from .oauth20 import getOAuth2UserName
+    from .oauth20 import setParametersArguments
+    
+    from .model import isAuthorized
+
+    from .wizard import showOAuth2Wizard
+    
+    from .configuration import State
+    from .configuration import g_extension
+    from .configuration import g_identifier
+    from .configuration import g_service
+    from .configuration import g_defaultlog
+    from .configuration import g_errorlog
+    from .configuration import g_basename
+    from .configuration import g_setup
+    from .configuration import g_token
+    
     from .plugin import extract2Json
     from .plugin import flattenJson
     from .plugin import javaScript2Json
@@ -91,11 +92,10 @@ try:
     from .plugin import parseJson
     from .plugin import splitJson
     from .plugin import xml2Json
-
+    
     from .webdriver import Browsers
     from .webdriver import clickButton
     from .webdriver import sendKey
 except Exception as e:
-    g_checkSetup = True
-    # do nothing OAuth2Setup will do
+    print("oauth20.__init__() ERROR: %s" % traceback.format_exc())
 

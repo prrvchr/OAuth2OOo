@@ -62,8 +62,13 @@ from .requestresponse import RequestResponse
 
 from .unotool import getSimpleFile
 
-from requests.exceptions import HTTPError
-from requests.exceptions import RequestException as RequestError
+from .configuration import State
+try:
+    from requests.exceptions import HTTPError
+    from requests.exceptions import RequestException as RequestError
+except TypeError as e:
+    State.restart = True
+
 import time
 from datetime import timedelta
 import re

@@ -30,9 +30,13 @@
 import uno
 import unohelper
 
+from com.sun.star.frame.DispatchResultState import FAILURE
+from com.sun.star.frame.DispatchResultState import SUCCESS
+
 from com.sun.star.lang import EventObject
 from com.sun.star.lang import XComponent
 from com.sun.star.lang import XServiceInfo
+
 from com.sun.star.auth import XOAuth2Service
 from com.sun.star.auth import RefreshTokenException
 
@@ -46,21 +50,19 @@ from oauth20 import RequestParameter
 from oauth20 import OAuth2Model
 from oauth20 import OAuth2OOo
 
+from oauth20 import download
 from oauth20 import executeDispatch
 from oauth20 import getConfiguration
-from oauth20 import isAuthorized
-
-from oauth20 import getSessionMode
-
-from oauth20 import getRequestResponse
 from oauth20 import getInputStream
-from oauth20 import download
-from oauth20 import upload
-
-from oauth20 import setParametersArguments
-
 from oauth20 import getLogger
+from oauth20 import getRequestResponse
+from oauth20 import getSessionMode
+from oauth20 import isAuthorized
+from oauth20 import upload
+from oauth20 import setParametersArguments
+from oauth20 import showOAuth2Wizard
 
+from oauth20 import State
 from oauth20 import g_identifier
 from oauth20 import g_service
 from oauth20 import g_defaultlog
@@ -68,8 +70,13 @@ from oauth20 import g_basename
 from oauth20 import g_token
 
 from string import Template
-import requests
 import traceback
+try:
+    import requests
+except ImportError as e:
+    print("OAuth2Service ImportError ERROR: %s" % traceback.format_exc())
+    State.restart = True
+
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -91,9 +98,9 @@ class OAuth2Service(unohelper.Base,
             providers = config.getByName('Providers')
             if not isAuthorized(urls, scopes, providers, url, user):
                 # FIXME: The Url and User name must not be able to be changed (ie: ReadOnly)
-                args = {'Url': url, 'UserName': user, 'ReadOnly': True}
-                executeDispatch(ctx, 'oauth2:Wizard', **args)
-                if not isAuthorized(urls, scopes, providers, url, user):
+                state, result = showOAuth2Wizard(ctx, url=url, user=user, readonly=True)
+                #showOAuth2(ctx, Url=url, User=user, ReadOnly=True)
+                if state == FAILURE or not isAuthorized(urls, scopes, providers, url, user):
                     # The OAuth2 Wizard has been canceled
                     return None
         return super(OAuth2Service, cls).__new__(cls)
@@ -127,9 +134,10 @@ class OAuth2Service(unohelper.Base,
         return getSessionMode(self._ctx, host)
 
     def isAuthorized(self):
-        if self._model.isOAuth2():
-            return self._model.isAuthorized()
-        return True
+        if self._model.isAuthorized():
+            return True
+        state, result = showOAuth2Wizard(ctx, **self._model.getWizardArguments())
+        return state == SUCCESS and self._model.isAuthorized()
 
     def isRegisteredUrl(self, url):
         return self._model.isRegisteredUrl(url)

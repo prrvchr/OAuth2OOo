@@ -52,8 +52,6 @@ from oauth20 import getConfiguration
 from oauth20 import getLogger
 from oauth20 import getResourceLocation
 
-from oauth20 import createService
-
 from oauth20 import extract2Json
 from oauth20 import flattenJson
 from oauth20 import javaScript2Json

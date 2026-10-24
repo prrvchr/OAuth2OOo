@@ -195,6 +195,15 @@ Pour créer l'extension OAuth2OOo avec l'aide d'Apache Ant, vous devez:
 
 ___
 
+## Problèmes connus:
+
+⚠️ Problème d'affichage sous Linux (Lubuntu / environnements Qt):
+Si vous utilisez une ancienne version de LibreOffice (notamment la branche 7.6 ou antérieure) sous Linux avec un environnement basé sur Qt (Lubuntu, KDE), la fenêtre de l'extension peut refuser de s'afficher ou apparaître vide à partir du deuxième chargement.
+- Raison: Il s'agit d'un bug connu du moteur de rendu graphique (vcl:qt5) de LibreOffice 7.6 dans la gestion des fenêtres non modales.
+- Solution: Mettez à jour LibreOffice vers une version moderne et supportée (recommandé : LibreOffice 24.2+ ou supérieure), où ce problème a été définitivement résolu.
+
+___
+
 ## A été testé avec:
 
 * LibreOffice 7.3.7.2 - Lubuntu 22.04 - Python version 3.10.12
