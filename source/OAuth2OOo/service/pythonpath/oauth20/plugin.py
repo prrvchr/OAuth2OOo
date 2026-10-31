@@ -32,23 +32,48 @@ import os
 import sys
 if sys.stderr is None:
     sys.stderr = open(os.devnull, 'w')
+
 # FIXME: We need to force the creation of tab files using the utf8 codec to workaround issues with
 # FIXME: the ply package, for systems like Windows that do not have utf8 configured as the default codec.
 if os.name == 'nt':
     from calmjs.parse.parsers.optimize import reoptimize_all
     reoptimize_all(True)
 
-import js2xml
-from js2xml.utils.objects import make
-from parsel import Selector
-from lxml import etree
-from jsonpath_ng import parse
-import extruct
-from w3lib.html import get_base_url
+from collections import OrderedDict
+
+from .configuration import State
+try:
+    import extruct
+    from parsel import Selector
+except ImportError as e:
+    State.restart = True
+except SyntaxError as e:
+    State.restart = True
+
+try:
+    from js2xml.utils.objects import make
+    from lxml import etree
+except ImportError as e:
+    State.restart = True
+
+try:
+    import js2xml
+except ModuleNotFoundError as e:
+    State.restart = True
+
+try:
+    from jsonpath_ng import parse
+except TypeError as e:
+    State.restart = True
 
 import json
 from six import string_types, text_type
-from collections import OrderedDict
+
+try:
+    from w3lib.html import get_base_url
+except SyntaxError as e:
+    State.restart = True
+
 import traceback
 
 

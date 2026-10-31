@@ -29,7 +29,13 @@
 
 from ..model import BaseModel
 
-from ..oauth2helper import getProviderName
+from ..model import getProviderName
+
+from ..unotool import canUpdatePackages
+from ..unotool import getStringResource
+
+from ..configuration import State
+from ..configuration import g_identifier
 
 import traceback
 
@@ -37,28 +43,49 @@ import traceback
 class OptionsModel(BaseModel):
     def __init__(self, ctx):
         super(OptionsModel, self).__init__(ctx)
+        self._update = canUpdatePackages()
+        self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'OptionsDialog')
+        self._resources = {'Links': 'OptionsDialog.Hyperlink%s.Url'}
 
     @property
     def _ConnectTimeout(self):
         return self._config.getByName('ConnectTimeout')
+
     @property
     def _ReadTimeout(self):
         return self._config.getByName('ReadTimeout')
+
     @property
     def _HandlerTimeout(self):
         return self._config.getByName('HandlerTimeout')
 
-    def getOptionsData(self):
-        return self._ConnectTimeout, self._ReadTimeout, self._HandlerTimeout, self.UrlList
+    @property
+    def _Setup(self):
+        return self._config.getByName('SetupUpdate')
+
+    def getViewData(self):
+        return self._update, self._getLinks()
+
+    def getInitData(self, state):
+        return self._ConnectTimeout, self._ReadTimeout, self._HandlerTimeout, self.UrlList, self._Setup, state
 
     def getProviderName(self, url):
         return getProviderName(self._config, url)
 
-    def setOptionsData(self, connect, read, handler):
+    def setOptionsData(self, connect, read, handler, setup):
         if connect != self._ConnectTimeout:
             self._config.replaceByName('ConnectTimeout', connect)
         if read != self._ReadTimeout:
             self._config.replaceByName('ReadTimeout', read)
         if handler != self._HandlerTimeout:
             self._config.replaceByName('HandlerTimeout', handler)
+        if self._update and setup != self._Setup:
+            self._config.replaceByName('SetupUpdate', setup)
+
+    def _getLinks(self):
+        links = []
+        for i in range(1, 2):
+            resource = self._resources.get('Links') % i
+            links.append(self._resolver.resolveString(resource))
+        return tuple(links)
 

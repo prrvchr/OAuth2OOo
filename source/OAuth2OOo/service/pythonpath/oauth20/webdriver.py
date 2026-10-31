@@ -40,12 +40,17 @@ from com.sun.star.util import XCloseListener
 
 from .configuration import g_identifier
 
-from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from .configuration import State
+try:
+    from selenium import webdriver
+    from selenium.webdriver.support.wait import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+except (ImportError, TypeError) as e:
+    State.restart = True
+
 import uuid
-from six import string_types, text_type
-from threading import Thread
+from six import string_types
+from six import text_type
 import traceback
 
 

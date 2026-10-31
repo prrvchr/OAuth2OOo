@@ -42,6 +42,8 @@ from oauth20 import UserView
 from oauth20 import UserHandler
 from oauth20 import HandlerModel
 
+from oauth20 import showOAuth2Wizard
+
 from oauth20 import g_identifier
 
 import traceback
@@ -106,9 +108,10 @@ class OAuth2Handler(unohelper.Base,
         return status == 1
 
     def _isAuthorized(self):
-        if self._model.isOAuth2():
-            return self._model.isAuthorized()
-        return False
+        if self._model.isAuthorized():
+            return True
+        state, result = showOAuth2Wizard(ctx, **self._model.getWizardArguments())
+        return state == SUCCESS and self._model.isAuthorized()
 
     def _showUserDialog(self, interaction, url, message):
         title, label = self._model.getUserData(url, message)

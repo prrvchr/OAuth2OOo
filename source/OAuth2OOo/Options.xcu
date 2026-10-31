@@ -34,6 +34,12 @@
   <prop oor:name="UnoWizard">
     <value>false</value>
   </prop>
+  <prop oor:name="SetupPosition">
+    <value>-1 -1</value>
+  </prop>
+  <prop oor:name="SetupUpdate">
+    <value>0</value>
+  </prop>
   <prop oor:name="ConnectTimeout">
     <value>5</value>
   </prop>

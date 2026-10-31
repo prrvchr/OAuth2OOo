@@ -66,18 +66,20 @@ from .json import getJsonStructure
 from .configuration import g_errorlog
 from .configuration import g_basename
 
-from requests.exceptions import ConnectionError
-from requests.exceptions import ConnectTimeout
-from requests.exceptions import HTTPError
-from requests.exceptions import InvalidURL
-from requests.exceptions import ReadTimeout
-from requests.exceptions import RequestException as RequestError
-from requests.exceptions import TooManyRedirects
-from requests.exceptions import URLRequired
+from .configuration import State
+try:
+    from requests.exceptions import ConnectionError
+    from requests.exceptions import ConnectTimeout
+    from requests.exceptions import HTTPError
+    from requests.exceptions import InvalidURL
+    from requests.exceptions import ReadTimeout
+    from requests.exceptions import RequestException as RequestError
+    from requests.exceptions import TooManyRedirects
+    from requests.exceptions import URLRequired
+except TypeError as e:
+    State.restart = True
+
 import json
-# FIXME: If you have Python Requests installed and its version is lower than 2.27.0
-# FIXME: then we cannot import JSONDecoderError it is not yet available
-# from requests.exceptions import JSONDecodeError
 from json.decoder import JSONDecodeError
 from urllib.parse import parse_qs
 import traceback
