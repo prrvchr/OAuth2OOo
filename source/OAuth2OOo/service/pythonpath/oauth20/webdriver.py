@@ -40,13 +40,17 @@ from com.sun.star.util import XCloseListener
 
 from .configuration import g_identifier
 
-from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from .configuration import State
+try:
+    from selenium import webdriver
+    from selenium.webdriver.support.wait import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+except (ImportError, TypeError) as e:
+    State.restart = True
+
 import uuid
-from six import string_types, text_type
-from threading import Thread
-import traceback
+from six import string_types
+from six import text_type
 
 
 def sendKey(driver, wait, by, path, value):
@@ -56,6 +60,7 @@ def sendKey(driver, wait, by, path, value):
     else:
         element = driver.find_element(by, path)
     element.send_keys(value)
+
 
 def clickButton(driver, wait, by, path):
     if wait:
@@ -74,8 +79,10 @@ class CloseListener(unohelper.Base,
     # XCloseListener
     def queryClosing(self, source, ownership):
         self._browser.close(source.Source)
+
     def notifyClosing(self, source):
         pass
+
     def disposing(self, source):
         pass
 
@@ -141,6 +148,7 @@ class Browser():
     @property
     def Driver(self):
         return self._driver
+
     @property
     def Session(self):
         return self._session
@@ -160,7 +168,7 @@ class Browser():
         try:
             self.Driver.title
             return False
-        except:
+        except Exception:
             return True
 
     def _getWebDriver(self, location, name, path, options):
@@ -172,7 +180,7 @@ class Browser():
                 for o in options:
                     option.add_argument(o)
         return self._getWebDriverClass(location, name, option)
-    
+
     def _getWebOptionClass(self, name, path):
         options = None
         if name in ('Brave', 'Chrome', 'Chromium'):
@@ -259,6 +267,7 @@ class VolatileResult(unohelper.Base,
     def addResultListener(self, listener):
         print("VolatileResult.addResultListener()")
         self._rlisteners.append(listener)
+
     def removeResultListener(self, listener):
         print("VolatileResult.removeResultListener()")
         if listener in self._rlisteners:
@@ -270,9 +279,11 @@ class VolatileResult(unohelper.Base,
         source = EventObject(self)
         for listener in self._listeners:
             listener.disposing(source)
+
     def addEventListener(self, listener):
         print("VolatileResult.addEventListener()")
         self._listeners.append(listener)
+
     def removeEventListener(self, listener):
         print("VolatileResult.removeEventListener()")
         if listener in self._listeners:
@@ -282,10 +293,11 @@ class VolatileResult(unohelper.Base,
     def supportsService(self, service):
         print("VolatileResult.supportsService()")
         return service == self._service
+
     def getImplementationName(self):
         print("VolatileResult.getImplementationName()")
         return self._name
+
     def getSupportedServiceNames(self):
         print("VolatileResult.getSupportedServiceNames()")
         return (self._service, )
-

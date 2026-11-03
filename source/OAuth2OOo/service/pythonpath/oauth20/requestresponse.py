@@ -34,16 +34,8 @@ from com.sun.star.container import XEnumeration
 from com.sun.star.container import NoSuchElementException
 
 from com.sun.star.io import XInputStream
-from com.sun.star.io import XSeekableInputStream
 
-from com.sun.star.logging.LogLevel import INFO
 from com.sun.star.logging.LogLevel import SEVERE
-
-from com.sun.star.rest.ParameterType import URL
-from com.sun.star.rest.ParameterType import JSON
-from com.sun.star.rest.ParameterType import QUERY
-from com.sun.star.rest.ParameterType import HEADER
-from com.sun.star.rest.ParameterType import REDIRECT
 
 from com.sun.star.rest import ConnectionException
 from com.sun.star.rest import ConnectTimeoutException
@@ -66,21 +58,22 @@ from .json import getJsonStructure
 from .configuration import g_errorlog
 from .configuration import g_basename
 
-from requests.exceptions import ConnectionError
-from requests.exceptions import ConnectTimeout
-from requests.exceptions import HTTPError
-from requests.exceptions import InvalidURL
-from requests.exceptions import ReadTimeout
-from requests.exceptions import RequestException as RequestError
-from requests.exceptions import TooManyRedirects
-from requests.exceptions import URLRequired
+from .configuration import State
+try:
+    from requests.exceptions import ConnectionError
+    from requests.exceptions import ConnectTimeout
+    from requests.exceptions import HTTPError
+    from requests.exceptions import InvalidURL
+    from requests.exceptions import ReadTimeout
+    from requests.exceptions import RequestException as RequestError
+    from requests.exceptions import TooManyRedirects
+    from requests.exceptions import URLRequired
+except TypeError as e:
+    State.restart = True
+
 import json
-# FIXME: If you have Python Requests installed and its version is lower than 2.27.0
-# FIXME: then we cannot import JSONDecoderError it is not yet available
-# from requests.exceptions import JSONDecodeError
 from json.decoder import JSONDecodeError
 from urllib.parse import parse_qs
-import traceback
 
 
 def getDuration(delta):
@@ -183,6 +176,7 @@ def raiseForStatus(ctx, source, cls, mtd, name, response):
     except RequestException as e:
         raiseRequestException(ctx, source, cls, mtd, name, 105, e)
 
+
 def raiseHTTPException(ctx, source, cls, mtd, name, code, error):
     e = HTTPException()
     e.Context = source
@@ -192,6 +186,7 @@ def raiseHTTPException(ctx, source, cls, mtd, name, code, error):
     e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, e.StatusCode, e.Content)
     raise e
 
+
 def raiseJSONDecodeException(ctx, source, cls, mtd, name, code, response):
     e = JSONDecodeException()
     e.Context = source
@@ -200,6 +195,7 @@ def raiseJSONDecodeException(ctx, source, cls, mtd, name, code, response):
     e.Content = response.text
     e.Message = getExceptionMessage(ctx, cls, mtd, code, name, e.Url, e.StatusCode, e.Content)
     raise e
+
 
 def raiseRequestException(ctx, source, cls, mtd, name, code, error):
     e = RequestException()
@@ -226,57 +222,75 @@ class RequestResponse(unohelper.Base,
     @property
     def Parameter(self):
         return self._parameter
+
     @property
     def Url(self):
         return self._response.url
+
     @property
     def FullUrl(self):
         return self._response.fullurl
+
     @property
     def StatusCode(self):
         return self._response.status_code
+
     @property
     def Reason(self):
         return self._response.reason
+
     @property
     def Links(self):
         return self._response.links
+
     @property
     def ApparentEncoding(self):
         return self._response.apparent_encoding
+
     @property
     def Encoding(self):
         return self._response.encoding
+
     @Encoding.setter
     def Encoding(self, encoding):
         self._response.encoding = encoding
+
     @property
     def Text(self):
         return self._response.text
+
     @property
     def Content(self):
         return uno.ByteSequence(self._response.content)
+
     @property
     def Headers(self):
         return json.dumps(self._response.headers)
+
     @property
     def History(self):
-        return tuple(ResquestResponse(self._ctx, self._parameter, r) for r in self._response.history)
+        return tuple(RequestResponse(self._ctx, self._parameter, r) for r in self._response.history)
+
     @property
     def Ok(self):
         return self._response.ok
+
     @property
     def Error(self):
         return self._getHTTPException(self._response.error)
+
     @property
     def IsPermanentRedirect(self):
         return self._response.is_permanent_redirect
+
     @property
     def IsRedirect(self):
         return self._response.is_redirect
+
     @property
     def Elapsed(self):
         return getDuration(self._response.elapsed)
+
     @property
     def DataSink(self):
         return DataStream(self._response)
@@ -331,26 +345,32 @@ class DataStream(unohelper.Base,
         self._length = self._input.tell()
         self._input.seek(0)
 
-    #XInputStream
+    # XInputStream
     def readBytes(self, sequence, length):
         sequence = uno.ByteSequence(self._input.read(length))
         return len(sequence), sequence
+
     def readSomeBytes(self, sequence, length):
         return self.readBytes(sequence, length)
+
     def skipBytes(self, length):
         self._input.seek(length, 1)
+
     def available(self):
         available = self._length - self._input.tell()
         return max(available, 0)
+
     def closeInput(self):
         self._input.close()
         self._response.close
 
-    #XSeekable
+    # XSeekable
     def seek(self, location):
         self._input.seek(location)
+
     def getPosition(self):
         return self._input.tell()
+
     def getLength(self):
         return self._length
 
@@ -363,7 +383,7 @@ class InputStream(unohelper.Base,
         self._chunk = chunk
         self._buffer = b''
 
-    #XInputStream
+    # XInputStream
     def readBytes(self, sequence, length):
         sequence = uno.ByteSequence(self._readBytes(length))
         return len(sequence), sequence
@@ -405,9 +425,10 @@ class Enumerator(unohelper.Base,
         # FIXME: method, I need to be one element ahead...
         self._buffer = self._nextElement()
 
-    #XEnumeration
+    # XEnumeration
     def hasMoreElements(self):
         return not self._stopped
+
     def nextElement(self):
         if self._stopped:
             raise NoSuchElementException('Error: no more elements exist', self)
@@ -425,8 +446,8 @@ class Enumerator(unohelper.Base,
 
 
 class FileLike():
-    def __init__(self, input):
-        self._input = input
+    def __init__(self, iput):
+        self._input = iput
 
     # Python FileLike Object
     def read(self, length):
@@ -445,4 +466,3 @@ class FileLike():
 
     def tell(self):
         return self._input.getPosition()
-

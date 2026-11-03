@@ -27,24 +27,19 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
-import unohelper
-
 from .tokenmodel import TokenModel
+
+from .helper import getProviderName
+from .helper import isEmailValid
 
 from ..unotool import getStringResource
 
-from ..oauth2helper import getProviderName
-from ..oauth2helper import isEmailValid
-
 from ..configuration import g_identifier
-
-import traceback
 
 
 class HandlerModel(TokenModel):
     def __init__(self, ctx):
-        super(TokenModel, self).__init__(ctx)
+        super().__init__(ctx)
         self._resolver = getStringResource(ctx, g_identifier, 'dialogs', 'UserDialog')
         self._resources = {'UserTitle': 'UserDialog.Title',
                            'UserLabel': 'UserDialog.Label1.Label'}
@@ -65,4 +60,3 @@ class HandlerModel(TokenModel):
     def _getUserLabel(self, msg):
         resource = self._resources.get('UserLabel')
         return self._resolver.resolveString(resource) % msg
-

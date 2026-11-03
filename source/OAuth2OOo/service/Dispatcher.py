@@ -38,9 +38,6 @@ from oauth20 import Dispatch
 
 from oauth20 import hasFrameInterface
 
-from oauth20 import g_identifier
-
-import traceback
 
 # pythonloader looks for a static g_ImplementationHelper variable
 g_ImplementationHelper = unohelper.ImplementationHelper()
@@ -78,8 +75,10 @@ class Dispatcher(unohelper.Base,
     # XServiceInfo
     def supportsService(self, service):
         return g_ImplementationHelper.supportsService(g_ImplementationName, service)
+
     def getImplementationName(self):
         return g_ImplementationName
+
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
@@ -87,4 +86,3 @@ class Dispatcher(unohelper.Base,
 g_ImplementationHelper.addImplementation(Dispatcher,                      # UNO object class
                                          g_ImplementationName,            # Implementation name
                                          g_ServiceNames)                  # List of implemented services
-

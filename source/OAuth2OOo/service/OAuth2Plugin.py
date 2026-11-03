@@ -27,7 +27,6 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-import uno
 import unohelper
 
 from com.sun.star.lang import EventObject
@@ -50,9 +49,6 @@ from oauth20 import raiseForStatus
 
 from oauth20 import getConfiguration
 from oauth20 import getLogger
-from oauth20 import getResourceLocation
-
-from oauth20 import createService
 
 from oauth20 import extract2Json
 from oauth20 import flattenJson
@@ -88,7 +84,7 @@ class OAuth2Plugin(unohelper.Base,
         self._ctx = ctx
         self._session = self._getHttpSession()
         self._config = getConfiguration(ctx, g_identifier, False)
-        #path = uno.fileUrlToSystemPath(getResourceLocation(ctx, g_identifier))
+        # path = uno.fileUrlToSystemPath(getResourceLocation(ctx, g_identifier))
         self._browsers = Browsers()
         self._listeners = []
         self._logger = getLogger(ctx, g_defaultlog, g_basename)
@@ -105,13 +101,13 @@ class OAuth2Plugin(unohelper.Base,
         cls, mtd = 'OAuth2Plugin', 'browserOpen'
         try:
             print("OAuth2Plugin.browserOpen() 2 Browser: %s - Path: %s" % (name, path))
-            #driver = getWebDriver(browser, path, '--headless')
+            # driver = getWebDriver(browser, path, '--headless')
             init = self._getInt(init)
             session = self._browsers.openBrowser(document, mtd, name, path, init, options)
         except Exception as e:
             self._logger.logp(SEVERE, cls, mtd, 'ERROR..... \n%s' % traceback.format_exc())
-            #self._logException(cls, mtd, e)
-            #print("OAuth2Plugin.browserOpen() Error: %s" % text_type(traceback.format_exc()))
+            # self._logException(cls, mtd, e)
+            # print("OAuth2Plugin.browserOpen() Error: %s" % text_type(traceback.format_exc()))
             session = "OAuth2Plugin.browserOpen() Error: %s" % text_type(e).strip()
             print(session)
         print("OAuth2Plugin.browserOpen() 4 Session: %s" % session)
@@ -184,7 +180,7 @@ class OAuth2Plugin(unohelper.Base,
         print("OAuth2Plugin.browserContent() 1")
         cls, mtd = 'OAuth2Plugin', 'browserContent'
         try:
-            driver, session = self._browsers.getBrowser(mtd, document)
+            driver, session = self._browsers.getBrowser(mtd, url)
             if driver is None:
                 return session
             encoding = encoding if isinstance(encoding, string_types) and encoding else 'utf-8'
@@ -203,8 +199,8 @@ class OAuth2Plugin(unohelper.Base,
     def httpAuth(self, name, pwd):
         if pwd is None:
             pass
-            #user = getOAuth2UserName(self._ctx, self, url, message)
-            #auth = '{"auth": ["%s","%s"]}' % name, pwd
+            # user = getOAuth2UserName(self._ctx, self, url, message)
+            # auth = '{"auth": ["%s","%s"]}' % name, pwd
         return json.dumps({'auth': [name, pwd]})
 
     def httpContent(self, url, method, encoding, parameters):
@@ -320,8 +316,10 @@ class OAuth2Plugin(unohelper.Base,
         source = EventObject(self)
         for listener in self._listeners:
             listener.disposing(source)
+
     def addEventListener(self, listener):
         self._listeners.append(listener)
+
     def removeEventListener(self, listener):
         if listener in self._listeners:
             self._listeners.remove(listener)
@@ -329,8 +327,10 @@ class OAuth2Plugin(unohelper.Base,
     # XServiceInfo
     def supportsService(self, service):
         return g_ImplementationHelper.supportsService(g_ImplementationName, service)
+
     def getImplementationName(self):
         return g_ImplementationName
+
     def getSupportedServiceNames(self):
         return g_ImplementationHelper.getSupportedServiceNames(g_ImplementationName)
 
@@ -338,4 +338,3 @@ class OAuth2Plugin(unohelper.Base,
 g_ImplementationHelper.addImplementation(OAuth2Plugin,
                                          g_ImplementationName,
                                          g_ServiceNames)
-

@@ -84,6 +84,8 @@
   </templates>
   <component>
     <prop oor:name="UnoWizard" oor:type="xs:boolean"/>
+    <prop oor:name="SetupPosition" oor:type="oor:int-list"/>
+    <prop oor:name="SetupUpdate" oor:type="xs:short"/>
     <prop oor:name="ConnectTimeout" oor:type="xs:short"/>
     <prop oor:name="ReadTimeout" oor:type="xs:short"/>
     <prop oor:name="HandlerTimeout" oor:type="xs:short"/>
