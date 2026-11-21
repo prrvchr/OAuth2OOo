@@ -50,15 +50,17 @@ from ...configuration import g_synclog
 
 
 class OptionManager():
-    def __init__(self, ctx, source, logger, window, config):
+    def __init__(self, ctx, window, logger, config):
         self._ctx = ctx
-        self._source = source
         self._logger = logger
         self._model = OptionModel(ctx, config)
         self._view = OptionView(ctx, window, OptionHandler(self), *self._model.getViewData())
-        self._logmanager = LogManager(ctx, self._view.getWindow(), 'requirements.txt', g_defaultlog, g_synclog)
+        self._logmanager = LogManager(ctx, self._view.getFrame(), 'requirements.txt', g_defaultlog, g_synclog)
         self._logmanager.initView()
         self._logger.logprb(INFO, 'OptionsManager', '__init__', 151)
+
+    def getLayout(self):
+        return self._view.getLayout().addLayout(self._logmanager.getLayout())
 
     def init(self, state):
         self._view.initView(*self._model.getInitData(state))

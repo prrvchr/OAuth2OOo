@@ -27,38 +27,56 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
+from com.sun.star.awt import Size
+
+from ..unotool import Layout
+from ..unotool import LinkListener
+from ..unotool import SubLayout
+
 
 class OptionsView():
-    def __init__(self, window, update, links):
+    def __init__(self, ctx, window):
         self._window = window
-        self._getSetup().Model.Enabled = update
-        for i, link in enumerate(links, start=1):
-            self._getLink(i).URL = link
+        self._link = LinkListener(ctx, self._getLabel())
+        self._layout = SubLayout(Layout(window, size=Size(279, 290), **self._getLayouts()))
+        window.addWindowListener(self._layout)
 
 # OptionsView getter methods
-    def getViewData(self):
-        return self.getSetup()
+    def getLayout(self):
+        return self._layout
+
+    def getFrame(self):
+        return self._getFrame()
 
     def getSetup(self):
-        return self._getSetup().getSelectedItemPos()
+        return self._getSetup()
 
 # OptionView setter methods
-    def initView(self, setup, state):
-        self._setSetup(setup)
-        self.refreshView(state)
+    def initView(self, label, url):
+        self.refreshView(label, url)
 
-    def refreshView(self, state):
-        self._window.Model.Step = state.step
+    def refreshView(self, label, url):
+        self._setLabel(label, url)
 
 # OptionsView private setter methods
-    def _setSetup(self, setup):
-        control = self._getSetup()
-        if control.Model.Enabled:
-            control.selectItemPos(setup, True)
+    def _getLayouts(self):
+        return {'horizontals': self._getHorizontals()}
+
+    def _getHorizontals(self):
+        yield self._getFrame()
+        yield self._getSetup()
+        yield self._getLabel()
+
+    def _setLabel(self, label, url):
+        self._getLabel().Model.Label = label
+        self._link.setUrl(url)
 
 # OptionsView private control methods
-    def _getSetup(self):
-        return self._window.getControl('ListBox1')
+    def _getFrame(self):
+        return self._window.getControl('FrameControl1')
 
-    def _getLink(self, index):
-        return self._window.getControl(f'Hyperlink{index}')
+    def _getSetup(self):
+        return self._window.getControl('FrameControl2')
+
+    def _getLabel(self):
+        return self._window.getControl('Label1')
