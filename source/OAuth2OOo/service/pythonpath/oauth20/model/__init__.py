@@ -35,3 +35,7 @@ from .handlermodel import HandlerModel
 
 from .oauth2model import OAuth2Model
 
+from .helper import getProviderName
+from .helper import isAuthorized
+from .helper import isEmailValid
+from .helper import isUserAuthorized

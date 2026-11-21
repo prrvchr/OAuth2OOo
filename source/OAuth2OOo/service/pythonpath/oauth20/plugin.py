@@ -27,29 +27,54 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-# FIXME: Some Python package try to log message on stderr who is no available on Windows
+from collections import OrderedDict
+
+from .configuration import State
+try:
+    import extruct
+    from parsel import Selector
+except ImportError as e:
+    State.restart = True
+except SyntaxError as e:
+    State.restart = True
+
+try:
+    from js2xml.utils.objects import make
+    from lxml import etree
+except ImportError as e:
+    State.restart = True
+
+try:
+    import js2xml
+except ModuleNotFoundError as e:
+    State.restart = True
+
+try:
+    from jsonpath_ng import parse
+except TypeError as e:
+    State.restart = True
+
+import json
+from six import string_types, text_type
+
+try:
+    from w3lib.html import get_base_url
+except SyntaxError as e:
+    State.restart = True
+
 import os
 import sys
+import traceback
+
+# FIXME: Some Python package try to log message on stderr who is no available on Windows
 if sys.stderr is None:
     sys.stderr = open(os.devnull, 'w')
+
 # FIXME: We need to force the creation of tab files using the utf8 codec to workaround issues with
 # FIXME: the ply package, for systems like Windows that do not have utf8 configured as the default codec.
 if os.name == 'nt':
     from calmjs.parse.parsers.optimize import reoptimize_all
     reoptimize_all(True)
-
-import js2xml
-from js2xml.utils.objects import make
-from parsel import Selector
-from lxml import etree
-from jsonpath_ng import parse
-import extruct
-from w3lib.html import get_base_url
-
-import json
-from six import string_types, text_type
-from collections import OrderedDict
-import traceback
 
 
 def parseJson(data, path):
@@ -62,6 +87,7 @@ def parseJson(data, path):
         results = (tuple(result), )
     return results
 
+
 def javaScript2Xml(data, path, default):
     try:
         tree = js2xml.parse(data)
@@ -72,6 +98,7 @@ def javaScript2Xml(data, path, default):
     else:
         results = (tuple(result), )
     return results
+
 
 def xml2Json(data, path, default):
     try:
@@ -84,6 +111,7 @@ def xml2Json(data, path, default):
         results = (tuple(result), )
     return results
 
+
 def javaScript2Json(data, path, default):
     try:
         tree = js2xml.parse(data)
@@ -95,6 +123,7 @@ def javaScript2Json(data, path, default):
         results = (tuple(result), )
     return results
 
+
 def splitJson(data, typename, path, separator, default):
     try:
         item = _loadJson(data, path)
@@ -102,11 +131,12 @@ def splitJson(data, typename, path, separator, default):
         if values:
             results = tuple([(k, ) + tuple(v) for k, v in values.items()])
         else:
-            result = ((), )
+            results = ((), )
     except Exception as e:
         print("OAuth2Plugin.splitJson() Error: %s" % traceback.format_exc())
         return ((), )
     return results
+
 
 def flattenJson(data, typename, path, separator, default):
     try:
@@ -116,6 +146,7 @@ def flattenJson(data, typename, path, separator, default):
         print("OAuth2Plugin.flattenJson() Error: %s" % traceback.format_exc())
         return ((), )
     return results
+
 
 def parseData(data, path, baseurl, dtype, default):
     url = _getBaseUrl(baseurl)
@@ -127,6 +158,7 @@ def parseData(data, path, baseurl, dtype, default):
     else:
         results = (tuple(result), )
     return results
+
 
 def extract2Json(data, baseurl, dtype):
     try:
@@ -141,15 +173,19 @@ def extract2Json(data, baseurl, dtype):
         results = (tuple(result), )
     return results
 
+
 # Private method
 def _getPath(path, default):
     return text_type(path) if path else default
 
+
 def _getBaseUrl(baseurl):
     return baseurl if baseurl and isinstance(baseurl, string_types) else None
 
+
 def _getSeparator(separator, default):
     return default if separator is None else separator
+
 
 def _loadJson(data, path):
     item = None
@@ -162,6 +198,7 @@ def _loadJson(data, path):
         item = json.loads(data)
     return item
 
+
 def _getSplitJson(item, tn, sep, *headers):
     results = OrderedDict()
     if isinstance(item, dict):
@@ -169,6 +206,7 @@ def _getSplitJson(item, tn, sep, *headers):
     elif isinstance(item, (list, tuple)):
         _getSplitList(item, results, tn, sep, *headers)
     return results
+
 
 def _getSplitDict(item, results, tn, sep, *headers):
     update, headers = _getHeaders(item, tn, headers)
@@ -183,6 +221,7 @@ def _getSplitDict(item, results, tn, sep, *headers):
             label = _getLabel(key, sep, headers)
             _addResult(results, label, value)
 
+
 def _getSplitList(item, results, tn, sep, *headers):
     for value in item:
         if isinstance(value, dict):
@@ -193,10 +232,12 @@ def _getSplitList(item, results, tn, sep, *headers):
             label = sep.join(headers)
             _addResult(results, label, value)
 
+
 def _addResult(results, label, value):
     if label not in results:
         results[label] = []
     results[label].append(value)
+
 
 def _getFlattenJson(item, tn, sep, *headers):
     results = []
@@ -207,6 +248,7 @@ def _getFlattenJson(item, tn, sep, *headers):
     else:
         results.append((sep.join(headers), item))
     return tuple(results)
+
 
 def _getFlattenDict(item, results, tn, sep, *headers):
     update, headers = _getHeaders(item, tn, headers)
@@ -220,6 +262,7 @@ def _getFlattenDict(item, results, tn, sep, *headers):
         else:
             results.append((_getLabel(key, sep, headers), value))
 
+
 def _getFlattenList(item, results, tn, sep, *headers):
     for i, value in enumerate(item):
         key = '[{}]'.format(i +1)
@@ -230,6 +273,7 @@ def _getFlattenList(item, results, tn, sep, *headers):
         else:
             results.append((_getLabel(key, sep, headers), value))
 
+
 def _getHeaders(item, tn, headers):
     update = True
     if tn:
@@ -239,14 +283,15 @@ def _getHeaders(item, tn, headers):
             headers = _updateHeaders(True, header, headers)
     return update, headers
 
+
 def _getLabel(key, sep, headers):
     headers = _updateHeaders(True, key, headers)
-    return sep.join(headers) 
+    return sep.join(headers)
+
 
 def _updateHeaders(update, key, headers):
     if update:
         headers = list(headers)
         headers.append(key)
-        headers = tuple(headers) 
+        headers = tuple(headers)
     return headers
-
