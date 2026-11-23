@@ -327,14 +327,14 @@ def uninstallPackage(package, url):
         namespaces = set()
         depth = len(package.split('.'))
 
-        dists = [d for d in metadata.distributions() if d.metadata['Name'] == package]
+        dists = [d for d in metadata.distributions(path=[pythonpath]) if d.metadata['Name'] == package]
         for dist in dists:
             try:
-                distinfo = None
-                if dist._location:
-                    distinfo = os.path.basename(str(dist._location))
-                if distinfo:
-                    shutil.rmtree(os.path.join(pythonpath, distinfo))
+                distinfo = os.path.basename(str(dist._path)) if getattr(dist, '_path', None) else None
+                if distinfo and distinfo.endswith('.dist-info'):
+                    target = os.path.join(pythonpath, distinfo)
+                    if _isSafeChildPath(pythonpath, target) and os.path.isdir(target):
+                        shutil.rmtree(target)
             except Exception:
                 pass
 
@@ -343,19 +343,19 @@ def uninstallPackage(package, url):
                 ext = _getBinaryExtension()
                 for module in modules:
                     parts = module.parts
-                    if not parts:
+                    if not parts or parts[0] in ('.', '..') or os.path.isabs(parts[0]):
                         continue
 
                     filename = parts[-1]
                     if filename.endswith(ext):
                         basename = filename.split('.')[0]
                         folder = os.path.join(pythonpath, *parts[:-1])
-                        if os.path.exists(folder) and os.path.isdir(folder):
+                        if _isSafeChildPath(pythonpath, folder) and os.path.isdir(folder):
                             for item in os.listdir(folder):
                                 if item.startswith(basename) and item.endswith(ext):
                                     alias = os.path.join(folder, item)
                                     try:
-                                        if os.path.isfile(alias):
+                                        if _isSafeChildPath(pythonpath, alias) and os.path.isfile(alias):
                                             os.remove(alias)
                                     except Exception:
                                         pass
@@ -370,7 +370,7 @@ def uninstallPackage(package, url):
 
         for r in roots:
             root = os.path.join(pythonpath, r)
-            if os.path.exists(root):
+            if _isSafeChildPath(pythonpath, root) and os.path.exists(root):
                 if os.path.isdir(root):
                     shutil.rmtree(root)
                 else:
@@ -378,7 +378,7 @@ def uninstallPackage(package, url):
 
         for ns in namespaces:
             parent = os.path.join(pythonpath, ns)
-            if os.path.exists(parent) and os.path.isdir(parent):
+            if _isSafeChildPath(pythonpath, parent) and os.path.isdir(parent):
                 entries = [e for e in os.listdir(parent) if e != '__pycache__']
                 if not entries:
                     shutil.rmtree(parent)
@@ -583,3 +583,9 @@ def _parseJavaVersion(version):
 
 def _getBinaryExtension():
     return '.pyd' if sys.platform.startswith('win32') else '.so'
+
+
+def _isSafeChildPath(base, target):
+    parent = os.path.realpath(base)
+    child = os.path.realpath(target)
+    return os.path.commonpath([parent, child]) == parent and child != parent
