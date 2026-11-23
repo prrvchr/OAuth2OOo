@@ -35,7 +35,7 @@ from ..task.java import Java
 from ..task.pypi import Pypi
 from ..task.python import Python
 
-from ...configuration import State
+from ...config.configuration import State
 
 from ...runner.runner import Runner
 
@@ -120,6 +120,12 @@ class SetupModel():
     def startCheck(self, cancel, indicator):
         runner = Runner(self._ctx, self._check, cancel, indicator)
         runner.start()
+
+    def hasExtension(self):
+        return bool(self._extensions)
+
+    def hasJava(self):
+        return bool(self._java)
 
     def hasDataBase(self):
         return self._database is not None
