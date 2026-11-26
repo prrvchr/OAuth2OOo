@@ -26,8 +26,3 @@
 ║                                                                                    ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
-
-from .wizard import Wizard
-
-from .wizardcontroller import WizardController
-

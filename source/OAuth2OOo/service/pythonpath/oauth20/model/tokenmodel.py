@@ -27,35 +27,45 @@
 ╚════════════════════════════════════════════════════════════════════════════════════╝
 """
 
-from com.sun.star.auth import RefreshTokenException
+from com.sun.star.auth import RefreshTokenException  # noqa
 
 from .basemodel import BaseModel
 
+from ..oauth20.oauth2lib import CustomParser
+
 from ..requestparameter import RequestParameter
 
-from ..oauth20 import CustomParser
+from ..config.configuration import State
 
-from ..oauth2helper import isUserAuthorized
+from .helper import isUserAuthorized
 
 from ..requestresponse import getRequestResponse
 
-from ..oauth20 import getParserItems
-from ..oauth20 import getResponseResults
-from ..oauth20 import setParametersArguments
-from ..oauth20 import setResquestParameter
-
-from ..unotool import executeDispatch
+from ..oauth20.oauth2tool import getParserItems
+from ..oauth20.oauth2tool import getResponseResults
+from ..oauth20.oauth2tool import setParametersArguments
+from ..oauth20.oauth2tool import setResquestParameter
 
 from ..configuration import g_refresh_overlap
 
 import time
-import requests
+
 import traceback
+
+try:
+    from requests import Session
+except ImportError as e:
+    print("tokenmodel ImportError ERROR: %s" % traceback.format_exc())
+    State.restart = True
+except Exception as e:
+    print("tokenmodel Exception ERROR: %s" % traceback.format_exc())
+    State.restart = True
 
 
 class TokenModel(BaseModel):
-    def __init__(self, ctx, url='', user=''):
-        super(TokenModel, self).__init__(ctx)
+    def __init__(self, ctx, url='', user='', parent=None):
+        super().__init__(ctx)
+        self._parent = parent
         if url and user:
             self.initialize(url, user)
         else:
@@ -74,14 +84,10 @@ class TokenModel(BaseModel):
     def isOAuth2(self):
         return self._isoauth2
 
-    def isAuthorized(self):
-        if not self.hasAuthorization():
-            args = {'Url': self._url, 'UserName': self._user, 'ReadOnly': True}
-            executeDispatch(self._ctx, 'oauth2:Wizard', **args)
-            return self.hasAuthorization()
-        return True
+    def getWizardArguments(self):
+        return {'url': self._url, 'user': self._user, 'readonly': True, 'parent': self._parent}
 
-    def hasAuthorization(self):
+    def isAuthorized(self):
         if self._isoauth2:
             scopes = self._config.getByName('Scopes')
             providers = self._config.getByName('Providers')
@@ -150,7 +156,7 @@ class TokenModel(BaseModel):
         parser = CustomParser(*getParserItems(request))
         timestamp = int(time.time())
         cls, mtd = 'TokenModel', '_refreshToken()'
-        response = getRequestResponse(self._ctx, source, requests.Session(), cls, mtd, parameter, self.Timeout)
+        response = getRequestResponse(self._ctx, source, Session(), cls, mtd, parameter, self.Timeout)
         if response.Ok and parser.hasItems():
             results = getResponseResults(parser, response)
             response.close()
@@ -163,10 +169,10 @@ class TokenModel(BaseModel):
 
     def _getRefreshArguments(self, user, provider):
         return {'ClientSecret': provider.getByName('ClientSecret'),
-                'ClientId':     provider.getByName('ClientId'),
-                'RedirectUri':  provider.getByName('RedirectUri'),
+                'ClientId':     provider.getByName('ClientId'),      # noqa
+                'RedirectUri':  provider.getByName('RedirectUri'),   # noqa
                 'RefreshToken': user.getByName('RefreshToken'),
-                'Scopes':       ' '.join(user.getByName('Scopes'))}
+                'Scopes':       ' '.join(user.getByName('Scopes'))}  # noqa
 
     def _getTokenFromResults(self, results, timestamp):
         refresh = results.get('RefreshToken', None)
@@ -175,7 +181,7 @@ class TokenModel(BaseModel):
         never = expires is None
         return refresh, access, never, 0 if never else timestamp + expires
 
-    def _saveRefreshedToken(self, user, refresh, access, never, timestamp):
+    def _saveRefreshedToken(self, user, _refresh, access, never, timestamp):
         if access is not None:
             user.replaceByName('AccessToken', access)
         user.replaceByName('NeverExpires', never)
@@ -188,4 +194,3 @@ class TokenModel(BaseModel):
         error.ResourceUrl = self._url
         error.UserName = self._user
         return error
-
